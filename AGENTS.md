@@ -35,7 +35,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 1. **Bloco pronto** (`src/blocks/*.tsx`): copie o arquivo, troque os dados do topo.
 2. **Composição de componentes do DS**.
 3. **Componente do DS com props diferentes**.
-4. shadcn/ui ou 21st.dev **com a ponte** `@g4ai/ds/shadcn.css` ([guia](docs/guias/shadcn.md)).
+4. shadcn/ui ou 21st.dev **com a ponte** `@g4ai/ds/shadcn.css` ([guia](docs/guias/shadcn.md)). Antes, confira o de/para em [equivalências shadcn ↔ DS](docs/guias/shadcn-equivalencias.md): quase todo componente do shadcn já tem equivalente.
 5. Escrever do zero, com tokens. Se for reaproveitável, promova ao DS.
 
 ## Regras obrigatórias
@@ -64,8 +64,8 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 6. **Ícones lucide**, 16 px em controles; `IconButton` exige `label`.
 
 ### Componentes e superfícies
-7. **Nenhum `<select>` nativo** (use `Select` ou `Combobox`), nenhum `<input type="date">` (use `DatePicker`), nenhum `window.confirm` (use `ConfirmDialog`), nenhum `alert` (use `notify`).
-8. **Rótulo visível acima de todo campo** (`FieldBlock`); placeholder é exemplo.
+7. **Nenhum `<select>` cru** (use `Select` para lista curta, `Combobox` para entidades, `MultiSelect`/`CheckboxGroup` para vários valores, `NativeSelect` quando o seletor do sistema é melhor, como lista longa no celular), nenhum `<input type="date">` (use `DatePicker`), nenhum `window.confirm` (use `ConfirmDialog`), nenhum `alert` (use `notify`).
+8. **Rótulo visível acima de todo campo**: o `label` dos campos do DS já desenha o rótulo (dentro de `FieldBlock` o rótulo é do FieldBlock); `hideLabel` só em toolbar, tabela e filtro. Placeholder é exemplo. Botão desabilitado sem motivo óbvio leva `disabledReason`. Coluna estreita: `<Page width="narrow">`, nunca `mx-auto max-w-*` só no corpo.
 9. **Superfície certa**: página para entidade; `Drawer` para criar/editar sem perder a lista; `Modal` para decisão curta; `ConfirmDialog` para irreversível; `Popover` para explicação; inline para um campo. **Drawer nunca abre drawer.**
 10. **Status é controle inline** (selo que abre menu), nunca um `Select` por linha.
 
@@ -134,7 +134,7 @@ Catálogo completo com descrições no [README](README.md#blocos).
 | Componentes | `src/components/*.tsx`, exportados por `src/index.ts` |
 | Formatação pt-BR | `src/lib/format.ts`; texto: `src/lib/text.ts` |
 | Blocos de tela | `src/blocks/*.tsx` |
-| Ponte shadcn / 21st | `src/styles/shadcn.css`, [docs/guias/shadcn.md](docs/guias/shadcn.md) |
+| Ponte shadcn / 21st e de/para | `src/styles/shadcn.css`, [docs/guias/shadcn.md](docs/guias/shadcn.md), [equivalências](docs/guias/shadcn-equivalencias.md) (fonte: `scripts/data/shadcn-map.json`) |
 | Cor, tipo, espaço, movimento, dados, ícones, escrita | `docs/fundamentos/` |
 | Layout, densidade, formulários, tabelas, superfícies, feedback, dashboards, pipelines, acessibilidade, responsivo | `docs/padroes/` |
 | CRM, ATS, ERP, financeiro, portal | `docs/receitas/` |

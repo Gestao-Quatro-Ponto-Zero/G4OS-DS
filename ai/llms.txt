@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 358 componentes, gráficos SVG e 85 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 397 componentes, gráficos SVG e 85 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -8,6 +8,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [Tokens](tokens.md)
 - [Manifesto JSON](manifest.json)
 - [Renomeações entre versões](renames.json)
+- [Equivalências shadcn/ui → DS](shadcn-map.json)
 
 ## Componentes
 - [primitives](components/primitives.md): Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
@@ -31,7 +32,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [inputs](components/inputs.md): Entradas especializadas: TextField, PasswordField, NumberField, CurrencyField, MaskedField (CPF/CNPJ/CEP/telefone), OtpInput, TagInput, Slider, RadioGroup, ChoiceCards, ToggleGroup, FileDropzone, Rating, InlineEdit.
 - [charts-advanced](components/charts-advanced.md): Gráficos avançados: Treemap, WaterfallChart, ScatterChart, RadarChart, GaugeChart, BulletChart, SankeyChart, HeatmapMatrix, ComboChart, ProportionBar, GanttChart.
 - [states](components/states.md): Estados de tela e avisos: StateView e presets (404, erro, sem acesso, offline), Spinner, LoadingState, Banner, InlineMessage, AlertCard, notifyPromise.
-- [overlays-extra](components/overlays-extra.md): Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.
+- [overlays-extra](components/overlays-extra.md): Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Menubar, Sheet, CommandPalette, Lightbox.
 - [disclosure](components/disclosure.md): Revelação progressiva: Accordion, Collapsible, TreeView, DescriptionToggle.
 - [media](components/media.md): Mídia: Carousel, SlideDeck + helpers de slide, ImageGallery, FileCard, AspectFrame.
 - [ai](components/ai.md): Padrões de IA: AskAI, mensagens de chat, SystemMessage, AgentTrace, ToolCallsSection, citações, sugestões.
@@ -55,6 +56,11 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [record-panel](components/record-panel.md): Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
 - [collab](components/collab.md): Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
 - [ai-layout](components/ai-layout.md): Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
+- [structure](components/structure.md): Estrutura: Separator, ScrollArea, Label, FieldSet/FieldGroup/FieldSeparator, Item (mídia · título · ações), Table estática, Prose (texto longo).
+- [controls](components/controls.md): Controles: Toggle, ButtonGroup, InputGroup (complementos dentro do campo), ColorPicker.
+- [navigation-extra](components/navigation-extra.md): NavigationMenu: navegação de site/portal com painéis de links.
+- [sortable](components/sortable.md): SortableList: reordenar por arraste e teclado, com anúncios pt-BR.
+- [questionnaire](components/questionnaire.md): Questionnaire: perguntas uma por vez (escolha, múltipla, livre, condicionais).
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)

@@ -134,13 +134,10 @@ export default function SignupBlock() {
                 <>
                   <TextField label="Empresa" icon={<Building2 />} autoComplete="organization" value={company} onChange={setCompany} error={tried ? e2.company : undefined} />
                   <div className="mb-5">
-                    <p className="m-0 mb-1.5 text-[12.5px] text-muted">Tamanho do time</p>
-                    <Select label="Tamanho do time" options={sizes} value={size} onValueChange={setSize} placeholder="Selecione…" />
-                    {tried && e2.size && <p className="m-0 mt-1.5 text-[12px] text-rose">{e2.size}</p>}
+                    <Select label="Tamanho do time" options={sizes} value={size} onValueChange={setSize} placeholder="Selecione…" error={tried ? e2.size : undefined} />
                   </div>
                   <div className="mb-5">
-                    <p className="m-0 mb-1.5 text-[12.5px] text-muted">Vai usar principalmente para</p>
-                    <Select label="Uso principal" options={uses} value={use} onValueChange={setUse} />
+                    <Select label="Vai usar principalmente para" options={uses} value={use} onValueChange={setUse} />
                   </div>
                   <div className="mb-6">
                     <Checkbox label="Aceito os termos" checked={terms} onCheckedChange={setTerms}>

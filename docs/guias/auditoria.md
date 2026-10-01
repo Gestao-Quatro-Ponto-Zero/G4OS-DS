@@ -411,7 +411,7 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 
 #### `native-select`
 
-**<select> nativo.** Select (lista curta) ou Combobox (entidades).
+**<select> cru.** Select (lista curta), Combobox (entidades), MultiSelect (vários) ou NativeSelect (seletor do sistema estilizado: celular, lista longa sem busca).
 
 - Gravidade: erro (strict: erro)
 - Evite: `<select>…</select>`

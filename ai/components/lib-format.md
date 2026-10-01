@@ -58,6 +58,24 @@ formatNumber(n, digits?): string
 formatPercent(fraction, digits?): string
 ```
 
+Exemplo (showcase `#/p/colecoes-reordenar`):
+
+```tsx
+<SortableList
+  label="Etapas do pipeline"
+  items={etapas}
+  getKey={(e) => e.id}
+  getLabel={(e) => e.nome}
+  onReorder={(next) => { setEtapas(next); notify("Ordem das etapas salva"); }}
+  renderItem={(e, { index }) => (
+    <div className="flex items-center justify-between gap-3">
+      <span>{index + 1}. {e.nome}</span>
+      <Badge>{formatPercent(e.prob, 0)}</Badge>
+    </div>
+  )}
+/>
+```
+
 ## formatRelative (function)
 
 Data relativa curta: "há 5 min", "ontem", "em 3 dias".

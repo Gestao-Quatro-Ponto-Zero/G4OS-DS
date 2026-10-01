@@ -179,6 +179,12 @@ Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
 // C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
 <SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
 
+// Largura do conteúdo: cabeçalho, barra e corpo juntos (full · wide 1200 · medium 1024 · narrow 896 · reading 720)
+<Page width="narrow">
+  <PageHeading title="Automações" />
+  <Card>…</Card>
+</Page>
+
 // D · Configurações: título fixo + subnavegação colada
 <Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>
 ```

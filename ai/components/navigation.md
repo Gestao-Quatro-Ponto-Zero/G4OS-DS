@@ -133,6 +133,12 @@ Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
 // C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
 <SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
 
+// Largura do conteúdo: cabeçalho, barra e corpo juntos (full · wide 1200 · medium 1024 · narrow 896 · reading 720)
+<Page width="narrow">
+  <PageHeading title="Automações" />
+  <Card>…</Card>
+</Page>
+
 // D · Configurações: título fixo + subnavegação colada
 <Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>
 ```
@@ -217,27 +223,10 @@ Navegação principal do app: marca + busca + grupos rotulados + rodapé com a p
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/nav-mobile`):
+Exemplo (showcase `#/p/form-listas`):
 
 ```tsx
-const nav = [
-  { href: "/", label: "Início", icon: Home },
-  { href: "/pipeline", label: "Pipeline", icon: KanbanSquare },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays, badge: 3 },
-  { href: "/empresas", label: "Empresas", icon: Building2 },
-  { href: "/config", label: "Configurações", icon: Settings },
-];
-
-<AppShell
-  product="Acme CRM"
-  mobileNav="both"                  // "drawer" | "tabbar" | "both"
-  tabs={nav.slice(0, 4)}            // 3–4 destinos da pílula
-  currentPath={pathname}
-  headerActions={<NotificationsButton />}
-  sidebar={(p) => <Sidebar {...p} product="Acme CRM" groups={[{ label: "Vendas", items: nav }]} currentPath={pathname} />}
->
-  {children}
-</AppShell>
+<Sidebar … footer={<Button variant="ghost" size="sm" onClick={logout}><LogOut /> Sair da demonstração</Button>} user={{ … }} />
 ```
 
 ## StickyHeader
@@ -261,7 +250,7 @@ Indicador de sincronização no pé da sidebar.
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `label` * | `string` |  |  |
-| `state` * | `"ok" \| "pending" \| "error"` |  |  |
+| `state` * | `"ok" \| "error" \| "pending"` |  |  |
 | `collapsed` | `boolean \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.

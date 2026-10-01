@@ -2,7 +2,7 @@
 
 Arquivo: `src/components/overlays-extra.tsx` · importe de `@g4ai/ds`.
 
-Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.
+Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Menubar, Sheet, CommandPalette, Lightbox.
 
 ## Command (type)
 
@@ -125,6 +125,34 @@ Exemplo (showcase `#/p/ov-menus`):
   { type: "separator" },
   { type: "checkbox", label: "Valor", checked, onCheckedChange },
 ]} />
+```
+
+## Menubar
+
+Barra de menus de aplicativo de documento (Arquivo · Editar · Ver), como em editores, planilhas e construtores.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `label` * | `string` |  | Nome acessível da barra ("Menu do editor"). |
+| `menus` * | `{ label: string; items: MenuEntry[]; disabled?: boolean; }[]` |  |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/nav-menus-de-site`):
+
+```tsx
+<Menubar
+  label="Menu do editor"
+  menus={[
+    { label: "Arquivo", items: [
+      { label: "Duplicar proposta", icon: <Copy />, shortcut: "⌘D", onSelect: duplicar },
+      { label: "Exportar", icon: <FileDown />, type: "submenu", items: [{ label: "PDF" }, { label: "Word" }] },
+    ] },
+    { label: "Editar", items: [...] },
+    { label: "Ver", items: [{ type: "checkbox", label: "Grade", checked: grade, onCheckedChange: setGrade }] },
+  ]}
+/>
 ```
 
 ## MenuEntry (type)

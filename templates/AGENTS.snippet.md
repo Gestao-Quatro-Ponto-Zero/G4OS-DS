@@ -12,7 +12,7 @@ Este projeto usa o **G4OS-DS** (`@g4ai/ds`). Antes de criar, editar ou revisar q
 1. Leia `node_modules/@g4ai/ds/ai/core.md` (regras, tokens, módulos, blocos). Sem acesso ao `node_modules`: https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt. Se o servidor MCP `g4os-ds` estiver ligado (`claude mcp add g4os-ds -- npx -y @g4ai/ds mcp`), prefira as ferramentas `search`, `get_component`, `get_block`.
 2. Para um componente, leia só `…/ai/components/<módulo>.md`; para uma tela parecida pronta, `…/ai/blocks/<slug>.md` e copie `…/src/blocks/<slug>.tsx`.
 3. Ordem: bloco pronto → composição de componentes do DS → componente com outras props → do zero com tokens.
-4. Nunca: hex, `bg-white`, `text-white`, `gray-500`/`blue-600`, `<select>` nativo, `confirm`/`alert`, `toFixed` para dinheiro. Use `bg-surface`/`bg-popover`/`text-ink`/`bg-primary text-on-primary`, `Select`, `ConfirmDialog`, `notify`, `formatCurrency`.
+4. Nunca: hex, `bg-white`, `text-white`, `gray-500`/`blue-600`, `<select>` cru, `<input type="date">`, `confirm`/`alert`, `toFixed` para dinheiro. Use `bg-surface`/`bg-popover`/`text-ink`/`bg-primary text-on-primary`, `Select`/`Combobox`/`MultiSelect`/`CheckboxGroup`/`NativeSelect`, `DatePicker`, `ConfirmDialog`, `notify`, `formatCurrency`. O `label` dos campos já é o rótulo visível (`hideLabel` só em toolbar/tabela).
 5. Texto em pt-BR; cinco estados em todo dado (carregando, vazio, vazio por filtro, erro, ideal); funciona em `data-theme="dark"`.
 6. Antes de concluir: `npx g4os-ds audit --changed --fix` e depois 0 erros, typecheck verde (e `eslint` se o projeto usa o plugin `@g4ai/ds/eslint`).
 

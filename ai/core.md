@@ -33,7 +33,7 @@ Leia isto antes de escrever ou mudar qualquer UI num projeto que usa `@g4ai/ds`.
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (358 componentes) → `ai/components/<nome>.md`
+## Módulos (397 componentes) → `ai/components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -55,7 +55,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **inputs**: Entradas especializadas: TextField, PasswordField, NumberField, CurrencyField, MaskedField (CPF/CNPJ/CEP/telefone), OtpInput, TagInput, Slider, RadioGroup, ChoiceCards, ToggleGroup, FileDropzone, Rating, InlineEdit.
 - **charts-advanced**: Gráficos avançados: Treemap, WaterfallChart, ScatterChart, RadarChart, GaugeChart, BulletChart, SankeyChart, HeatmapMatrix, ComboChart, ProportionBar, GanttChart.
 - **states**: Estados de tela e avisos: StateView e presets (404, erro, sem acesso, offline), Spinner, LoadingState, Banner, InlineMessage, AlertCard, notifyPromise.
-- **overlays-extra**: Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.
+- **overlays-extra**: Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Menubar, Sheet, CommandPalette, Lightbox.
 - **disclosure**: Revelação progressiva: Accordion, Collapsible, TreeView, DescriptionToggle.
 - **media**: Mídia: Carousel, SlideDeck + helpers de slide, ImageGallery, FileCard, AspectFrame.
 - **ai**: Padrões de IA: AskAI, mensagens de chat, SystemMessage, AgentTrace, ToolCallsSection, citações, sugestões.
@@ -79,6 +79,11 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **record-panel**: Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
 - **collab**: Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
 - **ai-layout**: Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
+- **structure**: Estrutura: Separator, ScrollArea, Label, FieldSet/FieldGroup/FieldSeparator, Item (mídia · título · ações), Table estática, Prose (texto longo).
+- **controls**: Controles: Toggle, ButtonGroup, InputGroup (complementos dentro do campo), ColorPicker.
+- **navigation-extra**: NavigationMenu: navegação de site/portal com painéis de links.
+- **sortable**: SortableList: reordenar por arraste e teclado, com anúncios pt-BR.
+- **questionnaire**: Questionnaire: perguntas uma por vez (escolha, múltipla, livre, condicionais).
 
 ## Blocos (85) → `ai/blocks/<slug>.md`
 - **ATS**: `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`
@@ -95,3 +100,6 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 
 ## Documentação humana (no pacote)
 `AGENTS.md` (regras completas), `docs/fundamentos/` (cor, tokens, temas, tipografia, dados, escrita), `docs/padroes/` (layout, densidade, formulários, tabelas, filtros, superfícies, feedback, dashboards, pipelines, acessibilidade, responsivo), `docs/receitas/` (CRM, ATS, ERP, financeiro, portal), `docs/guias/` (instalação, migração, shadcn, usar com IA).
+
+## Vindo do shadcn/ui
+Código ou pedido "em shadcn"? Traduza pelo `shadcn-map.json` (ex.: Dialog → `Modal`, Alert Dialog → `ConfirmDialog`, Sheet → `Sheet`/`Drawer`, Dropdown Menu → `Menu`/`ActionMenu`, Sonner → `notify`, Input → `TextField`, Field → `FieldBlock`). Tabela completa: `docs/guias/shadcn-equivalencias.md`.

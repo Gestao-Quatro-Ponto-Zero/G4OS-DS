@@ -96,7 +96,7 @@ O agente pede permissão antes de uma ação com efeito externo (enviar e-mail, 
 | `onEdit` | `(() => void) \| undefined` |  |  |
 | `onReject` | `(() => void) \| undefined` |  |  |
 | `preview` | `ReactNode` |  |  |
-| `risk` | `"low" \| "medium" \| "high" \| undefined` | `"medium"` |  |
+| `risk` | `"medium" \| "low" \| "high" \| undefined` | `"medium"` |  |
 | `state` | `ApprovalState \| undefined` | `"pending"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.

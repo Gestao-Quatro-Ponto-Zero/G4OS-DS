@@ -228,6 +228,7 @@ export default function Page() {
             { do: "O que é da página fica junto: filtros (PageToolbar), subnavegação e propriedades grudam colados ao cabeçalho.", dont: "Um elemento fixo cujo contexto rolou embora (subnavegação sem o título)." },
             { do: "PageHeading direto dentro de <Page>; se precisar de classe no invólucro, use `contents`.", dont: "<div className=\"no-print\"><PageHeading/></div> — o sticky fica preso ao div." },
             { do: "Uma rolagem por eixo. No celular, sempre a página (DataGrid ignora maxHeight < 640px).", dont: "Tabela rolando dentro de página rolando no celular." },
+            { do: "Coluna estreita (configuração, automações, formulário): <Page width=\"narrow\">. Cabeçalho e corpo ficam no mesmo eixo.", dont: "<Page><PageHeading/><div className=\"mx-auto max-w-4xl\">…</div></Page> — o título fica à esquerda e o conteúdo centrado." },
             { do: "Uma ação primária por área, à direita do título.", dont: "Duas ações primárias competindo no mesmo cabeçalho." },
             { do: "Barras de ação (BulkBar, alterações não salvas) no rodapé da área, só quando há o que fazer.", dont: "Botões de salvar no topo de formulário longo." },
           ]}
@@ -248,6 +249,12 @@ export default function Page() {
 
 // C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
 <SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
+
+// Largura do conteúdo: cabeçalho, barra e corpo juntos (full · wide 1200 · medium 1024 · narrow 896 · reading 720)
+<Page width="narrow">
+  <PageHeading title="Automações" />
+  <Card>…</Card>
+</Page>
 
 // D · Configurações: título fixo + subnavegação colada
 <Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>`}

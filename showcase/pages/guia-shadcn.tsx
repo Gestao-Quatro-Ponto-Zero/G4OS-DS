@@ -12,7 +12,14 @@ export const meta: PageMeta = {
 export default function Page() {
   return (
     <DocPage title={meta.title} kicker={meta.group} description={meta.description}>
-      <DocSection title="Ordem de preferência" rule="Componente do DS → bloco do DS → composição de componentes do DS → shadcn/21st com a ponte → escrever do zero.">
+      <DocSection
+        title="Ordem de preferência"
+        rule={
+          <>
+            Componente do DS → bloco do DS → composição de componentes do DS → shadcn/21st com a ponte → escrever do zero. Antes de instalar, procure o par em <a href="#/p/guia-shadcn-equivalencias">shadcn/ui ↔ G4OS-DS</a>.
+          </>
+        }
+      >
         <Rules
           items={[
             { do: "Trazer do shadcn só o que falta (editor rico, calendário de agenda, carrossel de marketing).", dont: "Instalar Button, Dialog, Select, Table ou Tabs do shadcn: o DS já tem, com os padrões de acessibilidade e escrita." },

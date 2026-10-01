@@ -431,9 +431,10 @@ Grupo de botões com estado (negrito/itálico, dias da semana, filtros rápidos)
 | --- | --- | --- | --- |
 | `label` * | `string` |  |  |
 | `onChange` * | `((value: T \| null) => void) \| ((value: T[]) => void)` |  |  |
-| `options` * | `{ value: T; label: string; icon?: ReactNode; hideLabel?: boolean; }[]` |  |  |
+| `options` * | `{ value: T; label: string; icon?: ReactNode; hideLabel?: boolean; disabled?: boolean; }[]` |  |  |
 | `value` * | `T \| T[] \| null` |  |  |
 | `className` | `string \| undefined` |  |  |
+| `disabled` | `boolean \| undefined` |  |  |
 | `multiple` | `boolean \| undefined` |  |  |
 | `size` | `"sm" \| "md" \| undefined` | `"md"` |  |
 

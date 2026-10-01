@@ -206,7 +206,7 @@ export default function CrmDeal() {
                           const late = !t.done && daysFromToday(t.due) < 0;
                           return (
                             <li key={t.id} className="flex items-center gap-3 px-4 py-3">
-                              <Checkbox label={t.title} checked={t.done} onCheckedChange={(v) => setTasks((all) => all.map((x) => (x.id === t.id ? { ...x, done: v } : x)))} />
+                              <Checkbox hideLabel label={t.title} checked={t.done} onCheckedChange={(v) => setTasks((all) => all.map((x) => (x.id === t.id ? { ...x, done: v } : x)))} />
                               <span className={t.done ? "min-w-0 flex-1 text-[13.5px] text-muted line-through" : "min-w-0 flex-1 text-[13.5px]"}>{t.title}</span>
                               <Badge tone={late ? "bad" : "neutral"}>{late ? `Atrasada · ${formatDate(t.due, { short: true })}` : daysFromToday(t.due) === 0 ? "Hoje" : formatDate(t.due, { short: true })}</Badge>
                             </li>

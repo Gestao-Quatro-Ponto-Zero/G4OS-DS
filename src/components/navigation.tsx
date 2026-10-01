@@ -562,7 +562,9 @@ export function Sidebar({
           </div>
         ))}
       </nav>
-      {footer}
+      {/* Rodapé com o mesmo respiro da navegação: qualquer filho (Button,
+          SyncStatus, card de plano) cabe no trilho sem vazar pelas bordas. */}
+      {footer && <div className={cn("mt-2 flex shrink-0 flex-col gap-2 pt-2 [&>.ui-button]:w-full", rail ? "items-center px-2" : "px-2.5")}>{footer}</div>}
       {user && (
         <DsLink
           href={user.href ?? "#"}

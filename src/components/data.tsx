@@ -105,8 +105,8 @@ export function useSelection(visible: string[]) {
 export function selectionColumn<T>(sel: ReturnType<typeof useSelection>, rowKey: (row: T) => string, rowLabel: (row: T) => string): Column<T> {
   return {
     key: "__select",
-    header: <Checkbox label="Selecionar todos" checked={sel.all} indeterminate={sel.some} onCheckedChange={sel.toggleAll} />,
-    cell: (row) => <Checkbox label={`Selecionar ${rowLabel(row)}`} checked={sel.has(rowKey(row))} onCheckedChange={() => sel.toggle(rowKey(row))} />,
+    header: <Checkbox hideLabel label="Selecionar todos" checked={sel.all} indeterminate={sel.some} onCheckedChange={sel.toggleAll} />,
+    cell: (row) => <Checkbox hideLabel label={`Selecionar ${rowLabel(row)}`} checked={sel.has(rowKey(row))} onCheckedChange={() => sel.toggle(rowKey(row))} />,
     action: true,
     mobileHidden: true,
     className: "w-10",

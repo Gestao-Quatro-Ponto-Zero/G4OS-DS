@@ -1,4 +1,8 @@
+"use client";
+
+import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { ArrowUpRight, Inbox } from "lucide-react";
+import { useId } from "react";
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
@@ -258,15 +262,15 @@ export function buttonClass({
 } = {}) {
   const sizes = size === "sm" ? "min-h-9 px-3 py-2 text-[13px]" : "min-h-10 px-4 py-2.5 text-[13.5px]";
   const variants: Record<ButtonVariant, string> = {
-    primary: "ui-button-primary bg-primary text-on-primary hover:bg-primary/90",
-    ghost: "bg-surface text-ink ring-1 ring-line hover:bg-soft",
-    danger: "bg-rose text-on-ink hover:bg-rose/90",
-    quiet: "bg-transparent text-muted hover:bg-soft hover:text-ink",
-    "split-left": "rounded-r-none bg-surface text-ink ring-1 ring-line hover:bg-soft",
-    "split-right": "rounded-l-none bg-primary text-on-primary hover:bg-primary/90",
+    primary: "ui-button-primary ui-button-solid bg-primary text-on-primary hover:bg-primary/90",
+    ghost: "ui-button-outline bg-surface text-ink ring-1 ring-line hover:bg-soft",
+    danger: "ui-button-solid bg-rose text-on-ink hover:bg-rose/90",
+    quiet: "ui-button-text bg-transparent text-muted hover:bg-soft hover:text-ink",
+    "split-left": "ui-button-outline rounded-r-none bg-surface text-ink ring-1 ring-line hover:bg-soft",
+    "split-right": "ui-button-solid rounded-l-none bg-primary text-on-primary hover:bg-primary/90",
   };
   return cn(
-    "ui-button inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium leading-5 disabled:opacity-40 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0",
+    "ui-button inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium leading-5 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0",
     sizes,
     variants[variant],
     className,
@@ -277,6 +281,8 @@ export function buttonClass({
  * Um primário por área. `ghost` para o resto. `danger` só dentro de uma
  * confirmação (nunca como botão solto na tela). `quiet` para ações terciárias
  * em linha. Com `href`, vira link com a mesma aparência.
+ * `disabled` + `disabledReason`: continua focável (aria-disabled), não
+ * dispara e explica o motivo num tooltip ("Indisponível na demonstração").
  */
 export function Button({
   children,
@@ -285,21 +291,57 @@ export function Button({
   className,
   href,
   type = "button",
+  disabled,
+  disabledReason,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: "sm" | "md";
   href?: string;
+  /** Por que está desabilitado. Mostra tooltip no hover/foco e é lido pelo leitor de tela. */
+  disabledReason?: ReactNode;
 }) {
+  const reasonId = useId();
   const cls = buttonClass({ variant, size, className });
-  if (href)
+  if (href && !disabled)
     return (
       <DsLink href={href} className={cls}>
         {children}
       </DsLink>
     );
+  if (disabled && disabledReason) {
+    return (
+      <BaseTooltip.Root>
+        <BaseTooltip.Trigger
+          delay={150}
+          render={
+            <button
+              type={type}
+              className={cls}
+              {...rest}
+              aria-disabled="true"
+              aria-describedby={reasonId}
+              onClick={(e) => e.preventDefault()}
+            >
+              {children}
+              <span id={reasonId} className="sr-only">
+                {disabledReason}
+              </span>
+            </button>
+          }
+        />
+        <BaseTooltip.Portal>
+          <BaseTooltip.Positioner side="top" sideOffset={6} collisionPadding={12} className="z-[100]">
+            <BaseTooltip.Popup className="max-w-[260px] origin-[var(--transform-origin)] rounded-md bg-ink px-2 py-1 text-[12px] leading-snug text-on-ink shadow-raised transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
+              {disabledReason}
+            </BaseTooltip.Popup>
+          </BaseTooltip.Positioner>
+        </BaseTooltip.Portal>
+      </BaseTooltip.Root>
+    );
+  }
   return (
-    <button type={type} className={cls} {...rest}>
+    <button type={type} className={cls} disabled={disabled} {...rest}>
       {children}
     </button>
   );
@@ -319,7 +361,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-soft hover:text-ink disabled:opacity-40 [&_svg]:h-4 [&_svg]:w-4",
+        "inline-flex shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-soft hover:text-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent [&_svg]:h-4 [&_svg]:w-4",
         size === "sm" ? "h-7 w-7" : "h-8 w-8",
         className,
       )}
@@ -419,20 +461,31 @@ export function Empty({
   );
 }
 
-/** Área rolável de uma tela, com margens responsivas e entrada suave. */
+/**
+ * Área rolável de uma tela, com margens responsivas e entrada suave.
+ * `width` limita a largura do conteúdo E do cabeçalho juntos (PageHeading,
+ * PageToolbar e corpo ficam no mesmo eixo; o fundo fixo do cabeçalho segue
+ * de ponta a ponta). Não envolva o corpo num `mx-auto max-w-*` próprio:
+ * o título fica desalinhado do conteúdo.
+ *   full 100% · wide 1200px · medium 1024px · narrow 896px · reading 720px
+ */
 export function Page({
   children,
   className,
   density,
+  width = "full",
 }: {
   children: ReactNode;
   className?: string;
   density?: "comfortable" | "compact";
+  /** Largura máxima do conteúdo (cabeçalho incluso). Padrão: full. */
+  width?: "full" | "wide" | "medium" | "narrow" | "reading";
 }) {
   return (
     <div
       data-density={density}
       data-ds-content=""
+      data-page-width={width === "full" ? undefined : width}
       className={cn("page-inset enter h-full overflow-y-auto bg-page", className)}
     >
       {children}

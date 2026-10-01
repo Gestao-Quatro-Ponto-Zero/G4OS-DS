@@ -5,7 +5,17 @@ import { createRoot } from "react-dom/client";
 import { Popover, Toaster, cn, normalize, notify, ProductMark, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
 import { Palette } from "lucide-react";
 import { blocks, pages } from "./.generated/registry";
-import { BlockPreview, blockCategories, groups, type BlockModule, type PageModule } from "./kit";
+import { BlockPreview, ShadcnContext, blockCategories, groups, type BlockModule, type PageModule } from "./kit";
+import shadcnMap from "../scripts/data/shadcn-map.json";
+
+const shadcnNames = new Map(shadcnMap.components.map((c) => [c.shadcn, c.name]));
+/** Selo "Equivalente no shadcn": meta.shadcn da página ou o de/para (scripts/data/shadcn-map.json). */
+function shadcnFor(page: PageModule) {
+  const own = page.meta.shadcn;
+  if (own === false) return [];
+  const slugs = own ? (Array.isArray(own) ? own : [own]) : shadcnMap.components.filter((c) => c.pages.includes(page.slug)).map((c) => c.shadcn);
+  return [...new Set(slugs)].map((slug) => ({ slug, name: shadcnNames.get(slug) ?? slug }));
+}
 
 /*
  * Site do design system, no modelo de ui.shadcn.com. Rotas (hash):
@@ -560,7 +570,9 @@ function DocsLayout({ page }: { page: PageModule }) {
         <DocsNav current={page.slug} />
       </aside>
       <div id="doc-content" className="min-w-0 flex-1 pb-20 pt-8" data-ds-content="">
-        <P />
+        <ShadcnContext.Provider value={shadcnFor(page)}>
+          <P />
+        </ShadcnContext.Provider>
         <div className="mx-auto mt-10 flex max-w-[1120px] justify-between gap-3 border-t border-line pt-6">
           {prev ? (
             <a href={`#/p/${prev.slug}`} className="rounded-lg border border-line px-3 py-2 text-[12.5px] hover:bg-soft">

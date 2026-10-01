@@ -124,11 +124,9 @@ export default function SettingsProfileBlock() {
       <SettingsSection title="Região" description="Datas, horários e números aparecem neste formato.">
         <div className="grid gap-x-4 sm:grid-cols-2">
           <div className="mb-5">
-            <p className="m-0 mb-1.5 text-[12.5px] text-muted">Idioma</p>
             <Select label="Idioma" options={languages} value={form.language} onValueChange={set("language")} />
           </div>
           <div className="mb-5">
-            <p className="m-0 mb-1.5 text-[12.5px] text-muted">Fuso horário</p>
             <Select label="Fuso horário" options={timezones} value={form.timezone} onValueChange={set("timezone")} />
           </div>
         </div>

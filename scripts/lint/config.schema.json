@@ -178,7 +178,7 @@
             1,
             2
           ],
-          "description": "<select> nativo. Select (lista curta) ou Combobox (entidades)."
+          "description": "<select> cru. Select (lista curta), Combobox (entidades), MultiSelect (vários) ou NativeSelect (seletor do sistema estilizado: celular, lista longa sem busca)."
         },
         "native-date": {
           "enum": [
@@ -572,7 +572,7 @@
                   1,
                   2
                 ],
-                "description": "<select> nativo. Select (lista curta) ou Combobox (entidades)."
+                "description": "<select> cru. Select (lista curta), Combobox (entidades), MultiSelect (vários) ou NativeSelect (seletor do sistema estilizado: celular, lista longa sem busca)."
               },
               "native-date": {
                 "enum": [

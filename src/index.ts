@@ -50,3 +50,9 @@ export * from "./components/tasks-ai";
 export * from "./components/record-panel";
 export * from "./components/collab";
 export * from "./components/ai-layout";
+// front W: paridade com shadcn/ui (Separator, ScrollArea, Label, FieldSet, Item, Table, Prose, Toggle, ButtonGroup, InputGroup, ColorPicker, NavigationMenu, SortableList, Questionnaire; Menubar fica em overlays-extra)
+export * from "./components/structure";
+export * from "./components/controls";
+export * from "./components/navigation-extra";
+export * from "./components/sortable";
+export * from "./components/questionnaire";

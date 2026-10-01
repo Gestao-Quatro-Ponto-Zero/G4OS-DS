@@ -20,6 +20,15 @@ CSS pronto para colar em themes.css (ou no globals.css do app).
 brandCss(name, brand, extra?): string
 ```
 
+Exemplo (showcase `#/p/form-cor`):
+
+```tsx
+const [marca, setMarca] = useState("#184560");
+<ColorPicker label="Cor principal da marca" value={marca} onChange={setMarca}
+  hint="Usada em botões principais e seleção." />
+const css = brandCss("cliente", deriveBrand(marca)); // [data-brand="cliente"] { --ds-primary: … }
+```
+
 ## BrandTokens (type)
 
 ```ts
@@ -40,6 +49,15 @@ Deriva os tokens de marca para claro e escuro a partir da cor de ação (primary
 
 ```ts
 deriveBrand(primary, accent?): { light: BrandTokens; dark: BrandTokens; }
+```
+
+Exemplo (showcase `#/p/form-cor`):
+
+```tsx
+const [marca, setMarca] = useState("#184560");
+<ColorPicker label="Cor principal da marca" value={marca} onChange={setMarca}
+  hint="Usada em botões principais e seleção." />
+const css = brandCss("cliente", deriveBrand(marca)); // [data-brand="cliente"] { --ds-primary: … }
 ```
 
 ## ensureContrast (function)

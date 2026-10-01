@@ -48,7 +48,7 @@ export const RULES = {
   "text-size": { category: "tipografia", severity: "warn", fixable: false, title: "Tamanho de texto fora da escala", hint: "text-caption/label/control/body/input/section/title ou um px da escala (10–25, 30)." },
   "tailwind-text-scale": { category: "tipografia", severity: "off", strict: "warn", fixable: true, title: "Escala de texto do Tailwind (text-sm, text-lg…)", hint: "Use a escala do DS: text-caption (12), text-input (14), text-section (18), text-record (20)." },
   // componentes
-  "native-select": { category: "componentes", severity: "error", fixable: false, title: "<select> nativo", hint: "Select (lista curta) ou Combobox (entidades)." },
+  "native-select": { category: "componentes", severity: "error", fixable: false, title: "<select> cru", hint: "Select (lista curta), Combobox (entidades), MultiSelect (vários) ou NativeSelect (seletor do sistema estilizado: celular, lista longa sem busca)." },
   "native-date": { category: "componentes", severity: "error", fixable: false, title: '<input type="date|datetime-local|month">', hint: "DatePicker · DateTimePicker · MonthPicker · TimePicker." },
   "confirm-alert": { category: "componentes", severity: "error", fixable: false, title: "window.confirm / alert / prompt", hint: "ConfirmDialog para confirmar; notify para avisar; Modal com campo para perguntar." },
   "deprecated-export": { category: "componentes", severity: "error", fixable: true, title: "Export ou classe renomeada", hint: "Troque pelo nome novo (ai/renames.json)." },

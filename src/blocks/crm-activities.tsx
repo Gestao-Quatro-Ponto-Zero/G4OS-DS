@@ -109,7 +109,7 @@ export default function CrmActivities() {
     const when = d === 0 ? `Hoje${a.time ? ` · ${a.time}` : ""}` : `${formatDate(a.due, { short: true })}${a.time ? ` · ${a.time}` : ""}`;
     return (
       <li key={a.id} className="flex items-start gap-3 px-4 py-3">
-        <Checkbox label={`Concluir ${a.title}`} checked={a.done} onCheckedChange={() => toggle(a)} className="mt-0.5" />
+        <Checkbox hideLabel label={`Concluir ${a.title}`} checked={a.done} onCheckedChange={() => toggle(a)} className="mt-0.5" />
         <span className="mt-0.5 inline-grid h-6 w-6 shrink-0 place-items-center rounded-md bg-soft text-muted [&_svg]:h-3.5 [&_svg]:w-3.5" title={activityLabel[a.type]}>
           {typeIcon[a.type]}
         </span>

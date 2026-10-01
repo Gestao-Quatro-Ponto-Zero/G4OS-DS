@@ -152,7 +152,7 @@ export default function RecordTracker() {
       sortable: true,
       cell: (r) => (
         <span onClick={(e) => e.stopPropagation()} className="inline-flex">
-          <Checkbox label={`Concluir ${r.title}`} checked={r.done} onCheckedChange={(c) => patch(r.id, { status: c ? "concluido" : "em-andamento" })} />
+          <Checkbox hideLabel label={`Concluir ${r.title}`} checked={r.done} onCheckedChange={(c) => patch(r.id, { status: c ? "concluido" : "em-andamento" })} />
         </span>
       ),
       mobile: "hidden",

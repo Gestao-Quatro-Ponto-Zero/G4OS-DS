@@ -54,6 +54,9 @@ const guides = listMd("docs")
     return { slug: rel.replace(/\.md$/, ""), title: text.match(/^#\s+(.+)$/m)?.[1] ?? rel, path: `docs/${rel}`, text };
   });
 const categories = [...new Set(manifest.blocks.map((b) => b.category))];
+/** De/para shadcn/ui → DS (ai/shadcn-map.json). */
+const shadcnMap = existsSync(join(root, "ai/shadcn-map.json")) ? JSON.parse(read("ai/shadcn-map.json")).components : [];
+const slugish = (s) => norm(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function score(q, fields) {
   const stop = new Set(["de", "da", "do", "das", "dos", "com", "para", "pra", "a", "o", "as", "os", "e", "em", "um", "uma", "no", "na", "por", "the", "of", "with", "for"]);
@@ -92,7 +95,7 @@ const tools = {
     inputSchema: {
       type: "object",
       properties: {
-        query: { type: "string", description: "O que procura, em português ou inglês: 'tabela com seleção', 'funil', 'login', 'DataGrid', 'tema escuro'." },
+        query: { type: "string", description: "O que procura, em português ou inglês: 'tabela com seleção', 'funil', 'login', 'DataGrid', 'tema escuro'. Nomes do shadcn/ui ('alert-dialog', 'sheet', 'dropdown-menu') retornam o equivalente do DS." },
         kind: { type: "string", enum: ["all", "component", "block", "guide"], description: "Filtra o tipo de resultado. Padrão: all." },
         limit: { type: "integer", description: "Máximo de resultados (1–50). Padrão: 12." },
         offset: { type: "integer", description: "Pula os N primeiros resultados (paginação). Padrão: 0." },
@@ -106,6 +109,29 @@ const tools = {
           const s = score(query, [[e.name, 3], [e.module, 1.5], [e.summary, 1]]);
           if (s) out.push({ s: s + (e.kind === "component" ? 2 : 0), type: "component", name: e.name, module: e.module, kind: e.kind, summary: e.summary, next: `get_component { "name": "${e.name}" }` });
         }
+      if (kind === "all" || kind === "component") {
+        // Nomes do shadcn/ui ("alert-dialog", "Sheet", "dropdown menu") → equivalentes do DS.
+        const q = slugish(query.replace(/^shadcn\s*/i, "").replace(/([a-z])([A-Z])/g, "$1-$2"));
+        for (const c of shadcnMap) {
+          const keys = [c.shadcn, slugish(c.name), ...(c.aliases ?? []).map(slugish)];
+          const exact = keys.includes(q);
+          const s = exact ? 200 : score(query, [[c.shadcn, 2], [c.name, 2], [(c.aliases ?? []).join(" "), 1]]);
+          if (!s) continue;
+          out.push({
+            s: s + 1,
+            type: "shadcn",
+            shadcn: c.name,
+            ours: c.ours.map((o) => o.name),
+            status: c.status,
+            summary: c.notes,
+            next: c.ours.length ? `get_component { "name": "${c.ours[0].name}" }` : `get_guide { "slug": "guias/shadcn-equivalencias" }`,
+          });
+          if (exact) for (const o of c.ours) {
+            const e = exportsIndex.find((x) => x.name === o.name);
+            if (e) out.push({ s: 150, type: "component", name: e.name, module: e.module, kind: e.kind, summary: e.summary, next: `get_component { "name": "${e.name}" }` });
+          }
+        }
+      }
       if (kind === "all" || kind === "block")
         for (const b of manifest.blocks) {
           const s = score(query, [[b.slug, 2], [b.title, 3], [b.category, 2], [b.description, 1], [b.concept?.goal, 1], [(b.concept?.patterns ?? []).join(" "), 0.6]]);
@@ -117,6 +143,14 @@ const tools = {
           if (s) out.push({ s, type: "guide", slug: g.slug, title: g.title, next: `get_guide { "slug": "${g.slug}" }` });
         }
       out.sort((a, b) => b.s - a.s);
+      // Sem repetidos (o mesmo componente pode vir da busca e do de/para shadcn); fica o de maior pontuação.
+      const seen = new Set();
+      const uniq = out.filter((r) => {
+        const k = `${r.type}:${r.name ?? r.slug ?? r.shadcn}`;
+        return seen.has(k) ? false : (seen.add(k), true);
+      });
+      out.length = 0;
+      out.push(...uniq);
       const lim = clamp(limit, 1, 50, 12);
       const off = clamp(offset, 0, 1e6, 0);
       const top = out.slice(off, off + lim).map(({ s: _s, ...r }) => r);

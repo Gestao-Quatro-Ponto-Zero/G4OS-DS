@@ -41,20 +41,16 @@ Rótulo curto de estado.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/dash-pipelines`):
+Exemplo (showcase `#/p/estrutura-separador-e-rolagem`):
 
 ```tsx
-<RecordCard
-  title="Grupo Aurora Alimentos"
-  subtitle="Licenças anuais · 240 usuários"
-  value={formatCurrency(460800, { cents: false })}
-  leading={<EntityMark name="Grupo Aurora" tint="#842e20" className="h-7 w-7 text-[11px]" />}
-  tags={<><Badge>Indicação</Badge><Badge tone="accent">Prioridade</Badge></>}
-  owner={{ name: "Ana Lopes", initials: "AL" }}
-  meta="12 dias na etapa"
-  onOpen={() => router.push("/negocios/d1")}
-  onDragStart={(e) => e.dataTransfer.setData("text/plain", "d1")}
-/>
+<ScrollArea maxHeight={280} label="Membros do time" className="rounded-xl border border-line bg-surface">
+  {pessoas.map((p) => <Row key={p.nome} {...p} />)}
+</ScrollArea>
+
+<ScrollArea orientation="horizontal" label="Etapas">
+  <div className="flex gap-2 p-1">{etapas.map((e) => <Badge key={e}>{e}</Badge>)}</div>
+</ScrollArea>
 ```
 
 ## Button
@@ -63,6 +59,7 @@ Um primário por área.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
+| `disabledReason` | `ReactNode` |  | Por que está desabilitado. |
 | `href` | `string \| undefined` |  |  |
 | `size` | `"sm" \| "md" \| undefined` | `"md"` |  |
 | `variant` | `ButtonVariant \| undefined` | `"primary"` |  |
@@ -251,6 +248,32 @@ Tecla de atalho.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+Exemplo (showcase `#/p/form-grupos-e-complementos`):
+
+```tsx
+<Label htmlFor="slug">Endereço do convite</Label>
+<InputGroup>
+  <InputGroupAddon><InputGroupText>app.g4os.com.br/</InputGroupText></InputGroupAddon>
+  <InputGroupInput id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
+  <InputGroupAddon align="inline-end"><CopyButton value={link} label="Copiar link" iconOnly /></InputGroupAddon>
+</InputGroup>
+
+<InputGroup>
+  <InputGroupAddon><Search /></InputGroupAddon>
+  <InputGroupInput aria-label="Buscar negócios" placeholder="Buscar negócios" />
+  <InputGroupAddon align="inline-end"><Kbd>/</Kbd></InputGroupAddon>
+</InputGroup>
+
+<InputGroup>
+  <InputGroupTextarea aria-label="Mensagem" placeholder="Escreva para o time…" />
+  <InputGroupAddon align="block-end">
+    <InputGroupButton label="Anexar"><Paperclip /></InputGroupButton>
+    <InputGroupButton label="Mencionar"><AtSign /></InputGroupButton>
+    <InputGroupButton variant="primary" label="Enviar" className="ml-auto"><ArrowUp /></InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>
+```
+
 ## LinkedCard
 
 Card com um destino principal (o título) e ações secundárias clicáveis.
@@ -303,6 +326,7 @@ Indicador. O valor é o protagonista (22px, tabular).
 | `children` * | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `density` | `"comfortable" \| "compact" \| undefined` |  |  |
+| `width` | `"full" \| "wide" \| "medium" \| "narrow" \| "reading" \| undefined` | `"full"` | Largura máxima do conteúdo (cabeçalho incluso). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

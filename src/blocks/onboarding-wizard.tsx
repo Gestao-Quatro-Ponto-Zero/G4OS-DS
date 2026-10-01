@@ -226,8 +226,7 @@ export default function OnboardingWizardBlock() {
                   hint="Cole uma lista inteira: separamos por vírgula."
                 />
                 <div className="mb-5 max-w-[260px]">
-                  <p className="m-0 mb-1.5 text-[12.5px] text-muted">Papel</p>
-                  <Select label="Papel dos convidados" options={roles} value={role} onValueChange={setRole} />
+                  <Select label="Papel" options={roles} value={role} onValueChange={setRole} />
                 </div>
                 <div className="flex items-center gap-2 rounded-xl border border-line bg-soft/50 px-4 py-3 text-[12.5px] text-muted">
                   <Users className="h-4 w-4 shrink-0" /> Administradores podem convidar pessoas e mudar o plano; membros só trabalham nos módulos.

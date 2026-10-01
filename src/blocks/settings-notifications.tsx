@@ -138,7 +138,7 @@ export default function SettingsNotificationsBlock() {
                     {channels.map((c) => (
                       <td key={c.id} className="px-2 py-3 text-center">
                         <span className="inline-flex">
-                          <Checkbox label={`${ev.label} por ${c.label}`} checked={(prefs[ev.id] ?? []).includes(c.id)} onCheckedChange={() => toggle(ev.id, c.id)} />
+                          <Checkbox hideLabel label={`${ev.label} por ${c.label}`} checked={(prefs[ev.id] ?? []).includes(c.id)} onCheckedChange={() => toggle(ev.id, c.id)} />
                         </span>
                       </td>
                     ))}

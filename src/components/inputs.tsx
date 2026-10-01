@@ -1149,7 +1149,9 @@ export function ChoiceCards<T extends string>({
 /**
  * Grupo de botões com estado (negrito/itálico, dias da semana, filtros
  * rápidos). `multiple` permite vários. Para alternar VISUALIZAÇÃO use
- * SegmentedControl.
+ * SegmentedControl. `label` é o nome acessível do grupo (não aparece:
+ * o grupo costuma ficar sob um título ou dentro de FieldBlock).
+ * Ligado = preenchido primário; desabilitado mantém o estado legível.
  */
 export function ToggleGroup<T extends string>({
   label,
@@ -1158,11 +1160,13 @@ export function ToggleGroup<T extends string>({
   onChange,
   multiple,
   size = "md",
+  disabled,
   className,
 }: {
   label: string;
-  options: { value: T; label: string; icon?: ReactNode; hideLabel?: boolean }[];
+  options: { value: T; label: string; icon?: ReactNode; hideLabel?: boolean; disabled?: boolean }[];
   size?: "sm" | "md";
+  disabled?: boolean;
   className?: string;
 } & ({ multiple?: false; value: T | null; onChange: (value: T | null) => void } | { multiple: true; value: T[]; onChange: (value: T[]) => void })) {
   const isOn = (v: T) => (multiple ? (value as T[]).includes(v) : value === v);
@@ -1173,7 +1177,7 @@ export function ToggleGroup<T extends string>({
     } else (onChange as (v: T | null) => void)(value === v ? null : v);
   };
   return (
-    <div role="group" aria-label={label} className={cn("inline-flex flex-wrap gap-1", className)}>
+    <div role="group" aria-label={label} aria-disabled={disabled || undefined} className={cn("inline-flex flex-wrap gap-1", className)}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -1181,11 +1185,14 @@ export function ToggleGroup<T extends string>({
           aria-pressed={isOn(o.value)}
           aria-label={o.hideLabel ? o.label : undefined}
           title={o.hideLabel ? o.label : undefined}
+          disabled={disabled || o.disabled}
           onClick={() => toggle(o.value)}
           className={cn(
-            "inline-flex items-center justify-center gap-1.5 rounded-lg border font-medium transition-colors [&_svg]:h-4 [&_svg]:w-4",
-            size === "sm" ? "h-8 min-w-8 px-2.5 text-[12.5px]" : "h-9 min-w-9 px-3 text-[13px]",
-            isOn(o.value) ? "border-primary bg-primary text-on-primary" : "border-line bg-surface text-ink-soft hover:bg-soft hover:text-ink",
+            "inline-flex items-center justify-center gap-1.5 rounded-lg border font-medium transition-colors disabled:cursor-not-allowed [&_svg]:h-4 [&_svg]:w-4",
+            size === "sm" ? "h-8 min-w-9 px-2.5 text-[12.5px]" : "h-9 min-w-10 px-3 text-[13px]",
+            isOn(o.value)
+              ? "border-primary bg-primary text-on-primary disabled:opacity-55"
+              : "border-line bg-surface text-ink-soft hover:bg-soft hover:text-ink disabled:bg-soft/60 disabled:text-muted disabled:hover:bg-soft/60",
           )}
         >
           {o.icon}

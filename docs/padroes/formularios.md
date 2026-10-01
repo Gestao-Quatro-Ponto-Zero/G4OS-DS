@@ -2,7 +2,8 @@
 
 ## Estrutura
 
-- **Rótulo sempre visível, acima do campo** (`FieldBlock label=…`). Placeholder é exemplo ("Ex.: Diretor comercial"), nunca rótulo.
+- **Rótulo sempre visível, acima do campo.** Placeholder é exemplo ("Ex.: Diretor comercial"), nunca rótulo.
+- **Regra do `label` (igual em todos os campos do DS):** `label` vira o rótulo visível acima do campo e o nome acessível (`TextField`, `Select`, `Combobox`, `MultiSelect`, `NativeSelect`, `CheckboxGroup`, `DatePicker`, `DateInput`, `Checkbox` ao lado da caixa). Dentro de `<FieldBlock label=…>` o rótulo é do FieldBlock e o campo não repete. `hideLabel` deixa só o nome acessível: use em toolbar, célula de tabela e filtro. Controles de barra (`Select size="compact"`, `ToggleGroup`, `SegmentedControl`) já escondem por padrão. Nunca faça um `<p>` de rótulo à mão acima de um campo.
 - Uma coluna por padrão. `FieldGrid` põe pares curtos lado a lado (cidade + UF, início + fim) a partir de 640 px; no celular volta a uma coluna.
 - Agrupe em seções com título quando passar de ~8 campos. Formulário longo mora em página ou drawer, em `ReadingColumn` (620 px).
 - Ajuda abaixo do campo em uma frase; erro substitui a ajuda, em `text-rose`, específico e com exemplo.
@@ -14,15 +15,18 @@
 | --- | --- |
 | Texto curto | `input` com `fieldClass` / `TextField` |
 | Texto longo | `textarea` com `areaClass` / `TextareaField` (cresce com o conteúdo) |
-| Lista curta (≤ 7) de opções fixas | `Select` (Base UI). **Nunca `<select>` nativo.** |
+| Lista curta (≤ 7) de opções fixas | `Select` (Base UI). **Nunca `<select>` cru.** No celular abre como folha inferior. |
+| Lista longa e simples em que o seletor do sistema é melhor (celular, sem busca, formulário sem JS) | `NativeSelect` (o `<select>` do sistema com a aparência do DS; aceita grupos) |
 | 2–4 opções visíveis e mutuamente exclusivas | `SegmentedControl` ou `RadioGroup` |
 | Escolha com descrição (plano, tipo de conta) | `ChoiceCards` / cards de escolha |
 | Entidade (pessoa, empresa, produto) ou lista longa | `Combobox` com busca |
-| Múltiplas entidades | `Combobox` múltiplo (chips abaixo) |
+| Vários valores, 2–8 opções que cabem na tela | `CheckboxGroup` (tudo visível, "Selecionar todos" tri-estado, `disabledReason`) |
+| Vários valores, lista longa, com grupos ou busca | `MultiSelect` (resumo "Ana, Bruno" / "5 selecionados", ou `display="chips"`; `max`) |
+| Múltiplas entidades, poucas escolhidas | `Combobox` múltiplo (chips abaixo) |
 | Etiquetas livres | `TagInput` |
 | Liga/desliga com efeito imediato | `Switch` |
 | Aceitar / marcar concluído | `Checkbox` |
-| Data | `DatePicker` (nunca `<input type="date">` nativo) |
+| Data | `DatePicker` (botão + calendário) ou `DateInput` (digitável). Nunca `<input type="date">`: no iPhone abre em inglês e carrega vazio. Vazio mostra um placeholder que diz o padrão ("Hoje (padrão)"); `clearable` volta para vazio. |
 | Número com passo | `NumberField` |
 | Dinheiro | `CurrencyField` (R$, centavos) |
 | CPF, CNPJ, CEP, telefone | `MaskedField mask={masks.cpf}` (`masks`: cpf, cnpj, cep, phone, date; CPF/CNPJ validam dígito) |
@@ -33,6 +37,17 @@
 | Nota / avaliação | `Rating` |
 
 Edição inline de um campo: `InlineEdit`. Grupo de alternância com ícones: `ToggleGroup`. Todos os controles de `inputs.tsx` estão no showcase em **Formulários**.
+
+## Desabilitado
+
+- Desabilitado continua **legível** (texto `muted` sobre fundo suave, borda visível); só os preenchidos (primário, perigo) esmaecem.
+- Quando o motivo não é óbvio, diga por quê: `<Button disabled disabledReason="Indisponível na demonstração">`. O botão continua focável (`aria-disabled`), não dispara e mostra o motivo em tooltip e para leitor de tela.
+- Opção indisponível numa lista diz o porquê na própria opção (`disabledReason` em `CheckboxGroup` e `MultiSelect`).
+
+## Celular
+
+- `Select` e `DatePicker` abrem como **folha inferior** abaixo de 640 px (largura total, fundo escurecido, por cima da barra inferior, área segura do iPhone). `Combobox` e `MultiSelect` têm busca (o teclado sobe), então ficam ancorados ao campo com a largura da tela. `presentation="popover"` mantém o popover.
+- Itens de lista com 44 px de altura mínima no toque.
 
 ## Envio
 

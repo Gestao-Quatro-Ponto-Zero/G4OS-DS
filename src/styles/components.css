@@ -48,6 +48,24 @@
 }
 .enter { animation: enter 0.28s ease both; }
 
+/* Page width="…": cabeçalho, barra e corpo no MESMO eixo. Os filhos diretos
+   ficam centrados com a largura máxima; o cabeçalho fixo e a barra continuam
+   de ponta a ponta (fundo e linha) e só recuam o conteúdo por dentro.
+   Em @layer components: um max-w-* do filho ainda vence (mais estreito). */
+@layer components {
+.page-inset[data-page-width="wide"] { --page-max: 1200px; }
+.page-inset[data-page-width="medium"] { --page-max: 1024px; }
+.page-inset[data-page-width="narrow"] { --page-max: 896px; }
+.page-inset[data-page-width="reading"] { --page-max: 720px; }
+.page-inset[data-page-width] > :not(.sticky-page-header):not(.page-toolbar) {
+  max-width: var(--page-max);
+  margin-inline: auto;
+}
+.page-inset[data-page-width] > :is(.sticky-page-header, .page-toolbar) {
+  padding-inline: max(0px, calc((100% - var(--page-max)) / 2));
+}
+}
+
 /* ==================================================================== */
 /* Cabeçalho de página (PageHeading) e cabeçalho fixo                     */
 /* ==================================================================== */
@@ -258,7 +276,23 @@
     transform var(--duration-press) ease;
 }
 .ui-button-primary { box-shadow: var(--shadow-primary); }
-.ui-button:active:not(:disabled) { transform: translateY(1px); }
+.ui-button:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); }
+
+/* Desabilitado legível: o texto continua lido (muted, contraste ≥ 4,5:1 sobre
+   o fundo suave) em vez de sumir com opacidade. Preenchidos (primário, perigo)
+   só esmaecem. aria-disabled = desabilitado que ainda recebe foco/hover para
+   explicar o motivo (Button disabledReason). */
+.ui-button:is(:disabled, [aria-disabled="true"]) { cursor: not-allowed; }
+.ui-button-solid:is(:disabled, [aria-disabled="true"]) { opacity: 0.5; box-shadow: none; }
+.ui-button-outline:is(:disabled, [aria-disabled="true"]) {
+  background: color-mix(in oklab, var(--ds-soft) 70%, var(--ds-surface));
+  color: var(--ds-muted);
+}
+.ui-button-text:is(:disabled, [aria-disabled="true"]) {
+  background: transparent;
+  color: var(--ds-muted);
+  opacity: 0.8;
+}
 
 .segmented-control {
   display: inline-flex;
@@ -702,5 +736,54 @@
     max-width: var(--available-width, calc(100vw - 16px));
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+}
+
+/* ==================================================================== */
+/* Popups de seleção no celular                                          */
+/* ==================================================================== */
+
+/* Select, DatePicker (presentation="auto"): abaixo de 640px o popup vira folha
+   inferior (largura total, cantos de cima arredondados, área segura do iPhone),
+   por cima da barra inferior (BottomNav). O Positioner do Base UI escreve
+   top/left inline; !important vence o estilo inline sem mexer no desktop. */
+@media (max-width: 639.98px) {
+  .ds-sheet-sm {
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  .ds-sheet-sm > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    max-height: min(78dvh, 560px);
+    border-radius: 18px 18px 0 0 !important;
+    border-bottom: 0 !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    overflow-y: auto;
+    transform-origin: bottom center !important;
+  }
+  .ds-sheet-sm > *::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    margin: 6px auto 4px;
+    border-radius: 999px;
+    background: var(--ds-line-strong);
+  }
+  .ds-sheet-sm .ds-sheet-list { max-height: calc(min(78dvh, 560px) - 64px) !important; }
+
+  /* Combobox, MultiSelect: têm busca (teclado sobe), então ficam ancorados ao
+     campo, mas com a largura toda da tela. */
+  .ds-fullwidth-sm > * {
+    /* O Positioner se posiciona por transform; com a largura da tela menos o
+       collisionPadding (12px de cada lado), o shift do Floating UI o encosta
+       nas margens. */
+    width: calc(100vw - 24px) !important;
+    max-width: none !important;
   }
 }

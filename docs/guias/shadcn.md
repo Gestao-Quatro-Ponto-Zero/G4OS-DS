@@ -4,6 +4,8 @@ O DS cobre as telas de produto. Quando faltar algo (um calendário de agenda, um
 
 **Ordem de preferência:** componente do DS → bloco do DS → composição de componentes do DS → shadcn/21st com a ponte → escrever do zero.
 
+**Antes de instalar do shadcn**, procure o equivalente em [equivalências shadcn ↔ G4OS-DS](shadcn-equivalencias.md): os componentes do shadcn/ui já têm par no DS (Dialog → `Modal`, Alert Dialog → `ConfirmDialog`, Dropdown Menu → `Menu`/`ActionMenu`, Input Group → `InputGroup`…). A ponte é para o que falta de verdade.
+
 ## 1. Ligar a ponte
 
 ```css

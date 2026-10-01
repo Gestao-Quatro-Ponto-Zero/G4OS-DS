@@ -42,7 +42,12 @@ const moduleSummary = {
   data: "Estado de tabela: useSort, SortHeader, useSelection, selectionColumn, BulkBar, usePagination, Pagination, PropertyList.",
   pipeline: "Pipelines por etapa: StagePath, RecordCard.",
   states: "Estados de tela e avisos: StateView e presets (404, erro, sem acesso, offline), Spinner, LoadingState, Banner, InlineMessage, AlertCard, notifyPromise.",
-  "overlays-extra": "Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.",
+  "overlays-extra": "Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Menubar, Sheet, CommandPalette, Lightbox.",
+  structure: "Estrutura: Separator, ScrollArea, Label, FieldSet/FieldGroup/FieldSeparator, Item (mídia · título · ações), Table estática, Prose (texto longo).",
+  controls: "Controles: Toggle, ButtonGroup, InputGroup (complementos dentro do campo), ColorPicker.",
+  "navigation-extra": "NavigationMenu: navegação de site/portal com painéis de links.",
+  sortable: "SortableList: reordenar por arraste e teclado, com anúncios pt-BR.",
+  questionnaire: "Questionnaire: perguntas uma por vez (escolha, múltipla, livre, condicionais).",
   disclosure: "Revelação progressiva: Accordion, Collapsible, TreeView, DescriptionToggle.",
   media: "Mídia: Carousel, SlideDeck + helpers de slide, ImageGallery, FileCard, AspectFrame.",
   filters: "Filtros estruturados: FilterBar, filtros ativos, construtor campo/operador/valor, visões salvas, período, estado na URL.",
@@ -316,6 +321,65 @@ function renderTokens() {
 }
 
 const componentCount = modules.reduce((n, m) => n + m.exports.filter((e) => e.kind === "component").length, 0);
+
+/* ------------------------------------------------------------------ */
+/* De/para shadcn/ui (scripts/data/shadcn-map.json)                    */
+/* ------------------------------------------------------------------ */
+
+const shadcnSrc = JSON.parse(read(join(root, "scripts/data/shadcn-map.json")));
+const exportModule = new Map(modules.flatMap((m) => m.exports.map((e) => [e.name, m.name])));
+const pageSlugs = new Set(readdirSync(join(root, "showcase/pages")).filter((f) => /^[a-z].*\.tsx$/.test(f)).map((f) => f.replace(/\.tsx$/, "")));
+{
+  const problems = [];
+  for (const e of [...shadcnSrc.components, ...shadcnSrc.extras]) {
+    for (const n of e.ours) if (!exportModule.has(n)) problems.push(`${e.name}: export "${n}" não existe`);
+    for (const pg of e.pages) if (!pageSlugs.has(pg)) problems.push(`${e.name}: página "${pg}" não existe em showcase/pages`);
+  }
+  if (problems.length) {
+    console.error(`scripts/data/shadcn-map.json inválido:\n- ${problems.join("\n- ")}`);
+    process.exit(1);
+  }
+}
+const shadcnStatus = { equivalente: "equivalente", parcial: "parcial", ponte: "use o do shadcn com a ponte", fora: "fora do escopo" };
+const shadcnEntries = shadcnSrc.components.map((e) => ({
+  shadcn: e.shadcn,
+  name: e.name,
+  url: `https://ui.shadcn.com/docs/components/${e.shadcn}`,
+  status: e.status,
+  ours: e.ours.map((n) => ({ name: n, module: exportModule.get(n), doc: `components/${exportModule.get(n)}.md` })),
+  pages: e.pages,
+  aliases: e.aliases ?? [],
+  notes: e.notes,
+}));
+const shadcnExtras = shadcnSrc.extras.map((e) => ({ name: e.name, ours: e.ours.map((n) => ({ name: n, module: exportModule.get(n), doc: `components/${exportModule.get(n)}.md` })), pages: e.pages, notes: e.notes }));
+const SITE = "https://gestao-quatro-ponto-zero.github.io/G4OS-DS/";
+const mdCell = (s) => String(s).replace(/\|/g, "\\|");
+function renderShadcnDoc() {
+  return `# Equivalências shadcn/ui ↔ G4OS-DS
+
+<!-- Gerado por npm run ai:build a partir de scripts/data/shadcn-map.json. Edite o JSON, não este arquivo. -->
+
+O G4OS-DS cobre os ${shadcnEntries.length} componentes do [shadcn/ui](${shadcnSrc.source}) com componentes próprios (Base UI + Tailwind v4, tokens semânticos, pt-BR, tema escuro e marca). Use esta tabela para traduzir um exemplo, um bloco ou um pedido escrito "em shadcn" para o DS.
+
+- **Prefira o componente do DS**: ele já segue as regras de escrita, acessibilidade, densidade e tema.
+- **Faltou algo?** Traga do shadcn ou do 21st.dev com a ponte \`@g4ai/ds/shadcn.css\` ([guia](shadcn.md)) e troque \`bg-accent\`/\`bg-muted\` por \`bg-soft\`.
+- No site, cada página de componente tem o selo "Equivalente no shadcn". Agentes: o MCP \`search\` entende nomes do shadcn ("alert-dialog", "sheet") e \`ai/shadcn-map.json\` tem a tabela em JSON.
+
+| shadcn/ui | G4OS-DS | Situação | Observação |
+| --- | --- | --- | --- |
+${shadcnEntries.map((e) => `| [${e.name}](${e.url}) | ${e.ours.length ? e.ours.map((o) => `\`${o.name}\``).join(", ") : "—"} | ${shadcnStatus[e.status] ?? e.status} | ${mdCell(e.notes)}${e.pages.length ? ` ([exemplo](${SITE}#/p/${e.pages[0]}))` : ""} |`).join("\n")}
+
+## Só no G4OS-DS
+
+| Componente | Exports | Observação |
+| --- | --- | --- |
+${shadcnExtras.map((e) => `| ${e.name} | ${e.ours.map((o) => `\`${o.name}\``).join(", ")} | ${mdCell(e.notes)}${e.pages.length ? ` ([exemplo](${SITE}#/p/${e.pages[0]}))` : ""} |`).join("\n")}
+
+Além disso: gráficos de negócio (funil, cascata, Sankey, Gantt, bullet), DataGrid, filtros estruturados e visões salvas, blocos de IA (sessões, aprovação, raciocínio, ferramentas) e ${blocks.length} blocos de tela completos (CRM, ATS, ERP, financeiro, SaaS).
+`;
+}
+/** Arquivos gerados fora de ai/ (caminho relativo à raiz → conteúdo). */
+const extraFiles = new Map([["docs/guias/shadcn-equivalencias.md", renderShadcnDoc().replace(/\n{3,}/g, "\n\n").trimEnd() + "\n"]]);
 const categories = [...new Set(blocks.map((b) => b.category).filter(Boolean))].sort();
 
 function renderCore() {
@@ -362,6 +426,9 @@ ${categories.map((c) => `- **${c}**: ${blocks.filter((b) => b.category === c).ma
 
 ## Documentação humana (no pacote)
 \`AGENTS.md\` (regras completas), \`docs/fundamentos/\` (cor, tokens, temas, tipografia, dados, escrita), \`docs/padroes/\` (layout, densidade, formulários, tabelas, filtros, superfícies, feedback, dashboards, pipelines, acessibilidade, responsivo), \`docs/receitas/\` (CRM, ATS, ERP, financeiro, portal), \`docs/guias/\` (instalação, migração, shadcn, usar com IA).
+
+## Vindo do shadcn/ui
+Código ou pedido "em shadcn"? Traduza pelo \`shadcn-map.json\` (ex.: Dialog → \`Modal\`, Alert Dialog → \`ConfirmDialog\`, Sheet → \`Sheet\`/\`Drawer\`, Dropdown Menu → \`Menu\`/\`ActionMenu\`, Sonner → \`notify\`, Input → \`TextField\`, Field → \`FieldBlock\`). Tabela completa: \`docs/guias/shadcn-equivalencias.md\`.
 `;
 }
 
@@ -376,6 +443,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [Tokens](tokens.md)
 - [Manifesto JSON](manifest.json)
 - [Renomeações entre versões](renames.json)
+- [Equivalências shadcn/ui → DS](shadcn-map.json)
 
 ## Componentes
 ${modules.map((m) => `- [${m.name}](components/${m.name}.md): ${m.summary}`).join("\n")}
@@ -389,6 +457,7 @@ out("core.md", renderCore());
 out("tokens.md", renderTokens());
 out("llms.txt", renderLlms());
 for (const m of modules) out(`components/${m.name}.md`, renderModule(m));
+out("shadcn-map.json", JSON.stringify({ $comment: "Gerado de scripts/data/shadcn-map.json: componente do shadcn/ui → export(s) do DS.", source: shadcnSrc.source, components: shadcnEntries, extras: shadcnExtras }, null, 2));
 for (const b of blocks) out(`blocks/${b.slug}.md`, renderBlock(b));
 out(
   "manifest.json",
@@ -443,6 +512,7 @@ if (check) {
     existing.delete(p);
   }
   for (const extra of existing) if (extra !== "manifest.schema.json") stale.push(`${extra} (sobrando)`);
+  for (const [p, content] of extraFiles) if (!existsSync(join(root, p)) || read(join(root, p)) !== content) stale.push(p);
   if (stale.length) {
     console.error(`ai/ desatualizado (${stale.length}): ${stale.slice(0, 8).join(", ")}${stale.length > 8 ? "…" : ""}\nRode: npm run ai:build`);
     process.exit(1);
@@ -454,5 +524,6 @@ if (check) {
     mkdirSync(dirname(join(outDir, p)), { recursive: true });
     writeFileSync(join(outDir, p), content);
   }
+  for (const [p, content] of extraFiles) writeFileSync(join(root, p), content);
   console.log(`ai/ gerado: ${modules.length} módulos, ${componentCount} componentes, ${blocks.length} blocos, ${snippets.length} exemplos do showcase`);
 }

@@ -607,11 +607,11 @@ export function ConditionEditor<T>({ field, value, onChange, me, autoFocus = tru
           {field.type === "date" &&
             (value.op === "range" ? (
               <div className="grid grid-cols-2 gap-2">
-                <DatePicker label="De" value={String(pair[0] ?? "")} onValueChange={(v) => set({ value: [v, pair[1]] })} placeholder="De" className="w-full" />
-                <DatePicker label="Até" value={String(pair[1] ?? "")} onValueChange={(v) => set({ value: [pair[0], v] })} placeholder="Até" className="w-full" />
+                <DatePicker hideLabel label="De" value={String(pair[0] ?? "")} onValueChange={(v) => set({ value: [v, pair[1]] })} placeholder="De" className="w-full" />
+                <DatePicker hideLabel label="Até" value={String(pair[1] ?? "")} onValueChange={(v) => set({ value: [pair[0], v] })} placeholder="Até" className="w-full" />
               </div>
             ) : (
-              <DatePicker label={field.label} value={String(value.value ?? "")} onValueChange={(v) => set({ value: v })} className="w-full" />
+              <DatePicker hideLabel label={field.label} value={String(value.value ?? "")} onValueChange={(v) => set({ value: v })} className="w-full" />
             ))}
           {(field.type === "enum" || field.type === "person" || field.type === "boolean") && (
             <OptionList
@@ -1282,8 +1282,8 @@ export function DateRangeFilter({
       <div className="border-t border-line p-3">
         <p className="m-0 mb-2 text-[12px] font-medium text-muted">Personalizado</p>
         <div className="grid grid-cols-2 gap-2">
-          <DatePicker label="De" value={custom.from} onValueChange={(v) => setCustom((c) => ({ ...c, from: v }))} placeholder="De" className="w-full" />
-          <DatePicker label="Até" value={custom.to} onValueChange={(v) => setCustom((c) => ({ ...c, to: v }))} placeholder="Até" className="w-full" />
+          <DatePicker hideLabel label="De" value={custom.from} onValueChange={(v) => setCustom((c) => ({ ...c, from: v }))} placeholder="De" className="w-full" />
+          <DatePicker hideLabel label="Até" value={custom.to} onValueChange={(v) => setCustom((c) => ({ ...c, to: v }))} placeholder="Até" className="w-full" />
         </div>
         <div className="mt-2.5 flex justify-end">
           <Button

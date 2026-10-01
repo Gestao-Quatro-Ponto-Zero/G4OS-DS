@@ -761,7 +761,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
       return (
         <td key={s.key} {...pinAttrs(s)} style={cellStyle(s)} className="dg-cell text-center" onPointerDownCapture={(e) => (shiftDown.current = e.shiftKey)}>
           <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <Checkbox label={`Selecionar ${rowLabel(row)}`} checked={selected.has(key)} onCheckedChange={() => toggleRow(index, key)} />
+            <Checkbox hideLabel label={`Selecionar ${rowLabel(row)}`} checked={selected.has(key)} onCheckedChange={() => toggleRow(index, key)} />
           </div>
         </td>
       );
@@ -996,7 +996,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
             <div className="flex items-start gap-2.5">
               {selectable && (
                 <span className="relative z-[1] pt-0.5" onPointerDownCapture={(e) => (shiftDown.current = e.shiftKey)}>
-                  <Checkbox label={`Selecionar ${rowLabel(row)}`} checked={selected.has(key)} onCheckedChange={() => toggleRow(index, key)} />
+                  <Checkbox hideLabel label={`Selecionar ${rowLabel(row)}`} checked={selected.has(key)} onCheckedChange={() => toggleRow(index, key)} />
                 </span>
               )}
               <div className="min-w-0 flex-1">
@@ -1142,7 +1142,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
                       return (
                         <th key={s.key} {...pinAttrs(s)} style={cellStyle(s)} className="dg-th text-center">
                           <span className="flex items-center justify-center">
-                            <Checkbox label="Selecionar todos desta página" checked={allOnPage} indeterminate={selectedOnPage > 0 && !allOnPage} onCheckedChange={toggleAll} />
+                            <Checkbox hideLabel label="Selecionar todos desta página" checked={allOnPage} indeterminate={selectedOnPage > 0 && !allOnPage} onCheckedChange={toggleAll} />
                           </span>
                         </th>
                       );

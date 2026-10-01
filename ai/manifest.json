@@ -100,13 +100,20 @@
               "description": null
             }
           ],
-          "examplePage": "dash-pipelines"
+          "examplePage": "estrutura-separador-e-rolagem"
         },
         {
           "name": "Button",
           "kind": "component",
           "summary": "Um primário por área.",
           "props": [
+            {
+              "name": "disabledReason",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Por que está desabilitado."
+            },
             {
               "name": "href",
               "type": "string | undefined",
@@ -432,7 +439,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "form-grupos-e-complementos"
         },
         {
           "name": "LinkedCard",
@@ -595,6 +602,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "width",
+              "type": "\"full\" | \"wide\" | \"medium\" | \"narrow\" | \"reading\" | undefined",
+              "required": false,
+              "default": "\"full\"",
+              "description": "Largura máxima do conteúdo (cabeçalho incluso)."
             }
           ],
           "examplePage": "dash-como-montar"
@@ -1007,7 +1021,7 @@
         {
           "name": "Checkbox",
           "kind": "component",
-          "summary": "Caixa 20px, marcada = ink.",
+          "summary": "Caixa 20px, marcada = primária.",
           "props": [
             {
               "name": "checked",
@@ -1042,11 +1056,32 @@
               "type": "string | undefined",
               "required": false,
               "default": null,
-              "description": null
+              "description": "Na caixa quando `hideLabel`; no rótulo (linha inteira) quando visível."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Linha de apoio abaixo do rótulo."
             },
             {
               "name": "disabled",
               "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só a caixa, com `label` como nome acessível."
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -1057,9 +1092,121 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "name",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "form-listas"
+        },
+        {
+          "name": "CheckboxGroup",
+          "kind": "component",
+          "summary": "Vários valores com TODAS as opções visíveis (2–8 itens, até ~12 em grade): cargos que recebem um aviso, canais de notificação, permissões.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Rótulo visível acima do campo e nome acessível."
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "options",
+              "type": "CheckboxGroupOption[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "columns",
+              "type": "1 | 2 | 3 | undefined",
+              "required": false,
+              "default": "1",
+              "description": "Colunas a partir de 640px (no celular sempre 1)."
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Erro abaixo do campo (substitui a ajuda) e borda rose."
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só nome acessível, sem rótulo visível (toolbar, tabela, filtro)."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto de ajuda abaixo do campo."
+            },
+            {
+              "name": "max",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Acrescenta \"(opcional)\" ao rótulo."
+            },
+            {
+              "name": "selectAll",
+              "type": "string | boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Caixa \"Selecionar todos\" (tri-estado) acima das opções."
+            }
+          ],
+          "examplePage": "form-listas"
+        },
+        {
+          "name": "CheckboxGroupOption",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ value: string; label: string; description?: ReactNode; disabled?: boolean; disabledReason?: string; }"
         },
         {
           "name": "Combobox",
@@ -1071,7 +1218,7 @@
               "type": "string",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Rótulo visível acima do campo e nome acessível."
             },
             {
               "name": "onValueChange",
@@ -1109,6 +1256,27 @@
               "description": null
             },
             {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Erro abaixo do campo (substitui a ajuda) e borda rose."
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só nome acessível, sem rótulo visível (toolbar, tabela, filtro)."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto de ajuda abaixo do campo."
+            },
+            {
               "name": "id",
               "type": "string | undefined",
               "required": false,
@@ -1130,11 +1298,25 @@
               "description": null
             },
             {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Acrescenta \"(opcional)\" ao rótulo."
+            },
+            {
               "name": "placeholder",
               "type": "string | undefined",
               "required": false,
               "default": "\"Selecione…\"",
               "description": null
+            },
+            {
+              "name": "presentation",
+              "type": "PopupPresentation | undefined",
+              "required": false,
+              "default": "\"auto\"",
+              "description": "auto = no celular o popup ocupa a largura toda; popover = sempre ancorado."
             },
             {
               "name": "required",
@@ -1144,13 +1326,19 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "form-listas"
         },
         {
           "name": "ComboboxOption",
           "kind": "type",
           "summary": null,
           "definition": "{ value: string; label: string; description?: string; disabled?: boolean; }"
+        },
+        {
+          "name": "ControlLabelProps",
+          "kind": "type",
+          "summary": "Props de rótulo comuns a Select, Combobox, MultiSelect, NativeSelect, DatePicker.",
+          "definition": "{ label: string; hideLabel?: boolean; hint?: ReactNode; error?: ReactNode; optional?: boolean; }"
         },
         {
           "name": "FieldBlock",
@@ -1200,7 +1388,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "form-listas"
         },
         {
           "name": "fieldClass",
@@ -1221,6 +1409,241 @@
             }
           ],
           "examplePage": null
+        },
+        {
+          "name": "fullWidthPositionerClass",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "MultiSelect",
+          "kind": "component",
+          "summary": "Vários valores de uma lista (cargos, equipes, etiquetas) num popup com busca, caixas de seleção, grupos, \"Selecionar todos\" e \"Limpar\".",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Rótulo visível acima do campo e nome acessível."
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "options",
+              "type": "MultiSelectOption[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "display",
+              "type": "\"summary\" | \"chips\" | undefined",
+              "required": false,
+              "default": "\"summary\"",
+              "description": "summary = \"Ana, Bruno\" ou \"5 selecionados\" no gatilho; chips = chips removíveis abaixo."
+            },
+            {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Erro abaixo do campo (substitui a ajuda) e borda rose."
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só nome acessível, sem rótulo visível (toolbar, tabela, filtro)."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto de ajuda abaixo do campo."
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "max",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Limite de escolhas; as demais ficam desabilitadas ao atingir."
+            },
+            {
+              "name": "name",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Acrescenta \"(opcional)\" ao rótulo."
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Selecione…\"",
+              "description": null
+            },
+            {
+              "name": "presentation",
+              "type": "PopupPresentation | undefined",
+              "required": false,
+              "default": "\"auto\"",
+              "description": null
+            },
+            {
+              "name": "searchable",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Busca no topo. Padrão: ligada a partir de 8 opções."
+            },
+            {
+              "name": "selectAll",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Ações \"Selecionar todos\" / \"Limpar\" no rodapé."
+            }
+          ],
+          "examplePage": "form-listas"
+        },
+        {
+          "name": "MultiSelectOption",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ value: string; label: string; description?: string; group?: string; disabled?: boolean; disabledReason?: string; }"
+        },
+        {
+          "name": "NativeSelect",
+          "kind": "component",
+          "summary": "`<select>` do sistema com a aparência do DS (equivalente ao native-select do shadcn).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Rótulo visível acima do campo e nome acessível."
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "options",
+              "type": "(NativeSelectOption | { label: string; options: NativeSelectOption[]; })[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Erro abaixo do campo (substitui a ajuda) e borda rose."
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só nome acessível, sem rótulo visível (toolbar, tabela, filtro)."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto de ajuda abaixo do campo."
+            },
+            {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Acrescenta \"(opcional)\" ao rótulo."
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Primeira opção vazia (\"Selecione…\"); o valor dela é \"\"."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            }
+          ],
+          "examplePage": "form-listas"
+        },
+        {
+          "name": "NativeSelectOption",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ value: string; label: string; disabled?: boolean }"
+        },
+        {
+          "name": "PopupPresentation",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"auto\" | \"popover\""
         },
         {
           "name": "SearchInput",
@@ -1268,7 +1691,7 @@
               "type": "string",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Rótulo visível acima do campo e nome acessível."
             },
             {
               "name": "onValueChange",
@@ -1313,6 +1736,27 @@
               "description": null
             },
             {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Erro abaixo do campo (substitui a ajuda) e borda rose."
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só nome acessível, sem rótulo visível (toolbar, tabela, filtro)."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto de ajuda abaixo do campo."
+            },
+            {
               "name": "id",
               "type": "string | undefined",
               "required": false,
@@ -1327,11 +1771,25 @@
               "description": null
             },
             {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Acrescenta \"(opcional)\" ao rótulo."
+            },
+            {
               "name": "placeholder",
               "type": "string | undefined",
               "required": false,
               "default": "\"Selecione…\"",
               "description": null
+            },
+            {
+              "name": "presentation",
+              "type": "PopupPresentation | undefined",
+              "required": false,
+              "default": "\"auto\"",
+              "description": "auto = folha inferior no celular; popover = sempre ancorado ao campo."
             },
             {
               "name": "required",
@@ -1345,7 +1803,7 @@
               "type": "\"compact\" | \"field\" | undefined",
               "required": false,
               "default": "\"field\"",
-              "description": "field = formulário (40px); compact = linha de tabela / toolbar (32px)."
+              "description": "field = formulário (40px, rótulo visível); compact = linha de tabela / toolbar (32px, rótulo só acessível)."
             },
             {
               "name": "tone",
@@ -1355,13 +1813,23 @@
               "description": null
             }
           ],
-          "examplePage": "graficos-area"
+          "examplePage": "form-listas"
         },
         {
           "name": "SelectOption",
           "kind": "type",
           "summary": null,
           "definition": "{ value: string; label: string; description?: string; disabled?: boolean; icon?: ReactNode; }"
+        },
+        {
+          "name": "sheetBackdropClass",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "sheetPositionerClass",
+          "kind": "const",
+          "summary": null
         },
         {
           "name": "Switch",
@@ -1397,6 +1865,13 @@
               "description": null
             },
             {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
               "name": "hideLabel",
               "type": "boolean | undefined",
               "required": false,
@@ -1404,7 +1879,19 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "useControlLabel",
+          "kind": "hook",
+          "summary": "Liga um controle ao rótulo: dentro de FieldBlock usa o contexto; fora, desenha rótulo/ajuda/erro (a menos que `hideLabel`).",
+          "signature": "useControlLabel(props): { id: string; describedBy: string | undefined; invalid: boolean; wrap: (control: ReactNode) => string | num…"
+        },
+        {
+          "name": "useFieldContext",
+          "kind": "hook",
+          "summary": "Dentro de um FieldBlock?",
+          "signature": "useFieldContext(): FieldContextValue | null"
         }
       ],
       "doc": "components/forms.md"
@@ -1779,7 +2266,7 @@
               "description": null
             }
           ],
-          "examplePage": "nav-mobile"
+          "examplePage": "form-listas"
         },
         {
           "name": "StickyHeader",
@@ -1838,7 +2325,7 @@
             },
             {
               "name": "state",
-              "type": "\"ok\" | \"pending\" | \"error\"",
+              "type": "\"ok\" | \"error\" | \"pending\"",
               "required": true,
               "default": null,
               "description": null
@@ -2841,7 +3328,7 @@
               "type": "string",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Rótulo visível acima do campo e nome acessível."
             },
             {
               "name": "onValueChange",
@@ -2872,6 +3359,13 @@
               "description": null
             },
             {
+              "name": "clearable",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Botão × no campo para voltar a vazio."
+            },
+            {
               "name": "disabled",
               "type": "boolean | undefined",
               "required": false,
@@ -2879,8 +3373,36 @@
               "description": null
             },
             {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Erro abaixo do campo (substitui a ajuda) e borda rose."
+            },
+            {
               "name": "extraHolidays",
               "type": "Holiday[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Só nome acessível, sem rótulo visível (toolbar, tabela, filtro)."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto de ajuda abaixo do campo."
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -2900,6 +3422,20 @@
               "description": null
             },
             {
+              "name": "now",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"Hoje\" de referência (testes, fuso do servidor)."
+            },
+            {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Acrescenta \"(opcional)\" ao rótulo."
+            },
+            {
               "name": "placeholder",
               "type": "string | undefined",
               "required": false,
@@ -2907,11 +3443,25 @@
               "description": null
             },
             {
+              "name": "presentation",
+              "type": "PopupPresentation | undefined",
+              "required": false,
+              "default": "\"auto\"",
+              "description": "auto = folha inferior no celular; popover = sempre ancorado."
+            },
+            {
+              "name": "shortcuts",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Rodapé com \"Hoje\" (e \"Limpar\" quando `clearable`)."
+            },
+            {
               "name": "triggerContent",
               "type": "ReactNode",
               "required": false,
               "default": null,
-              "description": null
+              "description": "Gatilho próprio (ex.: chip)."
             }
           ],
           "examplePage": "datas-data"
@@ -7038,7 +7588,7 @@
             },
             {
               "name": "options",
-              "type": "{ value: T; label: string; icon?: ReactNode; hideLabel?: boolean; }[]",
+              "type": "{ value: T; label: string; icon?: ReactNode; hideLabel?: boolean; disabled?: boolean; }[]",
               "required": true,
               "default": null,
               "description": null
@@ -7053,6 +7603,13 @@
             {
               "name": "className",
               "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -8682,7 +9239,7 @@
     {
       "name": "overlays-extra",
       "file": "src/components/overlays-extra.tsx",
-      "summary": "Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.",
+      "summary": "Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Menubar, Sheet, CommandPalette, Lightbox.",
       "exports": [
         {
           "name": "Command",
@@ -8896,6 +9453,35 @@
             }
           ],
           "examplePage": "ov-menus"
+        },
+        {
+          "name": "Menubar",
+          "kind": "component",
+          "summary": "Barra de menus de aplicativo de documento (Arquivo · Editar · Ver), como em editores, planilhas e construtores.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível da barra (\"Menu do editor\")."
+            },
+            {
+              "name": "menus",
+              "type": "{ label: string; items: MenuEntry[]; disabled?: boolean; }[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "nav-menus-de-site"
         },
         {
           "name": "MenuEntry",
@@ -15221,7 +15807,7 @@
             },
             {
               "name": "risk",
-              "type": "\"low\" | \"medium\" | \"high\" | undefined",
+              "type": "\"medium\" | \"low\" | \"high\" | undefined",
               "required": false,
               "default": "\"medium\"",
               "description": null
@@ -20685,6 +21271,1184 @@
         }
       ],
       "doc": "components/ai-layout.md"
+    },
+    {
+      "name": "structure",
+      "file": "src/components/structure.tsx",
+      "summary": "Estrutura: Separator, ScrollArea, Label, FieldSet/FieldGroup/FieldSeparator, Item (mídia · título · ações), Table estática, Prose (texto longo).",
+      "exports": [
+        {
+          "name": "FieldGroup",
+          "kind": "component",
+          "summary": "Empilha campos ou FieldSets com o espaçamento padrão de formulário.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "gap",
+              "type": "\"sm\" | \"md\" | \"lg\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "FieldSeparator",
+          "kind": "component",
+          "summary": "Divisória entre grupos de um formulário, com rótulo opcional (\"ou\").",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "FieldSet",
+          "kind": "component",
+          "summary": "Grupo de campos com legenda: endereço, dados de cobrança, permissões.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "legend",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"section\" | \"label\" | undefined",
+              "required": false,
+              "default": "\"section\"",
+              "description": "\"section\" = título de seção (15 px); \"label\" = rótulo de grupo (12.5 px), para radios/checkboxes."
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "Item",
+          "kind": "component",
+          "summary": "Linha genérica de conteúdo: mídia (ícone/avatar/imagem) · título e descrição · ações.",
+          "props": [
+            {
+              "name": "href",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"default\" | \"outline\" | \"muted\" | undefined",
+              "required": false,
+              "default": "\"default\"",
+              "description": "\"outline\" = borda própria (item solto); \"muted\" = fundo gelo; \"default\" = sem moldura (dentro de ItemGroup/Card)."
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "ItemActions",
+          "kind": "component",
+          "summary": "Ações à direita (Button ghost/quiet, IconButton, Switch, Badge).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "ItemContent",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "ItemDescription",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "ItemGroup",
+          "kind": "component",
+          "summary": "Lista de Items com borda única e divisórias.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "ItemMedia",
+          "kind": "component",
+          "summary": "Mídia à esquerda do Item: \"icon\" = quadrado gelo com ícone 16 px; \"image\" = miniatura 40 px.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"icon\" | \"image\" | \"default\" | undefined",
+              "required": false,
+              "default": "\"default\"",
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "ItemTitle",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "Label",
+          "kind": "component",
+          "summary": "Rótulo visível de um controle.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "htmlFor",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "id do controle. Obrigatório para o clique focar o campo e o leitor de tela ler o nome."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "optional",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Marca \"(opcional)\": use quando a maioria do formulário é obrigatória."
+            },
+            {
+              "name": "required",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Marca \"obrigatório\" (asterisco com texto acessível)."
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "Prose",
+          "kind": "component",
+          "summary": "Tipografia de texto longo (equivalente ao Typography do shadcn): títulos, listas, links, citações, código e tabelas já no tema.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "wide",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-tipografia"
+        },
+        {
+          "name": "ScrollArea",
+          "kind": "component",
+          "summary": "Área com rolagem própria: barra fina que aparece ao passar o mouse ou rolar, esmaecimento nas bordas quando há mais conteúdo e foco por teclado.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "contentClassName",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "fade",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Esmaece a borda onde ainda há conteúdo."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome acessível da região rolável (ex.: \"Lista de membros\")."
+            },
+            {
+              "name": "maxHeight",
+              "type": "string | number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Altura máxima (px ou CSS)."
+            },
+            {
+              "name": "orientation",
+              "type": "\"both\" | \"horizontal\" | \"vertical\" | undefined",
+              "required": false,
+              "default": "\"vertical\"",
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-separador-e-rolagem"
+        },
+        {
+          "name": "Separator",
+          "kind": "component",
+          "summary": "Divisória de 1 px em `line`.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto curto no meio da linha."
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\" | undefined",
+              "required": false,
+              "default": "\"horizontal\"",
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-separador-e-rolagem"
+        },
+        {
+          "name": "Table",
+          "kind": "component",
+          "summary": "Tabela estática simples (comparativo, especificação, resumo de fatura).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableBody",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableCaption",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableCell",
+          "kind": "component",
+          "summary": "Célula. `numeric` = direita + tabular-nums (formate com formatCurrency/formatNumber).",
+          "props": [
+            {
+              "name": "numeric",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableFooter",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableHead",
+          "kind": "component",
+          "summary": "Cabeçalho de coluna. `numeric` alinha à direita (valores, quantidades).",
+          "props": [
+            {
+              "name": "numeric",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableHeader",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        },
+        {
+          "name": "TableRow",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "selected",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-item-e-tabela"
+        }
+      ],
+      "doc": "components/structure.md"
+    },
+    {
+      "name": "controls",
+      "file": "src/components/controls.tsx",
+      "summary": "Controles: Toggle, ButtonGroup, InputGroup (complementos dentro do campo), ColorPicker.",
+      "exports": [
+        {
+          "name": "ButtonGroup",
+          "kind": "component",
+          "summary": "Botões colados que formam uma ação composta (Anterior | Próximo, Copiar | ⌄, zoom − 100 % +).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível do grupo (\"Navegação entre registros\")."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\" | undefined",
+              "required": false,
+              "default": "\"horizontal\"",
+              "description": null
+            }
+          ],
+          "examplePage": "acoes-toggle-e-grupos"
+        },
+        {
+          "name": "ButtonGroupText",
+          "kind": "component",
+          "summary": "Segmento de texto não clicável dentro de um ButtonGroup (\"100 %\", \"Página 2\").",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "acoes-toggle-e-grupos"
+        },
+        {
+          "name": "ColorPicker",
+          "kind": "component",
+          "summary": "Escolha de cor para personalização (cor da marca do cliente, etiqueta, calendário, pipeline).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Rótulo visível acima do campo."
+            },
+            {
+              "name": "onChange",
+              "type": "(hex: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Hex (#RRGGBB)."
+            },
+            {
+              "name": "allowCustom",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Hex digitável e seletor livre."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "showContrast",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Mostra o contraste do melhor texto (claro/escuro) sobre a cor."
+            },
+            {
+              "name": "swatches",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": "colorSwatches",
+              "description": null
+            }
+          ],
+          "examplePage": "form-cor"
+        },
+        {
+          "name": "colorSwatches",
+          "kind": "const",
+          "summary": "Amostras padrão: neutros + paleta de marca G4 + tons de apoio."
+        },
+        {
+          "name": "InputGroup",
+          "kind": "component",
+          "summary": "Campo com complementos: ícone, prefixo/sufixo de texto, botão, atalho, contador; acima/abaixo do texto (composer com barra de ações).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "invalid",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Borda de erro (combine com a mensagem do FieldBlock)."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "InputGroupAddon",
+          "kind": "component",
+          "summary": "Complemento do InputGroup.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "align",
+              "type": "\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\" | undefined",
+              "required": false,
+              "default": "\"inline-start\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "InputGroupButton",
+          "kind": "component",
+          "summary": "Botão compacto dentro do InputGroup (copiar, limpar, enviar, mostrar senha).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"primary\" | \"ghost\" | \"quiet\" | undefined",
+              "required": false,
+              "default": "\"quiet\"",
+              "description": null
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "InputGroupInput",
+          "kind": "component",
+          "summary": "Input sem caixa para dentro do InputGroup.",
+          "props": [],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "InputGroupText",
+          "kind": "component",
+          "summary": "Texto do complemento: \"R$\", \"https://\", \".com.br\", \"12/280\".",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "InputGroupTextarea",
+          "kind": "component",
+          "summary": "Textarea sem caixa para dentro do InputGroup (composer, comentário com barra).",
+          "props": [],
+          "examplePage": "form-grupos-e-complementos"
+        },
+        {
+          "name": "Toggle",
+          "kind": "component",
+          "summary": "Botão liga/desliga isolado (negrito, fixar, favoritar, mostrar arquivados).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onPressedChange",
+              "type": "(pressed: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "pressed",
+              "type": "boolean",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Obrigatório quando `children` é só um ícone."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"quiet\" | \"outline\" | undefined",
+              "required": false,
+              "default": "\"outline\"",
+              "description": "\"outline\" = borda, ligado em `primary` (como ToggleGroup); \"quiet\" = sem borda, ligado em gelo (barras de ferramenta)."
+            }
+          ],
+          "examplePage": "acoes-toggle-e-grupos"
+        }
+      ],
+      "doc": "components/controls.md"
+    },
+    {
+      "name": "navigation-extra",
+      "file": "src/components/navigation-extra.tsx",
+      "summary": "NavigationMenu: navegação de site/portal com painéis de links.",
+      "exports": [
+        {
+          "name": "NavigationMenu",
+          "kind": "component",
+          "summary": "Menu de navegação de site público, portal do cliente ou central de ajuda: links diretos e painéis com links descritos (título + descrição + ícone).",
+          "props": [
+            {
+              "name": "items",
+              "type": "NavigationMenuEntry[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "nav-menus-de-site"
+        },
+        {
+          "name": "NavigationMenuEntry",
+          "kind": "type",
+          "summary": null,
+          "definition": "| { label: string; href: string; active?: boolean } | { label: string; links: NavigationMenuLinkItem[]; feature?: ReactNode; active?: boolean; }"
+        },
+        {
+          "name": "NavigationMenuLinkItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ title: string; href: string; description?: string; icon?: ReactNode; }"
+        }
+      ],
+      "doc": "components/navigation-extra.md"
+    },
+    {
+      "name": "sortable",
+      "file": "src/components/sortable.tsx",
+      "summary": "SortableList: reordenar por arraste e teclado, com anúncios pt-BR.",
+      "exports": [
+        {
+          "name": "SortableList",
+          "kind": "component",
+          "summary": "Lista reordenável (etapas do pipeline, campos do formulário, prioridade de fila, ordem de colunas).",
+          "props": [
+            {
+              "name": "getKey",
+              "type": "(item: T) => string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "getLabel",
+              "type": "(item: T) => string",
+              "required": true,
+              "default": null,
+              "description": "Nome do item nos anúncios (\"Proposta enviada movida para a posição 2 de 5\")."
+            },
+            {
+              "name": "items",
+              "type": "T[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível da lista."
+            },
+            {
+              "name": "onReorder",
+              "type": "(items: T[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "renderItem",
+              "type": "(item: T, state: { dragging: boolean; index: number; }) => ReactNode",
+              "required": true,
+              "default": null,
+              "description": "Conteúdo da linha (a alça já vem à esquerda)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "colecoes-reordenar"
+        }
+      ],
+      "doc": "components/sortable.md"
+    },
+    {
+      "name": "questionnaire",
+      "file": "src/components/questionnaire.tsx",
+      "summary": "Questionnaire: perguntas uma por vez (escolha, múltipla, livre, condicionais).",
+      "exports": [
+        {
+          "name": "Questionnaire",
+          "kind": "component",
+          "summary": "Perguntas uma por vez, com progresso, atalhos numéricos (1–9 marcam opções), Voltar/Pular/Próxima e perguntas condicionais.",
+          "props": [
+            {
+              "name": "items",
+              "type": "QuestionnaireQuestion[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSubmit",
+              "type": "(answers: QuestionnaireAnswers) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultAnswers",
+              "type": "QuestionnaireAnswers | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultStep",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": null
+            },
+            {
+              "name": "onCancel",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Mostra \"Cancelar\" na primeira pergunta."
+            },
+            {
+              "name": "onChange",
+              "type": "((answers: QuestionnaireAnswers, step: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rascunho a cada mudança (para retomar depois)."
+            },
+            {
+              "name": "shortcuts",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "submitLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Enviar respostas\"",
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Título acima das perguntas (\"Antes de começar\")."
+            }
+          ],
+          "examplePage": "ia-questionario"
+        },
+        {
+          "name": "QuestionnaireAnswer",
+          "kind": "type",
+          "summary": "Resposta de uma pergunta; `null` = pulada.",
+          "definition": "{ choices: string[]; text: string } | null"
+        },
+        {
+          "name": "QuestionnaireAnswers",
+          "kind": "type",
+          "summary": null,
+          "definition": "Record<string, QuestionnaireAnswer>"
+        },
+        {
+          "name": "QuestionnaireChoice",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ value: string; label: string; description?: string }"
+        },
+        {
+          "name": "QuestionnaireQuestion",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ name: string; prompt: string; description?: string; choices?: QuestionnaireChoice[]; multiple?: boolean; input?: boolean | { placeholder?: string; multiline?: boolean; label?: string }; required?: boolean; when?: (answers: QuestionnaireAnswers) => boolean; }"
+        }
+      ],
+      "doc": "components/questionnaire.md"
     }
   ],
   "blocks": [

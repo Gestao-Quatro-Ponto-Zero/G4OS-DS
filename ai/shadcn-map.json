@@ -1,0 +1,1770 @@
+{
+  "$comment": "Gerado de scripts/data/shadcn-map.json: componente do shadcn/ui → export(s) do DS.",
+  "source": "https://ui.shadcn.com/docs/components",
+  "components": [
+    {
+      "shadcn": "accordion",
+      "name": "Accordion",
+      "url": "https://ui.shadcn.com/docs/components/accordion",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Accordion",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
+        }
+      ],
+      "pages": [
+        "nav-revelacao"
+      ],
+      "aliases": [],
+      "notes": "`multiple` permite várias seções abertas."
+    },
+    {
+      "shadcn": "alert",
+      "name": "Alert",
+      "url": "https://ui.shadcn.com/docs/components/alert",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Callout",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        },
+        {
+          "name": "InlineMessage",
+          "module": "states",
+          "doc": "components/states.md"
+        },
+        {
+          "name": "AlertCard",
+          "module": "states",
+          "doc": "components/states.md"
+        },
+        {
+          "name": "Banner",
+          "module": "states",
+          "doc": "components/states.md"
+        }
+      ],
+      "pages": [
+        "fb-avisos"
+      ],
+      "aliases": [],
+      "notes": "Callout = aviso fixo na página; InlineMessage = status curto em linha; AlertCard = lista de problemas com ações; Banner = faixa no topo."
+    },
+    {
+      "shadcn": "alert-dialog",
+      "name": "Alert Dialog",
+      "url": "https://ui.shadcn.com/docs/components/alert-dialog",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ConfirmDialog",
+          "module": "overlays",
+          "doc": "components/overlays.md"
+        }
+      ],
+      "pages": [
+        "base-superficies"
+      ],
+      "aliases": [
+        "confirm",
+        "confirmacao"
+      ],
+      "notes": "Confirmação do irreversível; único lugar onde o botão `danger` aparece."
+    },
+    {
+      "shadcn": "aspect-ratio",
+      "name": "Aspect Ratio",
+      "url": "https://ui.shadcn.com/docs/components/aspect-ratio",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "AspectFrame",
+          "module": "media",
+          "doc": "components/media.md"
+        }
+      ],
+      "pages": [
+        "midia-galeria"
+      ],
+      "aliases": [],
+      "notes": "Proporção fixa para imagem, vídeo e mapa."
+    },
+    {
+      "shadcn": "attachment",
+      "name": "Attachment",
+      "url": "https://ui.shadcn.com/docs/components/attachment",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "FileCard",
+          "module": "media",
+          "doc": "components/media.md"
+        },
+        {
+          "name": "FileDropzone",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "ComposerChip",
+          "module": "ai",
+          "doc": "components/ai.md"
+        }
+      ],
+      "pages": [
+        "midia-arquivos",
+        "form-upload"
+      ],
+      "aliases": [
+        "anexo",
+        "file"
+      ],
+      "notes": "FileCard tem `progress`, `error`, `preview` e variantes row/tile; FileDropzone faz o envio com progresso."
+    },
+    {
+      "shadcn": "avatar",
+      "name": "Avatar",
+      "url": "https://ui.shadcn.com/docs/components/avatar",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Avatar",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "AvatarGroup",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "EntityMark",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        }
+      ],
+      "pages": [
+        "base-exibicao"
+      ],
+      "aliases": [],
+      "notes": "EntityMark para empresas e registros (não pessoas)."
+    },
+    {
+      "shadcn": "badge",
+      "name": "Badge",
+      "url": "https://ui.shadcn.com/docs/components/badge",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Badge",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "StatusPill",
+          "module": "tags",
+          "doc": "components/tags.md"
+        },
+        {
+          "name": "TagPill",
+          "module": "tags",
+          "doc": "components/tags.md"
+        },
+        {
+          "name": "CountBadge",
+          "module": "states",
+          "doc": "components/states.md"
+        }
+      ],
+      "pages": [
+        "base-exibicao",
+        "tags-e-prioridade"
+      ],
+      "aliases": [],
+      "notes": "Badge neutro é o padrão; tom só na exceção. Status = ponto + texto (StatusPill)."
+    },
+    {
+      "shadcn": "breadcrumb",
+      "name": "Breadcrumb",
+      "url": "https://ui.shadcn.com/docs/components/breadcrumb",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Breadcrumb",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        },
+        {
+          "name": "ContextBar",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        }
+      ],
+      "pages": [
+        "base-navegacao"
+      ],
+      "aliases": [],
+      "notes": "Só ancestrais, nunca a página atual. Página de registro usa ContextBar."
+    },
+    {
+      "shadcn": "bubble",
+      "name": "Bubble",
+      "url": "https://ui.shadcn.com/docs/components/bubble",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "UserBubble",
+          "module": "ai-sessions",
+          "doc": "components/ai-sessions.md"
+        },
+        {
+          "name": "ChatMessage",
+          "module": "ai",
+          "doc": "components/ai.md"
+        }
+      ],
+      "pages": [
+        "ia-sessoes",
+        "ia-assistente"
+      ],
+      "aliases": [],
+      "notes": "Balão só para a fala da pessoa; a resposta do agente é texto corrido (AgentMessage)."
+    },
+    {
+      "shadcn": "button",
+      "name": "Button",
+      "url": "https://ui.shadcn.com/docs/components/button",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Button",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "IconButton",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "SplitButton",
+          "module": "email-compose",
+          "doc": "components/email-compose.md"
+        }
+      ],
+      "pages": [
+        "base-acoes"
+      ],
+      "aliases": [],
+      "notes": "Variantes primary · ghost · quiet · danger. Um primário por área; IconButton exige `label`."
+    },
+    {
+      "shadcn": "button-group",
+      "name": "Button Group",
+      "url": "https://ui.shadcn.com/docs/components/button-group",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ButtonGroup",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "ButtonGroupText",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "SplitButton",
+          "module": "email-compose",
+          "doc": "components/email-compose.md"
+        }
+      ],
+      "pages": [
+        "acoes-toggle-e-grupos"
+      ],
+      "aliases": [],
+      "notes": "Botões colados para uma ação composta. Escolher um entre vários: SegmentedControl."
+    },
+    {
+      "shadcn": "calendar",
+      "name": "Calendar",
+      "url": "https://ui.shadcn.com/docs/components/calendar",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Calendar",
+          "module": "dates",
+          "doc": "components/dates.md"
+        },
+        {
+          "name": "MonthCalendar",
+          "module": "dates",
+          "doc": "components/dates.md"
+        }
+      ],
+      "pages": [
+        "datas-data",
+        "datas-calendario-eventos"
+      ],
+      "aliases": [],
+      "notes": "Grade própria em pt-BR (segunda-feira primeiro), sem react-day-picker."
+    },
+    {
+      "shadcn": "card",
+      "name": "Card",
+      "url": "https://ui.shadcn.com/docs/components/card",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Card",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "LinkedCard",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "RecordCard",
+          "module": "pipeline",
+          "doc": "components/pipeline.md"
+        }
+      ],
+      "pages": [
+        "base-superficies"
+      ],
+      "aliases": [],
+      "notes": "Borda de 1 px, sem sombra; sombra só no que é clicável ou flutua."
+    },
+    {
+      "shadcn": "carousel",
+      "name": "Carousel",
+      "url": "https://ui.shadcn.com/docs/components/carousel",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Carousel",
+          "module": "media",
+          "doc": "components/media.md"
+        }
+      ],
+      "pages": [
+        "midia-carrossel"
+      ],
+      "aliases": [],
+      "notes": "Rolagem nativa com encaixe (sem Embla)."
+    },
+    {
+      "shadcn": "chart",
+      "name": "Chart",
+      "url": "https://ui.shadcn.com/docs/components/chart",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ChartContainer",
+          "module": "charts",
+          "doc": "components/charts.md"
+        },
+        {
+          "name": "AreaChart",
+          "module": "charts",
+          "doc": "components/charts.md"
+        },
+        {
+          "name": "BarChart",
+          "module": "charts",
+          "doc": "components/charts.md"
+        },
+        {
+          "name": "LineChart",
+          "module": "charts",
+          "doc": "components/charts.md"
+        },
+        {
+          "name": "PieChart",
+          "module": "charts-shapes",
+          "doc": "components/charts-shapes.md"
+        },
+        {
+          "name": "RadarChart",
+          "module": "charts-advanced",
+          "doc": "components/charts-advanced.md"
+        },
+        {
+          "name": "RadialChart",
+          "module": "charts-shapes",
+          "doc": "components/charts-shapes.md"
+        },
+        {
+          "name": "ChartTooltip",
+          "module": "charts",
+          "doc": "components/charts.md"
+        }
+      ],
+      "pages": [
+        "graficos-galeria",
+        "graficos-tooltip"
+      ],
+      "aliases": [],
+      "notes": "Gráficos SVG próprios (sem Recharts) com a mesma ideia de ChartConfig; `label` obrigatório."
+    },
+    {
+      "shadcn": "checkbox",
+      "name": "Checkbox",
+      "url": "https://ui.shadcn.com/docs/components/checkbox",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Checkbox",
+          "module": "forms",
+          "doc": "components/forms.md"
+        },
+        {
+          "name": "CheckboxGroup",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "form-listas",
+        "base-formularios"
+      ],
+      "aliases": [],
+      "notes": "CheckboxGroup para várias opções sempre visíveis. Preferência com efeito imediato: Switch."
+    },
+    {
+      "shadcn": "collapsible",
+      "name": "Collapsible",
+      "url": "https://ui.shadcn.com/docs/components/collapsible",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Collapsible",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
+        }
+      ],
+      "pages": [
+        "nav-revelacao"
+      ],
+      "aliases": [],
+      "notes": "Uma seção opcional (\"Opções avançadas\")."
+    },
+    {
+      "shadcn": "combobox",
+      "name": "Combobox",
+      "url": "https://ui.shadcn.com/docs/components/combobox",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Combobox",
+          "module": "forms",
+          "doc": "components/forms.md"
+        },
+        {
+          "name": "MultiSelect",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "form-listas",
+        "base-formularios"
+      ],
+      "aliases": [],
+      "notes": "Busca sem acento. Várias escolhas com busca: MultiSelect."
+    },
+    {
+      "shadcn": "command",
+      "name": "Command",
+      "url": "https://ui.shadcn.com/docs/components/command",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "CommandPalette",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        },
+        {
+          "name": "SearchPalette",
+          "module": "search",
+          "doc": "components/search.md"
+        }
+      ],
+      "pages": [
+        "ov-comandos",
+        "busca-cmdk"
+      ],
+      "aliases": [
+        "cmdk",
+        "command palette"
+      ],
+      "notes": "⌘K com busca tolerante a acento e erro de digitação, grupos e atalhos."
+    },
+    {
+      "shadcn": "context-menu",
+      "name": "Context Menu",
+      "url": "https://ui.shadcn.com/docs/components/context-menu",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ContextMenu",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        }
+      ],
+      "pages": [
+        "ov-menus"
+      ],
+      "aliases": [],
+      "notes": "Sempre duplique as ações num menu visível (⋯)."
+    },
+    {
+      "shadcn": "data-table",
+      "name": "Data Table",
+      "url": "https://ui.shadcn.com/docs/components/data-table",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "DataTable",
+          "module": "collections",
+          "doc": "components/collections.md"
+        },
+        {
+          "name": "DataGrid",
+          "module": "data-grid",
+          "doc": "components/data-grid.md"
+        },
+        {
+          "name": "TableToolbar",
+          "module": "collections",
+          "doc": "components/collections.md"
+        },
+        {
+          "name": "Pagination",
+          "module": "data",
+          "doc": "components/data.md"
+        }
+      ],
+      "pages": [
+        "busca-tabelas",
+        "grade-visao-geral"
+      ],
+      "aliases": [],
+      "notes": "DataTable para listas comuns; DataGrid para muitas linhas, rolagem interna, edição e teclado (sem TanStack)."
+    },
+    {
+      "shadcn": "date-picker",
+      "name": "Date Picker",
+      "url": "https://ui.shadcn.com/docs/components/date-picker",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "DatePicker",
+          "module": "date-picker",
+          "doc": "components/date-picker.md"
+        },
+        {
+          "name": "DateRangePicker",
+          "module": "dates",
+          "doc": "components/dates.md"
+        },
+        {
+          "name": "DateTimePicker",
+          "module": "dates",
+          "doc": "components/dates.md"
+        },
+        {
+          "name": "MonthPicker",
+          "module": "dates",
+          "doc": "components/dates.md"
+        }
+      ],
+      "pages": [
+        "datas-data",
+        "datas-periodo"
+      ],
+      "aliases": [],
+      "notes": "Datas digitáveis em pt-BR, presets e dias úteis."
+    },
+    {
+      "shadcn": "dialog",
+      "name": "Dialog",
+      "url": "https://ui.shadcn.com/docs/components/dialog",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Modal",
+          "module": "overlays",
+          "doc": "components/overlays.md"
+        }
+      ],
+      "pages": [
+        "base-superficies"
+      ],
+      "aliases": [
+        "modal"
+      ],
+      "notes": "Decisão curta. Criar/editar sem perder a lista: Drawer."
+    },
+    {
+      "shadcn": "direction",
+      "name": "Direction",
+      "url": "https://ui.shadcn.com/docs/components/direction",
+      "status": "fora",
+      "ours": [],
+      "pages": [],
+      "aliases": [],
+      "notes": "O DS é pt-BR (LTR); não há suporte a RTL."
+    },
+    {
+      "shadcn": "drawer",
+      "name": "Drawer",
+      "url": "https://ui.shadcn.com/docs/components/drawer",
+      "status": "parcial",
+      "ours": [
+        {
+          "name": "Sheet",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        },
+        {
+          "name": "Drawer",
+          "module": "overlays",
+          "doc": "components/overlays.md"
+        }
+      ],
+      "pages": [
+        "ov-sheet",
+        "base-superficies"
+      ],
+      "aliases": [],
+      "notes": "O Drawer do shadcn é uma folha inferior (Vaul): use Sheet (vira folha inferior no celular). O Drawer do DS é o painel lateral de edição."
+    },
+    {
+      "shadcn": "dropdown-menu",
+      "name": "Dropdown Menu",
+      "url": "https://ui.shadcn.com/docs/components/dropdown-menu",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Menu",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        },
+        {
+          "name": "ActionMenu",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        }
+      ],
+      "pages": [
+        "ov-menus"
+      ],
+      "aliases": [
+        "dropdown"
+      ],
+      "notes": "ActionMenu para o ⋯ de linha/card; Menu para submenus, marcações e escolha única."
+    },
+    {
+      "shadcn": "empty",
+      "name": "Empty",
+      "url": "https://ui.shadcn.com/docs/components/empty",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Empty",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "EmptyFilterResult",
+          "module": "filters",
+          "doc": "components/filters.md"
+        },
+        {
+          "name": "StateView",
+          "module": "states",
+          "doc": "components/states.md"
+        }
+      ],
+      "pages": [
+        "fb-estados-tela"
+      ],
+      "aliases": [],
+      "notes": "Diga o que falta e ofereça a próxima ação; vazio por filtro tem \"Limpar\"."
+    },
+    {
+      "shadcn": "field",
+      "name": "Field",
+      "url": "https://ui.shadcn.com/docs/components/field",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "FieldBlock",
+          "module": "forms",
+          "doc": "components/forms.md"
+        },
+        {
+          "name": "FieldSet",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "FieldGroup",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "FieldSeparator",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "Label",
+          "module": "structure",
+          "doc": "components/structure.md"
+        }
+      ],
+      "pages": [
+        "form-grupos-e-complementos",
+        "base-formularios"
+      ],
+      "aliases": [],
+      "notes": "FieldBlock = rótulo + controle + ajuda/erro; FieldSet agrupa com legenda. Os campos do DS (TextField, Select…) já trazem rótulo."
+    },
+    {
+      "shadcn": "hover-card",
+      "name": "Hover Card",
+      "url": "https://ui.shadcn.com/docs/components/hover-card",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "HoverCard",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        }
+      ],
+      "pages": [
+        "ov-tooltip"
+      ],
+      "aliases": [],
+      "notes": "Prévia de entidade num link; o link continua levando à página."
+    },
+    {
+      "shadcn": "input",
+      "name": "Input",
+      "url": "https://ui.shadcn.com/docs/components/input",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "TextField",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "PasswordField",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "NumberField",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "CurrencyField",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "MaskedField",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "SearchInput",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "form-texto",
+        "form-numeros",
+        "form-mascaras"
+      ],
+      "aliases": [],
+      "notes": "Campos completos com rótulo, ajuda, erro e contador."
+    },
+    {
+      "shadcn": "input-group",
+      "name": "Input Group",
+      "url": "https://ui.shadcn.com/docs/components/input-group",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "InputGroup",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "InputGroupAddon",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "InputGroupInput",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "InputGroupTextarea",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "InputGroupText",
+          "module": "controls",
+          "doc": "components/controls.md"
+        },
+        {
+          "name": "InputGroupButton",
+          "module": "controls",
+          "doc": "components/controls.md"
+        }
+      ],
+      "pages": [
+        "form-grupos-e-complementos"
+      ],
+      "aliases": [],
+      "notes": "Para ícone/prefixo/sufixo simples, TextField (`icon`, `prefix`, `suffix`) basta."
+    },
+    {
+      "shadcn": "input-otp",
+      "name": "Input OTP",
+      "url": "https://ui.shadcn.com/docs/components/input-otp",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "OtpInput",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        }
+      ],
+      "pages": [
+        "form-senha-otp"
+      ],
+      "aliases": [],
+      "notes": "Cola o código inteiro e avança sozinho."
+    },
+    {
+      "shadcn": "item",
+      "name": "Item",
+      "url": "https://ui.shadcn.com/docs/components/item",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Item",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ItemGroup",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ItemMedia",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ItemContent",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ItemTitle",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ItemDescription",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ItemActions",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ListRow",
+          "module": "collections",
+          "doc": "components/collections.md"
+        }
+      ],
+      "pages": [
+        "estrutura-item-e-tabela"
+      ],
+      "aliases": [],
+      "notes": "ListRow para listas de registros com contexto, meta e seta."
+    },
+    {
+      "shadcn": "kbd",
+      "name": "Kbd",
+      "url": "https://ui.shadcn.com/docs/components/kbd",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Kbd",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "KeyCombo",
+          "module": "interactive",
+          "doc": "components/interactive.md"
+        }
+      ],
+      "pages": [
+        "base-acoes"
+      ],
+      "aliases": [],
+      "notes": "KeyCombo monta atalhos (⌘ K) por plataforma."
+    },
+    {
+      "shadcn": "label",
+      "name": "Label",
+      "url": "https://ui.shadcn.com/docs/components/label",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Label",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "FieldBlock",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "form-grupos-e-complementos"
+      ],
+      "aliases": [],
+      "notes": "Rótulo visível acima de todo campo; placeholder é exemplo."
+    },
+    {
+      "shadcn": "marker",
+      "name": "Marker",
+      "url": "https://ui.shadcn.com/docs/components/marker",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "SystemMessage",
+          "module": "ai",
+          "doc": "components/ai.md"
+        },
+        {
+          "name": "DateSeparator",
+          "module": "collab",
+          "doc": "components/collab.md"
+        },
+        {
+          "name": "ThreadDaySeparator",
+          "module": "ai-layout",
+          "doc": "components/ai-layout.md"
+        },
+        {
+          "name": "ThinkingIndicator",
+          "module": "ai",
+          "doc": "components/ai.md"
+        },
+        {
+          "name": "Separator",
+          "module": "structure",
+          "doc": "components/structure.md"
+        }
+      ],
+      "pages": [
+        "ia-avisos",
+        "colaboracao-e-documento"
+      ],
+      "aliases": [],
+      "notes": "Status, nota do sistema e separador rotulado dentro de conversas."
+    },
+    {
+      "shadcn": "menubar",
+      "name": "Menubar",
+      "url": "https://ui.shadcn.com/docs/components/menubar",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Menubar",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        }
+      ],
+      "pages": [
+        "nav-menus-de-site"
+      ],
+      "aliases": [],
+      "notes": "Só em apps de documento (editor, planilha). Apps de gestão: botões + ActionMenu."
+    },
+    {
+      "shadcn": "message",
+      "name": "Message",
+      "url": "https://ui.shadcn.com/docs/components/message",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ChatMessage",
+          "module": "ai",
+          "doc": "components/ai.md"
+        },
+        {
+          "name": "AgentMessage",
+          "module": "ai-workspace",
+          "doc": "components/ai-workspace.md"
+        },
+        {
+          "name": "TeamMessage",
+          "module": "collab",
+          "doc": "components/collab.md"
+        }
+      ],
+      "pages": [
+        "ia-assistente",
+        "ia-layout-agente",
+        "colaboracao-e-documento"
+      ],
+      "aliases": [],
+      "notes": "Fala da pessoa, do agente e de colegas (chat de equipe)."
+    },
+    {
+      "shadcn": "message-scroller",
+      "name": "Message Scroller",
+      "url": "https://ui.shadcn.com/docs/components/message-scroller",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ChatThread",
+          "module": "ai",
+          "doc": "components/ai.md"
+        },
+        {
+          "name": "ThreadView",
+          "module": "ai-layout",
+          "doc": "components/ai-layout.md"
+        },
+        {
+          "name": "ThreadMinimap",
+          "module": "ai-sessions",
+          "doc": "components/ai-sessions.md"
+        }
+      ],
+      "pages": [
+        "ia-layout-agente"
+      ],
+      "aliases": [],
+      "notes": "Acompanha o fim enquanto a pessoa está no fim e para quando ela rola para ler."
+    },
+    {
+      "shadcn": "native-select",
+      "name": "Native Select",
+      "url": "https://ui.shadcn.com/docs/components/native-select",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "NativeSelect",
+          "module": "forms",
+          "doc": "components/forms.md"
+        },
+        {
+          "name": "Select",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "form-listas"
+      ],
+      "aliases": [],
+      "notes": "Select (Base UI) é o padrão; NativeSelect só quando a lista nativa do celular é desejada, sempre com rótulo e no tema."
+    },
+    {
+      "shadcn": "navigation-menu",
+      "name": "Navigation Menu",
+      "url": "https://ui.shadcn.com/docs/components/navigation-menu",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "NavigationMenu",
+          "module": "navigation-extra",
+          "doc": "components/navigation-extra.md"
+        }
+      ],
+      "pages": [
+        "nav-menus-de-site"
+      ],
+      "aliases": [],
+      "notes": "Site público, portal e central de ajuda. App: Sidebar/AppShell."
+    },
+    {
+      "shadcn": "pagination",
+      "name": "Pagination",
+      "url": "https://ui.shadcn.com/docs/components/pagination",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Pagination",
+          "module": "data",
+          "doc": "components/data.md"
+        }
+      ],
+      "pages": [
+        "nav-paginacao"
+      ],
+      "aliases": [],
+      "notes": "\"1–20 de 312\" + anterior/próxima."
+    },
+    {
+      "shadcn": "popover",
+      "name": "Popover",
+      "url": "https://ui.shadcn.com/docs/components/popover",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Popover",
+          "module": "overlays",
+          "doc": "components/overlays.md"
+        }
+      ],
+      "pages": [
+        "base-acoes"
+      ],
+      "aliases": [],
+      "notes": "Explicação ou mini-formulário sob demanda."
+    },
+    {
+      "shadcn": "progress",
+      "name": "Progress",
+      "url": "https://ui.shadcn.com/docs/components/progress",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Meter",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
+          "name": "ProgressRing",
+          "module": "charts",
+          "doc": "components/charts.md"
+        },
+        {
+          "name": "GoalMeter",
+          "module": "dashboard",
+          "doc": "components/dashboard.md"
+        },
+        {
+          "name": "Stepper",
+          "module": "status",
+          "doc": "components/status.md"
+        }
+      ],
+      "pages": [
+        "base-exibicao",
+        "graficos-radial"
+      ],
+      "aliases": [],
+      "notes": "Meter = barra fina; ProgressRing = anel; GoalMeter = meta com valor."
+    },
+    {
+      "shadcn": "questionnaire",
+      "name": "Questionnaire",
+      "url": "https://ui.shadcn.com/docs/components/questionnaire",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Questionnaire",
+          "module": "questionnaire",
+          "doc": "components/questionnaire.md"
+        }
+      ],
+      "pages": [
+        "ia-questionario"
+      ],
+      "aliases": [],
+      "notes": "Uma pergunta por vez: agente pedindo esclarecimentos, pesquisa curta, triagem."
+    },
+    {
+      "shadcn": "radio-group",
+      "name": "Radio Group",
+      "url": "https://ui.shadcn.com/docs/components/radio-group",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "RadioGroup",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "ChoiceCards",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        }
+      ],
+      "pages": [
+        "form-selecao"
+      ],
+      "aliases": [],
+      "notes": "ChoiceCards quando cada opção precisa de descrição (plano, tipo de conta)."
+    },
+    {
+      "shadcn": "resizable",
+      "name": "Resizable",
+      "url": "https://ui.shadcn.com/docs/components/resizable",
+      "status": "parcial",
+      "ours": [
+        {
+          "name": "ResizableSplit",
+          "module": "ai-workspace",
+          "doc": "components/ai-workspace.md"
+        }
+      ],
+      "pages": [
+        "ia-layout"
+      ],
+      "aliases": [],
+      "notes": "Dois painéis com divisor (mouse, toque e teclado). Mais de dois: aninhe ResizableSplit."
+    },
+    {
+      "shadcn": "scroll-area",
+      "name": "Scroll Area",
+      "url": "https://ui.shadcn.com/docs/components/scroll-area",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ScrollArea",
+          "module": "structure",
+          "doc": "components/structure.md"
+        }
+      ],
+      "pages": [
+        "estrutura-separador-e-rolagem"
+      ],
+      "aliases": [],
+      "notes": "Barra fina, esmaecimento nas bordas e foco por teclado. A página já rola (Page)."
+    },
+    {
+      "shadcn": "select",
+      "name": "Select",
+      "url": "https://ui.shadcn.com/docs/components/select",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Select",
+          "module": "forms",
+          "doc": "components/forms.md"
+        },
+        {
+          "name": "Combobox",
+          "module": "forms",
+          "doc": "components/forms.md"
+        },
+        {
+          "name": "MultiSelect",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "form-listas",
+        "base-formularios"
+      ],
+      "aliases": [],
+      "notes": "Lista curta e fixa: Select. Entidades com busca: Combobox."
+    },
+    {
+      "shadcn": "separator",
+      "name": "Separator",
+      "url": "https://ui.shadcn.com/docs/components/separator",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Separator",
+          "module": "structure",
+          "doc": "components/structure.md"
+        }
+      ],
+      "pages": [
+        "estrutura-separador-e-rolagem"
+      ],
+      "aliases": [],
+      "notes": "Com `label`, vira divisória rotulada (\"ou\")."
+    },
+    {
+      "shadcn": "sheet",
+      "name": "Sheet",
+      "url": "https://ui.shadcn.com/docs/components/sheet",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Sheet",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        },
+        {
+          "name": "Drawer",
+          "module": "overlays",
+          "doc": "components/overlays.md"
+        },
+        {
+          "name": "FilterSheet",
+          "module": "filters",
+          "doc": "components/filters.md"
+        }
+      ],
+      "pages": [
+        "ov-sheet"
+      ],
+      "aliases": [],
+      "notes": "Sheet = painel temporário; Drawer = criar/editar registro sem perder a lista."
+    },
+    {
+      "shadcn": "sidebar",
+      "name": "Sidebar",
+      "url": "https://ui.shadcn.com/docs/components/sidebar",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Sidebar",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        },
+        {
+          "name": "AppShell",
+          "module": "layout",
+          "doc": "components/layout.md"
+        },
+        {
+          "name": "IconRail",
+          "module": "ai-workspace",
+          "doc": "components/ai-workspace.md"
+        },
+        {
+          "name": "BottomNav",
+          "module": "layout",
+          "doc": "components/layout.md"
+        },
+        {
+          "name": "SessionSidebar",
+          "module": "ai-sessions",
+          "doc": "components/ai-sessions.md"
+        }
+      ],
+      "pages": [
+        "nav-mobile",
+        "ia-layout"
+      ],
+      "aliases": [],
+      "notes": "AppShell monta sidebar no desktop e topo + pílula inferior no celular."
+    },
+    {
+      "shadcn": "skeleton",
+      "name": "Skeleton",
+      "url": "https://ui.shadcn.com/docs/components/skeleton",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Skeleton",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        },
+        {
+          "name": "LoadingState",
+          "module": "states",
+          "doc": "components/states.md"
+        }
+      ],
+      "pages": [
+        "fb-carregando"
+      ],
+      "aliases": [],
+      "notes": "Esqueleto com a forma final do conteúdo."
+    },
+    {
+      "shadcn": "slider",
+      "name": "Slider",
+      "url": "https://ui.shadcn.com/docs/components/slider",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Slider",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        }
+      ],
+      "pages": [
+        "form-selecao"
+      ],
+      "aliases": [],
+      "notes": "Um valor ou faixa [min, max]."
+    },
+    {
+      "shadcn": "sonner",
+      "name": "Sonner",
+      "url": "https://ui.shadcn.com/docs/components/sonner",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Toaster",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        },
+        {
+          "name": "notify",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        }
+      ],
+      "pages": [
+        "fb-toasts"
+      ],
+      "aliases": [
+        "toast"
+      ],
+      "notes": "Toast só depois que terminou, com Desfazer quando reversível."
+    },
+    {
+      "shadcn": "spinner",
+      "name": "Spinner",
+      "url": "https://ui.shadcn.com/docs/components/spinner",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Spinner",
+          "module": "states",
+          "doc": "components/states.md"
+        },
+        {
+          "name": "OperationButton",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        }
+      ],
+      "pages": [
+        "fb-carregando"
+      ],
+      "aliases": [],
+      "notes": "Enquanto executa, o botão informa (OperationButton)."
+    },
+    {
+      "shadcn": "switch",
+      "name": "Switch",
+      "url": "https://ui.shadcn.com/docs/components/switch",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Switch",
+          "module": "forms",
+          "doc": "components/forms.md"
+        }
+      ],
+      "pages": [
+        "base-formularios"
+      ],
+      "aliases": [],
+      "notes": "Preferência com efeito imediato."
+    },
+    {
+      "shadcn": "table",
+      "name": "Table",
+      "url": "https://ui.shadcn.com/docs/components/table",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Table",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableHeader",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableBody",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableRow",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableHead",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableCell",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableFooter",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "TableCaption",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "DataTable",
+          "module": "collections",
+          "doc": "components/collections.md"
+        }
+      ],
+      "pages": [
+        "estrutura-item-e-tabela"
+      ],
+      "aliases": [],
+      "notes": "Table = tabela estática (comparativo, resumo). Coleção de registros: DataTable."
+    },
+    {
+      "shadcn": "tabs",
+      "name": "Tabs",
+      "url": "https://ui.shadcn.com/docs/components/tabs",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Tabs",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        },
+        {
+          "name": "SegmentedControl",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        }
+      ],
+      "pages": [
+        "base-navegacao"
+      ],
+      "aliases": [],
+      "notes": "Tabs = seções de uma entidade; SegmentedControl = alternar visualização."
+    },
+    {
+      "shadcn": "textarea",
+      "name": "Textarea",
+      "url": "https://ui.shadcn.com/docs/components/textarea",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "TextareaField",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        }
+      ],
+      "pages": [
+        "form-texto"
+      ],
+      "aliases": [],
+      "notes": "`autosize` e contador."
+    },
+    {
+      "shadcn": "toast",
+      "name": "Toast",
+      "url": "https://ui.shadcn.com/docs/components/toast",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Toaster",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        },
+        {
+          "name": "notify",
+          "module": "feedback",
+          "doc": "components/feedback.md"
+        }
+      ],
+      "pages": [
+        "fb-toasts"
+      ],
+      "aliases": [],
+      "notes": "Particípio + objeto (\"Proposta enviada\"), sem \"com sucesso\"."
+    },
+    {
+      "shadcn": "toggle",
+      "name": "Toggle",
+      "url": "https://ui.shadcn.com/docs/components/toggle",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Toggle",
+          "module": "controls",
+          "doc": "components/controls.md"
+        }
+      ],
+      "pages": [
+        "acoes-toggle-e-grupos"
+      ],
+      "aliases": [],
+      "notes": "Um botão liga/desliga. Vários relacionados: ToggleGroup."
+    },
+    {
+      "shadcn": "toggle-group",
+      "name": "Toggle Group",
+      "url": "https://ui.shadcn.com/docs/components/toggle-group",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "ToggleGroup",
+          "module": "inputs",
+          "doc": "components/inputs.md"
+        },
+        {
+          "name": "SegmentedControl",
+          "module": "navigation",
+          "doc": "components/navigation.md"
+        }
+      ],
+      "pages": [
+        "form-selecao"
+      ],
+      "aliases": [],
+      "notes": "Escolha única entre visualizações: SegmentedControl."
+    },
+    {
+      "shadcn": "tooltip",
+      "name": "Tooltip",
+      "url": "https://ui.shadcn.com/docs/components/tooltip",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Tooltip",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        },
+        {
+          "name": "TooltipGroup",
+          "module": "overlays-extra",
+          "doc": "components/overlays-extra.md"
+        }
+      ],
+      "pages": [
+        "ov-tooltip"
+      ],
+      "aliases": [],
+      "notes": "Nome/atalho de controle só-ícone; nunca conteúdo essencial."
+    },
+    {
+      "shadcn": "typography",
+      "name": "Typography",
+      "url": "https://ui.shadcn.com/docs/components/typography",
+      "status": "equivalente",
+      "ours": [
+        {
+          "name": "Prose",
+          "module": "structure",
+          "doc": "components/structure.md"
+        },
+        {
+          "name": "ReadingColumn",
+          "module": "layout",
+          "doc": "components/layout.md"
+        }
+      ],
+      "pages": [
+        "estrutura-tipografia"
+      ],
+      "aliases": [],
+      "notes": "Prose para markdown renderizado, termos e respostas de IA; escala de texto nos utilitários (text-body, text-title…)."
+    }
+  ],
+  "extras": [
+    {
+      "name": "Color Picker",
+      "ours": [
+        {
+          "name": "ColorPicker",
+          "module": "controls",
+          "doc": "components/controls.md"
+        }
+      ],
+      "pages": [
+        "form-cor"
+      ],
+      "notes": "Não existe no shadcn. Cor da marca do cliente, etiquetas, calendários; mostra o contraste."
+    },
+    {
+      "name": "Sortable",
+      "ours": [
+        {
+          "name": "SortableList",
+          "module": "sortable",
+          "doc": "components/sortable.md"
+        }
+      ],
+      "pages": [
+        "colecoes-reordenar"
+      ],
+      "notes": "Não existe no shadcn. Reordenar por arraste e teclado, com anúncios em pt-BR."
+    },
+    {
+      "name": "Tree View",
+      "ours": [
+        {
+          "name": "TreeView",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
+        }
+      ],
+      "pages": [
+        "nav-revelacao"
+      ],
+      "notes": "Não existe no shadcn. Pastas, plano de contas, estrutura de times."
+    },
+    {
+      "name": "Time Picker",
+      "ours": [
+        {
+          "name": "TimePicker",
+          "module": "dates",
+          "doc": "components/dates.md"
+        }
+      ],
+      "pages": [
+        "datas-horario"
+      ],
+      "notes": "Não existe no shadcn. Horário digitável (\"9h30\")."
+    },
+    {
+      "name": "Copy Button",
+      "ours": [
+        {
+          "name": "CopyButton",
+          "module": "interactive",
+          "doc": "components/interactive.md"
+        }
+      ],
+      "pages": [
+        "ia-imagens"
+      ],
+      "notes": "Copia e confirma com ✓."
+    }
+  ]
+}

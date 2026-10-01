@@ -168,6 +168,25 @@ await test("erros: ferramenta/prompt desconhecidos → -32602; argumento inváli
   }),
 );
 
+await test("search: nomes do shadcn/ui levam ao equivalente do DS", () =>
+  withStdioClient("2025-06-18", async (c) => {
+    for (const [q, want] of [
+      ["alert-dialog", "ConfirmDialog"],
+      ["AlertDialog", "ConfirmDialog"],
+      ["dropdown menu", "Menu"],
+      ["sonner", "notify"],
+      ["input-group", "InputGroup"],
+    ]) {
+      const r = await c.callTool({ name: "search", arguments: { query: q, limit: 3 } });
+      const top = JSON.parse(text(r).split("\n\nMais")[0]);
+      assert.equal(top[0].type, "shadcn", q);
+      assert.ok(top[0].ours.includes(want), `${q} → ${want}`);
+    }
+    const g = await c.callTool({ name: "get_guide", arguments: { slug: "guias/shadcn-equivalencias" } });
+    assert.match(text(g), /Alert Dialog/);
+  }),
+);
+
 await test("respostas longas: paginadas com offset e dica de continuação", () =>
   withStdioClient("2025-06-18", async (c) => {
     const { tools } = await c.listTools();

@@ -4,6 +4,7 @@
 import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
+import { Menubar as BaseMenubar } from "@base-ui/react/menubar";
 import { PreviewCard as BasePreviewCard } from "@base-ui/react/preview-card";
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { Check, ChevronLeft, ChevronRight, CornerDownLeft, Search, X } from "lucide-react";
@@ -641,5 +642,47 @@ export function Lightbox({ images, index, onIndexChange }: { images: LightboxIma
         </BaseDialog.Popup>
       </BaseDialog.Portal>
     </BaseDialog.Root>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Menubar                                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Barra de menus de aplicativo de documento (Arquivo · Editar · Ver), como
+ * em editores, planilhas e construtores. ←/→ alternam os menus abertos. Itens
+ * no mesmo formato do Menu (atalhos, marcações, escolha única, submenus).
+ * Em apps de gestão (CRM, ATS, ERP) prefira botões + ActionMenu: menubar só
+ * onde há muitas ações de documento.
+ */
+export function Menubar({
+  menus,
+  label,
+  className,
+}: {
+  menus: { label: string; items: MenuEntry[]; disabled?: boolean }[];
+  /** Nome acessível da barra ("Menu do editor"). */
+  label: string;
+  className?: string;
+}) {
+  const [ref, container] = usePortalContainer<HTMLDivElement>();
+  return (
+    <BaseMenubar ref={ref} aria-label={label} className={cn("flex items-center gap-0.5 rounded-lg border border-line bg-surface p-1", className)}>
+      {menus.map((m) => (
+        <BaseMenu.Root key={m.label} disabled={m.disabled}>
+          <BaseMenu.Trigger className="inline-flex h-7 select-none items-center rounded-md px-2.5 text-[13px] font-medium text-ink-soft outline-none hover:bg-soft hover:text-ink focus-visible:bg-soft focus-visible:ring-2 focus-visible:ring-accent/40 data-disabled:opacity-40 data-popup-open:bg-soft data-popup-open:text-ink">
+            {m.label}
+          </BaseMenu.Trigger>
+          <BaseMenu.Portal container={container}>
+            <BaseMenu.Positioner side="bottom" align="start" sideOffset={6} collisionPadding={12} className="z-[100] outline-none">
+              <BaseMenu.Popup className={menuPopup}>
+                <MenuEntries items={m.items} container={container} />
+              </BaseMenu.Popup>
+            </BaseMenu.Positioner>
+          </BaseMenu.Portal>
+        </BaseMenu.Root>
+      ))}
+    </BaseMenubar>
   );
 }

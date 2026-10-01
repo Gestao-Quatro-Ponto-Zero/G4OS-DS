@@ -10,8 +10,8 @@
  *   export const meta: BlockMeta = { title, description, category, height? };
  *   export default function Block() { … }   // tela inteira, dados de exemplo no topo do arquivo
  */
-import { Check, Copy, Maximize2, Monitor, Moon, RotateCw, Smartphone, Sun, Tablet } from "lucide-react";
-import { useState, type ComponentType, type ReactNode } from "react";
+import { ArrowUpRight, Check, Copy, Maximize2, Monitor, Moon, RotateCw, Smartphone, Sun, Tablet } from "lucide-react";
+import { createContext, useContext, useState, type ComponentType, type ReactNode } from "react";
 import { cn } from "@g4ai/ds";
 import { blockFiles } from "./.generated/registry";
 
@@ -30,7 +30,44 @@ export const groups = [
   "Mídia e conteúdo",
   "IA e interação",
 ] as const;
-export type PageMeta = { title: string; group: (typeof groups)[number]; order?: number; description?: string };
+export type PageMeta = {
+  title: string;
+  group: (typeof groups)[number];
+  order?: number;
+  description?: string;
+  /**
+   * Componente(s) equivalente(s) no shadcn/ui (slug de ui.shadcn.com/docs/components/<slug>).
+   * Opcional: sem ele, o selo vem de scripts/data/shadcn-map.json (campo `pages`).
+   * `false` esconde o selo.
+   */
+  shadcn?: string | string[] | false;
+};
+
+/** Equivalentes no shadcn da página atual (preenchido pelo DocsLayout). */
+export const ShadcnContext = createContext<{ slug: string; name: string }[]>([]);
+
+function ShadcnChips() {
+  const items = useContext(ShadcnContext);
+  if (!items.length) return null;
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-muted">
+      <span>Equivalente no shadcn:</span>
+      {items.map((it) => (
+        <a
+          key={it.slug}
+          href={`https://ui.shadcn.com/docs/components/${it.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2 py-0.5 font-medium text-ink-soft no-underline hover:border-line-strong hover:text-ink"
+        >
+          {it.name}
+          <ArrowUpRight aria-hidden className="h-3 w-3" />
+          <span className="sr-only">(abre ui.shadcn.com em nova aba)</span>
+        </a>
+      ))}
+    </div>
+  );
+}
 export type PageModule = { meta: PageMeta; default: ComponentType; slug: string; source: string };
 
 export const blockCategories = ["SaaS", "CRM", "ATS", "ERP", "Financeiro", "Autenticação", "Configurações", "Onboarding", "Aplicação", "IA", "Marketing"] as const;
@@ -57,6 +94,7 @@ export function DocPage({ title, description, children, kicker }: { title: strin
         {kicker && <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-muted">{kicker}</p>}
         <h1 className="m-0 text-[25px] font-semibold tracking-[-0.035em]">{title}</h1>
         {description && <div className="m-0 mt-2 max-w-[680px] text-[13.5px] leading-relaxed text-muted">{description}</div>}
+        <ShadcnChips />
       </header>
       <div className="divide-y divide-line">{children}</div>
     </article>

@@ -10,17 +10,26 @@ Seletor de data (Popover + Calendar, pt-BR).
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `label` * | `string` |  |  |
+| `label` * | `string` |  | Rótulo visível acima do campo e nome acessível. |
 | `onValueChange` * | `(value: string) => void` |  |  |
 | `value` * | `string` |  |  |
 | `businessDaysOnly` | `boolean \| undefined` |  | Só dias úteis (fins de semana e feriados nacionais desabilitados). |
 | `className` | `string \| undefined` |  |  |
+| `clearable` | `boolean \| undefined` | `false` | Botão × no campo para voltar a vazio. |
 | `disabled` | `boolean \| undefined` |  |  |
+| `error` | `ReactNode` |  | Erro abaixo do campo (substitui a ajuda) e borda rose. |
 | `extraHolidays` | `Holiday[] \| undefined` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Só nome acessível, sem rótulo visível (toolbar, tabela, filtro). |
+| `hint` | `ReactNode` |  | Texto de ajuda abaixo do campo. |
+| `id` | `string \| undefined` |  |  |
 | `max` | `string \| undefined` |  |  |
 | `min` | `string \| undefined` |  |  |
+| `now` | `string \| undefined` |  | "Hoje" de referência (testes, fuso do servidor). |
+| `optional` | `boolean \| undefined` |  | Acrescenta "(opcional)" ao rótulo. |
 | `placeholder` | `string \| undefined` | `"Selecione a data"` |  |
-| `triggerContent` | `ReactNode` |  |  |
+| `presentation` | `PopupPresentation \| undefined` | `"auto"` | auto = folha inferior no celular; popover = sempre ancorado. |
+| `shortcuts` | `boolean \| undefined` | `true` | Rodapé com "Hoje" (e "Limpar" quando `clearable`). |
+| `triggerContent` | `ReactNode` |  | Gatilho próprio (ex.: chip). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
