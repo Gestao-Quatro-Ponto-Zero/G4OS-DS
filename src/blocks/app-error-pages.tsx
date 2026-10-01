@@ -19,6 +19,20 @@ export const meta = {
   category: "Aplicação",
   order: 1,
   height: 720,
+  concept: {
+    goal: "Dar saída clara quando algo dá errado (404, 500, 403, offline, manutenção) sem tirar a pessoa do app.",
+    patterns: [
+      "Estados de tela dentro da casca: a navegação continua disponível",
+      "Cada estado com causa em linguagem simples e uma ação de saída",
+      "Estado linkável (?estado=) para testar",
+    ],
+    adapt: [
+      "Use os mesmos estados em qualquer produto; troque textos e destinos das ações",
+    ],
+    avoid: [
+      "Tela de erro sem caminho de volta",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

@@ -12,6 +12,21 @@ export const meta = {
   category: "Onboarding",
   order: 2,
   height: 860,
+  concept: {
+    goal: "Levar uma conta nova ao primeiro valor com poucos passos, cada um com a ação direta.",
+    patterns: [
+      "Anatomia B · Painel (home): cabeçalho fixo com saudação",
+      "Checklist com progresso; um passo aberto por vez",
+      "Cada passo leva à tela real onde a ação acontece",
+      "Pode ser dispensado; progresso salvo",
+    ],
+    adapt: [
+      "Ativação de cliente no SaaS, implantação no ERP, onboarding de recrutador",
+    ],
+    avoid: [
+      "Checklist com passos que não levam a lugar nenhum",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -69,7 +84,7 @@ export default function OnboardingChecklistBlock() {
     <AtlasShell current={atlasRoutes.home}>
       <Page>
         <div className="mx-auto max-w-[880px]">
-          <PageHeading kicker="Quarta · 30/09" title={`Boas-vindas, ${me.name.split(" ")[0]}`} description={`Alguns passos para o ${org.product} ficar com a cara da ${org.name}.`} sticky={false} />
+          <PageHeading kicker="Quarta · 30/09" title={`Boas-vindas, ${me.name.split(" ")[0]}`} description={`Alguns passos para o ${org.product} ficar com a cara da ${org.name}.`} />
           {fromWizard && (
             <div className="mt-6">
               <Callout tone="ok" title="Workspace criado">

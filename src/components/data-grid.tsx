@@ -1044,10 +1044,11 @@ export function DataGrid<T>(props: DataGridProps<T>) {
   return (
     <div
       ref={rootRef}
-      className={cn("data-grid relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-surface", className)}
+      className={cn("data-grid relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-surface", maxHeight != null && "data-grid-capped", className)}
       data-density={density}
       data-zebra={zebra ? "" : undefined}
-      style={{ height, maxHeight }}
+      // maxHeight vale do tablet para cima; no celular a página rola (sem rolagem aninhada).
+      style={{ height, ["--dg-max-h" as string]: maxHeight == null ? undefined : typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
     >
       {showToolbar && (
         <div className="flex flex-wrap items-start gap-2 border-b border-line px-3 py-2">

@@ -11,6 +11,21 @@ export const meta = {
   category: "Configurações",
   order: 3,
   height: 960,
+  concept: {
+    goal: "Deixar cada pessoa escolher onde quer ser avisada de quê, sem ruído.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "Matriz evento × canal por módulo",
+      "Resumo diário, horário de silêncio e pausa geral",
+      "Salva sozinho (efeito imediato, sem botão)",
+    ],
+    adapt: [
+      "Preferências de qualquer produto",
+    ],
+    avoid: [
+      "Botão Salvar para switches de efeito imediato",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

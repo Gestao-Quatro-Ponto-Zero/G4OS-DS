@@ -26,6 +26,20 @@ export const meta = {
   category: "ATS",
   order: 8,
   height: 900,
+  concept: {
+    goal: "Conduzir propostas de contratação pela aprovação até o aceite, com o risco de salário visível.",
+    patterns: [
+      "Anatomia F · Mestre-detalhe: lista de propostas + detalhe com cadeia de aprovação",
+      "Alerta quando o salário sai da faixa",
+      "Ações mudam com a situação (aprovar, enviar, registrar resposta)",
+    ],
+    adapt: [
+      "Descontos comerciais, compras acima da alçada, reembolsos",
+    ],
+    avoid: [
+      "Botões de todas as ações sempre visíveis, independentemente da situação",
+    ],
+  },
 } as const;
 
 const tabs: { id: "abertas" | OfferStatus | "todas"; label: string; match: (o: Offer) => boolean }[] = [

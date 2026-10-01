@@ -13,9 +13,12 @@ import {
   Copy,
   Database,
   Download,
+  Ellipsis,
   FileSpreadsheet,
   FileText,
+  FolderOpen,
   Globe,
+  Info,
   Layers,
   Link,
   LoaderCircle,
@@ -335,6 +338,7 @@ export function RunSummary({
   cost,
   defaultOpen = false,
   children,
+  variant = "inline",
   className,
 }: {
   status: RunStatus;
@@ -347,6 +351,12 @@ export function RunSummary({
   cost?: string;
   defaultOpen?: boolean;
   children?: ReactNode;
+  /**
+   * "inline" (padrão): "✓ Concluído em 40 s · 9 passos ›" com o trace num cartão.
+   * "divider": linha discreta "Trabalhou por 1 min 1 s ›" com fio fino em toda a
+   * largura (estilo Codex); o trace abre recuado, sem cartão. Para tarefas longas.
+   */
+  variant?: "inline" | "divider";
   className?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -361,6 +371,30 @@ export function RunSummary({
     status === "running" ? `Trabalhando… ${formatDuration(ms)}` : status === "error" ? `Falhou após ${formatDuration(ms)}` : status === "stopped" ? `Interrompido em ${formatDuration(ms)}` : `Concluído em ${formatDuration(ms)}`;
   const Icon = status === "running" ? LoaderCircle : status === "error" ? CircleX : status === "stopped" ? Square : CircleCheck;
   const meta = [steps != null && `${steps} passos`, tools != null && `${tools} ferramentas`, tokens != null && `${formatNumber(tokens)} tokens`, cost].filter(Boolean).join(" · ");
+  if (variant === "divider") {
+    const text =
+      status === "running" ? `Trabalhando… ${formatDuration(ms)}` : status === "error" ? `Falhou depois de ${formatDuration(ms)}` : status === "stopped" ? `Interrompido em ${formatDuration(ms)}` : `Trabalhou por ${formatDuration(ms)}`;
+    return (
+      <div className={cn("min-w-0", className)}>
+        <button
+          type="button"
+          onClick={() => children && setOpen((o) => !o)}
+          aria-expanded={children ? open : undefined}
+          title={meta || undefined}
+          className={cn(
+            "group flex w-full items-center gap-1 border-b border-line pb-2 text-left text-[13px] transition-colors",
+            status === "error" ? "text-rose" : "text-muted",
+            !!children && "hover:text-ink",
+          )}
+        >
+          <span className={cn("whitespace-nowrap tabular-nums", status === "running" && "ds-shimmer")}>{text}</span>
+          {children && <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 transition-transform", open && "rotate-90")} aria-hidden />}
+          {meta && open && <span className="ml-auto hidden truncate pl-3 text-[11.5px] sm:inline">{meta}</span>}
+        </button>
+        {open && children && <div className="enter mt-3 border-l border-line pl-4">{children}</div>}
+      </div>
+    );
+  }
   return (
     <div className={cn("min-w-0", className)}>
       <button
@@ -370,8 +404,8 @@ export function RunSummary({
         className={cn("group inline-flex max-w-full items-center gap-1.5 rounded-md py-0.5 text-[12.5px]", !!children && "hover:text-ink", status === "error" ? "text-rose" : "text-muted")}
       >
         <Icon className={cn("h-3.5 w-3.5 shrink-0", status === "running" && "animate-spin", status === "done" && "text-ok")} aria-hidden />
-        <span className={cn("font-medium tabular-nums", status === "running" && "ds-shimmer")}>{label}</span>
-        {meta && <span className="hidden truncate sm:inline">· {meta}</span>}
+        <span className={cn("whitespace-nowrap font-medium tabular-nums", status === "running" && "ds-shimmer")}>{label}</span>
+        {meta && <span className="hidden min-w-0 truncate sm:inline">· {meta}</span>}
         {children && <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 transition-transform", open && "rotate-90")} aria-hidden />}
       </button>
       {open && children && <div className="enter mt-2 rounded-xl border border-line bg-surface p-3">{children}</div>}
@@ -383,7 +417,7 @@ export function RunSummary({
 /* Artefatos                                                           */
 /* ================================================================== */
 
-export type ArtifactKind = "report" | "sheet" | "doc" | "chart" | "code" | "email" | "deck" | "context" | "output";
+export type ArtifactKind = "report" | "sheet" | "doc" | "chart" | "code" | "email" | "deck" | "context" | "output" | "details" | "files";
 
 export const artifactIcons: Record<ArtifactKind, LucideIcon> = {
   report: FileText,
@@ -395,6 +429,8 @@ export const artifactIcons: Record<ArtifactKind, LucideIcon> = {
   deck: Presentation,
   context: Layers,
   output: Sparkles,
+  details: Info,
+  files: FolderOpen,
 };
 const artifactTint: Partial<Record<ArtifactKind, string>> = { sheet: "text-ok", chart: "text-blue", deck: "text-accent-deep", email: "text-clay" };
 
@@ -497,9 +533,46 @@ export function ArtifactPanel({
   className?: string;
 }) {
   const strip = useRef<HTMLDivElement>(null);
+  // Abas não cabem → as inativas viram só ícone (com dica) e aparece o menu
+  // "Todas as abas"; a ativa fica sempre inteira. `need` = largura com rótulos.
+  const [overflow, setOverflow] = useState(false);
+  const need = useRef(0);
+  const tabKey = tabs.map((t) => t.title).join("|");
   useEffect(() => {
-    strip.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [active]);
+    const el = strip.current;
+    if (!el) return;
+    const check = () =>
+      setOverflow((compact) => {
+        if (!compact) {
+          if (el.scrollWidth <= el.clientWidth + 1) return false;
+          need.current = el.scrollWidth;
+          return true;
+        }
+        return el.clientWidth < need.current;
+      });
+    // Abas mudaram: remede a partir do modo completo (com rótulos).
+    setOverflow(false);
+    const raf = requestAnimationFrame(check);
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [tabKey]);
+  useEffect(() => {
+    const el = strip.current;
+    const tab = el?.querySelector<HTMLElement>('[aria-selected="true"]')?.parentElement;
+    if (!el || !tab) return;
+    // Rola só a faixa (scrollIntoView rolaria a página): aba ativa sempre inteira.
+    if (tab.offsetLeft < el.scrollLeft) el.scrollLeft = tab.offsetLeft;
+    else if (tab.offsetLeft + tab.offsetWidth > el.scrollLeft + el.clientWidth) el.scrollLeft = tab.offsetLeft + tab.offsetWidth - el.clientWidth + 24;
+  }, [active, overflow]);
+  const moreActions: MenuEntry[] = [
+    ...(onCopy ? [{ label: "Copiar", icon: <Copy className="h-4 w-4" />, onSelect: onCopy }] : []),
+    ...(onExport ? [{ label: "Exportar", icon: <Download className="h-4 w-4" />, onSelect: onExport }] : []),
+    ...(onShare ? [{ label: "Compartilhar", icon: <Share2 className="h-4 w-4" />, onSelect: onShare }] : []),
+  ];
   const onTabKey = (e: KeyboardEvent, i: number) => {
     const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : -1;
     if (next < 0 || next >= tabs.length) return;
@@ -509,17 +582,18 @@ export function ArtifactPanel({
   };
   const iconBtn = "grid h-8 w-8 shrink-0 place-items-center self-center rounded-lg text-muted hover:bg-soft hover:text-ink";
   return (
-    <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-page", className)} aria-label="Artefatos">
+    <section className={cn("@container/panel flex min-h-0 min-w-0 flex-1 flex-col bg-page", className)} aria-label="Artefatos">
       <header className="flex h-12 shrink-0 items-stretch gap-1 border-b border-line px-2">
         {onClose && (
           <button type="button" onClick={onClose} aria-label="Fechar painel" className={cn(iconBtn, "md:hidden")}>
             <X className="h-4 w-4" />
           </button>
         )}
-        <div ref={strip} role="tablist" aria-label="Artefatos abertos" className="flex min-w-0 flex-1 items-stretch gap-1 overflow-x-auto [scrollbar-width:none]">
+        <div ref={strip} role="tablist" aria-label="Artefatos abertos" className="relative flex min-w-0 flex-1 items-stretch gap-1 overflow-x-auto [scrollbar-width:none]">
           {tabs.map((t, i) => {
             const on = t.id === active;
             const Icon = artifactIcons[t.kind];
+            const iconOnly = overflow && !on;
             return (
               <div
                 key={t.id}
@@ -533,12 +607,18 @@ export function ArtifactPanel({
                   tabIndex={on ? 0 : -1}
                   onKeyDown={(e) => onTabKey(e, i)}
                   onClick={() => onActiveChange(t.id)}
-                  className={cn("my-1.5 flex h-8 max-w-[200px] items-center gap-1.5 rounded-md pl-2.5 text-[12.5px] transition-colors", t.closable && onCloseTab ? "pr-1" : "pr-2.5", on ? "font-medium text-ink" : "text-muted hover:bg-soft hover:text-ink")}
+                  aria-label={iconOnly ? t.title : undefined}
+                  title={iconOnly ? t.title : undefined}
+                  className={cn(
+                    "my-1.5 flex h-8 max-w-[200px] items-center gap-1.5 rounded-md text-[12.5px] transition-colors",
+                    iconOnly ? "w-8 justify-center" : cn("pl-2.5", t.closable && onCloseTab ? "pr-1" : "pr-2.5"),
+                    on ? "font-medium text-ink" : "text-muted hover:bg-soft hover:text-ink",
+                  )}
                 >
                   <Icon className={cn("h-3.5 w-3.5 shrink-0", artifactTint[t.kind])} aria-hidden />
-                  <span className="truncate">{t.title}</span>
+                  {!iconOnly && <span className="truncate">{t.title}</span>}
                 </button>
-                {t.closable && onCloseTab && (
+                {t.closable && onCloseTab && !iconOnly && (
                   <button
                     type="button"
                     onClick={() => onCloseTab(t.id)}
@@ -564,36 +644,51 @@ export function ArtifactPanel({
             />
           )}
         </div>
-        {tabs.length > 4 && (
+        {(overflow || tabs.length > 4) && (
           <Menu
             label="Todas as abas"
             align="end"
-            triggerClassName="!hidden !h-8 !w-8 shrink-0 justify-center !gap-0 !bg-transparent !px-0 !text-muted !ring-0 hover:!bg-soft hover:!text-ink sm:!inline-flex"
+            triggerClassName="!h-8 !w-8 shrink-0 self-center justify-center !gap-0 !bg-transparent !px-0 !text-muted !ring-0 hover:!bg-soft hover:!text-ink"
             trigger={<ChevronDown className="h-4 w-4" />}
-            items={tabs.map((t): MenuEntry => ({ label: t.title, onSelect: () => onActiveChange(t.id) }))}
+            items={tabs.map((t): MenuEntry => {
+              const Icon = artifactIcons[t.kind];
+              return { type: "checkbox", label: t.title, icon: <Icon className="h-4 w-4" />, checked: t.id === active, onCheckedChange: () => onActiveChange(t.id) };
+            })}
           />
         )}
-        <span aria-hidden className="mx-0.5 hidden h-5 w-px self-center bg-line sm:block" />
+        {moreActions.length > 0 && <span aria-hidden className="mx-0.5 hidden h-5 w-px self-center bg-line @[440px]/panel:block" />}
+        {/* Estreito: copiar/exportar/compartilhar vão para o ⋯. */}
         {onCopy && (
           <Tooltip content="Copiar" side="bottom">
-            <button type="button" onClick={onCopy} aria-label="Copiar" className={cn(iconBtn, "hidden sm:grid")}>
+            <button type="button" onClick={onCopy} aria-label="Copiar" className={cn(iconBtn, "hidden @[440px]/panel:grid")}>
               <Copy className="h-4 w-4" />
             </button>
           </Tooltip>
         )}
         {onExport && (
           <Tooltip content="Exportar" side="bottom">
-            <button type="button" onClick={onExport} aria-label="Exportar" className={iconBtn}>
+            <button type="button" onClick={onExport} aria-label="Exportar" className={cn(iconBtn, "hidden @[440px]/panel:grid")}>
               <Download className="h-4 w-4" />
             </button>
           </Tooltip>
         )}
         {onShare && (
           <Tooltip content="Compartilhar" side="bottom">
-            <button type="button" onClick={onShare} aria-label="Compartilhar" className={iconBtn}>
+            <button type="button" onClick={onShare} aria-label="Compartilhar" className={cn(iconBtn, "hidden @[440px]/panel:grid")}>
               <Share2 className="h-4 w-4" />
             </button>
           </Tooltip>
+        )}
+        {moreActions.length > 0 && (
+          <span className="flex shrink-0 self-center @[440px]/panel:hidden">
+            <Menu
+              label="Mais ações do painel"
+              align="end"
+              triggerClassName="!h-8 !w-8 justify-center !gap-0 !rounded-lg !bg-transparent !px-0 !text-muted !ring-0 hover:!bg-soft hover:!text-ink"
+              trigger={<Ellipsis className="h-4 w-4" />}
+              items={moreActions}
+            />
+          </span>
         )}
         {onExpandedChange && (
           <Tooltip content={expanded ? "Reduzir" : "Expandir"} side="bottom">
@@ -1250,6 +1345,7 @@ export function AgentComposer({
   leading,
   trailing,
   footer,
+  hint,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -1275,6 +1371,8 @@ export function AgentComposer({
   trailing?: ReactNode;
   /** Linha extra no rodapé do campo (ex.: ToolsBar com ferramentas conectadas). */
   footer?: ReactNode;
+  /** Dica discreta à direita da 1ª linha, só com o campo vazio e largo (≥ 640px). Ex.: "/ para comandos". */
+  hint?: ReactNode;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [cmdIdx, setCmdIdx] = useState(0);
@@ -1323,7 +1421,7 @@ export function AgentComposer({
     { label: "Link (URL)", icon: <Link className="h-4 w-4" /> },
   ];
   return (
-    <div className={cn("relative rounded-2xl border border-line bg-surface shadow-surface transition-colors focus-within:border-line-strong", className)}>
+    <div className={cn("@container/composer relative rounded-2xl border border-line bg-surface shadow-surface transition-colors focus-within:border-line-strong", className)}>
       {menuOpen && (
         <div role="listbox" aria-label="Comandos" className="absolute inset-x-2 bottom-full z-20 mb-2 overflow-hidden rounded-xl border border-line bg-popover p-1 shadow-popup">
           {filtered.map((c, i) => (
@@ -1357,6 +1455,7 @@ export function AgentComposer({
           <span className="sr-only">Gravando áudio</span>
         </div>
       ) : (
+        <div className="relative">
         <textarea
           ref={ref}
           rows={1}
@@ -1395,10 +1494,20 @@ export function AgentComposer({
               send();
             }
           }}
-          className="block max-h-[220px] min-h-[52px] w-full resize-none bg-transparent px-4 pt-3.5 text-[14px] leading-relaxed text-ink outline-none placeholder:text-muted focus-visible:shadow-none"
+          className={cn(
+            "block max-h-[220px] min-h-[52px] w-full resize-none bg-transparent px-4 pt-3.5 text-[14px] leading-relaxed text-ink outline-none placeholder:truncate placeholder:text-muted focus-visible:shadow-none",
+            !!hint && !value && "@[640px]/composer:pr-40",
+          )}
         />
+        {hint && !value && (
+          <span aria-hidden className="pointer-events-none absolute right-4 top-4 hidden whitespace-nowrap text-[12px] text-muted @[640px]/composer:inline-flex">
+            {hint}
+          </span>
+        )}
+        </div>
       )}
-      <div className="flex items-center gap-1.5 px-2 pb-2 pt-1">
+      {/* @container: os chips (permissão, modelo, ferramentas) compactam sozinhos quando o campo é estreito. */}
+      <div className="@container flex items-center gap-1.5 px-2 pb-2 pt-1 [&>*]:shrink-0">
         {recording == null ? (
           <>
             <Menu

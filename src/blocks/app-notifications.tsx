@@ -22,6 +22,20 @@ export const meta = {
   category: "Aplicação",
   order: 2,
   height: 820,
+  concept: {
+    goal: "Ver o que pede atenção agora e limpar a caixa rápido, para quem recebe avisos de vários módulos.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo com 'Marcar tudo como lido'",
+      "Abas Todas / Não lidas / Menções; grupos por dia",
+      "Cada aviso abre o registro e marca como lido; arquivar com desfazer",
+    ],
+    adapt: [
+      "Central de avisos de qualquer produto; no celular, item da pílula com contador",
+    ],
+    avoid: [
+      "Notificação que não leva a lugar nenhum",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

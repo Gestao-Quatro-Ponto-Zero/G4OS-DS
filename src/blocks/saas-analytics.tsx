@@ -27,6 +27,20 @@ export const meta = {
   category: "SaaS",
   order: 2,
   height: 1540,
+  concept: {
+    goal: "Entender de onde vêm os clientes e onde a aquisição perde gente.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com período",
+      "Funil em colunas com a maior perda destacada",
+      "Origem, dispositivos, conversão no tempo e atividade diária",
+    ],
+    adapt: [
+      "Funil de recrutamento, funil comercial",
+    ],
+    avoid: [
+      "Funil sem mostrar a conversão entre etapas",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

@@ -15,7 +15,7 @@ import {
   useFilters,
   usePagination,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { me, people } from "./data/workspace";
 import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
@@ -28,6 +28,21 @@ export const meta = {
   category: "Configurações",
   order: 8,
   height: 900,
+  concept: {
+    goal: "Responder quem fez o quê e quando, para segurança e compliance.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "PageToolbar com busca e filtros por pessoa, área e risco",
+      "Detalhe do evento (antes/depois, IP) em gaveta por ?id=",
+      "Exportação do recorte",
+    ],
+    adapt: [
+      "Histórico de alterações de pedidos, de contratos",
+    ],
+    avoid: [
+      "Log sem o antes/depois",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -111,7 +126,9 @@ export default function SettingsAuditLogBlock() {
       }
     >
       <div className="space-y-4">
-        <FilterBar filters={filters} noun="evento" search={<TableSearch value={q} onChange={filters.setQuery} total={events.length} noun="evento" searchIn="pessoa, ação, alvo e IP" />} />
+        <PageToolbar>
+          <FilterBar filters={filters} noun="evento" search={<TableSearch value={q} onChange={filters.setQuery} total={events.length} noun="evento" searchIn="pessoa, ação, alvo e IP" />} />
+        </PageToolbar>
         <DataTable
           rows={pages.rows}
           columns={cols}

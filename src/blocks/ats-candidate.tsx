@@ -32,6 +32,21 @@ export const meta = {
   category: "ATS",
   order: 5,
   height: 1300,
+  concept: {
+    goal: "Decidir sobre um candidato com tudo à mão: em que etapa está, como foi avaliado por critério e o que vem a seguir.",
+    patterns: [
+      "Anatomia C · Registro: trilha + nome + ações fixos; propriedades fixas à direita (SplitLayout)",
+      "StagePath clicável mostra o caminho e o próximo passo",
+      "Avaliações por critério e por entrevistador; radar contra o perfil da vaga",
+      "Reprovar pede confirmação; proposta em modal",
+    ],
+    adapt: [
+      "Registro de cliente no CRM (etapas do negócio), fornecedor em homologação no ERP",
+    ],
+    avoid: [
+      "Nota única sem critérios (esconde o porquê da decisão)",
+    ],
+  },
 } as const;
 
 function Score({ value }: { value: number }) {

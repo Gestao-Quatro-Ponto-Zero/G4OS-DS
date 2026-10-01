@@ -30,6 +30,20 @@ export const meta = {
   category: "SaaS",
   order: 7,
   height: 980,
+  concept: {
+    goal: "Gerar e agendar relatórios recorrentes para quem precisa receber números sem entrar no app.",
+    patterns: [
+      "Anatomia A · Lista: modelos prontos + relatórios salvos",
+      "Agendamento e execução manual",
+      "Criação com destinatários em modal",
+    ],
+    adapt: [
+      "Relatórios do financeiro, do recrutamento, de operações",
+    ],
+    avoid: [
+      "Relatório sem dono nem próxima execução visível",
+    ],
+  },
 } as const;
 
 const here = "#/frame/saas-reports";

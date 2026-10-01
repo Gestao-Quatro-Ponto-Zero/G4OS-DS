@@ -29,6 +29,20 @@ export const meta = {
   category: "SaaS",
   order: 8,
   height: 980,
+  concept: {
+    goal: "Manter as integrações funcionando e conectar novas sem sair do produto.",
+    patterns: [
+      "Catálogo por categoria com busca",
+      "Estado de sincronização e erro com reconexão em destaque",
+      "Autorização em modal; configuração em gaveta",
+    ],
+    adapt: [
+      "Conexões bancárias, canais de venda, provedores de e-mail",
+    ],
+    avoid: [
+      "Integração com erro sem botão de reconectar",
+    ],
+  },
 } as const;
 
 const here = "#/frame/saas-integrations";

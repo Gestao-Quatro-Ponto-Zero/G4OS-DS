@@ -25,7 +25,7 @@ import {
   useFilters,
   useSort,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { br, products, suppliers, today, type Supplier } from "./data/erp";
 import { payableStatus, payables } from "./data/fin";
@@ -39,6 +39,21 @@ export const meta = {
   category: "ERP",
   order: 8,
   height: 1100,
+  concept: {
+    goal: "Escolher e acompanhar fornecedores por pontualidade, prazo e gasto.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+      "Classificação A/B/C e OTIF contra a meta",
+      "Dispersão prazo × pontualidade para achar os problemáticos",
+      "Detalhe em gaveta",
+    ],
+    adapt: [
+      "Parceiros, agências, transportadoras",
+    ],
+    avoid: [
+      "Nota do fornecedor sem os critérios",
+    ],
+  },
 } as const;
 
 const ratingTone = { A: "ok", B: "info", C: "warn" } as const;
@@ -107,7 +122,9 @@ export default function ErpSuppliers() {
           </ChartCard>
         </div>
         <div className="mt-6 space-y-4">
-          <FilterBar filters={filters} noun="fornecedor" nounPlural="fornecedores" search={<TableSearch value={q} onChange={filters.setQuery} total={suppliers.length} noun="fornecedor" nounPlural="fornecedores" searchIn="nome, CNPJ, categoria e contato" />} />
+          <PageToolbar>
+            <FilterBar filters={filters} noun="fornecedor" nounPlural="fornecedores" search={<TableSearch value={q} onChange={filters.setQuery} total={suppliers.length} noun="fornecedor" nounPlural="fornecedores" searchIn="nome, CNPJ, categoria e contato" />} />
+          </PageToolbar>
           <DataTable rows={sort.rows} columns={columns} rowKey={(x) => x.id} onRowClick={(x) => setOpen(x.id)} rowLabel={(x) => `Abrir ${x.name}`} empty={<EmptyFilterResult filters={filters} noun="fornecedor" nounPlural="fornecedores" />} />
         </div>
       </Page>

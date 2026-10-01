@@ -29,6 +29,20 @@ export const meta = {
   category: "ERP",
   order: 1,
   height: 1300,
+  concept: {
+    goal: "Mostrar à operação se as vendas estão no ritmo e quais filas pedem ação agora (faturar, repor, aprovar).",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com período",
+      "Vendas × meta diária, OTIF, causas de atraso (Pareto)",
+      "Filas de ação antes dos detalhes",
+    ],
+    adapt: [
+      "Painel financeiro, de atendimento ou de recrutamento",
+    ],
+    avoid: [
+      "Gráficos bonitos sem a fila de ação",
+    ],
+  },
 } as const;
 
 export default function ErpDashboard() {

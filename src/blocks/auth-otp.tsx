@@ -12,6 +12,20 @@ export const meta = {
   category: "Autenticação",
   order: 3,
   height: 700,
+  concept: {
+    goal: "Confirmar a identidade com um código de 6 dígitos sem atrito.",
+    patterns: [
+      "Anatomia H · Fluxo focado: cartão central",
+      "Colar o código inteiro; verificação automática no último dígito",
+      "Erro com tentativas restantes; reenviar com contagem",
+    ],
+    adapt: [
+      "2FA em configurações de segurança, confirmação de telefone, aprovação de pagamento",
+    ],
+    avoid: [
+      "Botão 'Verificar' obrigatório quando os 6 dígitos já estão preenchidos",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

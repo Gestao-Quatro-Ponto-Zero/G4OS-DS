@@ -1,14 +1,16 @@
-import { Archive, Download, FolderInput, Pencil, Star, Trash2 } from "lucide-react";
+import { Archive, Download, FolderInput, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AnswerCard,
   Disclaimer,
   InputModal,
+  ListToggle,
   MessageActions,
   ResizableSplit,
   SessionComposer,
   SessionHeader,
   SessionInfoPanel,
+  SessionQuickSwitcher,
   SessionSidebar,
   StepGroup,
   ThreadMinimap,
@@ -22,7 +24,7 @@ import {
   type MinimapItem,
   type SlashCommand,
 } from "@g4os/ds";
-import { agents, cannedReply, markdown, osUser, osWorkspace, plain, sessions as seed, tagSuggestions, tools, type OsSession, type Rich, type ThreadEntry } from "./data/os-sessions";
+import { agents, cannedReply, markdown, osProjects, osUser, osWorkspace, plain, sessions as seed, tagSuggestions, tools, type OsSession, type Rich, type ThreadEntry } from "./data/os-sessions";
 import { useFrameParam } from "./shells/frame-route";
 import { OsShell, osRoutes } from "./shells/os-shell";
 
@@ -32,6 +34,24 @@ export const meta = {
   category: "IA",
   height: 860,
   order: 1,
+  concept: {
+    goal: "Central de trabalho com o agente para quem delega várias tarefas por dia: ver o que está rodando, retomar conversas e auditar o que o agente fez.",
+    patterns: [
+      "Anatomia Conversa: app em altura total, sem rolagem de página; só o histórico rola e o composer fica fixo",
+      "Lista rica: status ao vivo (Trabalhando, Resposta pronta, Falhou) e etiquetas sempre visíveis",
+      "Respostas em cartão com Copiar · Markdown · ramificar: toda saída é reaproveitável",
+      "Passos recolhíveis (StepGroup): o agente mostra o que fez sem poluir a leitura",
+      "Painel de informações separado (modo da sessão, nome, etiquetas, notas)",
+      "Lista recolhível (ListToggle no cabeçalho da conversa, ⌘\\, lembrada entre visitas); recolhida, a troca rápida de sessão fica no cabeçalho",
+      "Agrupar por data ou por projeto (ícone no cabeçalho da lista): pastas recolhíveis, “Mostrar mais” e ⋯ por projeto",
+    ],
+    adapt: [
+      "Assistentes internos (G4 OS, copiloto de CRM/ERP): troque agentes e ferramentas conectadas",
+      "Suporte com IA: a lista vira fila de atendimentos, o status vira SLA",
+      "Para leitura mais calma, use a variação Sessões com artefatos (lista clean + respostas em fluxo)",
+    ],
+    avoid: ["Esconder o status da sessão na lista", "Respostas sem ação de copiar ou ramificar", "Painel de informações aberto por padrão no celular", "Recolher a lista sem deixar um jeito visível de trocar de sessão"],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -104,13 +124,44 @@ export default function AiSessions() {
   const [recording, setRecording] = useState(false);
   const [voice, setVoice] = useState(false);
   const [renaming, setRenaming] = useState(false);
+  // Lista recolhível (⌘\): estado lembrado entre visitas.
+  const [listOpen, setListOpenState] = useState(() => {
+    try {
+      return localStorage.getItem("os-sessions:list") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const setListOpen = useCallback((v: boolean) => {
+    setListOpenState(v);
+    try {
+      localStorage.setItem("os-sessions:list", v ? "1" : "0");
+    } catch {
+      /* sem persistência */
+    }
+  }, []);
+  const [listMode, setListMode] = useState<"recent" | "projects">("recent");
+  const [projects, setProjects] = useState(osProjects);
+  const [renamingProject, setRenamingProject] = useState<string | null>(null);
   const [streaming, setStreaming] = useState<{ sessionId: string; entryId: string; shown: number; full: string } | null>(null);
   const timers = useRef<number[]>([]);
+  const listOpenRef = useRef(true);
   const scroller = useRef<HTMLDivElement>(null);
   const mobile = useMedia("(max-width: 767.98px)");
   const active = list.find((s) => s.id === activeId) ?? list[0];
+  listOpenRef.current = listOpen;
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key === "\\") {
+        e.preventDefault();
+        setListOpen(!listOpenRef.current);
+      }
+    };
+    window.addEventListener("keydown", on);
+    return () => window.removeEventListener("keydown", on);
+  }, [setListOpen]);
   useEffect(() => {
     if (initialId) setActiveId(initialId);
   }, [initialId]);
@@ -133,8 +184,8 @@ export default function AiSessions() {
     if (el) el.scrollTo({ top: el.scrollHeight });
   }, [activeId, active?.thread.length, streaming?.shown]);
 
-  const newSession = () => {
-    const s: OsSession = { id: uid("s"), title: "Nova sessão", time: "agora", status: "idle", day: "Hoje", mode: "executar", createdBy: osUser.name, notes: "", files: [], thread: [] };
+  const newSession = (projectId?: string) => {
+    const s: OsSession = { id: uid("s"), title: "Nova sessão", time: "agora", status: "idle", day: "Hoje", projectId, mode: "executar", createdBy: osUser.name, notes: "", files: [], thread: [] };
     setList((l) => [s, ...l]);
     select(s.id);
     notify("Sessão criada");
@@ -316,6 +367,20 @@ export default function AiSessions() {
         infoOpen={infoOpen}
         onInfoToggle={() => setInfoOpen((o) => !o)}
         onBack={() => setMobileView("list")}
+        leading={
+          <>
+            <ListToggle open={listOpen} onToggle={() => setListOpen(!listOpen)} label="sessões" />
+            {!listOpen && (
+              <SessionQuickSwitcher
+                always
+                className="hidden md:inline-flex"
+                sessions={list.filter((x) => !x.archived).map((x) => ({ id: x.id, title: x.title, time: x.time, status: x.status, group: x.day }))}
+                activeId={active?.id}
+                onSelect={select}
+              />
+            )}
+          </>
+        }
       />
       <div className="relative min-h-0 flex-1">
         <div ref={scroller} className="docs-scroll h-full overflow-y-auto overscroll-contain px-4 pb-20 pt-6 sm:px-8 sm:pb-6">
@@ -398,8 +463,29 @@ export default function AiSessions() {
       sessions={list}
       activeId={mobile && mobileView === "list" ? undefined : active?.id}
       onSelect={select}
-      onNew={newSession}
+      onNew={() => newSession(listMode === "projects" ? active?.projectId : undefined)}
       itemActions={itemActions}
+      projects={projects}
+      listMode={listMode}
+      onListModeChange={setListMode}
+      projectActions={(p) => [
+        { label: "Nova sessão no projeto", icon: <Plus className="h-4 w-4" />, onSelect: () => newSession(p.id) },
+        {
+          label: "Renomear projeto",
+          icon: <Pencil className="h-4 w-4" />,
+          onSelect: () => setRenamingProject(p.id),
+        },
+        { type: "separator" },
+        {
+          label: "Arquivar projeto",
+          icon: <Archive className="h-4 w-4" />,
+          onSelect: () => {
+            const ids = list.filter((x) => x.projectId === p.id && !x.archived).map((x) => x.id);
+            setList((l) => l.map((x) => (ids.includes(x.id) ? { ...x, archived: true } : x)));
+            notify(`${ids.length} sessões de “${p.name}” arquivadas`, () => setList((l) => l.map((x) => (ids.includes(x.id) ? { ...x, archived: false } : x))));
+          },
+        },
+      ]}
       footer={
         <WorkspaceSwitcher
           name={osWorkspace}
@@ -418,7 +504,18 @@ export default function AiSessions() {
   return (
     <OsShell current={osRoutes.sessions} hideTabbar={mobile && mobileView === "thread"}>
       <div className="flex min-h-0 flex-1">
-        <div className={cn("min-h-0 shrink-0 border-r border-line md:w-[300px] lg:w-[320px]", mobile ? (mobileView === "list" ? "flex w-full" : "hidden") : "flex")}>{sidebar}</div>
+        {mobile ? (
+          <div className={cn("min-h-0 w-full shrink-0", mobileView === "list" ? "flex" : "hidden")}>{sidebar}</div>
+        ) : (
+          // Recolher anima a largura; o conteúdo mantém a largura e é recortado.
+          <div
+            className={cn("flex min-h-0 shrink-0 overflow-hidden transition-[width] duration-200 ease-out motion-reduce:transition-none", listOpen ? "w-[300px] border-r border-line lg:w-[320px]" : "w-0")}
+            inert={!listOpen}
+            aria-hidden={!listOpen || undefined}
+          >
+            <div className="flex min-h-0 w-[300px] shrink-0 lg:w-[320px]">{sidebar}</div>
+          </div>
+        )}
         <div className={cn("min-h-0 min-w-0 flex-1", mobile && mobileView === "list" ? "hidden" : "flex")}>
           {active ? (
             <ResizableSplit left={thread} right={info} rightOpen={infoOpen} defaultSize={0.68} min={0.5} max={0.8} storageKey="os-sessions" label="Redimensionar painel de informações" />
@@ -438,6 +535,19 @@ export default function AiSessions() {
           patch(active.id, { title: v });
           setRenaming(false);
           notify("Sessão renomeada");
+        }}
+      />
+      <InputModal
+        open={!!renamingProject}
+        onClose={() => setRenamingProject(null)}
+        title="Renomear projeto"
+        submitLabel="Renomear"
+        initialValue={projects.find((p) => p.id === renamingProject)?.name}
+        placeholder="Nome do projeto"
+        onSubmit={(v) => {
+          setProjects((ps) => ps.map((x) => (x.id === renamingProject ? { ...x, name: v } : x)));
+          setRenamingProject(null);
+          notify("Projeto renomeado");
         }}
       />
       <VoiceOverlay

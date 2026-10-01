@@ -8,4 +8,4 @@ Lista de análises feitas pelo agente com status, dono, tempo, artefatos e custo
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `Highlight`, `InputModal`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `TableSearch`, `formatCurrency`, `formatDuration`, `formatNumber`, `notify`, `useFilters`
+`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `Highlight`, `InputModal`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PageToolbar`, `TableSearch`, `formatCurrency`, `formatDuration`, `formatNumber`, `notify`, `useFilters`

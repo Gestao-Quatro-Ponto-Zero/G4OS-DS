@@ -29,6 +29,20 @@ export const meta = {
   category: "CRM",
   order: 5,
   height: 960,
+  concept: {
+    goal: "Ver uma conta inteira (negócios, contatos, atividades) para preparar uma reunião ou decidir o próximo passo.",
+    patterns: [
+      "Anatomia C · Registro: cabeçalho fixo; propriedades fixas à direita (SplitLayout)",
+      "KPIs da conta no topo; abas para negócios, contatos e atividades",
+      "Novo negócio já vinculado à empresa",
+    ],
+    adapt: [
+      "Cliente no ERP, conta no SaaS, fornecedor",
+    ],
+    avoid: [
+      "Repetir na aba o que já está nas propriedades",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-contacts";

@@ -45,6 +45,28 @@ Barra de navegação em pílula, flutuando no rodapé (só no celular por padrã
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+Exemplo (showcase `#/p/ia-layout-agente`):
+
+```tsx
+<AgentAppLayout
+  storageKey="minhas-sessoes"          // persiste largura da lista, abertura e tamanho do painel
+  rail={<IconRail groups={rail} currentPath={rota} mark={<ProductMark />} />}
+  list={<SessionSidebar density="clean" sessions={sessoes} activeId={id} onSelect={abrir} onNew={nova} />}
+  main={
+    <>
+      <ThreadHeader title={sessao.titulo} menu={menu} onBack={() => setView("list")} actions={acoes} />
+      <ThreadView follow={mensagens.length} resetKey={sessao.id} minimap={mapa}>{mensagens}</ThreadView>
+      <AgentComposer … />
+    </>
+  }
+  panel={<ArtifactPanel tabs={abas} active={aba} onActiveChange={setAba} onClose={() => setPainel(false)}>{conteudo}</ArtifactPanel>}
+  panelOpen={painel}
+  onPanelOpenChange={setPainel}
+  mobileView={view}                    // "list" | "main" — o app troca ao abrir/voltar
+  mobileNav={<BottomNav items={abasCelular} currentPath={rota} />}
+/>
+```
+
 ## EntityHeader
 
 Cabeçalho de uma ENTIDADE com seções (cliente, projeto, conta): trilha, marca + nome + descrição + ações, abas.
@@ -93,6 +115,26 @@ Página de configurações: subnavegação à esquerda (vira faixa rolável de a
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
+
+```tsx
+// A · Lista
+<Page>
+  <PageHeading title="Clientes" actions={<Button>Novo cliente</Button>} />
+  <PageToolbar>            {/* gruda colada ao cabeçalho */}
+    <SavedViews … />
+    <FilterBar … search={<TableSearch … />} />
+  </PageToolbar>
+  <DataTable … />
+</Page>
+
+// C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
+<SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
+
+// D · Configurações: título fixo + subnavegação colada
+<Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>
+```
+
 ## SettingsNavItem (type)
 
 ```ts
@@ -125,12 +167,33 @@ Faixa de alerta global (topo do main).
 
 ## SplitLayout
 
-Layout conteúdo + painel lateral (detalhe de registro).
+Registro: conteúdo principal + coluna de propriedades.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `aside` * | `ReactNode` |  |  |
 | `main` * | `ReactNode` |  |  |
 | `asideWidth` | `number \| undefined` | `320` |  |
+| `stickyAside` | `boolean \| undefined` | `true` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
+
+```tsx
+// A · Lista
+<Page>
+  <PageHeading title="Clientes" actions={<Button>Novo cliente</Button>} />
+  <PageToolbar>            {/* gruda colada ao cabeçalho */}
+    <SavedViews … />
+    <FilterBar … search={<TableSearch … />} />
+  </PageToolbar>
+  <DataTable … />
+</Page>
+
+// C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
+<SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
+
+// D · Configurações: título fixo + subnavegação colada
+<Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>
+```

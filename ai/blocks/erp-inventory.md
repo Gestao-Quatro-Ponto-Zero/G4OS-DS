@@ -8,4 +8,4 @@ Saldo por item com quebra por depósito, régua contra o mínimo, cobertura em d
 
 ## Componentes usados
 
-`Badge`, `Button`, `Callout`, `ChartCard`, `Column`, `DataTable`, `EmptyFilterResult`, `FieldBlock`, `FilterBar`, `FilterField`, `Highlight`, `KpiCard`, `Meter`, `Modal`, `NumberField`, `Page`, `PageHeading`, `Select`, `SortHeader`, `TableSearch`, `TextField`, `Treemap`, `formatCurrency`, `formatNumber`, `notify`, `useFilters`, `useSort`
+`Badge`, `Button`, `Callout`, `ChartCard`, `Column`, `DataTable`, `EmptyFilterResult`, `FieldBlock`, `FilterBar`, `FilterField`, `Highlight`, `KpiCard`, `Meter`, `Modal`, `NumberField`, `Page`, `PageHeading`, `PageToolbar`, `Select`, `SortHeader`, `TableSearch`, `TextField`, `Treemap`, `formatCurrency`, `formatNumber`, `notify`, `useFilters`, `useSort`

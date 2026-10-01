@@ -1,4 +1,4 @@
-import { Bell, FolderOpen, Home, Inbox, Presentation, Search, Settings, Sparkles, Activity } from "lucide-react";
+import { Bell, Database, FileText, FolderOpen, Home, Inbox, Presentation, Search, Settings, Sparkles, Activity } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppShell, IconButton, Sidebar, type NavGroup, type NavItem } from "@g4os/ds";
 import { me, org } from "../data/workspace";
@@ -18,6 +18,8 @@ export const atlasRoutes = {
   tickets: frameHref("app-filtered-list"),
   files: frameHref("app-file-manager"),
   presentations: frameHref("app-presentation"),
+  tracker: frameHref("app-record-tracker"),
+  collab: frameHref("app-collab-doc"),
   search: frameHref("app-global-search"),
   commands: frameHref("app-command-palette"),
   assistant: frameHref("ai-chat"),
@@ -39,7 +41,15 @@ const main: NavItem[] = [
 const tabs: NavItem[] = main.map((it) => (it.href === atlasRoutes.notifications ? { ...it, label: "Avisos" } : it));
 
 const groups: NavGroup[] = [
-  { label: "Trabalho", items: [...main, { href: atlasRoutes.presentations, label: "Apresentações", icon: Presentation }] },
+  {
+    label: "Trabalho",
+    items: [
+      ...main,
+      { href: atlasRoutes.tracker, label: "Rastreador de QA", icon: Database },
+      { href: atlasRoutes.collab, label: "Documentos", icon: FileText },
+      { href: atlasRoutes.presentations, label: "Apresentações", icon: Presentation },
+    ],
+  },
   {
     label: "Ferramentas",
     items: [

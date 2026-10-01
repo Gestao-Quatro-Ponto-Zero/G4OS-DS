@@ -34,7 +34,7 @@ import {
   useSort,
   type Column,
   type FilterField,
-  type SavedView,
+  type SavedView, PageToolbar
 } from "@g4os/ds";
 import { customers as baseCustomers, go, healthLabel, healthTone, iso, personById, planPrice, plans, segments, team, useFrameParam, type Customer, type Health, type Plan } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
@@ -46,6 +46,21 @@ export const meta = {
   category: "SaaS",
   order: 3,
   height: 900,
+  concept: {
+    goal: "Achar e agir sobre contas em escala: quem está em risco, quem pode expandir.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (visões, filtros, busca)",
+      "Visões salvas por pergunta de negócio ('Em risco', 'Potencial de expansão')",
+      "Estado na URL; seleção em massa com BulkBar; paginação",
+      "Linha abre a conta",
+    ],
+    adapt: [
+      "Empresas (CRM), clientes (ERP), candidatos (ATS)",
+    ],
+    avoid: [
+      "Filtros fora da PageToolbar (somem ao rolar)",
+    ],
+  },
 } as const;
 
 const healthBadge = (h: Health) => <Badge tone={healthTone[h]}>{healthLabel[h]}</Badge>;
@@ -160,12 +175,14 @@ export default function SaasCustomers() {
           }
         />
         <div className="mt-4 space-y-4">
-          <SavedViews views={saved} counts={Object.fromEntries(views.map((v) => [v.id, filters.countFor(v.state)]))} />
-          <FilterBar
-            filters={filters}
-            noun="cliente"
-            search={<TableSearch value={q} onChange={filters.setQuery} total={customers.length} noun="cliente" searchIn="nome, cidade, segmento e responsável" />}
-          />
+          <PageToolbar>
+            <SavedViews views={saved} counts={Object.fromEntries(views.map((v) => [v.id, filters.countFor(v.state)]))} />
+            <FilterBar
+              filters={filters}
+              noun="cliente"
+              search={<TableSearch value={q} onChange={filters.setQuery} total={customers.length} noun="cliente" searchIn="nome, cidade, segmento e responsável" />}
+            />
+          </PageToolbar>
           <DataTable rows={pages.rows} columns={columns} rowKey={(c) => c.id} onRowClick={(c) => go("saas-customer", c.id)} rowLabel={(c) => `Abrir ${c.name}`} empty={<EmptyFilterResult filters={filters} noun="cliente" />} />
           <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
           <BulkBar count={sel.count} noun="cliente" onClear={sel.clear}>

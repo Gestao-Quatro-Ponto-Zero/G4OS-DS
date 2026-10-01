@@ -33,7 +33,7 @@ Leia isto antes de escrever ou mudar qualquer UI num projeto que usa `@g4os/ds`.
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (288 componentes) → `ai/components/<nome>.md`
+## Módulos (358 componentes) → `ai/components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -70,16 +70,25 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **ai-workspace**: Workspace de agente (docs: showcase › IA e interação › Workspace de agente).
 - **ai-sessions**: Interface agêntica de sessões (app de trabalho com agente: G4 OS desktop, Codex, T3).
 - **brand**: Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
+- **connections**: Conexões e apps: marketplace de integrações, detalhe da conexão, permissões por conta e o "cartão do agente" (o que ele acessa, quem ele aciona, o que entrega).
+- **email-compose**: Escrever e-mail (com ou sem IA): remetente, destinatários com busca, assunto, corpo, modelo e envio com agendamento.
+- **tags**: Etiquetas coloridas (categoria, tipo, status) no estilo "banco de dados": fundo suave + texto AA, 9 matizes em tokens (--ds-tag-*-bg/-fg), claros e escuros.
+- **rich-text**: Editor de texto rico LEVE (contentEditable + comandos do navegador).
+- **agent-builder**: Construtor de agente: a "ficha" do agente ao lado da conversa com ele.
+- **tasks-ai**: Tarefas propostas pela IA (a partir de uma reunião, documento ou análise).
+- **record-panel**: Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
+- **collab**: Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
+- **ai-layout**: Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
 
-## Blocos (75) → `ai/blocks/<slug>.md`
+## Blocos (85) → `ai/blocks/<slug>.md`
 - **ATS**: `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`
-- **Aplicação**: `app-command-palette`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-notifications`, `app-presentation`
+- **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-marketplace`, `app-notifications`, `app-presentation`, `app-record-tracker`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
 - **CRM**: `crm-activities`, `crm-company`, `crm-contact`, `crm-contacts`, `crm-deal`, `crm-pipeline`, `crm-sales-dashboard`, `crm-settings`, `crm-team`
 - **Configurações**: `settings-appearance`, `settings-audit-log`, `settings-billing`, `settings-integrations`, `settings-notifications`, `settings-profile`, `settings-security`, `settings-team`
 - **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-purchase-requests`, `erp-suppliers`
 - **Financeiro**: `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
-- **IA**: `ai-agent-run`, `ai-assistant`, `ai-chat`, `ai-conversation`, `ai-projects`, `ai-sessions-empty`, `ai-sessions`, `ai-trace`, `ai-workspace`
+- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-run`, `ai-assistant`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
 - **Marketing**: `marketing-landing`, `marketing-pricing`
 - **Onboarding**: `onboarding-checklist`, `onboarding-wizard`
 - **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-integrations`, `saas-reports`, `saas-support`

@@ -12,6 +12,20 @@ export const meta = {
   category: "Autenticação",
   order: 2,
   height: 860,
+  concept: {
+    goal: "Criar a conta com o mínimo de campos e sem dúvida sobre a senha.",
+    patterns: [
+      "Anatomia H · Fluxo focado: coluna única centrada em duas etapas (você → empresa)",
+      "Stepper discreto; senha com força visível",
+      "Plano vindo da página de preços (?plan=) aparece como selo",
+    ],
+    adapt: [
+      "Cadastro de parceiro, convite de cliente para portal",
+    ],
+    avoid: [
+      "Pedir dados de cobrança no cadastro",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

@@ -4,7 +4,7 @@ import { Ellipsis, Menu, X } from "lucide-react";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Toaster } from "./feedback";
-import { Breadcrumb, StickyHeader, Tabs, type Crumb, type NavItem, type TabItem } from "./navigation";
+import { Breadcrumb, PageHeading, StickyHeader, Tabs, type Crumb, type NavItem, type TabItem } from "./navigation";
 import { DsLink } from "./primitives";
 import { EntityMark } from "./primitives";
 
@@ -243,11 +243,16 @@ export function ReadingColumn({ children, className }: { children: ReactNode; cl
 }
 
 /** Layout conteúdo + painel lateral (detalhe de registro). Empilha abaixo de 1024px. */
-export function SplitLayout({ main, aside, asideWidth = 320 }: { main: ReactNode; aside: ReactNode; asideWidth?: number }) {
+/**
+ * Registro: conteúdo principal + coluna de propriedades. No desktop a coluna
+ * gruda abaixo do cabeçalho fixo (anatomia "Registro"); se for mais alta que a
+ * tela, rola sozinha. `stickyAside={false}` para colunas que devem rolar junto.
+ */
+export function SplitLayout({ main, aside, asideWidth = 320, stickyAside = true }: { main: ReactNode; aside: ReactNode; asideWidth?: number; stickyAside?: boolean }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_var(--aside)]" style={{ ["--aside" as string]: `${asideWidth}px` }}>
       <div className="min-w-0">{main}</div>
-      <aside className="min-w-0 space-y-6">{aside}</aside>
+      <aside className={cn("min-w-0 space-y-6", stickyAside && "page-aside")}>{aside}</aside>
     </div>
   );
 }
@@ -292,18 +297,13 @@ export function SettingsLayout({
 }) {
   return (
     <div className="mx-auto w-full max-w-[1080px]">
-      {heading && (
-        <header className="page-heading">
-          <div className="min-w-0">
-            <h1>{heading}</h1>
-            {headingDescription && <p>{headingDescription}</p>}
-          </div>
-        </header>
-      )}
+      {/* Título da página fixo (compacta ao rolar) e subnavegação fixa logo abaixo:
+          o que é da página fica junto; só o conteúdo da seção rola. */}
+      {heading && <PageHeading title={heading} description={headingDescription} />}
       <div className={cn("grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-8", heading && "mt-6")}>
         <nav
           aria-label={navLabel}
-          className="-mx-1 flex gap-1 overflow-x-auto border-b border-line px-1 pb-2 lg:sticky lg:top-0 lg:mx-0 lg:flex-col lg:self-start lg:overflow-visible lg:border-0 lg:px-0 lg:pb-0"
+          className="-mx-1 flex gap-1 overflow-x-auto border-b border-line px-1 pb-2 lg:sticky lg:top-[var(--pinned-header-height,0px)] lg:mx-0 lg:flex-col lg:self-start lg:overflow-visible lg:border-0 lg:px-0 lg:pb-0 lg:transition-[top] lg:duration-200"
         >
           {nav.map((it) => {
             const on = it.href === current;

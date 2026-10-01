@@ -34,6 +34,20 @@ export const meta = {
   category: "Financeiro",
   order: 2,
   height: 1320,
+  concept: {
+    goal: "Responder se vai faltar caixa nas próximas semanas e o que vence antes.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo",
+      "Entradas/saídas por semana (saídas negativas) e saldo projetado × mínimo",
+      "Ponte do mês em cascata; próximos pagamentos",
+    ],
+    adapt: [
+      "Projeção de capacidade, consumo de licenças",
+    ],
+    avoid: [
+      "Saldo projetado sem o mínimo de segurança",
+    ],
+  },
 } as const;
 
 const money = (n: number) => formatCurrency(n, { compact: true });

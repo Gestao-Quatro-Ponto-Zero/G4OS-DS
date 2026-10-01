@@ -29,6 +29,20 @@ export const meta = {
   category: "CRM",
   order: 6,
   height: 880,
+  concept: {
+    goal: "Entender o papel de uma pessoa na decisão e o histórico com ela antes de entrar em contato.",
+    patterns: [
+      "Anatomia C · Registro: propriedades fixas à direita",
+      "Papel na decisão (decisora, influenciadora) em destaque",
+      "Histórico em feed; e-mail com modelo em modal",
+    ],
+    adapt: [
+      "Candidato (ATS), contato de fornecedor, usuário de conta SaaS",
+    ],
+    avoid: [
+      "Ações de contato escondidas em menu",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-contacts";

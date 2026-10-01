@@ -30,6 +30,21 @@ export const meta = {
   category: "ERP",
   order: 3,
   height: 1000,
+  concept: {
+    goal: "Levar um pedido de venda do cadastro à entrega com as ações certas em cada etapa.",
+    patterns: [
+      "Anatomia C · Registro: etapas no topo; resumo fixo à direita",
+      "Ações mudam com a situação (aprovar, liberar crédito, faturar…)",
+      "Itens com saldo em estoque",
+      "?id=novo abre o cadastro na mesma tela",
+    ],
+    adapt: [
+      "Negócio (CRM), proposta (ATS), requisição de compra",
+    ],
+    avoid: [
+      "Todas as ações visíveis em todas as situações",
+    ],
+  },
 } as const;
 
 const money = (n: number) => formatCurrency(n);
@@ -324,7 +339,7 @@ function NewOrder() {
               </div>
             </section>
           </div>
-          <aside className="space-y-3">
+          <aside className="page-aside space-y-3">
             <section className="rounded-xl border border-line bg-surface p-4">
               <div className="text-[12px] text-muted">Total do pedido</div>
               <div className="mt-1 text-[24px] font-semibold tabular-nums tracking-tight">{formatCurrency(total)}</div>

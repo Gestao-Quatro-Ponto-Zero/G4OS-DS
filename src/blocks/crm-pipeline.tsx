@@ -27,6 +27,21 @@ export const meta = {
   category: "CRM",
   order: 1,
   height: 860,
+  concept: {
+    goal: "Ver o funil comercial inteiro e mover negócios entre etapas sabendo quanto vale cada coluna.",
+    patterns: [
+      "Anatomia E · Quadro: cabeçalho fixo; colunas crescem em telas largas",
+      "Soma de valor e previsão ponderada no topo e por coluna",
+      "Arrastar muda a etapa (com desfazer); card abre o negócio",
+      "Filtros e busca na barra acima do quadro",
+    ],
+    adapt: [
+      "Candidatos (ATS), pedidos (ERP), chamados por status",
+    ],
+    avoid: [
+      "Mudar etapa por botão dentro do card",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-pipeline";
@@ -78,8 +93,7 @@ export default function CrmPipeline() {
     <CrmShell current={here}>
       <div className="page-inset flex h-full min-h-0 flex-col overflow-y-auto" data-ds-content="">
         <PageHeading
-          sticky={false}
-          title="Pipeline"
+            title="Pipeline"
           description="Novos negócios B2B · funil padrão. Arraste um card para mudar de etapa."
           actions={
             <>

@@ -1617,6 +1617,28 @@
           "examplePage": "filtros-datas"
         },
         {
+          "name": "PageToolbar",
+          "kind": "component",
+          "summary": "Barra da página (FilterBar, visões salvas, busca) que gruda COLADA abaixo do cabeçalho fixo (PageHeading).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "padroes-anatomia-de-pagina"
+        },
+        {
           "name": "ProductMark",
           "kind": "component",
           "summary": "Marca-padrão (grafo de três nós, um dourado).",
@@ -1629,7 +1651,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "ia-layout-agente"
         },
         {
           "name": "SegmentedControl",
@@ -3020,7 +3042,7 @@
               "description": "Mostra \"Mais\" como último item (abre a gaveta/menu completo)."
             }
           ],
-          "examplePage": null
+          "examplePage": "ia-layout-agente"
         },
         {
           "name": "EntityHeader",
@@ -3191,7 +3213,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "padroes-anatomia-de-pagina"
         },
         {
           "name": "SettingsNavItem",
@@ -3260,7 +3282,7 @@
         {
           "name": "SplitLayout",
           "kind": "component",
-          "summary": "Layout conteúdo + painel lateral (detalhe de registro).",
+          "summary": "Registro: conteúdo principal + coluna de propriedades.",
           "props": [
             {
               "name": "aside",
@@ -3282,9 +3304,16 @@
               "required": false,
               "default": "320",
               "description": null
+            },
+            {
+              "name": "stickyAside",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "padroes-anatomia-de-pagina"
         }
       ],
       "doc": "components/layout.md"
@@ -11811,7 +11840,7 @@
               "description": null
             }
           ],
-          "examplePage": "filtros-padrao"
+          "examplePage": "padroes-anatomia-de-pagina"
         },
         {
           "name": "FilterCondition",
@@ -14971,6 +15000,13 @@
               "description": "Linha extra no rodapé do campo (ex.: ToolsBar com ferramentas conectadas)."
             },
             {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Dica discreta à direita da 1ª linha, só com o campo vazio e largo (≥ 640px)."
+            },
+            {
               "name": "leading",
               "type": "ReactNode",
               "required": false,
@@ -15294,7 +15330,7 @@
           "name": "ArtifactKind",
           "kind": "type",
           "summary": null,
-          "definition": "\"report\" | \"sheet\" | \"doc\" | \"chart\" | \"code\" | \"email\" | \"deck\" | \"context\" | \"output\""
+          "definition": "\"report\" | \"sheet\" | \"doc\" | \"chart\" | \"code\" | \"email\" | \"deck\" | \"context\" | \"output\" | \"details\" | \"files\""
         },
         {
           "name": "ArtifactPanel",
@@ -15886,6 +15922,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"inline\" | \"divider\" | undefined",
+              "required": false,
+              "default": "\"inline\"",
+              "description": "\"inline\" (padrão): \"✓ Concluído em 40 s · 9 passos ›\" com o trace num cartão."
             }
           ],
           "examplePage": "ia-workspace"
@@ -16034,7 +16077,7 @@
         {
           "name": "AnswerCard",
           "kind": "component",
-          "summary": "Resposta do agente num cartão com rodapé de ações.",
+          "summary": "Resposta do agente. Conteúdo rico (negrito, código, links).",
           "props": [
             {
               "name": "children",
@@ -16051,6 +16094,20 @@
               "description": null
             },
             {
+              "name": "actionsVisible",
+              "type": "\"always\" | \"hover\" | undefined",
+              "required": false,
+              "default": null,
+              "description": "(flow) \"hover\" (padrão): ações só no hover/foco."
+            },
+            {
+              "name": "artifacts",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "(flow) Cartões de artefato produzidos nesta resposta."
+            },
+            {
               "name": "className",
               "type": "string | undefined",
               "required": false,
@@ -16065,14 +16122,35 @@
               "description": null
             },
             {
+              "name": "run",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "(flow) Linha de status da execução: RunSummary."
+            },
+            {
               "name": "streaming",
               "type": "boolean | undefined",
               "required": false,
               "default": "false",
               "description": null
+            },
+            {
+              "name": "suggestions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "(flow) Continuações sugeridas (chips)."
+            },
+            {
+              "name": "variant",
+              "type": "\"card\" | \"flow\" | undefined",
+              "required": false,
+              "default": "\"card\"",
+              "description": null
             }
           ],
-          "examplePage": "ia-sessoes"
+          "examplePage": "ia-layout-agente"
         },
         {
           "name": "ConnectedTool",
@@ -16122,6 +16200,13 @@
               "description": null
             },
             {
+              "name": "compact",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Só ícones, alinhados à esquerda (respostas em fluxo)."
+            },
+            {
               "name": "markdown",
               "type": "string | undefined",
               "required": false,
@@ -16148,15 +16233,211 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "onShare",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Compartilhar a resposta (link ou exportar)."
+            },
+            {
+              "name": "size",
+              "type": "\"md\" | \"xs\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": "\"xs\": ícones mínimos (estilo Codex), implica `compact`."
             }
           ],
-          "examplePage": "ia-sessoes"
+          "examplePage": "ia-layout-agente"
         },
         {
           "name": "MinimapItem",
           "kind": "type",
           "summary": null,
           "definition": "{ id: string; role: \"user\" | \"assistant\"; preview: string }"
+        },
+        {
+          "name": "ModelEffort",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"leve\" | \"padrao\" | \"profundo\""
+        },
+        {
+          "name": "ModelOption",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; group?: string; description?: string; icon?: ReactNode }"
+        },
+        {
+          "name": "ModelPicker",
+          "kind": "component",
+          "summary": "Chip de modelo + esforço (\"⚡ Sol · Leve ⌄\").",
+          "props": [
+            {
+              "name": "models",
+              "type": "ModelOption[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onChange",
+              "type": "(id: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "agent",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "agents",
+              "type": "AgentOption[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Agentes disponíveis: o chip mostra o agente e o menu ganha a seção \"Agente\"."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "effort",
+              "type": "ModelEffort | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onAgentChange",
+              "type": "((id: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onEffortChange",
+              "type": "((e: ModelEffort) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-sessoes"
+        },
+        {
+          "name": "PermissionMode",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"ler\" | \"aprovar\" | \"total\""
+        },
+        {
+          "name": "PermissionModeChip",
+          "kind": "component",
+          "summary": "Chip de permissão do agente, sempre visível no campo.",
+          "props": [
+            {
+              "name": "onChange",
+              "type": "(mode: PermissionMode) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "PermissionMode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-sessoes"
+        },
+        {
+          "name": "ProjectGroup",
+          "kind": "component",
+          "summary": "Pasta de projeto na lista de sessões: ícone + nome + contagem, recolhível, sessões aninhadas, \"Mostrar mais\" depois de `limit` e menu ⋯ do projeto.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "count",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "project",
+              "type": "SessionProject",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actions",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "active",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "density",
+              "type": "\"rich\" | \"clean\" | undefined",
+              "required": false,
+              "default": "\"rich\"",
+              "description": null
+            },
+            {
+              "name": "limit",
+              "type": "number | undefined",
+              "required": false,
+              "default": "5",
+              "description": null
+            }
+          ],
+          "examplePage": null
         },
         {
           "name": "SessionComposer",
@@ -16265,6 +16546,119 @@
           "examplePage": "ia-sessoes"
         },
         {
+          "name": "SessionDetails",
+          "kind": "component",
+          "summary": "Conteúdo de detalhes da sessão (modo, criador, nome, etiquetas, notas) e arquivos, sem moldura.",
+          "props": [
+            {
+              "name": "createdBy",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "mode",
+              "type": "SessionMode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "notes",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onModeChange",
+              "type": "(m: SessionMode) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNameChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNotesChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onTagsChange",
+              "type": "(t: string[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "tags",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultSection",
+              "type": "\"detalhes\" | \"arquivos\" | undefined",
+              "required": false,
+              "default": "\"detalhes\"",
+              "description": null
+            },
+            {
+              "name": "files",
+              "type": "SessionFile[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "show",
+              "type": "\"both\" | \"detalhes\" | \"arquivos\" | undefined",
+              "required": false,
+              "default": "\"both\"",
+              "description": "\"both\" (padrão) com sub-abas; \"detalhes\" ou \"arquivos\" mostra só uma seção, sem sub-abas."
+            },
+            {
+              "name": "tagSuggestions",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Informações da sessão\"",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
           "name": "SessionFile",
           "kind": "type",
           "summary": null,
@@ -16287,6 +16681,13 @@
               "type": "string",
               "required": true,
               "default": null,
+              "description": null
+            },
+            {
+              "name": "density",
+              "type": "\"rich\" | \"clean\" | undefined",
+              "required": false,
+              "default": "\"rich\"",
               "description": null
             }
           ],
@@ -16324,6 +16725,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "leading",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Antes do título (desktop): ListToggle, SessionQuickSwitcher."
             },
             {
               "name": "onBack",
@@ -16515,15 +16923,34 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "density",
+              "type": "\"rich\" | \"clean\" | undefined",
+              "required": false,
+              "default": "\"rich\"",
+              "description": "\"rich\" (padrão): chips de status e etiquetas."
             }
           ],
           "examplePage": "ia-sessoes"
+        },
+        {
+          "name": "SessionListMode",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"recent\" | \"projects\""
         },
         {
           "name": "SessionMode",
           "kind": "type",
           "summary": null,
           "definition": "\"executar\" | \"planejar\" | \"perguntar\""
+        },
+        {
+          "name": "SessionProject",
+          "kind": "type",
+          "summary": "Projeto que agrupa sessões (repositório, cliente, iniciativa).",
+          "definition": "{ id: string; name: string; icon?: ReactNode }"
         },
         {
           "name": "SessionSidebar",
@@ -16566,11 +16993,32 @@
               "description": null
             },
             {
+              "name": "defaultListMode",
+              "type": "SessionListMode | undefined",
+              "required": false,
+              "default": "\"recent\"",
+              "description": null
+            },
+            {
+              "name": "density",
+              "type": "\"rich\" | \"clean\" | undefined",
+              "required": false,
+              "default": "\"rich\"",
+              "description": "\"rich\" (padrão): botão \"Nova sessão\", abas com ícone, etiquetas e chips."
+            },
+            {
               "name": "footer",
               "type": "ReactNode",
               "required": false,
               "default": null,
               "description": "Rodapé (seletor de workspace)."
+            },
+            {
+              "name": "headerExtra",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Controle extra no cabeçalho, antes do filtro (ex.: ListToggle)."
             },
             {
               "name": "itemActions",
@@ -16580,6 +17028,41 @@
               "description": null
             },
             {
+              "name": "listMode",
+              "type": "SessionListMode | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onListModeChange",
+              "type": "((mode: SessionListMode) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "projectActions",
+              "type": "((p: SessionProject) => MenuEntry[]) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Menu ⋯ de cada projeto (nova sessão no projeto, renomear, arquivar)."
+            },
+            {
+              "name": "projectLimit",
+              "type": "number | undefined",
+              "required": false,
+              "default": "5",
+              "description": "Sessões por projeto antes de \"Mostrar mais\"."
+            },
+            {
+              "name": "projects",
+              "type": "SessionProject[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Com projetos, um ícone no cabeçalho (e o menu de filtro) alterna o agrupamento por data ou por projeto."
+            },
+            {
               "name": "title",
               "type": "string | undefined",
               "required": false,
@@ -16587,7 +17070,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "ia-sessoes"
         },
         {
           "name": "SessionStatus",
@@ -16618,10 +17101,39 @@
           "examplePage": "ia-sessoes"
         },
         {
+          "name": "SessionStatusGlyph",
+          "kind": "component",
+          "summary": "Status de sessão em versão mínima (lista \"clean\"): ponto pulsante dourado = trabalhando, ponto verde = resposta pronta, alerta rose = falhou, relógio = rotina agendada.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "scheduled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "status",
+              "type": "SessionStatus | undefined",
+              "required": false,
+              "default": "\"idle\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-sessoes"
+        },
+        {
           "name": "SessionSummary",
           "kind": "type",
           "summary": null,
-          "definition": "{ id: string; title: string; time: string; status?: SessionStatus; tags?: string[]; starred?: boolean; archived?: boolean; parentId?: string; day?: string; scheduled?: boolean; }"
+          "definition": "{ id: string; title: string; time: string; status?: SessionStatus; tags?: string[]; starred?: boolean; archived?: boolean; parentId?: string; day?: string; scheduled?: boolean; projectId?: string; }"
         },
         {
           "name": "SessionTab",
@@ -16675,6 +17187,13 @@
               "required": false,
               "default": "[]",
               "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"line\" | \"group\" | undefined",
+              "required": false,
+              "default": "\"group\"",
+              "description": "\"group\" (padrão): botão com ícone ⇕."
             }
           ],
           "examplePage": "ia-sessoes"
@@ -16743,6 +17262,42 @@
             {
               "name": "onManage",
               "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-sessoes"
+        },
+        {
+          "name": "ToolsButton",
+          "kind": "component",
+          "summary": "Versão compacta do ToolsBar para o rodapé de um campo limpo: botão \"6 ferramentas\" (ponto rose se alguma falhou) que abre a lista com status e \"Gerenciar\".",
+          "props": [
+            {
+              "name": "tools",
+              "type": "ConnectedTool[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onManage",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onReconnect",
+              "type": "((tool: ConnectedTool) => void) | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -17069,9 +17624,3114 @@
         }
       ],
       "doc": "components/brand.md"
+    },
+    {
+      "name": "connections",
+      "file": "src/components/connections.tsx",
+      "summary": "Conexões e apps: marketplace de integrações, detalhe da conexão, permissões por conta e o \"cartão do agente\" (o que ele acessa, quem ele aciona, o que entrega).",
+      "exports": [
+        {
+          "name": "AccountRow",
+          "kind": "component",
+          "summary": "Conta conectada (loja, workspace, perfil de anúncios).",
+          "props": [
+            {
+              "name": "name",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "href",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "mark",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "meta",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "url",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "AgentConnection",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; icon?: IconLike; letter?: string; color?: string; status: \"connected\" | \"available\" | \"active\"; onConnect?: () => void; onClick?: () => void }"
+        },
+        {
+          "name": "AgentConnectionRow",
+          "kind": "component",
+          "summary": "Linha de conexão dentro do cartão do agente.",
+          "props": [
+            {
+              "name": "c",
+              "type": "AgentConnection",
+              "required": true,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "AgentResult",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; fileName?: string; onClick?: () => void; meta?: ReactNode }"
+        },
+        {
+          "name": "AppGrid",
+          "kind": "component",
+          "summary": "Grade de apps: 1 coluna no celular, 2 no desktop, linhas com respiro.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "AppIcon",
+          "kind": "component",
+          "summary": "Ícone de app/integração.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "color",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"var(--ds-ink)\"",
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "IconLike | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do app para leitor de tela (omita se o nome já aparece ao lado)."
+            },
+            {
+              "name": "letter",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Alternativa ao ícone: 1–2 letras."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | \"lg\" | \"xs\" | \"xl\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"plain\" | \"soft\" | \"tile\" | undefined",
+              "required": false,
+              "default": "\"tile\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "AppInfo",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; description: string; icon?: IconLike; letter?: string; color?: string; category?: string }"
+        },
+        {
+          "name": "AppTile",
+          "kind": "component",
+          "summary": "Linha de app no marketplace: ícone, nome, descrição de uma linha e a ação.",
+          "props": [
+            {
+              "name": "app",
+              "type": "AppInfo",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "badge",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Selo ao lado do nome (\"Novo\", \"Beta\")."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "connected",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "href",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onConnect",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpen",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "ConnectionsCard",
+          "kind": "component",
+          "summary": "Cartão do agente: faixa de cabeçalho (avatar, nome, escopo) sobre um cartão interno com o que ele acessa (conexões), quem ele aciona (subagentes) e o que ele entrega (resultados).",
+          "props": [
+            {
+              "name": "name",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "avatar",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "connections",
+              "type": "AgentConnection[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "results",
+              "type": "AgentResult[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "scope",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "\"Global\", \"Time Comercial\"…"
+            },
+            {
+              "name": "subagents",
+              "type": "Subagent[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "ConnectionState",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"connected\" | \"pending\" | \"error\" | \"disconnected\""
+        },
+        {
+          "name": "ConnectionStatus",
+          "kind": "component",
+          "summary": "Selo de estado de uma conexão.",
+          "props": [
+            {
+              "name": "status",
+              "type": "ConnectionState",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "DataSyncTable",
+          "kind": "component",
+          "summary": "Tabela chave/valor do que está sincronizado.",
+          "props": [
+            {
+              "name": "rows",
+              "type": "{ label: string; value: ReactNode; icon?: IconLike; href?: string; onClick?: () => void; hint?: ReactNode; }[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "HalftoneBand",
+          "kind": "component",
+          "summary": "Faixa decorativa pontilhada (meio-tom) que some para baixo.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "96",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "MarketplaceHero",
+          "kind": "component",
+          "summary": "Faixa de abertura do marketplace: degradê suave (tokens accent + info + série 2, funciona no escuro) com 1–3 pílulas de exemplo do que dá para pedir.",
+          "props": [
+            {
+              "name": "prompts",
+              "type": "{ app: Pick<AppInfo, \"name\" | \"icon\" | \"letter\" | \"color\">; text: string; onClick?: () => void; }[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "172",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "PromptPill",
+          "kind": "component",
+          "summary": "Pílula de prompt com o app em destaque: \"[Slack] Resumir as atualizações…\".",
+          "props": [
+            {
+              "name": "app",
+              "type": "Pick<AppInfo, \"name\" | \"color\" | \"icon\" | \"letter\">",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onClick",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "QuickActionsField",
+          "kind": "component",
+          "summary": "Campo de \"Ações rápidas\" que abre a paleta (⌘K).",
+          "props": [
+            {
+              "name": "onOpen",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Ações rápidas\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "ResultRow",
+          "kind": "component",
+          "summary": "Resultado entregue pelo agente (documento, PDF, planilha).",
+          "props": [
+            {
+              "name": "r",
+              "type": "AgentResult",
+              "required": true,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "SidebarProgressCard",
+          "kind": "component",
+          "summary": "Cartão \"Primeiros passos\" no rodapé da sidebar: anel + contagem.",
+          "props": [
+            {
+              "name": "done",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "href",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onClick",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Primeiros passos\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "Subagent",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; icon?: IconLike; letter?: string; color?: string; status: \"running\" | \"idle\" | \"done\" | \"error\"; onClick?: () => void }"
+        },
+        {
+          "name": "SubagentRow",
+          "kind": "component",
+          "summary": "Subagente com ponto de estado (âmbar pulsando = executando).",
+          "props": [
+            {
+              "name": "s",
+              "type": "Subagent",
+              "required": true,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "ToolPermission",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; title: string; description: string; scope: \"read\" | \"write\"; enabled: boolean }"
+        },
+        {
+          "name": "ToolPermissionList",
+          "kind": "component",
+          "summary": "Permissões das ferramentas de UMA conta, separadas em leitura e escrita.",
+          "props": [
+            {
+              "name": "items",
+              "type": "ToolPermission[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onChange",
+              "type": "(id: string, enabled: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "appName",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do app para os textos de ajuda (\"altera dados no Shopify\")."
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Permissões das ferramentas\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        },
+        {
+          "name": "TrialBanner",
+          "kind": "component",
+          "summary": "Linha de teste grátis/plano no rodapé da sidebar.",
+          "props": [
+            {
+              "name": "daysLeft",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onUpgrade",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "upgradeLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Assinar\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conexoes"
+        }
+      ],
+      "doc": "components/connections.md"
+    },
+    {
+      "name": "email-compose",
+      "file": "src/components/email-compose.tsx",
+      "summary": "Escrever e-mail (com ou sem IA): remetente, destinatários com busca, assunto, corpo, modelo e envio com agendamento.",
+      "exports": [
+        {
+          "name": "ComposeEmail",
+          "kind": "component",
+          "summary": "Corpo do compositor (use dentro de Modal/Drawer ou numa página).",
+          "props": [
+            {
+              "name": "body",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "directory",
+              "type": "Person[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "from",
+              "type": "Person",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onBodyChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSend",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSubjectChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onToChange",
+              "type": "(people: Person[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "subject",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "to",
+              "type": "Person[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "addOptions",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Menu do \"+\" (anexar arquivo, inserir modelo, pedir à IA…)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "model",
+              "type": "{ name: string; options?: MenuEntry[]; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Modelo que escreveu o rascunho (chip no rodapé)."
+            },
+            {
+              "name": "notice",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Faixa opcional acima do corpo (ex.: aviso \"Rascunho gerado pela IA a partir de…\")."
+            },
+            {
+              "name": "onClose",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "sendOptions",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": "Itens do menu ⌄ ao lado de Enviar (agendar, enviar amanhã às 8h…)."
+            },
+            {
+              "name": "status",
+              "type": "ComposeStatus | undefined",
+              "required": false,
+              "default": "\"draft\"",
+              "description": null
+            },
+            {
+              "name": "suggestions",
+              "type": "Person[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Escrever e-mail\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-email"
+        },
+        {
+          "name": "ComposeEmailDialog",
+          "kind": "component",
+          "summary": "Compositor em modal (sobre a tela atual).",
+          "props": [
+            {
+              "name": "body",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "directory",
+              "type": "Person[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "from",
+              "type": "Person",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onBodyChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onClose",
+              "type": "(() => void) & (() => void)",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSend",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSubjectChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onToChange",
+              "type": "(people: Person[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "subject",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "to",
+              "type": "Person[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "addOptions",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Menu do \"+\" (anexar arquivo, inserir modelo, pedir à IA…)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "model",
+              "type": "{ name: string; options?: MenuEntry[]; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Modelo que escreveu o rascunho (chip no rodapé)."
+            },
+            {
+              "name": "notice",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Faixa opcional acima do corpo (ex.: aviso \"Rascunho gerado pela IA a partir de…\")."
+            },
+            {
+              "name": "sendOptions",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Itens do menu ⌄ ao lado de Enviar (agendar, enviar amanhã às 8h…)."
+            },
+            {
+              "name": "status",
+              "type": "ComposeStatus | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "suggestions",
+              "type": "Person[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-email"
+        },
+        {
+          "name": "ComposeStatus",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"draft\" | \"sending\" | \"scheduled\" | \"sent\""
+        },
+        {
+          "name": "Person",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; email?: string; initials?: string; tint?: string; verified?: boolean; badge?: ReactNode }"
+        },
+        {
+          "name": "PersonChip",
+          "kind": "component",
+          "summary": "Pessoa como chip: avatar, nome, selo de verificado, remover opcional.",
+          "props": [
+            {
+              "name": "person",
+              "type": "Person",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRemove",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-email"
+        },
+        {
+          "name": "RecipientInput",
+          "kind": "component",
+          "summary": "Campo de destinatários: chips + digitação com sugestões em duas seções (\"Selecionar pessoa\" = e-mails que batem com o texto; \"Sugestões\" = pessoas frequentes).",
+          "props": [
+            {
+              "name": "directory",
+              "type": "Person[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onChange",
+              "type": "(people: Person[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "Person[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Para\"",
+              "description": null
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Adicionar pessoa\"",
+              "description": null
+            },
+            {
+              "name": "suggestions",
+              "type": "Person[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-email"
+        },
+        {
+          "name": "SplitButton",
+          "kind": "component",
+          "summary": "Botão com ação principal + menu de alternativas (Enviar | ⌄ Agendar…).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "items",
+              "type": "MenuEntry[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onClick",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "menuLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Mais opções\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-email"
+        }
+      ],
+      "doc": "components/email-compose.md"
+    },
+    {
+      "name": "tags",
+      "file": "src/components/tags.tsx",
+      "summary": "Etiquetas coloridas (categoria, tipo, status) no estilo \"banco de dados\": fundo suave + texto AA, 9 matizes em tokens (--ds-tag-*-bg/-fg), claros e escuros.",
+      "exports": [
+        {
+          "name": "Priority",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"urgente\" | \"alta\" | \"media\" | \"baixa\" | \"sem\""
+        },
+        {
+          "name": "PriorityIcon",
+          "kind": "component",
+          "summary": "Ícone de prioridade em barras (3 barras crescentes; urgente = quadrado com !).",
+          "props": [
+            {
+              "name": "priority",
+              "type": "Priority",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "tags-e-prioridade"
+        },
+        {
+          "name": "priorityLabel",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "PriorityPill",
+          "kind": "component",
+          "summary": "Prioridade com ícone + rótulo (chip neutro).",
+          "props": [
+            {
+              "name": "priority",
+              "type": "Priority",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            }
+          ],
+          "examplePage": "tags-e-prioridade"
+        },
+        {
+          "name": "StatusPill",
+          "kind": "component",
+          "summary": "Status de tarefa com cor fixa por estado (presets).",
+          "props": [
+            {
+              "name": "status",
+              "type": "TaskStatus",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"dot\" | \"soft\" | undefined",
+              "required": false,
+              "default": "\"soft\"",
+              "description": null
+            }
+          ],
+          "examplePage": "tags-e-prioridade"
+        },
+        {
+          "name": "TagColor",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"gray\" | \"brown\" | \"orange\" | \"yellow\" | \"green\" | \"blue\" | \"purple\" | \"pink\" | \"red\""
+        },
+        {
+          "name": "tagColorFor",
+          "kind": "function",
+          "summary": "Cor estável para um texto (mesma categoria = mesma cor em qualquer tela).",
+          "signature": "tagColorFor(label): TagColor"
+        },
+        {
+          "name": "tagColors",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "TagPill",
+          "kind": "component",
+          "summary": "Etiqueta. `variant=\"soft\"` (padrão) = fundo colorido; `\"dot\"` = contorno neutro com bolinha colorida (melhor em listas densas e ao lado de outras etiquetas).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "color",
+              "type": "TagColor | undefined",
+              "required": false,
+              "default": null,
+              "description": "Padrão: derivada do texto (tagColorFor)."
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRemove",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"dot\" | \"soft\" | undefined",
+              "required": false,
+              "default": "\"soft\"",
+              "description": null
+            }
+          ],
+          "examplePage": "tags-e-prioridade"
+        },
+        {
+          "name": "TaskStatus",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"nao-iniciado\" | \"em-andamento\" | \"em-revisao\" | \"concluido\" | \"bloqueado\" | \"sem-status\""
+        },
+        {
+          "name": "taskStatusLabel",
+          "kind": "const",
+          "summary": null
+        }
+      ],
+      "doc": "components/tags.md"
+    },
+    {
+      "name": "rich-text",
+      "file": "src/components/rich-text.tsx",
+      "summary": "Editor de texto rico LEVE (contentEditable + comandos do navegador).",
+      "exports": [
+        {
+          "name": "richTextContentClass",
+          "kind": "const",
+          "summary": "Estilos de leitura do conteúdo (h1–h3, listas, checklist, citação, código, tabela)."
+        },
+        {
+          "name": "RichTextEditor",
+          "kind": "component",
+          "summary": "Editor leve. Valor em HTML (controlado).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Rótulo acessível do campo."
+            },
+            {
+              "name": "onChange",
+              "type": "(html: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "aside",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ação à direita do toolbar (ex.: botão \"Melhorar com IA\")."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "minHeight",
+              "type": "number | undefined",
+              "required": false,
+              "default": "160",
+              "description": null
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Escreva aqui… use # para títulos, - par",
+              "description": null
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "tools",
+              "type": "RichTextTool[][] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "editor-de-texto"
+        },
+        {
+          "name": "RichTextTool",
+          "kind": "type",
+          "summary": null,
+          "definition": "| \"heading\" | \"bold\" | \"italic\" | \"strike\" | \"highlight\" | \"align\" | \"bullet\" | \"ordered\" | \"checklist\" | \"quote\" | \"table\" | \"code\" | \"link\" | \"image\""
+        },
+        {
+          "name": "RichTextToolbar",
+          "kind": "component",
+          "summary": "Barra de ferramentas do editor (também serve para TipTap: passe `onCommand` e `active` do seu editor).",
+          "props": [
+            {
+              "name": "onCommand",
+              "type": "(tool: RichTextTool | \"alignCenter\" | \"alignLeft\", value?: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "active",
+              "type": "Active | undefined",
+              "required": false,
+              "default": "{}",
+              "description": null
+            },
+            {
+              "name": "aside",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "tools",
+              "type": "RichTextTool[][] | undefined",
+              "required": false,
+              "default": "allTools",
+              "description": null
+            }
+          ],
+          "examplePage": "editor-de-texto"
+        }
+      ],
+      "doc": "components/rich-text.md"
+    },
+    {
+      "name": "agent-builder",
+      "file": "src/components/agent-builder.tsx",
+      "summary": "Construtor de agente: a \"ficha\" do agente ao lado da conversa com ele.",
+      "exports": [
+        {
+          "name": "AddPropertyMenu",
+          "kind": "component",
+          "summary": "Botão \"+ Adicionar\" com menu (aceita submenus).",
+          "props": [
+            {
+              "name": "items",
+              "type": "MenuEntry[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Adicionar\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "AgentHeader",
+          "kind": "component",
+          "summary": "Cabeçalho do agente: ícone grande, nome, descrição (ambos editáveis inline se receber os handlers).",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onDescriptionChange",
+              "type": "((v: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onTitleChange",
+              "type": "((v: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "AgentInstructions",
+          "kind": "component",
+          "summary": "Instruções do agente: editor de texto rico com \"Melhorar\" (IA) no toolbar.",
+          "props": [
+            {
+              "name": "onChange",
+              "type": "(html: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "enhancing",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "onEnhance",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "AgentStatus",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"rascunho\" | \"publicado\" | \"alterado\""
+        },
+        {
+          "name": "BuilderSection",
+          "kind": "component",
+          "summary": "Seção do construtor: título, selo opcional, descrição, ação à direita, conteúdo.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "badge",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "ChipItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; label: string; icon?: ReactNode }"
+        },
+        {
+          "name": "ChipPicker",
+          "kind": "component",
+          "summary": "Chips removíveis + \"+\" com menu para adicionar (ferramentas, saídas, skills).",
+          "props": [
+            {
+              "name": "chips",
+              "type": "ChipItem[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "addItems",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "addLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Adicionar\"",
+              "description": null
+            },
+            {
+              "name": "empty",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRemove",
+              "type": "((id: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "PropertyRow",
+          "kind": "component",
+          "summary": "Linha de propriedade: rótulo à esquerda (fixo) e valor/chips à direita; empilha no celular.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "PublishBar",
+          "kind": "component",
+          "summary": "Ações do construtor: status + Compartilhar · Testar · Publicar · ⋯.",
+          "props": [
+            {
+              "name": "status",
+              "type": "AgentStatus",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "menu",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onPublish",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onShare",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onTest",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "testing",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "ToolGlyph",
+          "kind": "component",
+          "summary": "Ícone de app/ferramenta: quadradinho com a inicial na cor da marca do app.",
+          "props": [
+            {
+              "name": "name",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "color",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "18",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "TriggerItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; icon?: ReactNode; label: ReactNode }"
+        },
+        {
+          "name": "TriggerList",
+          "kind": "component",
+          "summary": "Lista de gatilhos (quando o agente roda).",
+          "props": [
+            {
+              "name": "triggers",
+              "type": "TriggerItem[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "empty",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Nenhum gatilho: o agente só roda quando",
+              "description": null
+            },
+            {
+              "name": "rowMenu",
+              "type": "((t: TriggerItem) => MenuEntry[]) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "TriggerRow",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "menu",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        }
+      ],
+      "doc": "components/agent-builder.md"
+    },
+    {
+      "name": "tasks-ai",
+      "file": "src/components/tasks-ai.tsx",
+      "summary": "Tarefas propostas pela IA (a partir de uma reunião, documento ou análise).",
+      "exports": [
+        {
+          "name": "ProposalState",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"pendente\" | \"aceita\" | \"recusada\""
+        },
+        {
+          "name": "Subtask",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; title: string; type?: SubtaskType; done?: boolean; assignee?: Person }"
+        },
+        {
+          "name": "SubtaskRow",
+          "kind": "component",
+          "summary": "Sub-tarefa: círculo de concluído, título, tipo (pílula com ponto), responsável.",
+          "props": [
+            {
+              "name": "subtask",
+              "type": "Subtask",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onToggle",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "SubtaskType",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"melhoria\" | \"funcionalidade\" | \"bug\""
+        },
+        {
+          "name": "TaskDestination",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; label: string; icon?: ReactNode }"
+        },
+        {
+          "name": "TaskProposal",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; destination: string; title: string; description?: ReactNode; emphasis?: ReactNode; subtasks?: Subtask[]; project?: string; status?: TaskStatus; priority?: Priority; assignee?: Person; labels?: string[]; estimate?: string; }"
+        },
+        {
+          "name": "TaskProposalCard",
+          "kind": "component",
+          "summary": "Card de tarefa proposta.",
+          "props": [
+            {
+              "name": "destinations",
+              "type": "TaskDestination[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "proposal",
+              "type": "TaskProposal",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "onAccept",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onChange",
+              "type": "((patch: Partial<TaskProposal>) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onDecline",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onUndo",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "people",
+              "type": "Person[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "projects",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "state",
+              "type": "ProposalState | undefined",
+              "required": false,
+              "default": "\"pendente\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-tarefas-propostas"
+        },
+        {
+          "name": "TaskProposalList",
+          "kind": "component",
+          "summary": "Painel de propostas: cabeçalho com contagem e \"Aceitar todas / Recusar todas\", cards em coluna (o primeiro aberto; os seguintes recolhidos e esmaecidos).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "pending",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onAcceptAll",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onDeclineAll",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Tarefas\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-tarefas-propostas"
+        }
+      ],
+      "doc": "components/tasks-ai.md"
+    },
+    {
+      "name": "record-panel",
+      "file": "src/components/record-panel.tsx",
+      "summary": "Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.",
+      "exports": [
+        {
+          "name": "ActivitySection",
+          "kind": "component",
+          "summary": "Atividade do registro (usa ActivityFeed).",
+          "props": [
+            {
+              "name": "items",
+              "type": "ActivityItem[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "FileRow",
+          "kind": "component",
+          "summary": "Arquivo anexado: selo do tipo (ícone + rótulo), nome, ⋯.",
+          "props": [
+            {
+              "name": "file",
+              "type": "RecordFile",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "menu",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "FilesList",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "files",
+              "type": "RecordFile[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "empty",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Nenhum arquivo ainda.\"",
+              "description": null
+            },
+            {
+              "name": "rowMenu",
+              "type": "((f: RecordFile) => MenuEntry[]) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "NotesTable",
+          "kind": "component",
+          "summary": "Tabela pequena embutida (notas, critérios).",
+          "props": [
+            {
+              "name": "columns",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "rows",
+              "type": "ReactNode[][]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "maxRows",
+              "type": "number | undefined",
+              "required": false,
+              "default": "3",
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "PropertyPill",
+          "kind": "component",
+          "summary": "Pílula de propriedade (botão com menu).",
+          "props": [
+            {
+              "name": "placeholder",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "items",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onClick",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "PropertyPills",
+          "kind": "component",
+          "summary": "Linha de pílulas de propriedades (quebra em várias linhas).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "RecordFile",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; kind: RecordFileKind; meta?: string; href?: string }"
+        },
+        {
+          "name": "RecordFileKind",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"pdf\" | \"github\" | \"doc\" | \"sheet\" | \"image\" | \"link\""
+        },
+        {
+          "name": "RecordPanel",
+          "kind": "component",
+          "summary": "Painel do registro. Desktop: coluna à direita da lista (coloque-o ao lado do DataGrid).",
+          "props": [
+            {
+              "name": "onClose",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onDelete",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onDescriptionChange",
+              "type": "((v: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNext",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onPrev",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onTitleChange",
+              "type": "((v: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "position",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "properties",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Pílulas de propriedade (PropertyPills)."
+            },
+            {
+              "name": "width",
+              "type": "number | undefined",
+              "required": false,
+              "default": "460",
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "RecordSection",
+          "kind": "component",
+          "summary": "Seção do painel: título, ação à direita (\"+ Adicionar\", \"Ver tudo\", \"Filtro\").",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        },
+        {
+          "name": "SectionAddButton",
+          "kind": "component",
+          "summary": "\"+ Adicionar\" no padrão das seções do painel.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Adicionar\"",
+              "description": null
+            },
+            {
+              "name": "onClick",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "registros-painel-lateral"
+        }
+      ],
+      "doc": "components/record-panel.md"
+    },
+    {
+      "name": "collab",
+      "file": "src/components/collab.tsx",
+      "summary": "Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.",
+      "exports": [
+        {
+          "name": "ActionRequiredBanner",
+          "kind": "component",
+          "summary": "Faixa de ação obrigatória (ex.: \"Envie o documento obrigatório\") com botão tracejado que também aceita arrastar e soltar.",
+          "props": [
+            {
+              "name": "onFiles",
+              "type": "(files: File[]) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "accept",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actionLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Enviar\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "done",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Texto de confirmação depois de resolvido (ex.: \"contrato.pdf enviado\")."
+            }
+          ],
+          "examplePage": "colaboracao-e-documento"
+        },
+        {
+          "name": "DateSeparator",
+          "kind": "component",
+          "summary": "Separador de data no meio da conversa.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "colaboracao-e-documento"
+        },
+        {
+          "name": "ReadingDocument",
+          "kind": "component",
+          "summary": "Documento em tipografia de leitura (serifa editorial --ds-font-reading, medida ~68 caracteres).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "kicker",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "toc",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            }
+          ],
+          "examplePage": "colaboracao-e-documento"
+        },
+        {
+          "name": "TeamComposer",
+          "kind": "component",
+          "summary": "Campo de mensagem do time: texto, imagem, anexo, \"Enviar\" (Enter envia; Shift+Enter quebra linha).",
+          "props": [
+            {
+              "name": "onChange",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSend",
+              "type": "(v: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onAttach",
+              "type": "((files: File[], kind: \"imagem\" | \"arquivo\") => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Escreva uma mensagem\"",
+              "description": null
+            }
+          ],
+          "examplePage": "colaboracao-e-documento"
+        },
+        {
+          "name": "TeamMessage",
+          "kind": "component",
+          "summary": "Mensagem de uma pessoa: avatar, nome, hora e texto.",
+          "props": [
+            {
+              "name": "author",
+              "type": "Author",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "time",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "mine",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            }
+          ],
+          "examplePage": "colaboracao-e-documento"
+        },
+        {
+          "name": "TypingIndicator",
+          "kind": "component",
+          "summary": "\"• • •\" de alguém digitando.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "name",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "colaboracao-e-documento"
+        }
+      ],
+      "doc": "components/collab.md"
+    },
+    {
+      "name": "ai-layout",
+      "file": "src/components/ai-layout.tsx",
+      "summary": "Layout de app agêntico (docs: IA e interação › Layout de app agêntico).",
+      "exports": [
+        {
+          "name": "AgentAppLayout",
+          "kind": "component",
+          "summary": null,
+          "props": [
+            {
+              "name": "main",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": "Área principal: ThreadHeader + ThreadView + campo."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultListWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": "300",
+              "description": null
+            },
+            {
+              "name": "list",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Lista (SessionSidebar, lista de projetos)."
+            },
+            {
+              "name": "listOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Controlado. Sem ele, o layout guarda o estado (e persiste com `storageKey`)."
+            },
+            {
+              "name": "maxListWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": "420",
+              "description": null
+            },
+            {
+              "name": "minListWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": "240",
+              "description": null
+            },
+            {
+              "name": "mobileNav",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Celular: navegação inferior (BottomNav) mostrada só na tela da lista."
+            },
+            {
+              "name": "mobileView",
+              "type": "AgentMobileView | undefined",
+              "required": false,
+              "default": "\"main\"",
+              "description": "Celular: qual tela mostrar (\"list\" = lista; \"main\" = conversa)."
+            },
+            {
+              "name": "onListOpenChange",
+              "type": "((open: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onPanelOpenChange",
+              "type": "((open: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Alternar com ⌘. (ou Ctrl+.)."
+            },
+            {
+              "name": "panel",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Painel à direita (ArtifactPanel, SessionInfoPanel)."
+            },
+            {
+              "name": "panelOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "panelSize",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0.58",
+              "description": "Fração da largura do `main` quando o painel está aberto (0–1)."
+            },
+            {
+              "name": "rail",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Trilho de ícones (IconRail)."
+            },
+            {
+              "name": "storageKey",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Persiste largura/abertura da lista e do painel no localStorage."
+            }
+          ],
+          "examplePage": "ia-layout-agente"
+        },
+        {
+          "name": "AgentMobileView",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"list\" | \"main\""
+        },
+        {
+          "name": "CollapsedHistory",
+          "kind": "component",
+          "summary": "Linha \"67 mensagens anteriores ›\" com fio fino: histórico recolhido no topo de uma conversa longa.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onExpand",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "ListToggle",
+          "kind": "component",
+          "summary": "Botão de recolher/mostrar a lista do AgentAppLayout (⌘\\).",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"lista\"",
+              "description": null
+            },
+            {
+              "name": "onToggle",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-layout-agente"
+        },
+        {
+          "name": "QuickSession",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; title: string; time?: string; status?: SessionStatus; group?: string }"
+        },
+        {
+          "name": "SessionQuickSwitcher",
+          "kind": "component",
+          "summary": "Troca rápida de sessão (⌘K-lite) para quando a lista está recolhida: botão que abre um popover com busca, setas e Enter.",
+          "props": [
+            {
+              "name": "onSelect",
+              "type": "(id: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "sessions",
+              "type": "QuickSession[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "activeId",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "always",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Sessões\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-layout-agente"
+        },
+        {
+          "name": "ThreadAction",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; label: string; icon: ReactNode; onClick: () => void; active?: boolean; showLabel?: boolean; hideOnMobile?: boolean; tone?: \"neutral\" | \"danger\"; }"
+        },
+        {
+          "name": "ThreadDaySeparator",
+          "kind": "component",
+          "summary": "Separador de dia na conversa (\"Hoje\", \"12 mar\").",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "ThreadHeader",
+          "kind": "component",
+          "summary": "Cabeçalho da conversa: voltar (celular), título com menu (renomear, mover, exportar…) e ações compactas em ícone com tooltip.",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actions",
+              "type": "ThreadAction[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "backLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Voltar\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "leading",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "menu",
+              "type": "MenuEntry[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onBack",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "trailing",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-layout-agente"
+        },
+        {
+          "name": "ThreadView",
+          "kind": "component",
+          "summary": "Área rolável da conversa.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "bottomOffset",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": "Espaço reservado embaixo (ex.: botão flutuante no celular)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "collapseBefore",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": "Recolhe os N primeiros filhos numa linha \"N mensagens anteriores ›\" (conversas longas: mostra só o final)."
+            },
+            {
+              "name": "collapsedLabel",
+              "type": "((count: number) => string) | undefined",
+              "required": false,
+              "default": "(n: number) => `${n} ${n === 1 ? \"mensag",
+              "description": null
+            },
+            {
+              "name": "contentClassName",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "follow",
+              "type": "unknown",
+              "required": false,
+              "default": null,
+              "description": "Muda quando o conteúdo cresce (nº de mensagens, caracteres escritos)."
+            },
+            {
+              "name": "maxWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": "760",
+              "description": "Largura máxima da coluna de leitura (px)."
+            },
+            {
+              "name": "minimap",
+              "type": "MinimapItem[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "resetKey",
+              "type": "unknown",
+              "required": false,
+              "default": null,
+              "description": "Muda ao trocar de conversa: rola até o fim sem animação."
+            },
+            {
+              "name": "scrollRef",
+              "type": "RefObject<HTMLDivElement | null> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-layout-agente"
+        },
+        {
+          "name": "useAgentLayout",
+          "kind": "hook",
+          "summary": "Estado da lista do AgentAppLayout mais próximo (aberta, alternar, celular).",
+          "signature": "useAgentLayout(): AgentLayoutState | null"
+        }
+      ],
+      "doc": "components/ai-layout.md"
     }
   ],
   "blocks": [
+    {
+      "slug": "ai-agent-builder",
+      "file": "src/blocks/ai-agent-builder.tsx",
+      "title": "Construtor de agentes",
+      "description": "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar.",
+      "category": "IA",
+      "uses": [
+        "AddPropertyMenu",
+        "AgentComposer",
+        "AgentHeader",
+        "AgentInstructions",
+        "AgentMessage",
+        "AgentStatus",
+        "BuilderSection",
+        "ChipPicker",
+        "MenuEntry",
+        "PropertyRow",
+        "PublishBar",
+        "ResizableSplit",
+        "RunStatus",
+        "RunSummary",
+        "ToolGlyph",
+        "TriggerList",
+        "notify"
+      ]
+    },
+    {
+      "slug": "ai-agent-connections",
+      "file": "src/blocks/ai-agent-connections.tsx",
+      "title": "Agente e conexões",
+      "description": "Página do agente: o que ele acessa (conexões), quem ele aciona (subagentes com estado), o que entrega (resultados), gatilhos e instruções.",
+      "category": "IA",
+      "uses": [
+        "AgentConnection",
+        "AppIcon",
+        "Button",
+        "ConnectionsCard",
+        "Page",
+        "PageHeading",
+        "Subagent",
+        "Switch",
+        "notify"
+      ]
+    },
     {
       "slug": "ai-agent-run",
       "file": "src/blocks/ai-agent-run.tsx",
@@ -17164,6 +20824,64 @@
       ]
     },
     {
+      "slug": "ai-codex",
+      "file": "src/blocks/ai-codex.tsx",
+      "title": "Agente de código (tarefas longas)",
+      "description": "Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.",
+      "category": "IA",
+      "uses": [
+        "AgentAppLayout",
+        "AgentComposer",
+        "AnswerCard",
+        "BottomNav",
+        "Disclaimer",
+        "IconRail",
+        "InputModal",
+        "ListToggle",
+        "MenuEntry",
+        "MessageActions",
+        "ModelEffort",
+        "ModelPicker",
+        "NavItem",
+        "PermissionMode",
+        "PermissionModeChip",
+        "ProductMark",
+        "RailItem",
+        "RunSummary",
+        "SessionQuickSwitcher",
+        "SessionSidebar",
+        "StepGroup",
+        "StepItem",
+        "ThreadHeader",
+        "ThreadView",
+        "Tooltip",
+        "UserBubble",
+        "VoiceModeButton",
+        "VoiceOverlay",
+        "WorkspaceSwitcher",
+        "notify"
+      ]
+    },
+    {
+      "slug": "ai-compose-email",
+      "file": "src/blocks/ai-compose-email.tsx",
+      "title": "E-mail com IA",
+      "description": "Rascunhos preparados pelo agente: destinatários com busca e sugestões, modelo, estado RASCUNHO e envio com agendamento.",
+      "category": "IA",
+      "uses": [
+        "AiBadge",
+        "Button",
+        "ComposeEmail",
+        "ComposeEmailDialog",
+        "ComposeStatus",
+        "MenuEntry",
+        "Page",
+        "PageHeading",
+        "Person",
+        "notify"
+      ]
+    },
+    {
       "slug": "ai-conversation",
       "file": "src/blocks/ai-conversation.tsx",
       "title": "Conversa com aprovação",
@@ -17209,12 +20927,70 @@
         "KpiGrid",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "TableSearch",
         "formatCurrency",
         "formatDuration",
         "formatNumber",
         "notify",
         "useFilters"
+      ]
+    },
+    {
+      "slug": "ai-sessions-artifacts",
+      "file": "src/blocks/ai-sessions-artifacts.tsx",
+      "title": "Sessões com artefatos",
+      "description": "Lista de sessões enxuta + conversa em fluxo (status da execução, passos recolhíveis, artefatos que abrem em abas) + painel de artefatos e detalhes. Montada com AgentAppLayout, ThreadHeader e ThreadView.",
+      "category": "IA",
+      "uses": [
+        "AgentAppLayout",
+        "AgentComposer",
+        "AnswerCard",
+        "ArtifactCard",
+        "ArtifactPanel",
+        "ArtifactTab",
+        "BarChart",
+        "BarList",
+        "BottomNav",
+        "ComposerChip",
+        "ContextItem",
+        "ContextView",
+        "Disclaimer",
+        "IconRail",
+        "InputModal",
+        "InsightCard",
+        "ListToggle",
+        "MenuEntry",
+        "MessageActions",
+        "MinimapItem",
+        "ModelEffort",
+        "ModelPicker",
+        "NavItem",
+        "PermissionMode",
+        "PermissionModeChip",
+        "ProductMark",
+        "PromptSuggestions",
+        "RailItem",
+        "ReportSection",
+        "RunStatus",
+        "RunSummary",
+        "SessionDetails",
+        "SessionQuickSwitcher",
+        "SessionSidebar",
+        "SheetArtifact",
+        "SlashCommand",
+        "StepGroup",
+        "StepItem",
+        "ThreadHeader",
+        "ThreadView",
+        "Tooltip",
+        "UserBubble",
+        "VoiceModeButton",
+        "VoiceOverlay",
+        "WorkspaceSwitcher",
+        "formatCurrency",
+        "formatNumber",
+        "notify"
       ]
     },
     {
@@ -17245,6 +21021,7 @@
         "AnswerCard",
         "Disclaimer",
         "InputModal",
+        "ListToggle",
         "MenuEntry",
         "MessageActions",
         "MinimapItem",
@@ -17252,6 +21029,7 @@
         "SessionComposer",
         "SessionHeader",
         "SessionInfoPanel",
+        "SessionQuickSwitcher",
         "SessionSidebar",
         "SlashCommand",
         "StepGroup",
@@ -17260,6 +21038,24 @@
         "VoiceModeButton",
         "VoiceOverlay",
         "WorkspaceSwitcher",
+        "notify"
+      ]
+    },
+    {
+      "slug": "ai-task-proposals",
+      "file": "src/blocks/ai-task-proposals.tsx",
+      "title": "Tarefas propostas pela IA",
+      "description": "Resumo de reunião à esquerda e as tarefas que a IA sugere à direita: destino (Linear, Jira, Asana), sub-tarefas, propriedades editáveis, aceitar/recusar por tarefa ou todas, com desfazer.",
+      "category": "IA",
+      "uses": [
+        "AvatarGroup",
+        "ProposalState",
+        "SegmentedControl",
+        "TaskDestination",
+        "TaskProposal",
+        "TaskProposalCard",
+        "TaskProposalList",
+        "ToolGlyph",
         "notify"
       ]
     },
@@ -17323,6 +21119,24 @@
       ]
     },
     {
+      "slug": "app-collab-doc",
+      "file": "src/blocks/app-collab-doc.tsx",
+      "title": "Conversa do time + documento",
+      "description": "Conversa entre pessoas ao lado de um documento em tipografia de leitura: mensagens com nome e hora, separador de data, “digitando”, faixa de ação obrigatória com envio de arquivo e índice do documento.",
+      "category": "Aplicação",
+      "uses": [
+        "ActionRequiredBanner",
+        "AvatarGroup",
+        "DateSeparator",
+        "ReadingDocument",
+        "SegmentedControl",
+        "TeamComposer",
+        "TeamMessage",
+        "TypingIndicator",
+        "notify"
+      ]
+    },
+    {
       "slug": "app-command-palette",
       "file": "src/blocks/app-command-palette.tsx",
       "title": "Paleta de comandos (⌘K)",
@@ -17339,6 +21153,27 @@
         "PageHeading",
         "useCommandShortcut",
         "useTheme"
+      ]
+    },
+    {
+      "slug": "app-connection",
+      "file": "src/blocks/app-connection.tsx",
+      "title": "Detalhe da conexão",
+      "description": "Um app conectado: estado, exemplo de pedido, dados sincronizados, contas e permissões de leitura/escrita por conta, desconectar com confirmação.",
+      "category": "Aplicação",
+      "uses": [
+        "AccountRow",
+        "AppIcon",
+        "Breadcrumb",
+        "Button",
+        "ConfirmDialog",
+        "ConnectionStatus",
+        "DataSyncTable",
+        "MarketplaceHero",
+        "Page",
+        "ToolPermissionList",
+        "formatNumber",
+        "notify"
       ]
     },
     {
@@ -17410,6 +21245,7 @@
         "Modal",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "Pagination",
         "PropertyList",
         "SavedView",
@@ -17452,6 +21288,24 @@
       ]
     },
     {
+      "slug": "app-marketplace",
+      "file": "src/blocks/app-marketplace.tsx",
+      "title": "Marketplace de apps",
+      "description": "Conecte as ferramentas do time: busca, categorias, faixa de exemplos de pedido e grade de apps com conectar/conectado.",
+      "category": "Aplicação",
+      "uses": [
+        "AppGrid",
+        "AppTile",
+        "Button",
+        "Empty",
+        "HalftoneBand",
+        "MarketplaceHero",
+        "Page",
+        "normalize",
+        "notify"
+      ]
+    },
+    {
       "slug": "app-notifications",
       "file": "src/blocks/app-notifications.tsx",
       "title": "Central de notificações",
@@ -17487,6 +21341,43 @@
         "SlideStat",
         "SlideTitle",
         "notify"
+      ]
+    },
+    {
+      "slug": "app-record-tracker",
+      "file": "src/blocks/app-record-tracker.tsx",
+      "title": "Rastreador de registros",
+      "description": "Banco de registros estilo Notion: tabela com etiquetas coloridas, status e prioridade editáveis, desfazer/refazer, Tabela ou Quadro, e painel lateral com propriedades, arquivos, notas e atividade.",
+      "category": "Aplicação",
+      "uses": [
+        "ActivitySection",
+        "Avatar",
+        "Checkbox",
+        "DataGrid",
+        "FilesList",
+        "GridColumn",
+        "KanbanBoard",
+        "KanbanColumn",
+        "NotesTable",
+        "Priority",
+        "PriorityIcon",
+        "PriorityPill",
+        "PropertyPill",
+        "PropertyPills",
+        "RecordCard",
+        "RecordFile",
+        "RecordPanel",
+        "RecordSection",
+        "SectionAddButton",
+        "SegmentedControl",
+        "StatusPill",
+        "TableSearch",
+        "TagPill",
+        "TaskStatus",
+        "notify",
+        "priorityLabel",
+        "taskStatusLabel",
+        "useTableSearch"
       ]
     },
     {
@@ -17673,6 +21564,7 @@
         "Highlight",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "SortHeader",
         "StatCell",
         "StatGrid",
@@ -17807,6 +21699,7 @@
         "Modal",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "SegmentedControl",
         "Select",
         "TableSearch",
@@ -18059,6 +21952,7 @@
         "Meter",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "PropertyList",
         "SortHeader",
         "TableSearch",
@@ -18117,6 +22011,7 @@
         "NumberField",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "Select",
         "SortHeader",
         "TableSearch",
@@ -18169,6 +22064,7 @@
         "Highlight",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "SortHeader",
         "StatCell",
         "StatGrid",
@@ -18311,6 +22207,7 @@
         "ListRow",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "PropertyList",
         "ScatterChart",
         "SortHeader",
@@ -18445,6 +22342,7 @@
         "Highlight",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "PropertyList",
         "SortHeader",
         "StatCell",
@@ -18705,6 +22603,7 @@
         "NumberField",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "Pagination",
         "SavedView",
         "SavedViews",
@@ -18822,6 +22721,7 @@
         "KpiGrid",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "Select",
         "TableSearch",
         "TextareaField",
@@ -18865,6 +22765,7 @@
         "FilterBar",
         "FilterField",
         "Highlight",
+        "PageToolbar",
         "Pagination",
         "PropertyList",
         "TableSearch",
@@ -19287,6 +23188,132 @@
         "utility": "chart-grid",
         "light": "#eef0f2",
         "dark": "#242428",
+        "note": "Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes."
+      },
+      {
+        "token": "--ds-tag-gray-bg",
+        "utility": "tag-gray-bg",
+        "light": "#f0f0ef",
+        "dark": "#2f2f31",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-gray-fg",
+        "utility": "tag-gray-fg",
+        "light": "#4d4c49",
+        "dark": "#c9c8c4",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-brown-bg",
+        "utility": "tag-brown-bg",
+        "light": "#f4eeea",
+        "dark": "#3a2e26",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-brown-fg",
+        "utility": "tag-brown-fg",
+        "light": "#6b4a36",
+        "dark": "#ddb9a0",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-orange-bg",
+        "utility": "tag-orange-bg",
+        "light": "#fbecdd",
+        "dark": "#40291a",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-orange-fg",
+        "utility": "tag-orange-fg",
+        "light": "#8a4512",
+        "dark": "#f2b07a",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-yellow-bg",
+        "utility": "tag-yellow-bg",
+        "light": "#fbf3db",
+        "dark": "#3d331a",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-yellow-fg",
+        "utility": "tag-yellow-fg",
+        "light": "#7a5a00",
+        "dark": "#ecd07c",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-green-bg",
+        "utility": "tag-green-bg",
+        "light": "#e6f3ea",
+        "dark": "#1d3324",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-green-fg",
+        "utility": "tag-green-fg",
+        "light": "#1f6b3a",
+        "dark": "#8fd4a3",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-blue-bg",
+        "utility": "tag-blue-bg",
+        "light": "#e5eff9",
+        "dark": "#1b2c40",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-blue-fg",
+        "utility": "tag-blue-fg",
+        "light": "#1d5a96",
+        "dark": "#93c0ef",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-purple-bg",
+        "utility": "tag-purple-bg",
+        "light": "#f0ebf8",
+        "dark": "#2e2440",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-purple-fg",
+        "utility": "tag-purple-fg",
+        "light": "#6440a3",
+        "dark": "#c6aef0",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-pink-bg",
+        "utility": "tag-pink-bg",
+        "light": "#f9e9f1",
+        "dark": "#3d2130",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-pink-fg",
+        "utility": "tag-pink-fg",
+        "light": "#9b2f68",
+        "dark": "#f0a8cc",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-red-bg",
+        "utility": "tag-red-bg",
+        "light": "#fbe8e6",
+        "dark": "#42201e",
+        "note": null
+      },
+      {
+        "token": "--ds-tag-red-fg",
+        "utility": "tag-red-fg",
+        "light": "#a8302a",
+        "dark": "#f4a29b",
         "note": "Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo"
       },
       {
@@ -19405,6 +23432,13 @@
         "token": "--ds-display-tracking",
         "utility": null,
         "light": "-0.035em",
+        "dark": null,
+        "note": "Leitura longa (documentos, políticas, relatórios): serifa editorial."
+      },
+      {
+        "token": "--ds-font-reading",
+        "utility": null,
+        "light": "\"Source Serif 4\", \"Source Serif Pro\", Georgia, \"Times New Roman\", serif",
         "dark": null,
         "note": null
       }

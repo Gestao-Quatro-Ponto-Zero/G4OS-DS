@@ -28,6 +28,20 @@ export const meta = {
   category: "Marketing",
   order: 1,
   height: 1100,
+  concept: {
+    goal: "Apresentar o produto e levar a pessoa ao cadastro com prova real (o produto na moldura).",
+    patterns: [
+      "Anatomia I · Público: rolagem do documento, cabeçalho do site fixo",
+      "Hero com o produto real; logos; recursos; números; depoimentos",
+      "CTAs levam a cadastro, preços ou vendas",
+    ],
+    adapt: [
+      "Página de módulo, de evento, de parceiro",
+    ],
+    avoid: [
+      "Ilustrações genéricas no lugar do produto real",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

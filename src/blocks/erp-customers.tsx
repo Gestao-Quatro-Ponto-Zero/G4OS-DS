@@ -21,7 +21,7 @@ import {
   useFilters,
   useSort,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { br, customers as seed, orderStatus, orderTotal, ordersOf, sellers, today, user, type Customer } from "./data/erp";
 import { lateDays, receivables } from "./data/fin";
@@ -35,6 +35,20 @@ export const meta = {
   category: "ERP",
   order: 4,
   height: 900,
+  concept: {
+    goal: "Ver a carteira de clientes B2B com risco de crédito e agir sem perder a lista.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+      "Uso do limite de crédito e títulos vencidos na linha",
+      "Detalhe em gaveta com bloqueio de crédito e novo pedido",
+    ],
+    adapt: [
+      "Contas (CRM), clientes (SaaS)",
+    ],
+    avoid: [
+      "Abrir página nova só para ver o limite de crédito",
+    ],
+  },
 } as const;
 
 const openOf = (c: Customer) => receivables.filter((r) => r.customerId === c.id);
@@ -117,7 +131,9 @@ export default function ErpCustomers() {
           }
         />
         <div className="mt-6 space-y-4">
-          <FilterBar filters={filters} noun="cliente" search={<TableSearch value={q} onChange={filters.setQuery} total={list.length} noun="cliente" searchIn="nome, CNPJ, cidade e contato" />} />
+          <PageToolbar>
+            <FilterBar filters={filters} noun="cliente" search={<TableSearch value={q} onChange={filters.setQuery} total={list.length} noun="cliente" searchIn="nome, CNPJ, cidade e contato" />} />
+          </PageToolbar>
           <DataTable rows={sort.rows} columns={columns} rowKey={(k) => k.id} onRowClick={(k) => setOpen(k.id)} rowLabel={(k) => `Abrir ${k.name}`} empty={<EmptyFilterResult filters={filters} noun="cliente" />} />
         </div>
       </Page>

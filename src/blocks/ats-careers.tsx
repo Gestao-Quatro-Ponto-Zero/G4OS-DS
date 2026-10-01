@@ -25,6 +25,20 @@ export const meta = {
   category: "ATS",
   order: 9,
   height: 900,
+  concept: {
+    goal: "Atrair candidatos com uma página pública de vagas pensada primeiro para o celular.",
+    patterns: [
+      "Anatomia I · Público: rolagem do documento, cabeçalho do site fixo, sem casca de app",
+      "Busca e filtros por área e modelo",
+      "Candidatura em folha com currículo; botão fixo no celular",
+    ],
+    adapt: [
+      "Portal do cliente, página de parceiros, catálogo público de produtos",
+    ],
+    avoid: [
+      "Usar a navegação do app interno numa página pública",
+    ],
+  },
 } as const;
 
 const published = jobs.filter((j) => j.status === "aberta");

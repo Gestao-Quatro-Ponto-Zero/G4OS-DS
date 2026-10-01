@@ -84,6 +84,12 @@ export const meta = {
   category: "CRM",     // SaaS | CRM | ATS | ERP | Financeiro | Autenticação | Configurações | Onboarding | Aplicação
   height: 820,         // altura do iframe no showcase
   order: 10,
+  concept: {           // obrigatório: aparece na aba "Conceito" do bloco
+    goal: "Ver o funil comercial e mover negócios entre etapas sabendo quanto vale cada coluna.",
+    patterns: ["Anatomia E · Quadro: cabeçalho fixo; colunas crescem em telas largas", "Arrastar muda a etapa; card abre o negócio"],
+    adapt: ["Candidatos (ATS), pedidos (ERP)"],
+    avoid: ["Mudar etapa por botão dentro do card"],
+  },
 } as const;          // sem importar tipos do showcase: o arquivo continua copiável
 
 /* Dados de exemplo NO TOPO do arquivo: quem copia troca só isto. */
@@ -95,6 +101,9 @@ export default function Block() {
 ```
 
 Regras de bloco:
+
+- **Escolha a anatomia antes dos componentes** ([anatomia de página](../padroes/anatomia-de-pagina.md)) e declare-a no primeiro item de `concept.patterns` ("Anatomia A · Lista: …"). Cabeçalho fixo, filtros em `PageToolbar`, propriedades em `SplitLayout`: o que é da página gruda junto.
+- **`meta.concept` é obrigatório**: objetivo (problema + para quem), padrões aplicados, onde adaptar, o que evitar.
 
 - **Importe de `@g4os/ds`** (não caminhos relativos): o arquivo copiado funciona igual no app.
 - Autocontido: dados de exemplo no topo, nenhum import de outro bloco.

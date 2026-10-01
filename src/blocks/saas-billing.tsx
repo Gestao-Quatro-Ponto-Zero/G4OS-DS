@@ -42,6 +42,20 @@ export const meta = {
   category: "SaaS",
   order: 5,
   height: 1240,
+  concept: {
+    goal: "Proteger o MRR: ver de onde ele vem e recuperar cobranças que falharam.",
+    patterns: [
+      "Anatomia B · Painel + lista: ponte de MRR no topo, faturas abaixo",
+      "Régua de cobrança com retentativa",
+      "Ações em massa; detalhe da fatura em gaveta (?id=)",
+    ],
+    adapt: [
+      "Contas a receber (financeiro), assinaturas de serviço",
+    ],
+    avoid: [
+      "Falha de cobrança sem próxima tentativa visível",
+    ],
+  },
 } as const;
 
 const here = "#/frame/saas-billing";

@@ -32,6 +32,22 @@ export const meta = {
   category: "IA",
   order: 2,
   height: 1040,
+  concept: {
+    goal: "Explicar uma execução do agente passo a passo para quem precisa auditar ou aprovar o resultado antes de usar.",
+    patterns: [
+      "Anatomia C · Registro: trilha + título fixos, trace em cascata no conteúdo",
+      "Passo selecionado mostra entrada e saída lado a lado",
+      "Custo, tokens e tempo sempre visíveis",
+      "Saída que pede aprovação humana antes de agir; tentar de novo por passo",
+    ],
+    adapt: [
+      "Logs de automação, jobs de integração, pipelines de dados",
+      "Troque 'tokens' por 'registros processados' fora de IA",
+    ],
+    avoid: [
+      "Mostrar só o resultado final sem como chegou nele",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

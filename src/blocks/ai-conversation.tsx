@@ -28,6 +28,21 @@ export const meta = {
   category: "IA",
   order: 4,
   height: 900,
+  concept: {
+    goal: "Mostrar uma conversa longa em que o agente pensa, planeja, usa ferramentas e pede aprovação antes de uma ação irreversível.",
+    patterns: [
+      "Anatomia G · App de altura total: só a thread rola, composer fixo",
+      "Raciocínio e plano recolhíveis: visíveis, mas sem poluir",
+      "Pedido de aprovação humana antes de agir (enviar e-mails)",
+      "Fontes citadas e artefato inline",
+    ],
+    adapt: [
+      "Qualquer agente que mexe em dados de clientes (cobrança, CRM, RH)",
+    ],
+    avoid: [
+      "Esconder o que o agente fez; executar ação externa sem aprovação",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -53,7 +68,9 @@ export default function AiConversation() {
   const [draft, setDraft] = useState("");
   const [extra, setExtra] = useState<{ id: string; q: string; done: boolean }[]>([]);
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [extra.length, approval]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [extra.length, approval]);
 
   const decide = (s: ApprovalState, msg: string) => {
     setApproval(s);

@@ -26,6 +26,20 @@ export const meta = {
   category: "Financeiro",
   order: 1,
   height: 1280,
+  concept: {
+    goal: "O dia da controladoria em uma tela: caixa, recebíveis, aprovações e pendências.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com período",
+      "KPIs de liquidez, aging e caixa contra o mínimo",
+      "Filas de ação (aprovar, conciliar) antes dos detalhes",
+    ],
+    adapt: [
+      "Painel de operações, de RH",
+    ],
+    avoid: [
+      "Painel só com gráficos, sem o que fazer hoje",
+    ],
+  },
 } as const;
 
 const money = (n: number) => formatCurrency(n, { compact: true });

@@ -20,7 +20,7 @@ import {
   notify,
   useFilters,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import { go } from "./shells/frame-route";
@@ -34,6 +34,21 @@ export const meta = {
   category: "IA",
   order: 1,
   height: 820,
+  concept: {
+    goal: "Achar e reabrir análises feitas pelo agente, com status, dono e custo, para o time acompanhar o que a IA produziu.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (filtros e busca local)",
+      "KPIs curtos no topo (em andamento, concluídas, custo)",
+      "Uma ação primária: Nova análise (InputModal) que abre o workspace",
+      "Linha abre o projeto (?id=)",
+    ],
+    adapt: [
+      "Relatórios gerados, execuções de automação, campanhas: troque colunas e status",
+    ],
+    avoid: [
+      "Filtros fora da PageToolbar (somem ao rolar)",
+    ],
+  },
 } as const;
 
 const fields: FilterField<AgentProject>[] = [
@@ -104,7 +119,9 @@ export default function AiProjects() {
           <KpiCard label="Custo no mês" value={formatCurrency(totals.cost)} delta={0.12} goodWhen="down" period="vs. agosto" />
         </KpiGrid>
         <div className="mt-6 space-y-3">
-          <FilterBar filters={filters} noun="análise" nounPlural="análises" search={<TableSearch value={q} onChange={filters.setQuery} total={projects.length} noun="análise" nounPlural="análises" searchIn="título, pergunta, agente e dono" />} />
+          <PageToolbar>
+            <FilterBar filters={filters} noun="análise" nounPlural="análises" search={<TableSearch value={q} onChange={filters.setQuery} total={projects.length} noun="análise" nounPlural="análises" searchIn="título, pergunta, agente e dono" />} />
+          </PageToolbar>
           <DataTable
             rows={filters.rows}
             columns={columns}

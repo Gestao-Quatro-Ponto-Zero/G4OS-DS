@@ -28,6 +28,20 @@ export const meta = {
   category: "ATS",
   order: 7,
   height: 980,
+  concept: {
+    goal: "Organizar a agenda de entrevistas e não deixar avaliações pendentes.",
+    patterns: [
+      "Anatomia A · Lista agrupada por dia, cabeçalho fixo",
+      "Pendências de avaliação em destaque no topo",
+      "Scorecard em folha lateral com os critérios da vaga",
+    ],
+    adapt: [
+      "Agenda de visitas comerciais, reuniões de onboarding, auditorias",
+    ],
+    avoid: [
+      "Formulário de avaliação em outra página (perde a agenda)",
+    ],
+  },
 } as const;
 
 const dayLabel = (d: string) => {

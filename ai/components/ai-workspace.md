@@ -22,6 +22,7 @@ Campo de tarefa do agente: texto com autoaltura, "/" abre comandos, "+" anexa (a
 | `contextChips` | `ReactNode` |  |  |
 | `disabled` | `boolean \| undefined` |  |  |
 | `footer` | `ReactNode` |  | Linha extra no rodapé do campo (ex.: ToolsBar com ferramentas conectadas). |
+| `hint` | `ReactNode` |  | Dica discreta à direita da 1ª linha, só com o campo vazio e largo (≥ 640px). |
 | `leading` | `ReactNode` |  | Botões logo após o anexar (ex.: pasta de contexto). |
 | `onStop` | `(() => void) \| undefined` |  |  |
 | `onTranscribe` | `((ms: number) => string \| Promise<string>) \| undefined` |  | Chamado ao terminar a gravação com a duração (ms). |
@@ -155,7 +156,7 @@ Exemplo (showcase `#/p/ia-workspace`):
 ## ArtifactKind (type)
 
 ```ts
-type ArtifactKind = "report" | "sheet" | "doc" | "chart" | "code" | "email" | "deck" | "context" | "output"
+type ArtifactKind = "report" | "sheet" | "doc" | "chart" | "code" | "email" | "deck" | "context" | "output" | "details" | "files"
 ```
 
 ## ArtifactPanel
@@ -435,6 +436,7 @@ Linha de status de uma execução ("Concluído em 40 s ›").
 | `steps` | `number \| undefined` |  |  |
 | `tokens` | `number \| undefined` |  |  |
 | `tools` | `number \| undefined` |  |  |
+| `variant` | `"inline" \| "divider" \| undefined` | `"inline"` | "inline" (padrão): "✓ Concluído em 40 s · 9 passos ›" com o trace num cartão. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

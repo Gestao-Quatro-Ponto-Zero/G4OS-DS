@@ -35,6 +35,20 @@ export const meta = {
   category: "ATS",
   order: 3,
   height: 1100,
+  concept: {
+    goal: "Ver a saúde de uma vaga (funil, melhores candidatos) e definir como ela será avaliada.",
+    patterns: [
+      "Anatomia C · Registro com abas; propriedades fixas à direita",
+      "Modelo de avaliação: critérios com peso e nota esperada",
+      "?id=nova transforma o registro no formulário de abertura",
+    ],
+    adapt: [
+      "Campanha (marketing), produto (ERP), plano (SaaS): registro com abas + configuração",
+    ],
+    avoid: [
+      "Formulário de criação diferente da página de detalhe",
+    ],
+  },
 } as const;
 
 type Criterion = Job["criteria"][number];

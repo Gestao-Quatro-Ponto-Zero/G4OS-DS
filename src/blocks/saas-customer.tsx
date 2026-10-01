@@ -37,6 +37,20 @@ export const meta = {
   category: "SaaS",
   order: 4,
   height: 1180,
+  concept: {
+    goal: "Decidir o que fazer com uma conta: saúde, uso, cobrança e suporte em um lugar.",
+    patterns: [
+      "Anatomia C · Registro: KPIs da conta no topo; propriedades fixas à direita",
+      "Saúde e adoção por recurso",
+      "Ajuste de plano com prévia de MRR; cancelamento com confirmação",
+    ],
+    adapt: [
+      "Empresa (CRM), cliente B2B (ERP)",
+    ],
+    avoid: [
+      "Cancelar sem mostrar o impacto",
+    ],
+  },
 } as const;
 
 const here = "#/frame/saas-customers";

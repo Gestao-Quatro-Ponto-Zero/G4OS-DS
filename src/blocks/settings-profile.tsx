@@ -21,6 +21,21 @@ export const meta = {
   category: "Configurações",
   order: 1,
   height: 900,
+  concept: {
+    goal: "Manter os dados da pessoa e da conta com segurança e sem perder alterações.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "Seções rótulo-à-esquerda",
+      "Barra de alterações não salvas no rodapé",
+      "Zona de perigo separada no fim",
+    ],
+    adapt: [
+      "Perfil de empresa, dados fiscais",
+    ],
+    avoid: [
+      "Ação destrutiva no meio do formulário",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

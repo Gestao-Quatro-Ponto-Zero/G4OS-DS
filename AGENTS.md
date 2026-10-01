@@ -61,6 +61,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 12. **Controle só quando há o que controlar**: busca ≥ 12 itens, filtro ≥ 8, alternador de visualização ≥ 8 (`collectionThresholds`).
 13. Contador em aba/sidebar **só quando pede ação**, nunca total.
 14. `<html lang="pt-BR" className="ds-app" data-theme="system">`: o documento não rola; `Page` rola. Tema e marca pelo `<html>` (ver "Tema escuro e marca" abaixo).
+14a. **Toda tela segue uma das nove anatomias** de [anatomia de página](docs/padroes/anatomia-de-pagina.md) (Lista, Painel, Registro, Configurações, Quadro, Mestre-detalhe, App de altura total, Fluxo focado, Público). Cabeçalho da página fixo; **o que é da página fica junto** (filtros em `PageToolbar`, subnavegação, coluna de propriedades em `SplitLayout` grudam colados ao cabeçalho); nunca um elemento fixo cujo contexto rolou embora; uma rolagem por eixo.
 
 ### Dados
 15. **Números pelo `lib/format`**: `formatCurrency`, `formatNumber`, `formatPercent` (recebe fração), `formatDelta`, `formatCompact`, `formatDate`, `formatRelative`. Nada de `toFixed` ou `"R$ " +`. `tabular-nums` e alinhamento à direita em colunas numéricas.
@@ -131,7 +132,7 @@ Catálogo completo com descrições no [README](README.md#blocos).
 
 - Pacote distribuído como **código-fonte** (TSX + CSS); não há build de biblioteca. `package.json#exports` define os pontos de entrada.
 - Novo componente: arquivo da família em `src/components/`, export em `src/index.ts`, página em `showcase/pages/<slug>.tsx` (registro automático; contrato em `showcase/kit.tsx`). Ver [contribuir.md](docs/guias/contribuir.md).
-- Novo bloco: `src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order } as const` e `export default function`. Importa só de `@g4os/ds`; dados de exemplo no topo; realista em pt-BR.
+- Novo bloco: `src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order, concept } as const` e `export default function`. `concept` é obrigatório (`goal`, `patterns` começando pela anatomia, `adapt`, `avoid`) e aparece na aba Conceito do showcase. Importa só de `@g4os/ds`; dados de exemplo no topo; realista em pt-BR.
 - Mudou token: CSS **e** TS (`color` e `colorDark`), `npm run check:tokens`, docs de fundamentos.
 - Mudou export, prop ou bloco: `npm run ai:build` (o `check` falha se `ai/` estiver desatualizado). Renomeou um export: registre em `ai/renames.json` e no `CHANGELOG.md`.
 - Nomes exportados são únicos no pacote inteiro.

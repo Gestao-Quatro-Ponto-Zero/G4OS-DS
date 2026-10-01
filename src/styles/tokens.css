@@ -134,6 +134,26 @@
   --ds-chart-6: var(--g4-gray-400);
   --ds-chart-grid: #eef0f2;
 
+  /* Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. */
+  --ds-tag-gray-bg: #f0f0ef;
+  --ds-tag-gray-fg: #4d4c49;
+  --ds-tag-brown-bg: #f4eeea;
+  --ds-tag-brown-fg: #6b4a36;
+  --ds-tag-orange-bg: #fbecdd;
+  --ds-tag-orange-fg: #8a4512;
+  --ds-tag-yellow-bg: #fbf3db;
+  --ds-tag-yellow-fg: #7a5a00;
+  --ds-tag-green-bg: #e6f3ea;
+  --ds-tag-green-fg: #1f6b3a;
+  --ds-tag-blue-bg: #e5eff9;
+  --ds-tag-blue-fg: #1d5a96;
+  --ds-tag-purple-bg: #f0ebf8;
+  --ds-tag-purple-fg: #6440a3;
+  --ds-tag-pink-bg: #f9e9f1;
+  --ds-tag-pink-fg: #9b2f68;
+  --ds-tag-red-bg: #fbe8e6;
+  --ds-tag-red-fg: #a8302a;
+
   /* Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo */
   --ds-mark-text: 70%;
   --ds-mark-bg: 8%;
@@ -159,6 +179,8 @@
   --ds-font-display: var(--ds-font-sans);
   --ds-display-weight: 600;
   --ds-display-tracking: -0.035em;
+  /* Leitura longa (documentos, políticas, relatórios): serifa editorial. */
+  --ds-font-reading: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
 }
 
 /* ==================================================================== */
@@ -212,6 +234,24 @@
   --ds-chart-5: #8fbfa6;
   --ds-chart-6: #6b6e76;
   --ds-chart-grid: #242428;
+  --ds-tag-gray-bg: #2f2f31;
+  --ds-tag-gray-fg: #c9c8c4;
+  --ds-tag-brown-bg: #3a2e26;
+  --ds-tag-brown-fg: #ddb9a0;
+  --ds-tag-orange-bg: #40291a;
+  --ds-tag-orange-fg: #f2b07a;
+  --ds-tag-yellow-bg: #3d331a;
+  --ds-tag-yellow-fg: #ecd07c;
+  --ds-tag-green-bg: #1d3324;
+  --ds-tag-green-fg: #8fd4a3;
+  --ds-tag-blue-bg: #1b2c40;
+  --ds-tag-blue-fg: #93c0ef;
+  --ds-tag-purple-bg: #2e2440;
+  --ds-tag-purple-fg: #c6aef0;
+  --ds-tag-pink-bg: #3d2130;
+  --ds-tag-pink-fg: #f0a8cc;
+  --ds-tag-red-bg: #42201e;
+  --ds-tag-red-fg: #f4a29b;
   --ds-focus: #8f929a;
   --ds-backdrop: rgb(0 0 0 / 0.55);
   --ds-shadow-surface: 0 1px 2px #00000040;
@@ -267,6 +307,24 @@
     --ds-chart-5: #8fbfa6;
     --ds-chart-6: #6b6e76;
     --ds-chart-grid: #242428;
+    --ds-tag-gray-bg: #2f2f31;
+    --ds-tag-gray-fg: #c9c8c4;
+    --ds-tag-brown-bg: #3a2e26;
+    --ds-tag-brown-fg: #ddb9a0;
+    --ds-tag-orange-bg: #40291a;
+    --ds-tag-orange-fg: #f2b07a;
+    --ds-tag-yellow-bg: #3d331a;
+    --ds-tag-yellow-fg: #ecd07c;
+    --ds-tag-green-bg: #1d3324;
+    --ds-tag-green-fg: #8fd4a3;
+    --ds-tag-blue-bg: #1b2c40;
+    --ds-tag-blue-fg: #93c0ef;
+    --ds-tag-purple-bg: #2e2440;
+    --ds-tag-purple-fg: #c6aef0;
+    --ds-tag-pink-bg: #3d2130;
+    --ds-tag-pink-fg: #f0a8cc;
+    --ds-tag-red-bg: #42201e;
+    --ds-tag-red-fg: #f4a29b;
     --ds-backdrop: rgb(0 0 0 / 0.55);
     --ds-shadow-popup: 0 20px 25px -5px #00000080, 0 8px 10px -6px #00000066, 0 0 0 1px #ffffff0a;
     --ds-shadow-toast: 0 8px 32px #00000080, 0 0 0 1px #ffffff0a;
@@ -280,6 +338,7 @@
   --font-sans: var(--ds-font-sans);
   --font-mono: var(--ds-font-mono);
   --font-display: var(--ds-font-display);
+  --font-reading: var(--ds-font-reading);
 
   --color-page: var(--ds-page);
   --color-surface: var(--ds-surface);
@@ -327,6 +386,24 @@
   --color-chart-5: var(--ds-chart-5);
   --color-chart-6: var(--ds-chart-6);
   --color-chart-grid: var(--ds-chart-grid);
+  --color-tag-gray-bg: var(--ds-tag-gray-bg);
+  --color-tag-gray-fg: var(--ds-tag-gray-fg);
+  --color-tag-brown-bg: var(--ds-tag-brown-bg);
+  --color-tag-brown-fg: var(--ds-tag-brown-fg);
+  --color-tag-orange-bg: var(--ds-tag-orange-bg);
+  --color-tag-orange-fg: var(--ds-tag-orange-fg);
+  --color-tag-yellow-bg: var(--ds-tag-yellow-bg);
+  --color-tag-yellow-fg: var(--ds-tag-yellow-fg);
+  --color-tag-green-bg: var(--ds-tag-green-bg);
+  --color-tag-green-fg: var(--ds-tag-green-fg);
+  --color-tag-blue-bg: var(--ds-tag-blue-bg);
+  --color-tag-blue-fg: var(--ds-tag-blue-fg);
+  --color-tag-purple-bg: var(--ds-tag-purple-bg);
+  --color-tag-purple-fg: var(--ds-tag-purple-fg);
+  --color-tag-pink-bg: var(--ds-tag-pink-bg);
+  --color-tag-pink-fg: var(--ds-tag-pink-fg);
+  --color-tag-red-bg: var(--ds-tag-red-bg);
+  --color-tag-red-fg: var(--ds-tag-red-fg);
 
   /* Alias legado do G4 Delivery. Não use em código novo: use clay. */
   --color-magenta: var(--ds-clay);

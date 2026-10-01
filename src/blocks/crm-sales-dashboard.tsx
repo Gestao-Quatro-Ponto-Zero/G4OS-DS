@@ -27,6 +27,20 @@ export const meta = {
   category: "CRM",
   order: 4,
   height: 1400,
+  concept: {
+    goal: "Responder se o time vai bater a meta do trimestre e onde está perdendo negócios.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com seletor de time",
+      "Meta com ritmo esperado (GoalMeter) antes de tudo",
+      "Receita × meta, funil, ranking e motivos de perda (Pareto)",
+    ],
+    adapt: [
+      "Painel de recrutamento, de cobrança ou de operações",
+    ],
+    avoid: [
+      "Mostrar receita sem meta nem ritmo esperado",
+    ],
+  },
 } as const;
 
 // Dados de exemplo em ./data/crm (os mesmos do pipeline e de Time e metas).

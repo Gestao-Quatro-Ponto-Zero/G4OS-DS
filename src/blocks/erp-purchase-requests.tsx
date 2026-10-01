@@ -30,6 +30,21 @@ export const meta = {
   category: "ERP",
   order: 7,
   height: 960,
+  concept: {
+    goal: "Aprovar ou recusar requisições de compra com a cotação certa e justificativa.",
+    patterns: [
+      "Anatomia F · Mestre-detalhe: fila à esquerda, requisição à direita",
+      "Cadeia de aprovadores com etapa atual",
+      "Comparação de cotações com o menor preço destacado",
+      "Recusar exige justificativa",
+    ],
+    adapt: [
+      "Aprovação de propostas (ATS), descontos (CRM), reembolsos",
+    ],
+    avoid: [
+      "Aprovar sem ver as cotações",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

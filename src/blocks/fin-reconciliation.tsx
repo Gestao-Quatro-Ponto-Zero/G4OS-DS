@@ -24,6 +24,20 @@ export const meta = {
   category: "Financeiro",
   order: 5,
   height: 1000,
+  concept: {
+    goal: "Bater o extrato com o ERP rápido, aceitando o óbvio e resolvendo só as exceções.",
+    patterns: [
+      "Anatomia F · Mestre-detalhe: extrato × lançamentos lado a lado",
+      "Sugestões com grau de confiança; aceite em massa",
+      "Vínculo manual e lançamento para tarifas sem documento",
+    ],
+    adapt: [
+      "Conciliação de cartões, de estoque físico × sistema",
+    ],
+    avoid: [
+      "Pedir confirmação item a item quando a confiança é alta",
+    ],
+  },
 } as const;
 
 type State = { matched: string | null; created?: boolean };

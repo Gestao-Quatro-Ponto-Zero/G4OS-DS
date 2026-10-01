@@ -27,6 +27,21 @@ export const meta = {
   category: "Aplicação",
   order: 2,
   height: 780,
+  concept: {
+    goal: "Achar qualquer coisa no app (registros, pessoas, ações) e ir direto para a tabela filtrada quando há muitos resultados.",
+    patterns: [
+      "⌘K com escopos (Tab, prefixos > @ #) e resultados por tipo com destaque",
+      "Prévia à direita sem abrir o registro",
+      "'Ver todos' abre a lista já filtrada (?q=)",
+      "Fonte remota com carregamento e erro",
+    ],
+    adapt: [
+      "Busca de qualquer produto: registre os tipos e a fonte de dados",
+    ],
+    avoid: [
+      "Busca que só navega e não leva ao recorte da lista",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

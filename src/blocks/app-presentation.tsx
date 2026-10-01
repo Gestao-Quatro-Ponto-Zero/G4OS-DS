@@ -19,6 +19,20 @@ export const meta = {
   category: "Aplicação",
   order: 4,
   height: 820,
+  concept: {
+    goal: "Apresentar uma revisão de negócio (QBR) direto do app, com slides montados nos layouts do DS.",
+    patterns: [
+      "Anatomia G · App de altura total: palco 16:9, miniaturas, notas",
+      "Teclado (← →, F para tela cheia) e progresso",
+      "Layouts de slide do DS: capa, números, tendência, citação",
+    ],
+    adapt: [
+      "Relatório mensal ao cliente, board meeting, onboarding de time",
+    ],
+    avoid: [
+      "Slides com cores e fontes fora dos tokens",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

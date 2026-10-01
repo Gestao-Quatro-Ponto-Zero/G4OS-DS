@@ -27,6 +27,21 @@ export const meta = {
   category: "Configurações",
   order: 5,
   height: 900,
+  concept: {
+    goal: "Gerenciar quem tem acesso e com qual papel, dentro do limite de licenças.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "Papel editável na linha",
+      "Convites pendentes e uso de licenças visíveis",
+      "Convite em massa em modal; remoção com confirmação",
+    ],
+    adapt: [
+      "Equipes de qualquer produto; usuários de cliente no portal",
+    ],
+    avoid: [
+      "Remover membro sem confirmação",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

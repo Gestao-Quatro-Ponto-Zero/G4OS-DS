@@ -8,4 +8,4 @@ Fornecedores com classificação A/B/C, OTIF contra a meta, prazo de entrega, ga
 
 ## Componentes usados
 
-`Badge`, `BarList`, `BulletChart`, `Button`, `ChartCard`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `ListRow`, `Page`, `PageHeading`, `PropertyList`, `ScatterChart`, `SortHeader`, `TableSearch`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`, `useSort`
+`Badge`, `BarList`, `BulletChart`, `Button`, `ChartCard`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `ListRow`, `Page`, `PageHeading`, `PageToolbar`, `PropertyList`, `ScatterChart`, `SortHeader`, `TableSearch`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`, `useSort`

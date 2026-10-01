@@ -48,7 +48,25 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `chart-4` | `--ds-chart-4` | `#842e20` | `#e08d7c` |  |
 | `chart-5` | `--ds-chart-5` | `#5f7f6f` | `#8fbfa6` |  |
 | `chart-6` | `--ds-chart-6` | `#a3a7b0` | `#6b6e76` |  |
-| `chart-grid` | `--ds-chart-grid` | `#eef0f2` | `#242428` | Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo |
+| `chart-grid` | `--ds-chart-grid` | `#eef0f2` | `#242428` | Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. |
+| `tag-gray-bg` | `--ds-tag-gray-bg` | `#f0f0ef` | `#2f2f31` |  |
+| `tag-gray-fg` | `--ds-tag-gray-fg` | `#4d4c49` | `#c9c8c4` |  |
+| `tag-brown-bg` | `--ds-tag-brown-bg` | `#f4eeea` | `#3a2e26` |  |
+| `tag-brown-fg` | `--ds-tag-brown-fg` | `#6b4a36` | `#ddb9a0` |  |
+| `tag-orange-bg` | `--ds-tag-orange-bg` | `#fbecdd` | `#40291a` |  |
+| `tag-orange-fg` | `--ds-tag-orange-fg` | `#8a4512` | `#f2b07a` |  |
+| `tag-yellow-bg` | `--ds-tag-yellow-bg` | `#fbf3db` | `#3d331a` |  |
+| `tag-yellow-fg` | `--ds-tag-yellow-fg` | `#7a5a00` | `#ecd07c` |  |
+| `tag-green-bg` | `--ds-tag-green-bg` | `#e6f3ea` | `#1d3324` |  |
+| `tag-green-fg` | `--ds-tag-green-fg` | `#1f6b3a` | `#8fd4a3` |  |
+| `tag-blue-bg` | `--ds-tag-blue-bg` | `#e5eff9` | `#1b2c40` |  |
+| `tag-blue-fg` | `--ds-tag-blue-fg` | `#1d5a96` | `#93c0ef` |  |
+| `tag-purple-bg` | `--ds-tag-purple-bg` | `#f0ebf8` | `#2e2440` |  |
+| `tag-purple-fg` | `--ds-tag-purple-fg` | `#6440a3` | `#c6aef0` |  |
+| `tag-pink-bg` | `--ds-tag-pink-bg` | `#f9e9f1` | `#3d2130` |  |
+| `tag-pink-fg` | `--ds-tag-pink-fg` | `#9b2f68` | `#f0a8cc` |  |
+| `tag-red-bg` | `--ds-tag-red-bg` | `#fbe8e6` | `#42201e` |  |
+| `tag-red-fg` | `--ds-tag-red-fg` | `#a8302a` | `#f4a29b` | Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo |
 | — | `--ds-mark-text` | `70%` | `38%` |  |
 | — | `--ds-mark-bg` | `8%` | `16%` | Foco e sobreposição |
 | — | `--ds-focus` | `#6b6e76` | `#8f929a` |  |
@@ -65,7 +83,8 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | — | `--ds-font-mono` | `ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace` | `=` | Títulos (h1 de página, título de registro, capa, hero). Pode ser serifada. |
 | — | `--ds-font-display` | `var(--ds-font-sans)` | `=` |  |
 | — | `--ds-display-weight` | `600` | `=` |  |
-| — | `--ds-display-tracking` | `-0.035em` | `=` |  |
+| — | `--ds-display-tracking` | `-0.035em` | `=` | Leitura longa (documentos, políticas, relatórios): serifa editorial. |
+| — | `--ds-font-reading` | `"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif` | `=` |  |
 
 ## Tipografia (px)
 

@@ -31,6 +31,21 @@ export const meta = {
   category: "IA",
   order: 3,
   height: 900,
+  concept: {
+    goal: "Investigar uma execução que falhou ou demorou: onde, por quê e quanto custou, para quem mantém agentes.",
+    patterns: [
+      "Anatomia C · Registro: cabeçalho fixo com trilha; trace + detalhe lado a lado (ResizableSplit)",
+      "Cascata com latência por passo; passo com erro em destaque",
+      "Entrada/saída em JSON, tokens e custo do passo",
+      "Tentar de novo só o passo que falhou",
+    ],
+    adapt: [
+      "Monitor de integrações, filas de processamento, ETL",
+    ],
+    avoid: [
+      "Logs em texto corrido sem estrutura por passo",
+    ],
+  },
 } as const;
 
 function flat(steps: TraceStep[], out: TraceStep[] = []) {
@@ -61,7 +76,6 @@ export default function AiTrace() {
     <Page className="!pb-10">
       <PageHeading
         compact
-        sticky={false}
         crumbs={[{ label: "Projetos", href: agentRoutes.projects }, { label: project.title, href: frameHref("ai-workspace", project.id) }, { label: "Execução" }]}
         title={`Execução de ${project.lastRun}`}
         description={`${project.agent} · pedida por ${owner.name}`}

@@ -24,6 +24,21 @@ export const meta = {
   category: "Configurações",
   order: 4,
   height: 900,
+  concept: {
+    goal: "Proteger a conta: senha, 2FA, sessões e chaves de API.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "2FA com código em modal (OtpInput)",
+      "Sessões ativas com encerramento",
+      "Chave de API mostrada uma única vez",
+    ],
+    adapt: [
+      "Segurança de portal do cliente, acesso de parceiros",
+    ],
+    avoid: [
+      "Mostrar a chave de API de novo depois de criada",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

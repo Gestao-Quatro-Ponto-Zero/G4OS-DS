@@ -33,6 +33,20 @@ export const meta = {
   category: "ATS",
   order: 1,
   height: 1400,
+  concept: {
+    goal: "Mostrar ao time de recrutamento se as contratações estão no ritmo e o que pede ação hoje.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com período, KPIs no topo",
+      "Um gráfico por pergunta: meta, tempo × SLA, funil, aceite, origem",
+      "Fila 'o que pede ação hoje' antes dos detalhes",
+    ],
+    adapt: [
+      "Painel de vendas, operações ou atendimento: troque as perguntas e as filas",
+    ],
+    avoid: [
+      "Gráficos sem período ou sem meta de referência",
+    ],
+  },
 } as const;
 
 type Source = (typeof sourceQuality)[number];

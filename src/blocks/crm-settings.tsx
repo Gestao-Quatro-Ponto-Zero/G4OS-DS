@@ -22,6 +22,20 @@ export const meta = {
   category: "CRM",
   order: 9,
   height: 1000,
+  concept: {
+    goal: "Ajustar o funil e as regras do CRM sem quebrar o que o time usa.",
+    patterns: [
+      "Anatomia D · Configurações: título fixo",
+      "Etapas com probabilidade e ordem; motivos de perda; regras de automação",
+      "Barra de alterações não salvas no rodapé",
+    ],
+    adapt: [
+      "Etapas de vaga (ATS), situações de pedido (ERP)",
+    ],
+    avoid: [
+      "Salvar a cada campo quando a mudança afeta o time inteiro",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-settings";

@@ -11,6 +11,20 @@ export const meta = {
   category: "Configurações",
   order: 2,
   height: 900,
+  concept: {
+    goal: "Aplicar a marca do cliente (white-label), o modo e a tipografia no app inteiro, ao vivo.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "Prévia ao vivo antes de salvar; restaurar padrão",
+      "Usa os tokens semânticos: só --ds-* mudam",
+    ],
+    adapt: [
+      "Qualquer produto vendido para vários clientes",
+    ],
+    avoid: [
+      "Trocar cores em componentes em vez de tokens",
+    ],
+  },
 } as const;
 
 /*

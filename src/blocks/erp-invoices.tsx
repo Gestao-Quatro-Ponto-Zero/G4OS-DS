@@ -22,7 +22,7 @@ import {
   useSelection,
   useSort,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { br, customerById, invoiceStatus, invoices as seed, orderById, today, type Invoice, type InvoiceStatus } from "./data/erp";
 import { go } from "./shells/frame-route";
@@ -35,6 +35,20 @@ export const meta = {
   category: "ERP",
   order: 9,
   height: 900,
+  concept: {
+    goal: "Achar notas com problema na SEFAZ e resolver rápido.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+      "Rejeições em destaque com o motivo e reenvio",
+      "Busca por número, chave ou cliente (/); XML em massa",
+    ],
+    adapt: [
+      "Faturas (SaaS), títulos (financeiro)",
+    ],
+    avoid: [
+      "Rejeição sem o motivo na linha",
+    ],
+  },
 } as const;
 
 const fields: FilterField<Invoice>[] = [
@@ -141,7 +155,9 @@ export default function ErpInvoices() {
             </Callout>
           ))}
           <div className="space-y-4">
-            <FilterBar filters={filters} noun="nota" search={<TableSearch value={q} onChange={filters.setQuery} total={list.length} noun="nota" searchIn="número, chave de acesso, cliente e CNPJ" />} />
+            <PageToolbar>
+              <FilterBar filters={filters} noun="nota" search={<TableSearch value={q} onChange={filters.setQuery} total={list.length} noun="nota" searchIn="número, chave de acesso, cliente e CNPJ" />} />
+            </PageToolbar>
             <DataTable rows={sort.rows} columns={columns} rowKey={(n) => n.id} onRowClick={(n) => go("erp-invoice", n.id)} rowLabel={(n) => `Abrir NF-e ${n.number}`} empty={<EmptyFilterResult filters={filters} noun="nota" />} />
             <BulkBar count={sel.count} noun="nota" onClear={sel.clear}>
               <button type="button" onClick={() => { notify(`${sel.count} XML baixados (ZIP)`, undefined, "info"); sel.clear(); }}>

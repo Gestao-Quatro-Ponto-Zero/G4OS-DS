@@ -1,6 +1,6 @@
 # @g4os/ds
 
-> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 288 componentes, gráficos SVG e 75 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 358 componentes, gráficos SVG e 85 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -46,24 +46,43 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [ai-workspace](components/ai-workspace.md): Workspace de agente (docs: showcase › IA e interação › Workspace de agente).
 - [ai-sessions](components/ai-sessions.md): Interface agêntica de sessões (app de trabalho com agente: G4 OS desktop, Codex, T3).
 - [brand](components/brand.md): Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
+- [connections](components/connections.md): Conexões e apps: marketplace de integrações, detalhe da conexão, permissões por conta e o "cartão do agente" (o que ele acessa, quem ele aciona, o que entrega).
+- [email-compose](components/email-compose.md): Escrever e-mail (com ou sem IA): remetente, destinatários com busca, assunto, corpo, modelo e envio com agendamento.
+- [tags](components/tags.md): Etiquetas coloridas (categoria, tipo, status) no estilo "banco de dados": fundo suave + texto AA, 9 matizes em tokens (--ds-tag-*-bg/-fg), claros e escuros.
+- [rich-text](components/rich-text.md): Editor de texto rico LEVE (contentEditable + comandos do navegador).
+- [agent-builder](components/agent-builder.md): Construtor de agente: a "ficha" do agente ao lado da conversa com ele.
+- [tasks-ai](components/tasks-ai.md): Tarefas propostas pela IA (a partir de uma reunião, documento ou análise).
+- [record-panel](components/record-panel.md): Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
+- [collab](components/collab.md): Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
+- [ai-layout](components/ai-layout.md): Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
 
 ## Blocos
+- [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)
+- [ai-agent-connections](blocks/ai-agent-connections.md): Agente e conexões (IA)
 - [ai-agent-run](blocks/ai-agent-run.md): Execução de agente (IA)
 - [ai-assistant](blocks/ai-assistant.md): Assistente sobre a tela (IA)
 - [ai-chat](blocks/ai-chat.md): Chat com histórico (IA)
+- [ai-codex](blocks/ai-codex.md): Agente de código (tarefas longas) (IA)
+- [ai-compose-email](blocks/ai-compose-email.md): E-mail com IA (IA)
 - [ai-conversation](blocks/ai-conversation.md): Conversa com aprovação (IA)
 - [ai-projects](blocks/ai-projects.md): Projetos do agente (IA)
+- [ai-sessions-artifacts](blocks/ai-sessions-artifacts.md): Sessões com artefatos (IA)
 - [ai-sessions-empty](blocks/ai-sessions-empty.md): Nova sessão do G4 OS (IA)
 - [ai-sessions](blocks/ai-sessions.md): Sessões do G4 OS (app agêntico) (IA)
+- [ai-task-proposals](blocks/ai-task-proposals.md): Tarefas propostas pela IA (IA)
 - [ai-trace](blocks/ai-trace.md): Inspetor de execução (IA)
 - [ai-workspace](blocks/ai-workspace.md): Workspace de agente (IA)
+- [app-collab-doc](blocks/app-collab-doc.md): Conversa do time + documento (Aplicação)
 - [app-command-palette](blocks/app-command-palette.md): Paleta de comandos (⌘K) (Aplicação)
+- [app-connection](blocks/app-connection.md): Detalhe da conexão (Aplicação)
 - [app-error-pages](blocks/app-error-pages.md): Páginas de erro (Aplicação)
 - [app-file-manager](blocks/app-file-manager.md): Gerenciador de arquivos (Aplicação)
 - [app-filtered-list](blocks/app-filtered-list.md): Lista com filtros (desktop e celular) (Aplicação)
 - [app-global-search](blocks/app-global-search.md): Busca global (⌘K) (Aplicação)
+- [app-marketplace](blocks/app-marketplace.md): Marketplace de apps (Aplicação)
 - [app-notifications](blocks/app-notifications.md): Central de notificações (Aplicação)
 - [app-presentation](blocks/app-presentation.md): Apresentação (QBR) (Aplicação)
+- [app-record-tracker](blocks/app-record-tracker.md): Rastreador de registros (Aplicação)
 - [ats-candidate](blocks/ats-candidate.md): Perfil do candidato (ATS)
 - [ats-candidates](blocks/ats-candidates.md): Banco de talentos (ATS)
 - [ats-careers](blocks/ats-careers.md): Página de carreiras (ATS)

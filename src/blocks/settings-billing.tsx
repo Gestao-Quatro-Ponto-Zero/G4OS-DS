@@ -22,6 +22,21 @@ export const meta = {
   category: "Configurações",
   order: 6,
   height: 1000,
+  concept: {
+    goal: "Mostrar o plano, o uso contra os limites e as faturas, e permitir trocar de plano.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "Uso contra limites com aviso perto do teto",
+      "Planos lado a lado com o atual marcado; mensal/anual",
+      "Histórico de faturas com PDF",
+    ],
+    adapt: [
+      "Contrato de serviço, consumo de créditos",
+    ],
+    avoid: [
+      "Esconder o limite até ele estourar",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

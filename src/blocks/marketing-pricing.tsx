@@ -13,6 +13,21 @@ export const meta = {
   category: "Marketing",
   order: 2,
   height: 1100,
+  concept: {
+    goal: "Ajudar a escolher o plano certo e ir para o cadastro com ele selecionado.",
+    patterns: [
+      "Anatomia I · Público: cabeçalho do site fixo",
+      "Ciclo mensal/anual e calculadora por usuários",
+      "Comparativo com cabeçalho fixo ao rolar; FAQ em acordeão",
+      "CTA leva ao cadastro com ?plan=",
+    ],
+    adapt: [
+      "Planos de suporte, pacotes de serviço",
+    ],
+    avoid: [
+      "Esconder o preço ('fale com vendas') em todos os planos",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

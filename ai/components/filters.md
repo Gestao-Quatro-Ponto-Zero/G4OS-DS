@@ -163,27 +163,24 @@ Barra de filtros de uma lista.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/filtros-padrao`):
+Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
 
 ```tsx
-const fields: FilterField<Deal>[] = [
-  { key: "stage", label: "Etapa", type: "enum", quick: true, accessor: (d) => d.stage, options },
-  { key: "owner", label: "Responsável", type: "person", quick: true, accessor: (d) => d.owner, options: owners },
-  { key: "value", label: "Valor", type: "currency", accessor: (d) => d.value },
-  { key: "closes", label: "Fechamento previsto", type: "date", accessor: (d) => d.closes },
-];
+// A · Lista
+<Page>
+  <PageHeading title="Clientes" actions={<Button>Novo cliente</Button>} />
+  <PageToolbar>            {/* gruda colada ao cabeçalho */}
+    <SavedViews … />
+    <FilterBar … search={<TableSearch … />} />
+  </PageToolbar>
+  <DataTable … />
+</Page>
 
-const filters = useFilters(deals, { fields, search: (d) => [d.name, d.company], me: "ana", url: true });
-const views = useSavedViews(filters, systemViews, "negocios-visoes");
+// C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
+<SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
 
-<SavedViews views={views} />
-<FilterBar
-  filters={filters}
-  noun="negócio"
-  search={<TableSearch value={filters.state.query} onChange={filters.setQuery} total={deals.length} noun="negócio" />}
-  actions={<DisplayControls … />}
-/>
-<DataTable rows={filters.rows} … empty={<EmptyFilterResult filters={filters} noun="negócio" />} />
+// D · Configurações: título fixo + subnavegação colada
+<Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>
 ```
 
 ## FilterCondition (type)

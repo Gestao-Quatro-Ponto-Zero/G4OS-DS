@@ -32,6 +32,20 @@ export const meta = {
   category: "ERP",
   order: 6,
   height: 1100,
+  concept: {
+    goal: "Entender um SKU: onde está o estoque, quando acaba, margem e quem fornece.",
+    patterns: [
+      "Anatomia C · Registro: propriedades fixas à direita",
+      "Saldo por depósito contra o mínimo; projeção de 30 dias",
+      "Ajuste de preço e pedido de compra em modal",
+    ],
+    adapt: [
+      "Plano (SaaS), vaga (ATS), contrato",
+    ],
+    avoid: [
+      "Projeção sem a linha do mínimo",
+    ],
+  },
 } as const;
 
 type Movement = ReturnType<typeof movementsOf>[number];

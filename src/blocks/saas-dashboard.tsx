@@ -30,6 +30,21 @@ export const meta = {
   category: "SaaS",
   order: 1,
   height: 1320,
+  concept: {
+    goal: "Mostrar a saúde do produto SaaS em uma olhada: receita, aquisição, retenção e satisfação.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com Exportar e Nova conta",
+      "KPIs com variação e sparkline",
+      "Visitantes com seletor de período; movimento de MRR; NPS",
+      "Contas recentes abrem a página da conta",
+    ],
+    adapt: [
+      "Painel de qualquer produto: troque os KPIs e as perguntas",
+    ],
+    avoid: [
+      "Mais de 5 KPIs no topo",
+    ],
+  },
 } as const;
 
 const here = "#/frame/saas-dashboard";

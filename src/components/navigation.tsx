@@ -59,7 +59,10 @@ export function StickyHeader({
             header.getBoundingClientRect().top <= scroller.getBoundingClientRect().top + 1;
         header.toggleAttribute("data-stuck", stuck);
         const prop = external ? "--outer-header-height" : "--pinned-header-height";
-        scroller.style.setProperty(prop, `${header.getBoundingClientRect().height + (external ? 0 : 12)}px`);
+        const height = header.getBoundingClientRect().height;
+        scroller.style.setProperty(prop, `${height + (external ? 0 : 12)}px`);
+        // Altura exata do cabeçalho: PageToolbar gruda colado logo abaixo dele.
+        if (!external) scroller.style.setProperty("--page-header-height", `${height}px`);
       });
     };
     scroller.addEventListener("scroll", sync, { passive: true });
@@ -77,6 +80,50 @@ export function StickyHeader({
     <header ref={ref} className={cn(enabled && "sticky-page-header", className)}>
       {children}
     </header>
+  );
+}
+
+/**
+ * Barra da página (FilterBar, visões salvas, busca) que gruda COLADA abaixo do
+ * cabeçalho fixo (PageHeading). Regra de anatomia: o que é da página fica
+ * junto — se o título está visível, a barra que filtra a lista também está.
+ * Use em listas com mais de uma tela de altura; abaixo disso, dispensável.
+ *
+ *   <PageHeading title="Clientes" actions={…} />
+ *   <PageToolbar><SavedViews …/><FilterBar …/></PageToolbar>
+ *   <DataTable … />
+ */
+export function PageToolbar({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const bar = ref.current;
+    if (!bar) return;
+    let scroller = bar.parentElement;
+    while (scroller && !/(auto|scroll)/.test(getComputedStyle(scroller).overflowY)) scroller = scroller.parentElement;
+    if (!scroller) return;
+    const box = scroller;
+    let frame = 0;
+    const sync = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const headerH = parseFloat(getComputedStyle(box).getPropertyValue("--page-header-height")) || 0;
+        const stuck = getComputedStyle(bar).position === "sticky" && box.scrollTop > 0 && bar.getBoundingClientRect().top <= box.getBoundingClientRect().top + headerH + 1;
+        bar.toggleAttribute("data-stuck", stuck);
+        box.toggleAttribute("data-toolbar-stuck", stuck);
+      });
+    };
+    box.addEventListener("scroll", sync, { passive: true });
+    sync();
+    return () => {
+      cancelAnimationFrame(frame);
+      box.removeEventListener("scroll", sync);
+      box.removeAttribute("data-toolbar-stuck");
+    };
+  }, []);
+  return (
+    <div ref={ref} className={cn("page-toolbar space-y-3", className)}>
+      {children}
+    </div>
   );
 }
 

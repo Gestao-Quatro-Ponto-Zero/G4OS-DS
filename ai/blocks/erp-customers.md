@@ -8,4 +8,4 @@ Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e 
 
 ## Componentes usados
 
-`Badge`, `Button`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `ListRow`, `Meter`, `Page`, `PageHeading`, `PropertyList`, `SortHeader`, `TableSearch`, `formatCurrency`, `notify`, `useFilters`, `useSort`
+`Badge`, `Button`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `ListRow`, `Meter`, `Page`, `PageHeading`, `PageToolbar`, `PropertyList`, `SortHeader`, `TableSearch`, `formatCurrency`, `notify`, `useFilters`, `useSort`

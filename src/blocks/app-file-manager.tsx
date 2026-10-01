@@ -31,6 +31,20 @@ export const meta = {
   category: "Aplicação",
   order: 5,
   height: 860,
+  concept: {
+    goal: "Organizar, achar e prever arquivos do time em pastas, com envio e detalhes sem trocar de tela.",
+    patterns: [
+      "Anatomia G · App de altura total: árvore de pastas à esquerda, conteúdo rola",
+      "Grade ou lista (SegmentedControl), busca, envio com progresso",
+      "Prévia em Sheet com detalhes e ações",
+    ],
+    adapt: [
+      "Documentos de cliente no CRM, currículos no ATS, notas e XMLs no ERP",
+    ],
+    avoid: [
+      "Abrir arquivo em nova página para só ver detalhes",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

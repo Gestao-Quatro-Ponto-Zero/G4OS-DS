@@ -34,7 +34,18 @@ export type PageMeta = { title: string; group: (typeof groups)[number]; order?: 
 export type PageModule = { meta: PageMeta; default: ComponentType; slug: string; source: string };
 
 export const blockCategories = ["SaaS", "CRM", "ATS", "ERP", "Financeiro", "Autenticação", "Configurações", "Onboarding", "Aplicação", "IA", "Marketing"] as const;
-export type BlockMeta = { title: string; description: string; category: (typeof blockCategories)[number]; height?: number; order?: number };
+/** Conceito do bloco: o que ele quer passar, para reaproveitar com intenção. */
+export type BlockConcept = {
+  /** Problema que a tela resolve e para quem. */
+  goal: string;
+  /** Padrões de layout/interação aplicados ("cabeçalho fixo que compacta", …). */
+  patterns?: readonly string[];
+  /** Em que apps faz sentido e o que adaptar. */
+  adapt?: readonly string[];
+  /** O que evitar ao copiar. */
+  avoid?: readonly string[];
+};
+export type BlockMeta = { title: string; description: string; category: (typeof blockCategories)[number]; height?: number; order?: number; concept?: BlockConcept };
 export type BlockModule = { meta: BlockMeta; default: ComponentType; slug: string; source: string };
 
 /* ------------------------------------------------------------------ */
@@ -221,7 +232,7 @@ export function CodeBlock({ code, maxHeight = 520, className }: { code: string; 
 const viewports = { desktop: "100%", tablet: "820px", mobile: "390px" } as const;
 
 export function BlockPreview({ block }: { block: BlockModule }) {
-  const [tab, setTab] = useState<"preview" | "code">("preview");
+  const [tab, setTab] = useState<"preview" | "code" | "concept">("preview");
   const [vp, setVp] = useState<keyof typeof viewports>("desktop");
   const [reload, setReload] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -239,6 +250,9 @@ export function BlockPreview({ block }: { block: BlockModule }) {
           </button>
           <button type="button" aria-pressed={tab === "code"} onClick={() => setTab("code")}>
             Código
+          </button>
+          <button type="button" aria-pressed={tab === "concept"} onClick={() => setTab("concept")}>
+            Conceito
           </button>
         </div>
         <span aria-hidden className="hidden h-5 w-px bg-line sm:block" />
@@ -306,8 +320,10 @@ export function BlockPreview({ block }: { block: BlockModule }) {
             style={{ width: viewports[vp], maxWidth: "100%", height: block.meta.height ?? 760 }}
           />
         </div>
-      ) : (
+      ) : tab === "code" ? (
         <BlockCode block={block} />
+      ) : (
+        <BlockConceptView block={block} />
       )}
     </section>
   );
@@ -341,6 +357,69 @@ function BlockCode({ block }: { block: BlockModule }) {
         </div>
       )}
       <CodeBlock code={code} maxHeight={block.meta.height ?? 760} />
+    </div>
+  );
+}
+
+/** Aba Conceito: objetivo, padrões, adaptação e componentes usados (extraídos do import). */
+function BlockConceptView({ block }: { block: BlockModule }) {
+  const c = block.meta.concept;
+  const imports = Array.from(
+    new Set(
+      [...block.source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"@g4os\/ds"/g)]
+        .flatMap((m) => m[1].split(","))
+        .map((x) => x.trim().replace(/^type\s+/, ""))
+        .filter((x) => /^[A-Z]/.test(x)),
+    ),
+  ).sort((a, b) => a.localeCompare(b));
+  const locals = Array.from(new Set([...block.source.matchAll(/from "\.\/((?:shells|data)\/[\w-]+)"/g)].map((m) => m[1])));
+  const list = (title: string, items?: readonly string[]) =>
+    items && items.length ? (
+      <div>
+        <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{title}</p>
+        <ul className="m-0 list-none space-y-1.5 p-0">
+          {items.map((it) => (
+            <li key={it} className="flex gap-2 text-[13px] leading-relaxed text-ink-soft">
+              <span aria-hidden className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-accent" />
+              {it}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
+  return (
+    <div className="grid gap-6 rounded-2xl border border-line bg-surface p-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="space-y-6">
+        <div>
+          <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Objetivo</p>
+          <p className="m-0 text-[14.5px] leading-relaxed text-ink">{c?.goal ?? block.meta.description}</p>
+        </div>
+        {list("Padrões aplicados", c?.patterns)}
+        {list("Quando usar e o que adaptar", c?.adapt)}
+        {list("Evite ao copiar", c?.avoid)}
+        {!c && <p className="m-0 text-[12.5px] text-muted">Este bloco ainda não tem o conceito descrito (meta.concept).</p>}
+      </div>
+      <div className="space-y-5 lg:border-l lg:border-line lg:pl-6">
+        <div>
+          <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Componentes do DS ({imports.length})</p>
+          <div className="flex flex-wrap gap-1.5">
+            {imports.map((name) => (
+              <code key={name} className="rounded-md border border-line bg-soft px-1.5 py-0.5 font-mono text-[11.5px] text-ink-soft">
+                {name}
+              </code>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Arquivos</p>
+          <ul className="m-0 list-none space-y-1 p-0 font-mono text-[11.5px] text-ink-soft">
+            <li>src/blocks/{block.slug}.tsx</li>
+            {locals.map((l) => (
+              <li key={l}>src/blocks/{l}.ts{l.startsWith("shells") ? "x" : ""}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

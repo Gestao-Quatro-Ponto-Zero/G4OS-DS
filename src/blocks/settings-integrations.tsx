@@ -23,6 +23,20 @@ export const meta = {
   category: "Configurações",
   order: 7,
   height: 900,
+  concept: {
+    goal: "Conectar e controlar integrações do workspace com permissões claras.",
+    patterns: [
+      "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+      "Catálogo com filtros por categoria",
+      "Detalhe em gaveta (permissões, sincronização, histórico) por ?id=",
+    ],
+    adapt: [
+      "Integrações de qualquer produto",
+    ],
+    avoid: [
+      "Conectar sem mostrar o que será acessado",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

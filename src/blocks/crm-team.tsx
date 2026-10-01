@@ -32,6 +32,20 @@ export const meta = {
   category: "CRM",
   order: 8,
   height: 1180,
+  concept: {
+    goal: "Mostrar ao gestor quem está acima ou abaixo da meta e como o ranking mudou.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo",
+      "Bullet por vendedor (realizado × meta), bump do ranking, slope do trimestre",
+      "Editar meta em modal",
+    ],
+    adapt: [
+      "Metas de recrutadores, produtividade de atendentes",
+    ],
+    avoid: [
+      "Ranking sem mostrar a meta de cada um",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-team";

@@ -10,6 +10,20 @@ export const meta = {
   category: "Autenticação",
   order: 4,
   height: 720,
+  concept: {
+    goal: "Recuperar o acesso sem fricção e sem revelar se um e-mail existe.",
+    patterns: [
+      "Anatomia H · Fluxo focado: uma coluna, quatro estados na mesma tela",
+      "Mensagem neutra após pedir o link (segurança)",
+      "Nova senha com confirmação e força visível",
+    ],
+    adapt: [
+      "Qualquer produto com login próprio; troque o painel de marca",
+    ],
+    avoid: [
+      "Dizer 'e-mail não encontrado' (vaza a base de usuários)",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

@@ -36,6 +36,18 @@ export const meta = {
   category: "IA",
   order: 0,
   height: 900,
+  concept: {
+    goal: "Análise feita pelo agente que gera entregáveis: a conversa explica, os artefatos (relatório, planilha, contexto) ficam ao lado para revisar e exportar.",
+    patterns: [
+      "Anatomia Conversa + painel: ResizableSplit com conversa à esquerda e ArtifactPanel à direita",
+      "Resposta em fluxo com RunSummary (tempo, passos, ferramentas, custo) que abre o trace",
+      "Artefatos são cidadãos de primeira classe: cartões na conversa abrem abas no painel",
+      "Contexto explícito: o que o agente usou, com relevância e citações",
+      "Composer com comandos (/relatório) e voz",
+    ],
+    adapt: ["Análises de receita, funil, churn, inadimplência", "Pesquisa de mercado e due diligence", "Relatórios para cliente: o relatório vira entregável exportável"],
+    avoid: ["Esconder quanto tempo e quanto custou a execução", "Artefato que só existe dentro da conversa (sem aba e sem exportar)"],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

@@ -21,7 +21,7 @@ import {
   useFilters,
   useSort,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { areas, candidatesOf, company, jobs as allJobs, me, offers, openDays, person, stages, team, today, type Job, type JobStatus } from "./data/ats";
 import { go } from "./shells/frame-route";
@@ -34,6 +34,21 @@ export const meta = {
   category: "ATS",
   order: 2,
   height: 900,
+  concept: {
+    goal: "Acompanhar todas as vagas abertas e achar rápido as que estão fora do SLA.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada; abas por situação",
+      "Funil por etapa na linha (barra de proporção)",
+      "Tempo em aberto contra o SLA com tom de alerta",
+      "Estado na URL; linha abre a vaga",
+    ],
+    adapt: [
+      "Projetos, contratos, pedidos com prazo",
+    ],
+    avoid: [
+      "SLA só em número, sem tom quando estoura",
+    ],
+  },
 } as const;
 
 /** Candidatos por etapa: os listados + o volume da triagem. */
@@ -189,7 +204,9 @@ export default function AtsJobs() {
           ]}
         />
         <div className="mt-5 space-y-4">
-          <FilterBar filters={filters} noun="vaga" search={<TableSearch value={q} onChange={filters.setQuery} total={inTab.length} noun="vaga" searchIn="título, área e cidade" />} />
+          <PageToolbar>
+            <FilterBar filters={filters} noun="vaga" search={<TableSearch value={q} onChange={filters.setQuery} total={inTab.length} noun="vaga" searchIn="título, área e cidade" />} />
+          </PageToolbar>
           <DataTable
             rows={sort.rows}
             columns={columns}

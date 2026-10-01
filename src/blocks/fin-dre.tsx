@@ -25,6 +25,20 @@ export const meta = {
   category: "Financeiro",
   order: 7,
   height: 1320,
+  concept: {
+    goal: "Explicar o resultado do mês: da receita ao lucro, contra o orçado.",
+    patterns: [
+      "Anatomia B · Painel com tabela hierárquica: grupos expansíveis",
+      "Realizado × orçado com variação favorável/desfavorável",
+      "Cascata da receita ao lucro; margens contra a meta",
+    ],
+    adapt: [
+      "Relatório de unidade de negócio, P&L de produto",
+    ],
+    avoid: [
+      "Tabela plana sem grupos (impossível de ler)",
+    ],
+  },
 } as const;
 
 const money = (n: number) => formatCurrency(n, { compact: true });

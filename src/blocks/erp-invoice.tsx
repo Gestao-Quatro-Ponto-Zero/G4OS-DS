@@ -25,6 +25,21 @@ export const meta = {
   category: "ERP",
   order: 10,
   height: 1180,
+  concept: {
+    goal: "Conferir, imprimir e corrigir uma NF-e com a mesma leitura do documento fiscal.",
+    patterns: [
+      "Anatomia C · Registro como documento: cabeçalho fixo (fora da impressão)",
+      "Layout fiel ao documento: chave, emitente, destinatário, itens, tributos",
+      "CSS de impressão só com o documento",
+      "Carta de correção e cancelamento com confirmação",
+    ],
+    adapt: [
+      "Proposta comercial, contrato, recibo",
+    ],
+    avoid: [
+      "Embrulhar o cabeçalho num invólucro (o fixo para de funcionar)",
+    ],
+  },
 } as const;
 
 function Box({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
@@ -65,7 +80,8 @@ function InvoiceDoc({ invoice }: { invoice: Invoice }) {
       {/* Impressão: só o documento. */}
       <style>{`@media print { aside[aria-label="Menu principal"], nav[aria-label="Navegação principal"], .no-print { display: none !important; } .invoice-doc { border: 0 !important; box-shadow: none !important; } }`}</style>
       <Page>
-        <div className="no-print">
+        {/* contents: o cabeçalho fixo precisa da página inteira como contêiner (um invólucro limitaria o sticky). */}
+        <div className="no-print contents">
           <PageHeading
             crumbs={[
               { label: "Notas fiscais", href: "#/frame/erp-invoices" },

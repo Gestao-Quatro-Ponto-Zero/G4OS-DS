@@ -12,6 +12,20 @@ export const meta = {
   category: "Autenticação",
   order: 1,
   height: 820,
+  concept: {
+    goal: "Entrar rápido pelo caminho que a pessoa já usa: senha, SSO ou link mágico.",
+    patterns: [
+      "Anatomia H · Fluxo focado: formulário à esquerda, painel de marca navy à direita (some no celular)",
+      "SSO Google/Microsoft e link mágico além da senha",
+      "Erro no lugar do campo, sem limpar o que foi digitado",
+    ],
+    adapt: [
+      "Portal do cliente, app interno, área de parceiros",
+    ],
+    avoid: [
+      "Painel de marca ocupando a tela no celular",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

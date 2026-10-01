@@ -106,6 +106,37 @@ const [range, setRange] = useState(resolveDateRange("last30"));
   description={`${describeDateRange(range)} · comparado ao período anterior\
 ```
 
+## PageToolbar
+
+Barra da página (FilterBar, visões salvas, busca) que gruda COLADA abaixo do cabeçalho fixo (PageHeading).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` * | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
+
+```tsx
+// A · Lista
+<Page>
+  <PageHeading title="Clientes" actions={<Button>Novo cliente</Button>} />
+  <PageToolbar>            {/* gruda colada ao cabeçalho */}
+    <SavedViews … />
+    <FilterBar … search={<TableSearch … />} />
+  </PageToolbar>
+  <DataTable … />
+</Page>
+
+// C · Registro: a coluna de propriedades gruda abaixo do cabeçalho no desktop
+<SplitLayout main={…} aside={<PropertyList … />} />   // stickyAside={false} para rolar junto
+
+// D · Configurações: título fixo + subnavegação colada
+<Page><SettingsLayout nav={…} current={…} title="Plano e cobrança">…</SettingsLayout></Page>
+```
+
 ## ProductMark
 
 Marca-padrão (grafo de três nós, um dourado).
@@ -115,6 +146,28 @@ Marca-padrão (grafo de três nós, um dourado).
 | `size` | `number \| undefined` | `28` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-layout-agente`):
+
+```tsx
+<AgentAppLayout
+  storageKey="minhas-sessoes"          // persiste largura da lista, abertura e tamanho do painel
+  rail={<IconRail groups={rail} currentPath={rota} mark={<ProductMark />} />}
+  list={<SessionSidebar density="clean" sessions={sessoes} activeId={id} onSelect={abrir} onNew={nova} />}
+  main={
+    <>
+      <ThreadHeader title={sessao.titulo} menu={menu} onBack={() => setView("list")} actions={acoes} />
+      <ThreadView follow={mensagens.length} resetKey={sessao.id} minimap={mapa}>{mensagens}</ThreadView>
+      <AgentComposer … />
+    </>
+  }
+  panel={<ArtifactPanel tabs={abas} active={aba} onActiveChange={setAba} onClose={() => setPainel(false)}>{conteudo}</ArtifactPanel>}
+  panelOpen={painel}
+  onPanelOpenChange={setPainel}
+  mobileView={view}                    // "list" | "main" — o app troca ao abrir/voltar
+  mobileNav={<BottomNav items={abasCelular} currentPath={rota} />}
+/>
+```
 
 ## SegmentedControl
 

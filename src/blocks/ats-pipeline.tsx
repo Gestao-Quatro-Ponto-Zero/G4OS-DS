@@ -29,6 +29,21 @@ export const meta = {
   category: "ATS",
   order: 4,
   height: 860,
+  concept: {
+    goal: "Mover candidatos de uma vaga entre etapas e ver onde o funil trava.",
+    patterns: [
+      "Anatomia E · Quadro: colunas por etapa; no desktop a página não rola",
+      "Card com nota média, origem e tempo na etapa; arrastar para avançar",
+      "Alternar Quadro/Lista sem perder filtros",
+      "Card abre o perfil",
+    ],
+    adapt: [
+      "Pipeline de vendas, esteira de pedidos, kanban de chamados",
+    ],
+    avoid: [
+      "Mudar status por botões dentro do card",
+    ],
+  },
 } as const;
 
 /** Nota 1–5 em estrelas pequenas (só leitura). */
@@ -101,8 +116,7 @@ function Board({ jobId }: { jobId: string }) {
     <TalentosShell section="vagas">
       <Page className="flex flex-col">
         <PageHeading
-          sticky={false}
-          crumbs={[{ label: "Vagas", href: "#/frame/ats-jobs" }, { label: job.short, href: `#/frame/ats-job?id=${job.id}` }]}
+            crumbs={[{ label: "Vagas", href: "#/frame/ats-jobs" }, { label: job.short, href: `#/frame/ats-job?id=${job.id}` }]}
           title={`Candidatos · ${job.short}`}
           description={`${job.location} · ${job.mode} · aberta há ${openDays(job)} dias de ${job.sla} · gestor: ${person(job.manager).name}`}
           actions={

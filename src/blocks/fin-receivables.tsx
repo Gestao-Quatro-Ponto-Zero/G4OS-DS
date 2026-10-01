@@ -37,6 +37,21 @@ export const meta = {
   category: "Financeiro",
   order: 3,
   height: 1180,
+  concept: {
+    goal: "Cobrar quem está atrasado, começando pelo maior risco.",
+    patterns: [
+      "Anatomia A · Lista com resumo de aging no topo e DataGrid abaixo",
+      "Tom da linha por atraso; total fixo no rodapé da grade",
+      "Cobrança em massa e ações rápidas (receber, cobrar)",
+      "Registrar pagamento ou promessa em gaveta",
+    ],
+    adapt: [
+      "Faturas em atraso (SaaS), devoluções pendentes",
+    ],
+    avoid: [
+      "Ordenar por nome em vez de atraso",
+    ],
+  },
 } as const;
 
 const money = (n: number) => formatCurrency(n, { compact: true });

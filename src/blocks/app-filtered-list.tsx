@@ -34,7 +34,7 @@ import {
   type DateRange,
   type FilterField,
   type SavedView,
-  type Tone,
+  type Tone, PageToolbar
 } from "@g4os/ds";
 import { me as workspaceMe, people } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
@@ -47,6 +47,21 @@ export const meta = {
   category: "Aplicação",
   order: 4,
   height: 860,
+  concept: {
+    goal: "Atender a fila de chamados com o recorte certo: período, visões salvas e filtros por SLA, canal e data.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo com período à direita + PageToolbar colada",
+      "Visões salvas por pergunta ('Meus', 'SLA estourando')",
+      "No celular os filtros vão para FilterSheet com 'Aplicar (N)'",
+      "Detalhe em gaveta (?id=) sem perder a lista",
+    ],
+    adapt: [
+      "Qualquer fila operacional: pedidos, títulos, candidatos",
+    ],
+    avoid: [
+      "Filtros que não aparecem na URL (não dá para compartilhar o recorte)",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -218,12 +233,14 @@ export default function AppFilteredList() {
           }
         />
         <div className="mt-4 space-y-4">
-          <SavedViews views={saved} counts={Object.fromEntries(views.map((v) => [v.id, filters.countFor(v.state)]))} />
-          <FilterBar
-            filters={filters}
-            noun="chamado"
-            search={<TableSearch value={q} onChange={filters.setQuery} total={inRange.length} noun="chamado" searchIn="assunto, número e cliente" />}
-          />
+          <PageToolbar>
+            <SavedViews views={saved} counts={Object.fromEntries(views.map((v) => [v.id, filters.countFor(v.state)]))} />
+            <FilterBar
+              filters={filters}
+              noun="chamado"
+              search={<TableSearch value={q} onChange={filters.setQuery} total={inRange.length} noun="chamado" searchIn="assunto, número e cliente" />}
+            />
+          </PageToolbar>
           <DataTable rows={pages.rows} columns={columns} rowKey={(t) => t.id} onRowClick={(t) => setFrameQuery({ id: t.id })} rowLabel={(t) => `Abrir chamado ${t.code}`} empty={<EmptyFilterResult filters={filters} noun="chamado" />} />
           <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
         </div>

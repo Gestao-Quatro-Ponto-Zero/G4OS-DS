@@ -544,9 +544,9 @@ export function ChatComposer({
 /** Chip do rodapé do composer (modelo, fonte, contexto). Clicável se tiver onClick. */
 export function ComposerChip({ icon, children, onClick, onRemove, active }: { icon?: ReactNode; children: ReactNode; onClick?: () => void; onRemove?: () => void; active?: boolean }) {
   const cls = cn(
-    "inline-flex h-7 max-w-[200px] items-center gap-1.5 rounded-lg border px-2 text-[12px] [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0",
-    active ? "border-line-strong bg-soft text-ink" : "border-line bg-surface text-ink-soft",
-    onClick && "hover:bg-soft hover:text-ink",
+    "inline-flex h-7 max-w-[200px] items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[12px] [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0",
+    active ? "bg-ink/[0.08] text-ink" : "bg-soft text-ink-soft",
+    onClick && "hover:bg-ink/[0.08] hover:text-ink",
     onRemove && "pr-6",
   );
   const inner = (

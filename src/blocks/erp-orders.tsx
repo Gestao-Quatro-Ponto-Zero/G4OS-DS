@@ -31,6 +31,21 @@ export const meta = {
   category: "ERP",
   order: 2,
   height: 900,
+  concept: {
+    goal: "Operar pedidos em volume: agrupar por situação, ver itens sem abrir e faturar em massa.",
+    patterns: [
+      "Anatomia A · Lista com DataGrid: rolagem interna, total fixo no rodapé",
+      "Abas por situação + agrupamento com subtotal",
+      "Itens expansíveis na linha; faturamento em massa",
+      "Ações rápidas e CSV",
+    ],
+    adapt: [
+      "Chamados agrupados por prioridade, títulos por vencimento",
+    ],
+    avoid: [
+      "Subtotal só no fim da página",
+    ],
+  },
 } as const;
 
 const payments: Payment[] = ["Pix", "Boleto 28 dias", "Cartão 3x", "Boleto 30/60/90"];

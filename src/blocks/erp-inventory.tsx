@@ -27,7 +27,7 @@ import {
   useFilters,
   useSort,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { categories, coverageDays, levelInfo, levelOf, products as seed, qtyOf, today, warehouses, type Level, type Product, type WarehouseId } from "./data/erp";
 import { go } from "./shells/frame-route";
@@ -40,6 +40,21 @@ export const meta = {
   category: "ERP",
   order: 5,
   height: 1180,
+  concept: {
+    goal: "Evitar ruptura: ver o saldo por depósito contra o mínimo e repor a tempo.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+      "Régua de saldo contra o mínimo e cobertura em dias",
+      "Ruptura vira requisição de compra em um clique",
+      "Linha abre o produto",
+    ],
+    adapt: [
+      "Licenças (SaaS), capacidade de equipes, vagas por área",
+    ],
+    avoid: [
+      "Mostrar saldo sem o mínimo de referência",
+    ],
+  },
 } as const;
 
 const fields: FilterField<Product>[] = [
@@ -194,7 +209,9 @@ export default function ErpInventory() {
           </div>
 
           <div className="space-y-4">
-            <FilterBar filters={filters} noun="item" nounPlural="itens" search={<TableSearch value={q} onChange={filters.setQuery} total={items.length} noun="item" nounPlural="itens" searchIn="SKU, descrição e NCM" />} />
+            <PageToolbar>
+              <FilterBar filters={filters} noun="item" nounPlural="itens" search={<TableSearch value={q} onChange={filters.setQuery} total={items.length} noun="item" nounPlural="itens" searchIn="SKU, descrição e NCM" />} />
+            </PageToolbar>
             <DataTable rows={sort.rows} columns={columns} rowKey={(p) => p.sku} onRowClick={(p) => go("erp-product", p.sku)} rowLabel={(p) => `Abrir ${p.name}`} empty={<EmptyFilterResult filters={filters} noun="item" nounPlural="itens" />} />
           </div>
         </div>

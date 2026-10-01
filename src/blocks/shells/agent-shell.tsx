@@ -1,4 +1,4 @@
-import { FolderKanban, History, MessagesSquare, Network, Settings, Sparkles, SquareTerminal } from "lucide-react";
+import { Bot, FolderKanban, History, ListChecks, MessagesSquare, Network, Settings, Sparkles, SquareTerminal } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppShell, Avatar, IconRail, Tooltip, type NavItem, type RailItem } from "@g4os/ds";
 import { me, org } from "../data/workspace";
@@ -16,6 +16,8 @@ export const agentRoutes = {
   trace: frameHref("ai-trace"),
   conversation: frameHref("ai-conversation"),
   chat: frameHref("ai-chat"),
+  builder: frameHref("ai-agent-builder"),
+  tasks: frameHref("ai-task-proposals"),
   runs: frameHref("ai-agent-run"),
   settings: frameHref("settings-integrations", { id: "claude" }),
 } as const;
@@ -25,8 +27,10 @@ const rail: RailItem[][] = [
     { href: agentRoutes.workspace, label: "Workspace", icon: Sparkles },
     { href: agentRoutes.projects, label: "Projetos", icon: FolderKanban, dot: true },
     { href: agentRoutes.conversation, label: "Conversa com aprovação", icon: MessagesSquare },
+    { href: agentRoutes.tasks, label: "Tarefas propostas", icon: ListChecks },
   ],
   [
+    { href: agentRoutes.builder, label: "Agentes", icon: Bot },
     { href: agentRoutes.trace, label: "Inspetor de execução", icon: Network },
     { href: agentRoutes.runs, label: "Execuções", icon: History },
     { href: agentRoutes.chat, label: "Chat livre", icon: SquareTerminal },

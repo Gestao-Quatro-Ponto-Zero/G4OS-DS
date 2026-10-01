@@ -32,6 +32,20 @@ export const meta = {
   category: "Financeiro",
   order: 6,
   height: 1180,
+  concept: {
+    goal: "Mostrar onde o realizado está fugindo do orçado e quem responde por isso.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com mês/acumulado",
+      "Halteres orçado × realizado; desvio favorável/desfavorável por cor e palavra",
+      "Pedido de remanejamento em modal",
+    ],
+    adapt: [
+      "Metas comerciais, headcount por área",
+    ],
+    avoid: [
+      "Verde/vermelho sem dizer se custo acima é ruim",
+    ],
+  },
 } as const;
 
 const money = (n: number) => formatCurrency(n, { compact: true });

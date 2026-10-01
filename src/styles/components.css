@@ -134,6 +134,61 @@
   .sticky-page-header[data-stuck] .page-heading-actions { gap: 6px; }
 }
 
+/* Barra da página (filtros/visões) colada abaixo do cabeçalho fixo. O fundo se
+   estende pelas margens; ao grudar, a linha passa do cabeçalho para a barra. */
+.page-toolbar {
+  position: sticky;
+  top: calc(var(--sticky-top, 0px) + var(--page-header-height, 0px));
+  z-index: var(--z-sticky-local);
+  background: var(--ds-page);
+  padding-block: 8px;
+}
+.page-toolbar::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(-1 * var(--page-gutter, 0px));
+  z-index: -1;
+  background: var(--ds-page);
+}
+.page-toolbar[data-stuck]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  inset-inline: calc(-1 * var(--page-gutter, 0px));
+  height: 1px;
+  background: var(--ds-line);
+}
+[data-toolbar-stuck] .sticky-page-header[data-stuck]::after { display: none; }
+
+/* Celular: espaço vertical é do conteúdo. O cabeçalho fixo vira uma linha só
+   (título + ação primária + último item, em geral o ⋯); trilha e secundárias voltam ao
+   rolar para o topo. A barra da página rola junto com a lista. */
+@media (max-width: 639.98px) {
+  .page-toolbar { position: relative; top: auto; }
+  .page-toolbar[data-stuck]::after { display: none; }
+  .sticky-page-header[data-stuck] { flex-wrap: nowrap; align-items: center; }
+  .sticky-page-header[data-stuck] .page-heading-crumbs { display: none; }
+  .sticky-page-header[data-stuck] h1 { font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sticky-page-header[data-stuck] > .min-w-0 { min-width: 0; flex: 1 1 auto; }
+  .sticky-page-header[data-stuck] .page-heading-actions { flex-wrap: nowrap; flex-shrink: 0; }
+  .sticky-page-header[data-stuck] .page-heading-actions > :not(:last-child):not(.ui-button-primary):not(:has(.ui-button-primary)) { display: none; }
+}
+
+/* Coluna lateral de registro (propriedades): gruda abaixo do cabeçalho fixo no
+   desktop; rola sozinha só se passar da altura da tela. */
+@media (min-width: 1024px) {
+  .page-aside {
+    position: sticky;
+    top: calc(var(--sticky-top, 0px) + var(--page-header-height, 0px) + 16px);
+    align-self: start;
+    max-height: calc(100dvh - var(--page-header-height, 0px) - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding-bottom: 8px;
+  }
+}
+
 /* Barra de contexto de uma página de registro (ciclo, tarefa, reunião). */
 .context-bar { --page-gutter: 0px; }
 .context-bar[data-stuck] { padding-block: 0; }
@@ -627,4 +682,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ds-shimmer { -webkit-text-fill-color: currentColor; background: none; }
+}
+
+/* DataGrid com teto de altura: rolagem interna só a partir de 640px. */
+@media (min-width: 640px) {
+  .data-grid-capped { max-height: var(--dg-max-h); }
 }

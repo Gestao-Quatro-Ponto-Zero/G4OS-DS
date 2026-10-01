@@ -36,6 +36,21 @@ export const meta = {
   category: "ATS",
   order: 6,
   height: 900,
+  concept: {
+    goal: "Trabalhar o banco de talentos em escala: filtrar, selecionar muitos e mover de etapa de uma vez.",
+    patterns: [
+      "Anatomia A · Lista com DataGrid: rolagem interna, cabeçalho e colunas fixos",
+      "Visões salvas, filtros e busca local (/) na barra da grade",
+      "Seleção em massa com BulkBar (mover etapa, e-mail)",
+      "Ações rápidas na linha; colunas configuráveis; CSV",
+    ],
+    adapt: [
+      "Base de contatos (CRM), clientes B2B (ERP), leads de marketing",
+    ],
+    avoid: [
+      "Ação em massa sem confirmação quando altera muitos registros",
+    ],
+  },
 } as const;
 
 const statusInfo = {

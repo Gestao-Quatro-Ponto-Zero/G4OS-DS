@@ -18,7 +18,7 @@ import {
   cn,
   notify,
   useFilters,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { customerById, personById, priorityLabel, priorityTone, team, ticketLabel, tickets as baseTickets, today, useFrameParam, type Priority, type Ticket, type TicketStatus } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
@@ -30,6 +30,20 @@ export const meta = {
   category: "SaaS",
   order: 6,
   height: 900,
+  concept: {
+    goal: "Atender a fila de chamados priorizando SLA, sem perder a conversa.",
+    patterns: [
+      "Anatomia F · Mestre-detalhe: fila à esquerda, conversa à direita",
+      "PageToolbar com filtros e busca colada ao cabeçalho",
+      "SLA, prioridade e responsável no detalhe; no celular a conversa abre em tela cheia (?id=)",
+    ],
+    adapt: [
+      "Atendimento interno (TI, RH), pós-venda, ouvidoria",
+    ],
+    avoid: [
+      "Abrir cada chamado em página nova",
+    ],
+  },
 } as const;
 
 const here = "#/frame/saas-support";
@@ -87,7 +101,9 @@ export default function SaasSupport() {
         <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(320px,420px)_1fr]">
           {/* Fila */}
           <section className={cn("min-w-0 space-y-3", current && "hidden lg:block")} aria-label="Fila de chamados">
-            <FilterBar filters={filters} noun="chamado" search={<TableSearch value={q} onChange={filters.setQuery} total={tickets.length} noun="chamado" searchIn="assunto, número e cliente" />} />
+            <PageToolbar>
+              <FilterBar filters={filters} noun="chamado" search={<TableSearch value={q} onChange={filters.setQuery} total={tickets.length} noun="chamado" searchIn="assunto, número e cliente" />} />
+            </PageToolbar>
             <ul className="m-0 list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
               {list.map((t) => {
                 const c = customerById(t.customerId);

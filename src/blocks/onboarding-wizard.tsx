@@ -21,6 +21,20 @@ export const meta = {
   category: "Onboarding",
   order: 1,
   height: 820,
+  concept: {
+    goal: "Configurar o espaço de trabalho em poucos passos guiados, com a opção de pular.",
+    patterns: [
+      "Anatomia H · Fluxo focado: trilha lateral de passos + rodapé fixo Voltar/Continuar",
+      "Um assunto por passo (espaço, módulos, equipe, dados)",
+      "Pular etapa sempre disponível; tela de conclusão leva ao checklist",
+    ],
+    adapt: [
+      "Implantação de módulo, importação de dados, configuração de integração",
+    ],
+    avoid: [
+      "Mais de 5 passos ou passos obrigatórios que podiam ser depois",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

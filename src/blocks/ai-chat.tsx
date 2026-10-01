@@ -34,6 +34,21 @@ export const meta = {
   category: "IA",
   order: 3,
   height: 860,
+  concept: {
+    goal: "Conversar com o assistente em página inteira, com histórico pesquisável, para quem usa a IA como ferramenta de trabalho diária.",
+    patterns: [
+      "Anatomia G · App de altura total: histórico à esquerda, thread rola, composer fixo",
+      "Histórico agrupado por data com busca",
+      "Estado vazio com sugestões; avisos do sistema e limite de uso com contagem",
+      "Respostas com ferramentas e fontes",
+    ],
+    adapt: [
+      "Suporte interno, base de conhecimento, copiloto de vendas",
+    ],
+    avoid: [
+      "Rolar a página inteira junto com a conversa (perde o composer)",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

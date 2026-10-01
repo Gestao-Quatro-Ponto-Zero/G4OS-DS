@@ -22,6 +22,20 @@ export const meta = {
   category: "Aplicação",
   order: 3,
   height: 760,
+  concept: {
+    goal: "Navegar, criar e achar registros pelo teclado sem tirar a mão dele, para quem usa o app o dia inteiro.",
+    patterns: [
+      "⌘K abre uma paleta sobre qualquer tela",
+      "Grupos (navegar, criar, registros), busca sem acento, recentes e atalhos visíveis",
+      "Enter executa, Esc fecha; a tela de fundo não muda",
+    ],
+    adapt: [
+      "Qualquer produto do DS: registre os comandos do produto e os atalhos de criação",
+    ],
+    avoid: [
+      "Paleta com ações sem atalho nem grupo (vira lista sem ordem)",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

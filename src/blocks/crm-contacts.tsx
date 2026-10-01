@@ -41,6 +41,21 @@ export const meta = {
   category: "CRM",
   order: 3,
   height: 900,
+  concept: {
+    goal: "Trabalhar a base de contas em escala: filtrar, editar na célula e agir em massa sem abrir cada registro.",
+    patterns: [
+      "Anatomia A · Lista com DataGrid: rolagem interna, cabeçalho e total fixos, empresa fixa à esquerda",
+      "Estágio e responsável editáveis na célula com desfazer",
+      "Ações rápidas na linha (ligar, e-mail, ⋯ e clique direito)",
+      "Seleção em massa; colunas configuráveis; CSV; cards no celular",
+    ],
+    adapt: [
+      "Clientes (ERP), candidatos (ATS), contas (SaaS)",
+    ],
+    avoid: [
+      "Rolagem interna no celular (a grade já passa a rolar com a página)",
+    ],
+  },
 } as const;
 
 type Row = Company & { openDeals: number; pipeline: number; lastTouchDate: string };

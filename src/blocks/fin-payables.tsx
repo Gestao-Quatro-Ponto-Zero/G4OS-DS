@@ -27,7 +27,7 @@ import {
   useSelection,
   useSort,
   type Column,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { br, iso, payableStatus, payables as seed, today, type Payable } from "./data/fin";
 import { useFrameParam } from "./shells/frame-route";
@@ -40,6 +40,20 @@ export const meta = {
   category: "Financeiro",
   order: 4,
   height: 960,
+  concept: {
+    goal: "Pagar em dia e só o que foi aprovado, com o comprovante à mão.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada; abas por situação",
+      "Aprovação e agendamento em massa (BulkBar)",
+      "Recusa com motivo; boleto anexo na gaveta",
+    ],
+    adapt: [
+      "Reembolsos, comissões, faturas de fornecedor",
+    ],
+    avoid: [
+      "Pagar em massa sem confirmação do total",
+    ],
+  },
 } as const;
 
 type Tab = "aprovacao" | "abertos" | "pagos";
@@ -128,7 +142,9 @@ export default function FinPayables() {
           ]}
         />
         <div className="mt-5 space-y-4">
-          <FilterBar filters={filters} noun="título" search={<TableSearch value={q} onChange={filters.setQuery} total={rows.length} noun="título" searchIn="favorecido, documento e centro de custo" />} />
+          <PageToolbar>
+            <FilterBar filters={filters} noun="título" search={<TableSearch value={q} onChange={filters.setQuery} total={rows.length} noun="título" searchIn="favorecido, documento e centro de custo" />} />
+          </PageToolbar>
           <DataTable rows={sort.rows} columns={columns} rowKey={(x) => x.id} onRowClick={(x) => setOpen(x.id)} rowLabel={(x) => `Abrir ${x.doc}`} empty={<EmptyFilterResult filters={filters} noun="título" />} />
           <BulkBar count={sel.count} noun="título" onClear={sel.clear}>
             {tab === "aprovacao" ? (

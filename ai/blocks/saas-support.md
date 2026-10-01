@@ -8,4 +8,4 @@ Fila de chamados com filtros e SLA, conversa com resposta, status, prioridade e 
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `EntityMark`, `FieldBlock`, `FilterBar`, `FilterField`, `Highlight`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `Select`, `TableSearch`, `TextareaField`, `notify`, `useFilters`
+`Avatar`, `Badge`, `Button`, `EntityMark`, `FieldBlock`, `FilterBar`, `FilterField`, `Highlight`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PageToolbar`, `Select`, `TableSearch`, `TextareaField`, `notify`, `useFilters`

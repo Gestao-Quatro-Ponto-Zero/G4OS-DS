@@ -23,7 +23,7 @@ import {
   formatDate,
   notify,
   useFilters,
-  type FilterField,
+  type FilterField, PageToolbar
 } from "@g4os/ds";
 import { activities as initial, activityLabel, companies, companyById, daysFromToday, dealById, iso, me, repById, reps, today, useFrameParam, type Activity, type ActivityType } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
@@ -35,6 +35,20 @@ export const meta = {
   category: "CRM",
   order: 7,
   height: 900,
+  concept: {
+    goal: "Não deixar follow-up cair: ver o que está atrasado, o que é hoje e fechar rápido.",
+    patterns: [
+      "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+      "Agrupado por prazo (atrasadas primeiro) ou por semana",
+      "Conclusão rápida na linha; nova atividade em modal",
+    ],
+    adapt: [
+      "Tarefas do ATS (entrevistas, retornos), cobranças do financeiro",
+    ],
+    avoid: [
+      "Ordenar por criação em vez de prazo",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-activities";
@@ -154,7 +168,9 @@ export default function CrmActivities() {
           }
         />
         <div className="mt-6 space-y-5">
-          <FilterBar filters={filters} noun="atividade" search={<TableSearch value={q} onChange={filters.setQuery} total={items.length} noun="atividade" searchIn="título, empresa e responsável" />} />
+          <PageToolbar>
+            <FilterBar filters={filters} noun="atividade" search={<TableSearch value={q} onChange={filters.setQuery} total={items.length} noun="atividade" searchIn="título, empresa e responsável" />} />
+          </PageToolbar>
           {view === "lista" ? (
             groups.length ? (
               groups.map((g) => (

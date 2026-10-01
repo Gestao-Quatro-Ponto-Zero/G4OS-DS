@@ -37,6 +37,21 @@ export const meta = {
   category: "IA",
   order: 1,
   height: 860,
+  concept: {
+    goal: "Pedir ajuda à IA sobre a tela que já está aberta (aqui, o CRM) sem perder o contexto nem a tela.",
+    patterns: [
+      "Painel lateral de IA ao lado da tela: a tela continua usável",
+      "Respostas com ferramentas usadas e fontes citadas",
+      "Streaming com Parar; sugestões de pergunta no início",
+      "No celular o painel abre fechado e ocupa a tela quando aberto",
+    ],
+    adapt: [
+      "Qualquer tela de lista ou registro (ERP, ATS, financeiro): troque as sugestões pelo contexto da tela",
+    ],
+    avoid: [
+      "Modal de IA que cobre a tela que a pessoa quer analisar",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */

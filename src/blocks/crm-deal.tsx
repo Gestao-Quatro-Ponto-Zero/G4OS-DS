@@ -39,6 +39,21 @@ export const meta = {
   category: "CRM",
   order: 2,
   height: 1000,
+  concept: {
+    goal: "Avançar um negócio: ver em que etapa está, registrar o que aconteceu e decidir ganho ou perda.",
+    patterns: [
+      "Anatomia C · Registro: trilha + título + Perdido/Ganho fixos; propriedades fixas à direita",
+      "StagePath clicável; perda pede motivo",
+      "Nota rápida alimenta o feed de atividade",
+      "Edição longa em gaveta (Drawer)",
+    ],
+    adapt: [
+      "Proposta (ATS), pedido (ERP), chamado (suporte)",
+    ],
+    avoid: [
+      "Ganho/perda sem motivo (perde o dado para o painel)",
+    ],
+  },
 } as const;
 
 const here = "#/frame/crm-pipeline"; // item ativo na navegação
