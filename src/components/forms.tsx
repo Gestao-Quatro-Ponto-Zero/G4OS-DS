@@ -988,14 +988,14 @@ export function Switch({
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "inline-flex h-10 items-center gap-2.5 whitespace-nowrap text-[12.5px] text-muted outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed",
+        "inline-flex min-h-10 max-w-full items-center gap-2.5 text-left text-[12.5px] text-muted outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed",
         className,
       )}
     >
       <span aria-hidden className={cn("flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors", checked ? "bg-primary" : "bg-line-strong", disabled && "opacity-55")}>
         <span className={cn("h-4 w-4 rounded-full bg-surface shadow-sm transition-transform", checked && "translate-x-4")} />
       </span>
-      {!hideLabel && label}
+      {!hideLabel && <span className="min-w-0 py-1 leading-snug">{label}</span>}
     </button>
   );
 }

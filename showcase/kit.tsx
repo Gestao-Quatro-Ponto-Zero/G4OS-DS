@@ -113,6 +113,12 @@ export function DocSection({ id, title, rule, children }: { id?: string; title: 
 }
 
 /** Exemplo vivo com aba de código. `code` é o trecho de uso (não o arquivo todo). */
+/** `trecho` em descrições de string vira <code>. */
+function inlineCode(text: string): ReactNode {
+  if (!text.includes("`")) return text;
+  return text.split("`").map((part, i) => (i % 2 ? <code key={i} className="rounded bg-soft px-1 font-mono text-[11.5px] text-ink-soft">{part}</code> : part));
+}
+
 export function Demo({ title, description, code, children, className, bare }: { title?: string; description?: ReactNode; code?: string; children: ReactNode; className?: string; bare?: boolean }) {
   const [tab, setTab] = useState<"preview" | "code">("preview");
   return (
@@ -121,7 +127,7 @@ export function Demo({ title, description, code, children, className, bare }: { 
         <div className="mb-2 flex items-end justify-between gap-3">
           <div className="min-w-0">
             {title && <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{title}</p>}
-            {description && <p className="m-0 mt-1 text-[12.5px] text-muted">{description}</p>}
+            {description && <p className="m-0 mt-1 text-[12.5px] text-muted">{typeof description === "string" ? inlineCode(description) : description}</p>}
           </div>
           {code && (
             <div className="segmented-control shrink-0" role="group" aria-label="Visualização">
