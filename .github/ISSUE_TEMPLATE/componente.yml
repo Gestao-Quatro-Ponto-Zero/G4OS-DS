@@ -1,0 +1,14 @@
+name: Novo componente ou mudança no DS
+description: Proponha um componente, variante, token ou bloco
+labels: [proposta]
+body:
+  - type: textarea
+    id: problema
+    attributes: { label: Qual problema resolve?, description: "Em quais produtos/telas aparece (CRM, ATS, ERP…)? Já existe algo parecido no DS?" }
+    validations: { required: true }
+  - type: textarea
+    id: proposta
+    attributes: { label: Proposta, description: "API sugerida, estados, comportamento no celular e no escuro. Referências visuais ajudam." }
+  - type: dropdown
+    id: tipo
+    attributes: { label: Tipo, options: [Componente, Variante de componente existente, Token/tema, Bloco (tela), Gráfico, Documentação] }

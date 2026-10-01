@@ -1,0 +1,147 @@
+/*
+ * G4OS-DS · base
+ *
+ * Comportamentos globais: shell sem rolagem externa, foco, seleção,
+ * cursores, movimento reduzido, tipografia de leitura. Sem classes de
+ * componente aqui (essas ficam em components.css).
+ */
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes drawer-enter {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Tudo abaixo fica em @layer base: utilitários do Tailwind sempre vencem. */
+@layer base {
+  /* App shell: o documento nunca rola. Cada área de trabalho tem a própria
+     rolagem (página, sidebar, drawer, kanban). Evita o "duplo scroll" e deixa
+     cabeçalhos fixos confiáveis. Para sites (não apps), remova este bloco. */
+  html.ds-app,
+  html.ds-app body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body {
+    background: var(--ds-page);
+    color: var(--ds-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ds-line-strong) transparent;
+  }
+  ::selection {
+    background: var(--ds-accent-soft);
+  }
+
+  /* Cursor honesto: mão só no que age, "proibido" no que está desabilitado. */
+  button:not(:disabled),
+  [role="button"],
+  select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :where(a, button) {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Foco: um anel neutro de 2px com 2px de folga. Nunca remover sem trocar. */
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--ds-focus);
+    outline-offset: 2px;
+  }
+
+  /* Campos: borda escurece + halo de 3px, sem outline. */
+  :where(input:not([type="checkbox"]):not([type="radio"]), textarea, select),
+  .focus-field {
+    transition:
+      border-color var(--duration-state) ease,
+      box-shadow var(--duration-state) ease;
+  }
+  :where(input:not([type="checkbox"]):not([type="radio"]), textarea, select):focus-visible {
+    outline: none;
+    border-color: var(--ds-muted);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ds-ink) 6%, transparent);
+  }
+  /* Campo composto (ícone + input): o contêiner é quem mostra o foco. */
+  .focus-field:has(> input:focus-visible, > textarea:focus-visible) {
+    border-color: var(--ds-muted);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ds-ink) 6%, transparent);
+  }
+  .focus-field > :is(input, textarea):focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+  /* Campo "sem caixa" (fundo transparente dentro de um contêiner: busca,
+     paleta, composer, tags): nada de halo nem outline no input; quem mostra
+     o foco é o contêiner (use .focus-field nele, ou :focus-within). */
+  :where(input, textarea):where(.bg-transparent, .ds-bare):focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+  input,
+  textarea,
+  select {
+    accent-color: var(--ds-accent);
+  }
+  /* Aprovação e conclusão leem como sucesso, não como marca. */
+  input[type="checkbox"] {
+    accent-color: var(--ds-ok);
+  }
+
+  @media (forced-colors: active) {
+    :where(input, textarea, select):focus-visible,
+    .focus-field:has(> input:focus-visible, > textarea:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
+
+  /* Leitura: títulos equilibrados, parágrafos sem viúvas. */
+  :where(main, [data-ds-content]) :where(h1, h2, h3) {
+    text-wrap: balance;
+    line-height: 1.3;
+  }
+  :where(main, [data-ds-content]) :where(p) {
+    text-wrap: pretty;
+  }
+  :where(table) th {
+    font-weight: 500;
+  }
+  :where(table) tbody tr {
+    transition: background-color 140ms ease;
+  }
+  :where(table) tbody tr:focus-visible {
+    outline-offset: -2px;
+    background-color: var(--ds-soft);
+  }
+  /* Ícones lucide mais finos dentro do conteúdo. */
+  :where(main, aside, [data-ds-content]) .lucide {
+    stroke-width: 1.65;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0s !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

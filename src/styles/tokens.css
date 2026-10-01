@@ -1,0 +1,425 @@
+/*
+ * G4OS-DS · tokens
+ *
+ * Três camadas (docs/fundamentos/tokens.md):
+ *
+ *   1. PRIMITIVOS   --g4-*   paleta crua. Nunca use direto em componente.
+ *   2. SEMÂNTICOS   --ds-*   papéis (superfície, texto, ação, linha, estados).
+ *                            Trocam por tema: claro, escuro e marca do cliente.
+ *   3. PONTE        @theme   vira utilitário Tailwind (bg-surface, text-muted,
+ *                            rounded-card…) apontando para os semânticos.
+ *
+ * Para adaptar a um cliente, sobrescreva SÓ semânticos (--ds-primary,
+ * --ds-accent, --ds-radius-scale, --ds-font-sans…) num seletor de marca:
+ *   [data-brand="acme"] { --ds-primary: #0b5cff; --ds-radius-scale: .75; }
+ * Modo escuro: <html data-theme="dark"> (ou "system" para seguir o SO).
+ * Presets prontos em themes.css. Gerador visual no showcase: Fundamentos › Temas.
+ */
+
+/* Variante `dark:` do Tailwind segue data-theme (não a mídia do SO direto). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ==================================================================== */
+/* 1. Primitivos                                                         */
+/* ==================================================================== */
+:root {
+  --g4-white: #ffffff;
+  --g4-gray-25: #fbfbfc;
+  --g4-gray-50: #f8f8f9;
+  --g4-gray-100: #e9eaed;
+  --g4-gray-200: #d2d4da;
+  --g4-gray-400: #a3a7b0;
+  --g4-gray-500: #6b6e76;
+  --g4-gray-700: #484a50;
+  --g4-gray-900: #202124;
+  --g4-gray-950: #121214;
+
+  /* Paleta oficial da marca G4 (manual de marca). */
+  --g4-navy-blue: #001f35; /* Navy Blue: cor primária institucional */
+  --g4-royal-gold: #b9915b; /* Royal Gold: conquista, premium, destaque */
+  --g4-royal-silver: #f5f4f3; /* Royal Silver: fundos claros de marca */
+  --g4-maua-blue: #031a26;
+  --g4-scaling-blue: #184560;
+  --g4-founders-red: #441b1b;
+  --g4-ground-clay: #842e20;
+  --g4-warm-white: #fafaf9;
+  --g4-light-gray: #e8e6e3;
+  --g4-mid-gray: #9a9895;
+  --g4-dark-gray: #4a4845;
+  --g4-charcoal: #2a2826;
+
+  --g4-navy-900: #031a26;
+  --g4-navy-700: #184560;
+  --g4-gold-500: #b9915b;
+  --g4-gold-700: #8c6a3a;
+  --g4-gold-50: #f5eee3;
+  --g4-clay-700: #842e20;
+  --g4-clay-50: #f6e7e3;
+  --g4-wine-900: #441b1b;
+  --g4-sage-500: #5f7f6f;
+
+  --g4-green-800: #1b5e20;
+  --g4-green-50: #e8f5e9;
+  --g4-orange-800: #e65100;
+  --g4-orange-50: #fff3e0;
+  --g4-red-800: #b71c1c;
+  --g4-red-50: #ffebee;
+  --g4-blue-800: #0d47a1;
+  --g4-blue-50: #e3f2fd;
+}
+
+/* ==================================================================== */
+/* 2. Semânticos · tema claro (padrão)                                   */
+/* ==================================================================== */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Superfícies */
+  --ds-page: var(--g4-white); /* fundo da área de trabalho */
+  --ds-surface: var(--g4-white); /* card, painel, tabela, campo */
+  --ds-popover: var(--g4-white); /* menu, popover, modal, toast */
+  --ds-soft: var(--g4-gray-50); /* gelo: hover, cabeçalho de tabela, rodapé */
+  --ds-rail: var(--g4-gray-25); /* sidebar */
+
+  /* Texto e linhas */
+  --ds-ink: var(--g4-gray-900); /* texto principal */
+  --ds-ink-soft: var(--g4-gray-700); /* texto secundário forte */
+  --ds-muted: var(--g4-gray-500); /* metadado, rótulo, placeholder (AA) */
+  --ds-line: var(--g4-gray-100); /* toda borda e divisória */
+  --ds-line-strong: var(--g4-gray-200); /* hover de card, borda de checkbox */
+  --ds-on-ink: var(--g4-white); /* texto sobre preenchimento forte (ink, rose, ok…) */
+
+  /* Ação principal: por padrão é a tinta. Marcas trocam aqui. */
+  --ds-primary: var(--g4-gray-900);
+  --ds-on-primary: var(--g4-white);
+
+  /* Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela. */
+  --ds-brand: var(--g4-navy-blue);
+  --ds-on-brand: var(--g4-royal-silver);
+  --ds-brand-accent: var(--g4-royal-gold);
+  /* Marcador do item ativo na navegação (gesto de marca discreto). */
+  --ds-nav-marker: var(--g4-royal-gold);
+
+  /* Marca */
+  --ds-navy: var(--g4-navy-900); /* superfícies escuras de marca (fica escura nos dois modos) */
+  --ds-blue: var(--g4-navy-700); /* link, ação textual, "em andamento" */
+  --ds-clay: var(--g4-clay-700);
+  --ds-clay-soft: var(--g4-clay-50);
+  --ds-founders: var(--g4-wine-900);
+  --ds-accent: var(--g4-gold-500); /* SÓ preenchimento: progresso, foco, próximo passo */
+  --ds-accent-deep: var(--g4-gold-700); /* texto na cor de destaque */
+  --ds-accent-soft: var(--g4-gold-50);
+
+  /* Estados */
+  --ds-ok: var(--g4-green-800);
+  --ds-ok-soft: var(--g4-green-50);
+  --ds-amber: var(--g4-orange-800);
+  --ds-amber-soft: var(--g4-orange-50);
+  --ds-rose: var(--g4-red-800);
+  --ds-rose-soft: var(--g4-red-50);
+  --ds-info: var(--g4-blue-800);
+  --ds-info-soft: var(--g4-blue-50);
+
+  /* Canvas escuros (grafo, IA) */
+  --ds-ai: #18181b;
+  --ds-graph: var(--g4-gray-950);
+
+  /* Dados */
+  --ds-chart-1: var(--g4-gray-900);
+  --ds-chart-2: var(--g4-navy-700);
+  --ds-chart-3: var(--g4-gold-500);
+  --ds-chart-4: var(--g4-clay-700);
+  --ds-chart-5: var(--g4-sage-500);
+  --ds-chart-6: var(--g4-gray-400);
+  --ds-chart-grid: #eef0f2;
+
+  /* Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo */
+  --ds-mark-text: 70%;
+  --ds-mark-bg: 8%;
+
+  /* Foco e sobreposição */
+  --ds-focus: var(--g4-gray-500);
+  --ds-backdrop: rgb(0 0 0 / 0.2);
+
+  /* Sombras: quase invisíveis no claro */
+  --ds-shadow-surface: 0 1px 2px #20212403;
+  --ds-shadow-raised: 0 3px 12px #20212407;
+  --ds-shadow-pressed: 0 1px 3px #20212408;
+  --ds-shadow-primary: inset 0 1px 0 #ffffff24, 0 1px 2px #20212418;
+  --ds-shadow-popup: 0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a;
+  --ds-shadow-toast: 0 8px 32px #20212412, 0 2px 4px #20212404;
+  --ds-shadow-overlay: 0 25px 50px -12px #00000026;
+
+  /* Forma e tipo da marca */
+  --ds-radius-scale: 1; /* 0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável */
+  --ds-font-sans: "Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif;
+  --ds-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  /* Títulos (h1 de página, título de registro, capa, hero). Pode ser serifada. */
+  --ds-font-display: var(--ds-font-sans);
+  --ds-display-weight: 600;
+  --ds-display-tracking: -0.035em;
+}
+
+/* ==================================================================== */
+/* 2b. Semânticos · tema escuro                                          */
+/* Não é inversão: superfícies sobem de luminância com a elevação,       */
+/* estados ficam mais claros e menos saturados para ler sobre escuro.    */
+/* ==================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ds-mark-text: 38%;
+  --ds-mark-bg: 16%;
+  --ds-page: #111113;
+  --ds-surface: #18181b;
+  --ds-popover: #1f1f23;
+  --ds-soft: #202024;
+  --ds-rail: #141416;
+  --ds-ink: #ececef;
+  --ds-ink-soft: #c5c6cc;
+  --ds-muted: #8f929a;
+  --ds-line: #2a2a2f;
+  --ds-line-strong: #3b3c43;
+  --ds-on-ink: #121214;
+  --ds-primary: #ececef;
+  --ds-on-primary: #121214;
+  --ds-navy: #0a2130;
+  --ds-brand: #0a2236; /* navy continua navy, um passo acima do fundo escuro */
+  --ds-on-brand: var(--g4-royal-silver);
+  --ds-brand-accent: #c9a46f;
+  --ds-nav-marker: #c9a46f;
+  --ds-blue: #8cb8da;
+  --ds-clay: #e59a8a;
+  --ds-clay-soft: #3a211c;
+  --ds-founders: #c98b8b;
+  --ds-accent: #c9a46f;
+  --ds-accent-deep: #dcbd8e;
+  --ds-accent-soft: #2e2619;
+  --ds-ok: #7fd18b;
+  --ds-ok-soft: #15291a;
+  --ds-amber: #ffb163;
+  --ds-amber-soft: #33240f;
+  --ds-rose: #ff8f86;
+  --ds-rose-soft: #3a1719;
+  --ds-info: #90b8f8;
+  --ds-info-soft: #14233a;
+  --ds-ai: #0e0e10;
+  --ds-graph: #0b0b0d;
+  --ds-chart-1: #ececef;
+  --ds-chart-2: #6fa8d6;
+  --ds-chart-3: #c9a46f;
+  --ds-chart-4: #e08d7c;
+  --ds-chart-5: #8fbfa6;
+  --ds-chart-6: #6b6e76;
+  --ds-chart-grid: #242428;
+  --ds-focus: #8f929a;
+  --ds-backdrop: rgb(0 0 0 / 0.55);
+  --ds-shadow-surface: 0 1px 2px #00000040;
+  --ds-shadow-raised: 0 4px 16px #00000059;
+  --ds-shadow-pressed: 0 1px 3px #00000059;
+  --ds-shadow-primary: inset 0 1px 0 #ffffff14, 0 1px 2px #00000066;
+  --ds-shadow-popup: 0 20px 25px -5px #00000080, 0 8px 10px -6px #00000066, 0 0 0 1px #ffffff0a;
+  --ds-shadow-toast: 0 8px 32px #00000080, 0 0 0 1px #ffffff0a;
+  --ds-shadow-overlay: 0 25px 50px -12px #000000a6, 0 0 0 1px #ffffff0a;
+}
+
+/* "system": segue o sistema operacional. */
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    color-scheme: dark;
+    --ds-mark-text: 38%;
+    --ds-mark-bg: 16%;
+    --ds-page: #111113;
+    --ds-surface: #18181b;
+    --ds-popover: #1f1f23;
+    --ds-soft: #202024;
+    --ds-rail: #141416;
+    --ds-ink: #ececef;
+    --ds-ink-soft: #c5c6cc;
+    --ds-muted: #8f929a;
+    --ds-line: #2a2a2f;
+    --ds-line-strong: #3b3c43;
+    --ds-on-ink: #121214;
+    --ds-primary: #ececef;
+    --ds-on-primary: #121214;
+    --ds-navy: #0a2130;
+    --ds-brand: #0a2236;
+    --ds-brand-accent: #c9a46f;
+    --ds-nav-marker: #c9a46f;
+    --ds-blue: #8cb8da;
+    --ds-clay: #e59a8a;
+    --ds-clay-soft: #3a211c;
+    --ds-accent: #c9a46f;
+    --ds-accent-deep: #dcbd8e;
+    --ds-accent-soft: #2e2619;
+    --ds-ok: #7fd18b;
+    --ds-ok-soft: #15291a;
+    --ds-amber: #ffb163;
+    --ds-amber-soft: #33240f;
+    --ds-rose: #ff8f86;
+    --ds-rose-soft: #3a1719;
+    --ds-info: #90b8f8;
+    --ds-info-soft: #14233a;
+    --ds-chart-1: #ececef;
+    --ds-chart-2: #6fa8d6;
+    --ds-chart-3: #c9a46f;
+    --ds-chart-4: #e08d7c;
+    --ds-chart-5: #8fbfa6;
+    --ds-chart-6: #6b6e76;
+    --ds-chart-grid: #242428;
+    --ds-backdrop: rgb(0 0 0 / 0.55);
+    --ds-shadow-popup: 0 20px 25px -5px #00000080, 0 8px 10px -6px #00000066, 0 0 0 1px #ffffff0a;
+    --ds-shadow-toast: 0 8px 32px #00000080, 0 0 0 1px #ffffff0a;
+  }
+}
+
+/* ==================================================================== */
+/* 3. Ponte Tailwind: utilitários apontam para os semânticos             */
+/* ==================================================================== */
+@theme inline {
+  --font-sans: var(--ds-font-sans);
+  --font-mono: var(--ds-font-mono);
+  --font-display: var(--ds-font-display);
+
+  --color-page: var(--ds-page);
+  --color-surface: var(--ds-surface);
+  --color-popover: var(--ds-popover);
+  --color-soft: var(--ds-soft);
+  --color-rail: var(--ds-rail);
+  --color-ink: var(--ds-ink);
+  --color-ink-soft: var(--ds-ink-soft);
+  --color-muted: var(--ds-muted);
+  --color-line: var(--ds-line);
+  --color-line-strong: var(--ds-line-strong);
+  --color-on-ink: var(--ds-on-ink);
+  --color-primary: var(--ds-primary);
+  --color-on-primary: var(--ds-on-primary);
+
+  --color-navy: var(--ds-navy);
+  --color-brand: var(--ds-brand);
+  --color-on-brand: var(--ds-on-brand);
+  --color-brand-accent: var(--ds-brand-accent);
+  --color-nav-marker: var(--ds-nav-marker);
+  --color-blue: var(--ds-blue);
+  --color-clay: var(--ds-clay);
+  --color-clay-soft: var(--ds-clay-soft);
+  --color-founders: var(--ds-founders);
+  --color-accent: var(--ds-accent);
+  --color-accent-deep: var(--ds-accent-deep);
+  --color-accent-soft: var(--ds-accent-soft);
+
+  --color-ok: var(--ds-ok);
+  --color-ok-soft: var(--ds-ok-soft);
+  --color-amber: var(--ds-amber);
+  --color-amber-soft: var(--ds-amber-soft);
+  --color-rose: var(--ds-rose);
+  --color-rose-soft: var(--ds-rose-soft);
+  --color-info: var(--ds-info);
+  --color-info-soft: var(--ds-info-soft);
+
+  --color-ai: var(--ds-ai);
+  --color-graph: var(--ds-graph);
+
+  --color-chart-1: var(--ds-chart-1);
+  --color-chart-2: var(--ds-chart-2);
+  --color-chart-3: var(--ds-chart-3);
+  --color-chart-4: var(--ds-chart-4);
+  --color-chart-5: var(--ds-chart-5);
+  --color-chart-6: var(--ds-chart-6);
+  --color-chart-grid: var(--ds-chart-grid);
+
+  /* Alias legado do G4 Delivery. Não use em código novo: use clay. */
+  --color-magenta: var(--ds-clay);
+  --color-magenta-soft: var(--ds-clay-soft);
+
+  /* ------------------------------------------------------------------ */
+  /* Tipografia: escala nomeada (o Delivery usava px arbitrários).       */
+  /* Nome = papel, não tamanho. Ver docs/fundamentos/tipografia.md.       */
+  /* ------------------------------------------------------------------ */
+  --text-overline: 10px; /* rótulo de grupo em CAIXA ALTA, tracking .1em */
+  --text-overline--line-height: 1.4;
+  --text-meta: 11px; /* contador, legenda, data em chip, rótulo de célula mobile */
+  --text-meta--line-height: 1.4;
+  --text-caption: 12px; /* metadado, cabeçalho de tabela, aba, descrição curta */
+  --text-caption--line-height: 1.5;
+  --text-label: 12.5px; /* rótulo de campo, item de menu lateral, texto de controle */
+  --text-label--line-height: 1.5;
+  --text-control: 13px; /* botão sm, chip, toast, breadcrumb, corpo compacto */
+  --text-control--line-height: 1.45;
+  --text-body: 13.5px; /* corpo padrão, tabela, botão md, item de menu */
+  --text-body--line-height: 1.55;
+  --text-input: 14px; /* valor digitado, título de card, item de combobox */
+  --text-input--line-height: 1.5;
+  --text-value: 15px; /* valor de campo de leitura (Field) */
+  --text-value--line-height: 1.6;
+  --text-section: 18px; /* título de área (h2), título de modal */
+  --text-section--line-height: 1.35;
+  --text-record: 20px; /* título de drawer, nome do cliente no cabeçalho */
+  --text-record--line-height: 1.3;
+  --text-metric: 22px; /* número de indicador */
+  --text-metric--line-height: 1.2;
+  --text-title: 25px; /* h1 de página (23px < 640px). Não se chama "page" para não colidir com a cor page */
+  --text-title--line-height: 1.3;
+
+  --tracking-tightest: -0.035em; /* h1 de página */
+  --tracking-title: -0.025em; /* h2, títulos de registro */
+  --tracking-overline: 0.1em;
+
+  /* ------------------------------------------------------------------ */
+  /* Forma: Tailwind padrão (md 6 · lg 8 · xl 12 · 2xl 16) + um papel.   */
+  /* ------------------------------------------------------------------ */
+  --radius-chip: calc(6px * var(--ds-radius-scale)); /* badge, contador, chip de data */
+  --radius-control: calc(8px * var(--ds-radius-scale)); /* botão, campo, item de menu, aba */
+  --radius-tile: calc(10px * var(--ds-radius-scale)); /* card de kanban, marca de entidade */
+  --radius-card: calc(12px * var(--ds-radius-scale)); /* card, painel, tabela, popup, toast */
+  /* Raios padrão do Tailwind também escalam com a marca. */
+  --radius-sm: calc(4px * var(--ds-radius-scale));
+  --radius-md: calc(6px * var(--ds-radius-scale));
+  --radius-lg: calc(8px * var(--ds-radius-scale));
+  --radius-xl: calc(12px * var(--ds-radius-scale));
+  --radius-2xl: calc(16px * var(--ds-radius-scale));
+  --radius-shell: calc(16px * var(--ds-radius-scale)); /* modal, ListPanel, StatGrid, calendário */
+
+  /* ------------------------------------------------------------------ */
+  /* Sombras: quase invisíveis. Superfície se separa por borda, não sombra. */
+  /* ------------------------------------------------------------------ */
+  --shadow-surface: var(--ds-shadow-surface);
+  --shadow-raised: var(--ds-shadow-raised);
+  --shadow-pressed: var(--ds-shadow-pressed);
+  --shadow-primary: var(--ds-shadow-primary);
+  --shadow-popup: var(--ds-shadow-popup);
+  --shadow-toast: var(--ds-shadow-toast);
+  --shadow-overlay: var(--ds-shadow-overlay);
+
+  /* ------------------------------------------------------------------ */
+  /* Movimento                                                           */
+  /* ------------------------------------------------------------------ */
+  --ease-soft: ease;
+  --ease-panel: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-enter: enter 280ms ease both;
+  --animate-fade: fade-in 160ms ease both;
+  --animate-drawer: drawer-enter 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Durações e camadas como variáveis puras (não geram utilitário). */
+:root {
+  --duration-press: 100ms; /* botão afundando, popup abrindo */
+  --duration-state: 160ms; /* hover, troca de aba, seleção */
+  --duration-toast: 180ms; /* toast, backdrop */
+  --duration-panel: 220ms; /* drawer, cabeçalho compactando */
+  --duration-page: 280ms; /* entrada de página */
+
+  --z-sticky-local: 15; /* cabeçalho fixo dentro de uma seção */
+  --z-sticky: 20; /* cabeçalho de página */
+  --z-sticky-shell: 30; /* cabeçalho de entidade (cliente) */
+  --z-nav: 40; /* sidebar no celular */
+  --z-floating: 50; /* menus posicionados à mão */
+  --z-toast: 80;
+  --z-backdrop: 90;
+  --z-modal: 95;
+  --z-popup: 100; /* select, combobox, menu, popover: sempre por cima */
+
+  --page-gutter: 20px;
+  --content-max: 1440px;
+  --reading-max: 620px;
+}

@@ -1,0 +1,119 @@
+{
+  "name": "@g4os/ds",
+  "version": "0.2.0",
+  "description": "Design system G4 OS: tokens, componentes React (Base UI + Tailwind v4), gráficos e blocos de tela para construir CRM, ATS, ERP e qualquer produto.",
+  "license": "MIT",
+  "author": "Gestão 4.0 (G4 Educação)",
+  "homepage": "https://gestao-quatro-ponto-zero.github.io/G4OS-DS/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/issues"
+  },
+  "keywords": [
+    "design-system",
+    "react",
+    "tailwindcss",
+    "base-ui",
+    "components",
+    "charts",
+    "pt-BR",
+    "dark-mode",
+    "g4os"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./src/styles/index.css",
+    "./tokens.css": "./src/styles/tokens.css",
+    "./themes.css": "./src/styles/themes.css",
+    "./shadcn.css": "./src/styles/shadcn.css",
+    "./tokens": {
+      "types": "./dist/types/tokens/index.d.ts",
+      "import": "./dist/tokens/index.js"
+    },
+    "./components/*": {
+      "types": "./dist/types/components/*.d.ts",
+      "import": "./dist/components/*.js"
+    },
+    "./lib/*": {
+      "types": "./dist/types/lib/*.d.ts",
+      "import": "./dist/lib/*.js"
+    },
+    "./source": "./src/index.ts",
+    "./ai/*": "./ai/*",
+    "./llms.txt": "./ai/llms.txt",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "docs",
+    "templates",
+    "ai",
+    "scripts",
+    "plugin",
+    ".claude-plugin",
+    "README.md",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "g4os-ds": "scripts/cli.mjs"
+  },
+  "scripts": {
+    "typecheck": "node showcase/build.mjs --registry && tsc --noEmit",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "ai:build": "node scripts/build-ai-docs.mjs",
+    "ai:check": "node scripts/build-ai-docs.mjs --check",
+    "audit": "node scripts/cli.mjs audit",
+    "audit:self": "node scripts/cli.mjs audit src templates",
+    "check": "npm run check:tokens && npm run typecheck && npm run ai:check && npm run audit:self",
+    "showcase:build": "node showcase/build.mjs",
+    "showcase": "npm run showcase:build && npx --yes serve showcase/dist -l 4173",
+    "showcase:watch": "node showcase/build.mjs --watch",
+    "build": "node scripts/build-lib.mjs",
+    "prepublishOnly": "npm run check && npm run build",
+    "release": "changeset publish"
+  },
+  "peerDependencies": {
+    "@base-ui/react": "^1.8.0",
+    "lucide-react": ">=1.45.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "@base-ui/react": "1.8.0",
+    "@changesets/cli": "^2.31.1",
+    "@tailwindcss/cli": "4.3.3",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.25.0",
+    "lucide-react": "1.45.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,22 @@
+/*
+ * G4OS-DS · ponto de entrada CSS
+ *
+ * No globals.css do projeto:
+ *   @import "tailwindcss";
+ *   @import "@g4os/ds/styles.css";      (ou o caminho relativo deste arquivo)
+ *
+ * As classes dos componentes e blocos são lidas pelos @source abaixo
+ * (relativos a ESTE arquivo), então o app não precisa declarar nada. Se o seu
+ * gerenciador de pacotes usar links que o Tailwind não segue, acrescente no app:
+ *   @source "../node_modules/@g4os/ds/src";
+ *
+ * Tema: <html data-theme="light|dark|system" data-brand="…">. Ver src/lib/theme.ts.
+ */
+@import "./tokens.css";
+@import "./themes.css"; /* presets de marca: [data-brand="…"] */
+@import "./base.css";
+@import "./components.css";
+
+@source "../components";
+@source "../blocks";
+@source "../lib";

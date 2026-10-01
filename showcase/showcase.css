@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@import "../src/styles/index.css";
+@source "../src";
+@source "./";
+
+/* Realce de código mínimo do showcase (não faz parte do DS). */
+.code-view { tab-size: 2; }
+.code-view .tk-k { color: #842e20; }
+.code-view .tk-s { color: #1b5e20; }
+.code-view .tk-c { color: #8b8e96; font-style: italic; }
+.code-view .tk-t { color: #184560; }
+
+/* Rolagens internas do site (menu da doc, "Nesta página"): barra fina que
+   aparece no hover e degradê nas bordas indicando que há mais conteúdo. */
+.docs-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 24px), transparent 100%);
+}
+.docs-scroll:hover { scrollbar-color: var(--ds-line-strong) transparent; }
+html { scroll-padding-top: 72px; }

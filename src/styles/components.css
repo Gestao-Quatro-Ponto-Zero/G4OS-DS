@@ -1,0 +1,630 @@
+/*
+ * G4OS-DS · components
+ *
+ * Classes que o Tailwind sozinho não expressa bem: estados via atributo
+ * (`data-stuck`, `data-density`, `data-view`), pseudo-elementos, container
+ * queries, tabela que vira card no celular. Os componentes React usam estas
+ * classes; em HTML puro você pode usá-las diretamente.
+ *
+ * Convenções de atributo:
+ *   data-stuck            cabeçalho fixo já grudou (posto por StickyHeader)
+ *   data-density=compact  reduz respiro de cards, linhas e kanban
+ *   data-view=cards       tabela de coleção renderizada como grade de cards
+ *   data-label="Prazo"    rótulo da célula quando a tabela vira bloco
+ *   data-primary / data-wide / data-action / data-mobile-hidden  em <td>
+ */
+
+/* ==================================================================== */
+/* Página                                                                */
+/* ==================================================================== */
+
+/* Área rolável padrão de uma tela. Margens 20 / 28 / 40 px por largura. */
+.page-inset {
+  --page-gutter: 20px;
+  --sticky-top: -28px;
+  overscroll-behavior-y: contain;
+  padding: 28px 20px 40px;
+  scroll-padding-block: 24px;
+  scroll-padding-top: var(--pinned-header-height, 24px);
+}
+.page-gutter {
+  padding-inline: 20px;
+}
+@media (min-width: 640px) {
+  .page-inset {
+    --page-gutter: 28px;
+    --sticky-top: -32px;
+    padding: 32px 28px 48px;
+  }
+  .page-gutter { padding-inline: 28px; }
+}
+@media (min-width: 1024px) {
+  .page-inset {
+    --page-gutter: 40px;
+    --sticky-top: -36px;
+    padding: 36px 40px 48px;
+  }
+  .page-gutter { padding-inline: 40px; }
+}
+.enter { animation: enter 0.28s ease both; }
+
+/* ==================================================================== */
+/* Cabeçalho de página (PageHeading) e cabeçalho fixo                     */
+/* ==================================================================== */
+
+.page-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.page-heading h1 {
+  font-family: var(--ds-font-display);
+  font-size: var(--text-title);
+  font-weight: var(--ds-display-weight);
+  letter-spacing: var(--ds-display-tracking);
+  line-height: 1.3;
+  margin: 0;
+}
+.page-heading p {
+  margin: 7px 0 0;
+  max-width: var(--reading-max);
+  font-size: var(--text-body);
+  line-height: 1.65;
+  color: var(--ds-muted);
+}
+.page-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.page-heading-compact h2 {
+  font-family: var(--ds-font-display);
+  font-size: var(--text-section);
+  font-weight: var(--ds-display-weight);
+  letter-spacing: var(--tracking-title);
+  margin: 0;
+}
+.page-heading-compact p {
+  margin-top: 5px;
+  font-size: var(--text-control);
+}
+.page-heading-crumbs {
+  display: flex;
+  flex-basis: 100%;
+  font-size: var(--text-caption);
+}
+
+/* Cabeçalho que gruda no topo da área rolável e compacta quando gruda.
+   O fundo se estende pelas margens (::before) e ganha uma linha (::after). */
+.sticky-page-header {
+  position: sticky;
+  top: var(--sticky-top, 0px);
+  z-index: var(--z-sticky);
+  background: var(--ds-page);
+}
+.sticky-page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(-1 * var(--page-gutter, 0px));
+  z-index: -1;
+  background: var(--ds-page);
+}
+.sticky-page-header[data-stuck] {
+  padding-block: 12px;
+  row-gap: 8px;
+}
+.sticky-page-header[data-stuck]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  inset-inline: calc(-1 * var(--page-gutter, 0px));
+  height: 1px;
+  background: var(--ds-line);
+}
+.sticky-page-header[data-stuck] [data-header-description] { display: none; }
+.sticky-page-header[data-stuck] h1 { font-size: 20px; }
+
+@media (max-width: 639.98px) {
+  .page-heading h1 { font-size: 23px; }
+  .page-heading-actions { gap: 8px; }
+  .sticky-page-header[data-stuck] { gap: 8px; padding-block: 8px; }
+  .sticky-page-header[data-stuck] .page-heading-actions { gap: 6px; }
+}
+
+/* Barra de contexto de uma página de registro (ciclo, tarefa, reunião). */
+.context-bar { --page-gutter: 0px; }
+.context-bar[data-stuck] { padding-block: 0; }
+.context-bar[data-stuck]::after { display: none; }
+
+/* ==================================================================== */
+/* Cabeçalho de entidade (EntityHeader): identidade + abas, compacta ao rolar */
+/* ==================================================================== */
+
+.entity-header {
+  --sticky-top: 0px;
+  --page-gutter: 0px;
+  z-index: var(--z-sticky-shell);
+  transition: padding-top var(--duration-panel) ease;
+}
+.entity-header .entity-description {
+  max-height: 80px;
+  overflow: hidden;
+  transition:
+    max-height var(--duration-panel) ease,
+    opacity var(--duration-state) ease,
+    margin var(--duration-panel) ease;
+}
+.entity-header :is(.entity-avatar, .entity-title, .entity-tab, .entity-actions > a, .entity-actions > button, .entity-tabs) {
+  transition:
+    height var(--duration-panel) ease,
+    width var(--duration-panel) ease,
+    font-size var(--duration-panel) ease,
+    padding var(--duration-panel) ease,
+    margin var(--duration-panel) ease;
+}
+.entity-header[data-stuck] { padding-top: 8px; }
+.entity-header[data-stuck] .entity-crumb { display: none; }
+.entity-header[data-stuck] .entity-description {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  pointer-events: none;
+}
+.entity-header[data-stuck] .entity-title { font-size: 16px; }
+.entity-header[data-stuck] .entity-avatar {
+  height: 24px;
+  width: 24px;
+  border-radius: calc(7px * var(--ds-radius-scale));
+  font-size: 11px;
+}
+.entity-header[data-stuck] .entity-tabs { margin-top: 2px; padding-top: 0; }
+.entity-header[data-stuck] .entity-tab { padding-top: 4px; padding-bottom: 8px; }
+.entity-header[data-stuck] .entity-actions > :is(a, button) { height: 32px; }
+.entity-header[data-stuck] [data-collapse-label] { display: none; }
+.entity-tab {
+  transition:
+    color var(--duration-state) ease,
+    background-color var(--duration-state) ease;
+}
+.entity-tab:hover { background: var(--ds-soft); }
+.entity-content-enter { animation: fade-in 160ms ease; }
+
+/* ==================================================================== */
+/* Controles                                                             */
+/* ==================================================================== */
+
+.ui-button {
+  transition:
+    background-color var(--duration-state) ease,
+    box-shadow var(--duration-state) ease,
+    transform var(--duration-press) ease;
+}
+.ui-button-primary { box-shadow: var(--shadow-primary); }
+.ui-button:active:not(:disabled) { transform: translateY(1px); }
+
+.segmented-control {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--ds-line);
+  border-radius: calc(10px * var(--ds-radius-scale));
+  background: var(--ds-soft);
+}
+.segmented-control > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 5px 11px;
+  border: 1px solid transparent;
+  border-radius: calc(7px * var(--ds-radius-scale));
+  background: transparent;
+  white-space: nowrap;
+  font: inherit;
+  font-size: var(--text-caption);
+  line-height: 18px;
+  color: var(--ds-muted);
+  transition:
+    background-color var(--duration-state) ease,
+    color var(--duration-state) ease,
+    box-shadow var(--duration-state) ease;
+}
+.segmented-control > button[aria-pressed="true"] {
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  border-color: var(--ds-line);
+  box-shadow: var(--shadow-pressed);
+  font-weight: 500;
+}
+.segmented-control > button:hover { color: var(--ds-ink); }
+@media (max-width: 639.98px) {
+  .segmented-control > button { min-height: 34px; }
+  /* Em telas pequenas, controles de exibição viram só ícone. */
+  .display-controls .segmented-control > button {
+    min-width: 34px;
+    gap: 0;
+    padding-inline: 9px;
+    font-size: 0;
+  }
+  .display-controls .segmented-control > button svg { width: 14px; height: 14px; }
+}
+@media (min-width: 640px) {
+  .table-search { flex: 0 1 310px; min-width: 230px; }
+}
+
+/* Botão de ícone quadrado para canvas / mapas. */
+.map-control {
+  display: inline-flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(8px * var(--ds-radius-scale));
+  color: var(--ds-muted);
+}
+.map-control:hover:not(:disabled) { background: var(--ds-soft); color: var(--ds-ink); }
+.map-control:disabled { opacity: 0.28; cursor: default; }
+
+/* ==================================================================== */
+/* Superfícies                                                           */
+/* ==================================================================== */
+
+.surface-card {
+  box-shadow: var(--shadow-surface);
+  transition:
+    border-color var(--duration-state) ease,
+    box-shadow var(--duration-state) ease,
+    background-color var(--duration-state) ease;
+}
+.surface-interactive:hover { box-shadow: var(--shadow-raised); }
+.metric-panel { box-shadow: var(--shadow-surface); }
+
+/* Card com um destino principal e ações secundárias independentes:
+   o link principal estica sobre o card; botões internos ficam por cima. */
+.linked-card { position: relative; isolation: isolate; }
+.linked-card .card-primary-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+}
+.linked-card :is(a:not(.card-primary-link), button, input, select, textarea, summary) {
+  position: relative;
+  z-index: 1;
+}
+.linked-card:has(.card-primary-link:focus-visible) {
+  outline: 2px solid var(--ds-muted);
+  outline-offset: -2px;
+}
+.linked-card .card-primary-link:focus-visible { outline: none; }
+
+.kanban-task:focus-visible { outline: 2px solid var(--ds-muted); outline-offset: -2px; }
+
+/* Indicador com rodapé explicativo. */
+.service-metric {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: calc(12px * var(--ds-radius-scale));
+  overflow: hidden;
+}
+.service-metric-footer {
+  border-top: 1px solid var(--ds-line);
+  background: var(--ds-soft);
+  padding: 9px 14px;
+  font-size: var(--text-meta);
+  color: var(--ds-muted);
+}
+
+/* Diálogo nativo (Drawer) e toast. */
+.app-dialog[open] .drawer-surface { animation: drawer-enter 220ms var(--ease-panel); }
+.app-dialog[open]::backdrop { animation: fade-in 180ms ease; }
+.feedback-host {
+  position: fixed;
+  z-index: var(--z-toast);
+  bottom: 24px;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%);
+}
+.feedback-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid var(--ds-line);
+  border-radius: calc(12px * var(--ds-radius-scale));
+  background: var(--ds-popover);
+  box-shadow: var(--shadow-toast);
+  font-size: var(--text-control);
+  animation: enter 180ms ease;
+}
+@media (max-width: 639.98px) {
+  .feedback-host { bottom: 16px; }
+}
+
+/* ==================================================================== */
+/* Tabela responsiva: tabela no desktop, blocos rotulados abaixo de 1024px */
+/* ==================================================================== */
+
+.responsive-table {
+  min-width: 720px;
+  line-height: 1.55;
+  border-collapse: collapse;
+}
+.responsive-table :is(th, td) { padding: 12px 16px; }
+.responsive-table th { padding-block: 10px; white-space: nowrap; }
+.responsive-table :is(th, td):first-child { padding-left: 20px; }
+.responsive-table :is(th, td):last-child { padding-right: 20px; }
+.responsive-table tbody tr + tr { border-top: 1px solid var(--ds-line); }
+@media (min-width: 1024px) {
+  .responsive-table td[data-nowrap] { white-space: nowrap; }
+}
+@media (max-width: 1023.98px) {
+  .responsive-table,
+  .responsive-table tbody { display: block; width: 100%; min-width: 0; }
+  .responsive-table thead { display: none; }
+  .responsive-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    padding: 14px 16px;
+  }
+  .responsive-table tbody td {
+    display: block;
+    min-width: 0;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .responsive-table tbody td:is(:first-child, :last-child) { padding-inline: 0; }
+  .responsive-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ds-muted);
+    font-size: var(--text-meta);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  .responsive-table td:is([data-primary], [data-wide], [data-action], [colspan]) { grid-column: 1 / -1; }
+  .responsive-table td[data-primary] { grid-row: 1; font-size: var(--text-input); }
+  .responsive-table td[data-action] { padding-top: 8px; border-top: 1px solid var(--ds-line); }
+  .responsive-table td[data-mobile-hidden] { display: none; }
+  .responsive-table .truncate { overflow: visible; white-space: normal; text-overflow: clip; }
+  /* Tabela com seleção: checkbox em coluna própria de 28px. */
+  .selectable-table tbody tr { grid-template-columns: 28px minmax(0, 1fr); }
+  .selectable-table td[data-selection] { grid-column: 1; grid-row: 1; padding-top: 1px; }
+  .selectable-table td[data-primary] { grid-column: 2; grid-row: 1; }
+  .selectable-table tbody td:not([data-selection]):not([data-primary]) { grid-column: 1 / -1; }
+}
+
+/* Mesma coleção como grade de cards (DisplayControls → Cards). */
+.collection-table[data-view="cards"] { overflow: visible; border: 0; border-radius: 0; box-shadow: none; }
+.collection-table[data-view="cards"] table { display: block; min-width: 0; }
+.collection-table[data-view="cards"] thead { display: none; }
+.collection-table[data-view="cards"] tbody {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  gap: 14px;
+}
+.collection-table[data-view="cards"] tbody tr {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 12px 16px;
+  padding: 16px;
+  border: 1px solid var(--ds-line);
+  border-radius: calc(12px * var(--ds-radius-scale));
+}
+.collection-table[data-view="cards"] tbody td {
+  display: block;
+  min-width: 0;
+  max-width: none;
+  padding: 0;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.collection-table[data-view="cards"] td:is([data-primary], [data-wide], [data-action], [colspan]) { grid-column: 1 / -1; }
+.collection-table[data-view="cards"] td[data-label]::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ds-muted);
+  font-size: var(--text-meta);
+}
+
+/* ==================================================================== */
+/* Densidade                                                             */
+/* ==================================================================== */
+
+[data-density="compact"] [data-collection-card] { padding: 12px; }
+[data-density="compact"] [data-collection-secondary] { display: none; }
+[data-density="compact"] table tbody td { padding-block: 7px; }
+[data-density="compact"] .kanban-task { padding: 9px 10px; }
+[data-density="compact"] .kanban-task [data-avatar] { height: 22px; width: 22px; font-size: 9px; }
+[data-density="compact"] .collection-table[data-view="cards"] tbody tr { gap: 8px 12px; padding: 12px; }
+@media (max-width: 1023.98px) {
+  [data-density="compact"] .responsive-table tbody tr { padding: 10px 12px; gap: 8px 12px; }
+  [data-density="compact"] .responsive-table tbody td { padding: 0; }
+}
+
+/* ==================================================================== */
+/* Timeline / container queries                                          */
+/* ==================================================================== */
+
+.timeline-item { container-type: inline-size; }
+@container (max-width: 360px) { .timeline-secondary { display: none; } }
+@container (max-width: 220px) { .timeline-progress { width: 24px; } }
+@container (max-width: 140px) { .timeline-percent, .timeline-progress { display: none; } }
+
+/* ==================================================================== */
+/* Fundos decorativos (use com parcimônia: canvas, capas, estados vazios) */
+/* ==================================================================== */
+
+/* ds-audit-ignore-start hex-color: grade clara sobre canvas escuro fixo (ai/graph) */
+.paper-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+/* ds-audit-ignore-end */
+.paper-grid-light {
+  background-color: var(--ds-soft);
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--ds-ink) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--ds-ink) 5%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ==================================================================== */
+/* DataGrid: rolagem interna, cabeçalho/rodapé fixos, colunas fixas     */
+/* ==================================================================== */
+
+.data-grid {
+  --dg-row-bg: var(--ds-surface);
+  --dg-head-bg: color-mix(in oklab, var(--ds-soft) 70%, var(--ds-surface));
+  --dg-pad-x: 12px;
+}
+.data-grid[data-density="compact"] { --dg-pad-x: 10px; }
+
+.data-grid .dg-th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 40px;
+  padding: 0 var(--dg-pad-x);
+  border-bottom: 1px solid var(--ds-line);
+  background: var(--dg-head-bg);
+  color: var(--ds-muted);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.data-grid .dg-th[data-pin] { z-index: 4; }
+.data-grid[data-scrolled-y] .dg-th { box-shadow: 0 6px 10px -8px color-mix(in oklab, var(--ds-ink) 22%, transparent); }
+
+.data-grid .dg-cell {
+  padding: 0 var(--dg-pad-x);
+  border-bottom: 1px solid var(--ds-line);
+  background: var(--dg-row-bg);
+  vertical-align: middle;
+  overflow: hidden;
+}
+.data-grid .dg-cell[data-pin] { z-index: 2; }
+
+.data-grid tr[data-row] { outline: none; }
+.data-grid tr[data-even] { --dg-row-bg: color-mix(in oklab, var(--ds-soft) 55%, var(--ds-surface)); }
+.data-grid tr[data-row]:hover { --dg-row-bg: color-mix(in oklab, var(--ds-soft) 90%, var(--ds-surface)); }
+.data-grid tr[aria-selected="true"] { --dg-row-bg: color-mix(in oklab, var(--ds-primary) 7%, var(--ds-surface)); }
+.data-grid tr[aria-selected="true"]:hover { --dg-row-bg: color-mix(in oklab, var(--ds-primary) 11%, var(--ds-surface)); }
+.data-grid tr[data-row]:focus-visible > td {
+  box-shadow: inset 0 1px 0 var(--ds-focus), inset 0 -1px 0 var(--ds-focus);
+}
+.data-grid tr[data-row]:focus-visible > td:first-child { box-shadow: inset 2px 0 0 var(--ds-focus), inset 0 1px 0 var(--ds-focus), inset 0 -1px 0 var(--ds-focus); }
+
+/* Tom de atenção: filete de 2px na primeira célula. */
+.data-grid tr[data-tone="warn"] > td:first-child { box-shadow: inset 2px 0 0 var(--ds-amber); }
+.data-grid tr[data-tone="bad"] > td:first-child { box-shadow: inset 2px 0 0 var(--ds-rose); }
+.data-grid tr[data-tone="ok"] > td:first-child { box-shadow: inset 2px 0 0 var(--ds-ok); }
+.data-grid .dg-card[data-tone="warn"] { box-shadow: inset 3px 0 0 var(--ds-amber); }
+.data-grid .dg-card[data-tone="bad"] { box-shadow: inset 3px 0 0 var(--ds-rose); }
+.data-grid .dg-card[aria-selected="true"] { border-color: color-mix(in oklab, var(--ds-primary) 40%, var(--ds-line)); background: color-mix(in oklab, var(--ds-primary) 5%, var(--ds-surface)); }
+
+.data-grid .dg-group > td {
+  --dg-row-bg: var(--ds-soft);
+  background: var(--ds-soft);
+  border-bottom: 1px solid var(--ds-line);
+}
+
+/* Rodapé de totais fixo embaixo. */
+.data-grid .dg-tf {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  height: 40px;
+  padding: 0 var(--dg-pad-x);
+  border-top: 1px solid var(--ds-line-strong);
+  background: var(--dg-head-bg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.data-grid .dg-tf[data-pin] { z-index: 4; }
+
+/* Sombra na borda das colunas fixas quando há conteúdo passando por baixo. */
+.data-grid [data-pin-edge]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  width: 10px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-state) ease;
+}
+.data-grid [data-pin-edge="left"]::after { right: -10px; background: linear-gradient(to right, color-mix(in oklab, var(--ds-ink) 10%, transparent), transparent); }
+.data-grid [data-pin-edge="right"]::after { left: -10px; background: linear-gradient(to left, color-mix(in oklab, var(--ds-ink) 10%, transparent), transparent); }
+.data-grid[data-scrolled-x] [data-pin-edge="left"]::after { opacity: 1; }
+.data-grid[data-scroll-end-x] [data-pin-edge="right"]::after { opacity: 1; }
+
+/* Redimensionar coluna. */
+.data-grid .dg-resize::before {
+  content: "";
+  position: absolute;
+  inset: 10px 3px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background-color var(--duration-state) ease;
+}
+.data-grid .dg-th:hover .dg-resize::before { background: var(--ds-line-strong); }
+.data-grid .dg-resize:hover::before,
+.data-grid .dg-resize:active::before { background: var(--ds-primary); }
+
+/* Ações rápidas: aparecem no hover/foco; sempre visíveis no toque. */
+.data-grid .dg-quick { opacity: 0; transition: opacity var(--duration-state) ease; }
+.data-grid tr[data-row]:hover .dg-quick,
+.data-grid tr[data-row]:focus-within .dg-quick,
+.data-grid tr[data-row]:focus-visible .dg-quick { opacity: 1; }
+@media (pointer: coarse) { .data-grid .dg-quick { opacity: 1; } }
+
+/* Célula editável: sublinhado discreto no hover. */
+.data-grid .dg-editable { cursor: text; }
+.data-grid tr[data-row]:hover .dg-editable [data-cell-content] {
+  text-decoration: underline dotted var(--ds-line-strong);
+  text-underline-offset: 4px;
+}
+
+/* ==================================================================== */
+/* Brilho de "trabalhando" (IA): texto com reflexo que corre. Desligado   */
+/* com prefers-reduced-motion (regra global em base.css).                 */
+/* ==================================================================== */
+@keyframes ds-shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+.ds-shimmer {
+  background: linear-gradient(90deg, currentColor 35%, color-mix(in oklab, currentColor 35%, transparent) 50%, currentColor 65%) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ds-shimmer 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-shimmer { -webkit-text-fill-color: currentColor; background: none; }
+}

@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@import "@g4os/ds/styles.css"; /* tokens, marcas (data-brand), tema escuro (data-theme), componentes; já traz os @source do DS */
+/* Opcional: componentes do shadcn/ui e 21st.dev com a cara do DS. */
+/* @import "@g4os/ds/shadcn.css"; */
+
+/* Se o Tailwind não achar as classes do DS (links de pnpm), descomente: */
+/* @source "../node_modules/@g4os/ds/src"; */
+
+/* Figtree carregada por next/font (ver app/layout.tsx). */
+:root {
+  --ds-font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Marca do cliente (opcional): só semânticos --ds-*. Gere com a skill ds-theme
+   ou em showcase › Fundamentos › Temas e marca.
+[data-brand="cliente"] { --ds-primary: #0b5cff; --ds-on-primary: #ffffff; }
+[data-brand="cliente"][data-theme="dark"] { --ds-primary: #7ea8ff; --ds-on-primary: #0a1630; }
+*/

@@ -1,0 +1,125 @@
+# @g4os/ds
+
+> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 288 componentes, gráficos SVG e 75 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+
+Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
+
+## Referência
+- [Tokens](tokens.md)
+- [Manifesto JSON](manifest.json)
+- [Renomeações entre versões](renames.json)
+
+## Componentes
+- [primitives](components/primitives.md): Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
+- [overlays](components/overlays.md): Modal, ConfirmDialog, Drawer, Popover (Base UI).
+- [forms](components/forms.md): Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
+- [navigation](components/navigation.md): Navegação: Sidebar, PageHeading, StickyHeader, Breadcrumb, ContextBar, Tabs, SegmentedControl, ActionMenu, ProductMark.
+- [collections](components/collections.md): Coleções: TableToolbar, FacetFilter, DataTable (vira cards no celular), DisplayControls, ListPanel/ListRow, Kanban.
+- [feedback](components/feedback.md): Feedback de operação: notify/Toaster, Callout, useOperation, OperationButton, OperationFeedback, Skeleton.
+- [status](components/status.md): Status de trabalho (5 estados), StatusLabel, StatusBar, HealthDot, Stepper, NextStep, Timeline.
+- [date-picker](components/date-picker.md): DatePicker (Calendar próprio do DS) e utilitários de data ISO.
+- [layout](components/layout.md): Casca: AppShell, ShellBanner, EntityHeader, ReadingColumn, SplitLayout.
+- [charts](components/charts.md): Gráficos SVG sem dependência: AreaChart, LineChart, BarChart, Sparkline, BarList, DonutChart, FunnelChart, CalendarHeatmap, ProgressRing.
+- [dashboard](components/dashboard.md): Dashboard: KpiCard, KpiGrid, Delta, ChartCard, GoalMeter, ActivityFeed, Leaderboard, CompareStat.
+- [data](components/data.md): Estado de tabela: useSort, SortHeader, useSelection, selectionColumn, BulkBar, usePagination, Pagination, PropertyList.
+- [pipeline](components/pipeline.md): Pipelines por etapa: StagePath, RecordCard.
+- [lib-text](components/lib-text.md): Texto pt-BR: normalize (busca sem acento), plural, initials.
+- [lib-format](components/lib-format.md): Formatação pt-BR: formatCurrency, formatNumber, formatPercent, formatDelta, formatCompact, formatDate, formatRelative.
+- [lib-theme](components/lib-theme.md): Tema e marca: useTheme, applyTheme, themeScript, brandPresets.
+- [lib-color](components/lib-color.md): Utilidades de cor para temas de cliente: contraste WCAG e derivação de uma marca completa (claro + escuro) a partir de 1–2 cores.
+- [theme](components/theme.md): ThemeToggle (claro/escuro/sistema).
+- [inputs](components/inputs.md): Entradas especializadas: TextField, PasswordField, NumberField, CurrencyField, MaskedField (CPF/CNPJ/CEP/telefone), OtpInput, TagInput, Slider, RadioGroup, ChoiceCards, ToggleGroup, FileDropzone, Rating, InlineEdit.
+- [charts-advanced](components/charts-advanced.md): Gráficos avançados: Treemap, WaterfallChart, ScatterChart, RadarChart, GaugeChart, BulletChart, SankeyChart, HeatmapMatrix, ComboChart, ProportionBar, GanttChart.
+- [states](components/states.md): Estados de tela e avisos: StateView e presets (404, erro, sem acesso, offline), Spinner, LoadingState, Banner, InlineMessage, AlertCard, notifyPromise.
+- [overlays-extra](components/overlays-extra.md): Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.
+- [disclosure](components/disclosure.md): Revelação progressiva: Accordion, Collapsible, TreeView, DescriptionToggle.
+- [media](components/media.md): Mídia: Carousel, SlideDeck + helpers de slide, ImageGallery, FileCard, AspectFrame.
+- [ai](components/ai.md): Padrões de IA: AskAI, mensagens de chat, SystemMessage, AgentTrace, ToolCallsSection, citações, sugestões.
+- [interactive](components/interactive.md): Interação e marketing: InputModal, AnimatedModal, LimitDialog, ImageSphere, Hero, FeatureGrid, BeforeAfter, NumberTicker.
+- [filters](components/filters.md): Filtros estruturados: FilterBar, filtros ativos, construtor campo/operador/valor, visões salvas, período, estado na URL.
+- [search](components/search.md): Busca: SearchPalette (⌘K global com escopos e prévia) e busca local de tabela ("/").
+- [charts-extra](components/charts-extra.md): Gráficos de negócio que as bibliotecas comuns não trazem prontos.
+- [charts-shapes](components/charts-shapes.md): Formas: pizza/rosca e radial.
+- [dates](components/dates.md): Datas e horários. Regras (docs/padroes/datas.md · showcase Formulários › Datas): · valor é ISO só-data ("2026-09-30"); horário "HH:MM"; nada de <input type="date"> · digitar é sempre possível (dd/mm/aaaa, "sexta", "em 3
+- [lib-dates](components/lib-dates.md): Datas só-dia em pt-BR, sem dependência.
+- [data-grid](components/data-grid.md): DataGrid: a tabela "de trabalho" do DS.
+- [ai-workspace](components/ai-workspace.md): Workspace de agente (docs: showcase › IA e interação › Workspace de agente).
+- [ai-sessions](components/ai-sessions.md): Interface agêntica de sessões (app de trabalho com agente: G4 OS desktop, Codex, T3).
+- [brand](components/brand.md): Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
+
+## Blocos
+- [ai-agent-run](blocks/ai-agent-run.md): Execução de agente (IA)
+- [ai-assistant](blocks/ai-assistant.md): Assistente sobre a tela (IA)
+- [ai-chat](blocks/ai-chat.md): Chat com histórico (IA)
+- [ai-conversation](blocks/ai-conversation.md): Conversa com aprovação (IA)
+- [ai-projects](blocks/ai-projects.md): Projetos do agente (IA)
+- [ai-sessions-empty](blocks/ai-sessions-empty.md): Nova sessão do G4 OS (IA)
+- [ai-sessions](blocks/ai-sessions.md): Sessões do G4 OS (app agêntico) (IA)
+- [ai-trace](blocks/ai-trace.md): Inspetor de execução (IA)
+- [ai-workspace](blocks/ai-workspace.md): Workspace de agente (IA)
+- [app-command-palette](blocks/app-command-palette.md): Paleta de comandos (⌘K) (Aplicação)
+- [app-error-pages](blocks/app-error-pages.md): Páginas de erro (Aplicação)
+- [app-file-manager](blocks/app-file-manager.md): Gerenciador de arquivos (Aplicação)
+- [app-filtered-list](blocks/app-filtered-list.md): Lista com filtros (desktop e celular) (Aplicação)
+- [app-global-search](blocks/app-global-search.md): Busca global (⌘K) (Aplicação)
+- [app-notifications](blocks/app-notifications.md): Central de notificações (Aplicação)
+- [app-presentation](blocks/app-presentation.md): Apresentação (QBR) (Aplicação)
+- [ats-candidate](blocks/ats-candidate.md): Perfil do candidato (ATS)
+- [ats-candidates](blocks/ats-candidates.md): Banco de talentos (ATS)
+- [ats-careers](blocks/ats-careers.md): Página de carreiras (ATS)
+- [ats-dashboard](blocks/ats-dashboard.md): Painel de recrutamento (ATS)
+- [ats-interviews](blocks/ats-interviews.md): Entrevistas (ATS)
+- [ats-job](blocks/ats-job.md): Vaga (ATS)
+- [ats-jobs](blocks/ats-jobs.md): Vagas (ATS)
+- [ats-offers](blocks/ats-offers.md): Propostas (ATS)
+- [ats-pipeline](blocks/ats-pipeline.md): Candidatos da vaga (ATS)
+- [auth-forgot-password](blocks/auth-forgot-password.md): Redefinir senha (Autenticação)
+- [auth-login](blocks/auth-login.md): Entrar (Autenticação)
+- [auth-otp](blocks/auth-otp.md): Verificar código (Autenticação)
+- [auth-signup](blocks/auth-signup.md): Criar conta (Autenticação)
+- [crm-activities](blocks/crm-activities.md): Atividades e agenda (CRM)
+- [crm-company](blocks/crm-company.md): Página da empresa (CRM)
+- [crm-contact](blocks/crm-contact.md): Página do contato (CRM)
+- [crm-contacts](blocks/crm-contacts.md): Empresas e contatos (CRM)
+- [crm-deal](blocks/crm-deal.md): Página do negócio (CRM)
+- [crm-pipeline](blocks/crm-pipeline.md): Pipeline de vendas (CRM)
+- [crm-sales-dashboard](blocks/crm-sales-dashboard.md): Painel comercial (CRM)
+- [crm-settings](blocks/crm-settings.md): Configurações do CRM (CRM)
+- [crm-team](blocks/crm-team.md): Time e metas (CRM)
+- [erp-customers](blocks/erp-customers.md): Clientes (ERP)
+- [erp-dashboard](blocks/erp-dashboard.md): Painel de operações (ERP)
+- [erp-inventory](blocks/erp-inventory.md): Estoque (ERP)
+- [erp-invoice](blocks/erp-invoice.md): Nota fiscal (NF-e) (ERP)
+- [erp-invoices](blocks/erp-invoices.md): Notas fiscais (ERP)
+- [erp-order](blocks/erp-order.md): Pedido de venda (ERP)
+- [erp-orders](blocks/erp-orders.md): Pedidos de venda (ERP)
+- [erp-product](blocks/erp-product.md): Produto (ERP)
+- [erp-purchase-requests](blocks/erp-purchase-requests.md): Requisições de compra (ERP)
+- [erp-suppliers](blocks/erp-suppliers.md): Fornecedores (ERP)
+- [fin-budget](blocks/fin-budget.md): Orçamento (Financeiro)
+- [fin-cashflow](blocks/fin-cashflow.md): Fluxo de caixa (Financeiro)
+- [fin-dashboard](blocks/fin-dashboard.md): Visão financeira (Financeiro)
+- [fin-dre](blocks/fin-dre.md): DRE gerencial (Financeiro)
+- [fin-payables](blocks/fin-payables.md): Contas a pagar (Financeiro)
+- [fin-receivables](blocks/fin-receivables.md): Contas a receber (Financeiro)
+- [fin-reconciliation](blocks/fin-reconciliation.md): Conciliação bancária (Financeiro)
+- [marketing-landing](blocks/marketing-landing.md): Landing de produto (Marketing)
+- [marketing-pricing](blocks/marketing-pricing.md): Página de preços (Marketing)
+- [onboarding-checklist](blocks/onboarding-checklist.md): Primeiros passos (Onboarding)
+- [onboarding-wizard](blocks/onboarding-wizard.md): Assistente de configuração (Onboarding)
+- [saas-analytics](blocks/saas-analytics.md): Análise de aquisição (SaaS)
+- [saas-billing](blocks/saas-billing.md): Cobrança e faturas (SaaS)
+- [saas-customer](blocks/saas-customer.md): Página da conta (SaaS)
+- [saas-customers](blocks/saas-customers.md): Lista de clientes (SaaS)
+- [saas-dashboard](blocks/saas-dashboard.md): Dashboard de produto SaaS (SaaS)
+- [saas-integrations](blocks/saas-integrations.md): Integrações (SaaS)
+- [saas-reports](blocks/saas-reports.md): Relatórios (SaaS)
+- [saas-support](blocks/saas-support.md): Central de suporte (SaaS)
+- [settings-appearance](blocks/settings-appearance.md): Aparência e marca (Configurações)
+- [settings-audit-log](blocks/settings-audit-log.md): Log de auditoria (Configurações)
+- [settings-billing](blocks/settings-billing.md): Plano e cobrança (Configurações)
+- [settings-integrations](blocks/settings-integrations.md): Integrações (Configurações)
+- [settings-notifications](blocks/settings-notifications.md): Notificações (Configurações)
+- [settings-profile](blocks/settings-profile.md): Perfil (Configurações)
+- [settings-security](blocks/settings-security.md): Segurança (Configurações)
+- [settings-team](blocks/settings-team.md): Equipe e permissões (Configurações)

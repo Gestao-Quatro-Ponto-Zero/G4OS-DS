@@ -1,0 +1,13 @@
+{
+  "$comment": "Renomeações entre versões, lidas pelo audit e pela skill ds-migrate (modo atualização). Formato: { \"<versão>\": { \"exports\": { \"Antigo\": \"Novo\" }, \"classes\": { \"bg-antigo\": \"bg-novo\" }, \"notes\": [\"…\"] } }.",
+  "0.2.0": {
+    "exports": {},
+    "classes": {
+      "bg-white": "bg-surface",
+      "bg-ink text-white": "bg-primary text-on-primary"
+    },
+    "notes": [
+      "Tokens em 3 camadas; bg-white/text-white viraram bg-surface/text-on-ink/text-on-primary para suportar tema escuro e marcas."
+    ]
+  }
+}

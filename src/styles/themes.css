@@ -1,0 +1,373 @@
+/*
+ * G4OS-DS · presets de marca
+ *
+ * Cada marca sobrescreve SÓ tokens semânticos (--ds-*). Nada de componente.
+ * Receita para um cliente novo (ou use o gerador em Fundamentos › Temas e marca):
+ *
+ *   [data-brand="cliente"] {
+ *     --ds-primary: <cor de ação>;       --ds-on-primary: <texto sobre ela, AA>;
+ *     --ds-accent: <destaque>;           --ds-accent-deep: <destaque para texto, AA>;
+ *     --ds-accent-soft: <fundo suave>;   --ds-radius-scale: 1;
+ *     --ds-font-sans: "Fonte", system-ui, sans-serif;
+ *   }
+ *   [data-brand="cliente"][data-theme="dark"] { --ds-primary: <versão clara>; --ds-on-primary: <escuro>; … }
+ *
+ * Regra: primary e on-primary precisam de contraste ≥ 4,5:1 nos dois modos.
+ */
+
+/* ---------------- Oceano: SaaS azul, cantos um pouco mais suaves ---------------- */
+[data-brand="oceano"] {
+  --ds-primary: #1554d1;
+  --ds-on-primary: #ffffff;
+  --ds-blue: #1554d1;
+  --ds-accent: #3b7bf0;
+  --ds-accent-deep: #1447b3;
+  --ds-accent-soft: #e8f0fe;
+  --ds-chart-1: #1554d1;
+  --ds-chart-2: #202124;
+  --ds-chart-3: #3fb6c9;
+  --ds-radius-scale: 1.15;
+}
+[data-brand="oceano"][data-theme="dark"] {
+  --ds-primary: #7aa7ff;
+  --ds-on-primary: #0a1630;
+  --ds-blue: #8fb5ff;
+  --ds-accent: #6d9cff;
+  --ds-accent-deep: #a9c4ff;
+  --ds-accent-soft: #13203a;
+  --ds-chart-1: #7aa7ff;
+  --ds-chart-2: #ececef;
+}
+
+/* ---------------- Floresta: agro, sustentabilidade, saúde ---------------- */
+[data-brand="floresta"] {
+  --ds-primary: #1f5f45;
+  --ds-on-primary: #ffffff;
+  --ds-accent: #c8963e;
+  --ds-accent-deep: #8a6420;
+  --ds-accent-soft: #f7efdf;
+  --ds-chart-1: #1f5f45;
+  --ds-chart-2: #202124;
+  --ds-chart-3: #c8963e;
+}
+[data-brand="floresta"][data-theme="dark"] {
+  --ds-primary: #7fcfa8;
+  --ds-on-primary: #0b1f16;
+  --ds-accent: #d9ac5e;
+  --ds-accent-deep: #e8c586;
+  --ds-accent-soft: #2c2415;
+  --ds-chart-1: #7fcfa8;
+  --ds-chart-2: #ececef;
+}
+
+/* ---------------- Vinho: jurídico, financeiro premium ---------------- */
+[data-brand="vinho"] {
+  --ds-primary: #7a1f35;
+  --ds-on-primary: #ffffff;
+  --ds-accent: #b57b4a;
+  --ds-accent-deep: #8a5a31;
+  --ds-accent-soft: #f6ece3;
+  --ds-chart-1: #7a1f35;
+  --ds-chart-3: #b57b4a;
+  --ds-radius-scale: 0.85;
+}
+[data-brand="vinho"][data-theme="dark"] {
+  --ds-primary: #f09bb0;
+  --ds-on-primary: #2a0a12;
+  --ds-accent: #d19a6b;
+  --ds-accent-deep: #e6b98f;
+  --ds-accent-soft: #2e2118;
+  --ds-chart-1: #f09bb0;
+}
+
+/* ---------------- Grafite quadrado: indústria, ERP denso ---------------- */
+[data-brand="grafite"] {
+  --ds-primary: #2b2d31;
+  --ds-accent: #6b6e76;
+  --ds-accent-deep: #484a50;
+  --ds-accent-soft: #eef0f2;
+  --ds-radius-scale: 0.4;
+  --ds-font-sans: "IBM Plex Sans", "Figtree", ui-sans-serif, system-ui, sans-serif;
+}
+[data-brand="grafite"][data-theme="dark"] {
+  --ds-accent: #8f929a;
+  --ds-accent-deep: #c5c6cc;
+  --ds-accent-soft: #26272b;
+}
+
+/* ---------------- Violeta: produto de IA, educação ---------------- */
+[data-brand="violeta"] {
+  --ds-primary: #5b3fd1;
+  --ds-on-primary: #ffffff;
+  --ds-blue: #5b3fd1;
+  --ds-accent: #8a6cf0;
+  --ds-accent-deep: #4a2fb8;
+  --ds-accent-soft: #f0ecff;
+  --ds-chart-1: #5b3fd1;
+  --ds-chart-2: #202124;
+  --ds-chart-3: #e08a3c;
+  --ds-radius-scale: 1.3;
+}
+[data-brand="violeta"][data-theme="dark"] {
+  --ds-primary: #b3a1ff;
+  --ds-on-primary: #1a1140;
+  --ds-blue: #b3a1ff;
+  --ds-accent: #9d85ff;
+  --ds-accent-deep: #c9bcff;
+  --ds-accent-soft: #221a3d;
+  --ds-chart-1: #b3a1ff;
+  --ds-chart-2: #ececef;
+}
+
+/* ==================================================================== */
+/* Sistemas completos: mudam superfícies, texto, ação, forma e tipo.      */
+/* Inspirados em referências públicas, adaptados à estrutura do DS.       */
+/* ==================================================================== */
+
+/* ---------------- Pergaminho (ref.: Anthropic): marfim, serifa nos títulos,
+   argila como ÚNICA cor de ação, sem sombra, cartões mais arredondados. ---- */
+[data-brand="pergaminho"] {
+  --ds-page: #f0eee6;
+  --ds-surface: #faf9f5;
+  --ds-popover: #faf9f5;
+  --ds-soft: #e8e6dc;
+  --ds-rail: #ebe9e0;
+  --ds-ink: #141413;
+  --ds-ink-soft: #3d3d3a;
+  --ds-muted: #6b6a64;
+  --ds-line: #dedcd4;
+  --ds-line-strong: #cccbc8;
+  --ds-on-ink: #faf9f5;
+  --ds-primary: #b85a3a; /* argila escurecida: 4,1:1 sobre o marfim, texto branco 4,9:1 */
+  --ds-on-primary: #ffffff;
+  --ds-blue: #9a4a2c;
+  --ds-accent: #d97757;
+  --ds-accent-deep: #9a4a2c;
+  --ds-accent-soft: #f5e3c7;
+  --ds-chart-1: #141413;
+  --ds-chart-2: #d97757;
+  --ds-chart-3: #b0aea5;
+  --ds-chart-4: #9a4a2c;
+  --ds-chart-grid: #e6e3da;
+  --ds-shadow-surface: none;
+  --ds-shadow-raised: none;
+  --ds-shadow-pressed: none;
+  --ds-shadow-primary: none;
+  --ds-radius-scale: 1.4;
+  --ds-font-sans: "Inter", system-ui, sans-serif;
+  --ds-font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --ds-display-weight: 400;
+  --ds-display-tracking: -0.01em;
+}
+[data-brand="pergaminho"][data-theme="dark"] {
+  --ds-page: #1a1916;
+  --ds-surface: #22211e;
+  --ds-popover: #2a2926;
+  --ds-soft: #2c2b27;
+  --ds-rail: #1d1c19;
+  --ds-ink: #f0eee6;
+  --ds-ink-soft: #cfccc2;
+  --ds-muted: #a3a097;
+  --ds-line: #34322d;
+  --ds-line-strong: #45433d;
+  --ds-on-ink: #141413;
+  --ds-primary: #e08a6a;
+  --ds-on-primary: #141413;
+  --ds-blue: #eba88c;
+  --ds-accent: #e08a6a;
+  --ds-accent-deep: #eba88c;
+  --ds-accent-soft: #3a2a20;
+  --ds-chart-1: #f0eee6;
+  --ds-chart-2: #e08a6a;
+  --ds-chart-grid: #2c2b27;
+}
+
+/* ---------------- Ledger (ref.: Stripe): branco puro, tinta azul-marinho,
+   índigo na ação, cantos de 4px, títulos leves e apertados, sem sombra. ---- */
+[data-brand="ledger"] {
+  --ds-page: #ffffff;
+  --ds-surface: #ffffff;
+  --ds-popover: #ffffff;
+  --ds-soft: #f8fafd;
+  --ds-rail: #f8fafd;
+  --ds-ink: #061b31;
+  --ds-ink-soft: #273951;
+  --ds-muted: #50617a;
+  --ds-line: #e5edf5;
+  --ds-line-strong: #d3dde9;
+  --ds-primary: #533afd;
+  --ds-on-primary: #ffffff;
+  --ds-blue: #533afd;
+  --ds-accent: #533afd;
+  --ds-accent-deep: #4330d9;
+  --ds-accent-soft: #e8e9ff;
+  --ds-chart-1: #533afd;
+  --ds-chart-2: #061b31;
+  --ds-chart-3: #7389ff;
+  --ds-chart-4: #839bc8;
+  --ds-chart-grid: #eef2f8;
+  --ds-shadow-surface: none;
+  --ds-shadow-raised: none;
+  --ds-shadow-pressed: none;
+  --ds-radius-scale: 0.5;
+  --ds-font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
+  --ds-display-weight: 300;
+  --ds-display-tracking: -0.025em;
+}
+[data-brand="ledger"][data-theme="dark"] {
+  --ds-page: #0a1424;
+  --ds-surface: #0f1b2e;
+  --ds-popover: #14233a;
+  --ds-soft: #15233a;
+  --ds-rail: #0c1729;
+  --ds-ink: #e6ecf5;
+  --ds-ink-soft: #b9c5d6;
+  --ds-muted: #8497b3;
+  --ds-line: #1e2d45;
+  --ds-line-strong: #2b3d5a;
+  --ds-on-ink: #0a1424;
+  --ds-primary: #8f7bff;
+  --ds-on-primary: #0a0a2a;
+  --ds-blue: #a99bff;
+  --ds-accent: #8f7bff;
+  --ds-accent-deep: #b3a6ff;
+  --ds-accent-soft: #1e1b4a;
+  --ds-chart-1: #8f7bff;
+  --ds-chart-2: #e6ecf5;
+  --ds-chart-grid: #17253c;
+}
+
+/* ---------------- Caderno (ref.: Notion): papel morno, azul na ação,
+   destaque marigold, títulos pesados e compactos, sombra mínima. ---------- */
+[data-brand="caderno"] {
+  --ds-page: #f6f5f4;
+  --ds-surface: #ffffff;
+  --ds-popover: #ffffff;
+  --ds-soft: #f1f0ee;
+  --ds-rail: #f7f6f3;
+  --ds-ink: #191919;
+  --ds-ink-soft: #37352f;
+  --ds-muted: #615d59;
+  --ds-line: #e9e8e5;
+  --ds-line-strong: #d9d8d4;
+  --ds-primary: #0075de;
+  --ds-on-primary: #ffffff;
+  --ds-blue: #0075de;
+  --ds-accent: #ffb110;
+  --ds-accent-deep: #8a5a00;
+  --ds-accent-soft: #fff4dc;
+  --ds-chart-1: #0075de;
+  --ds-chart-2: #191919;
+  --ds-chart-3: #ffb110;
+  --ds-chart-4: #f64932;
+  --ds-chart-5: #62aef0;
+  --ds-radius-scale: 1;
+  --ds-font-sans: "Inter", system-ui, sans-serif;
+  --ds-display-weight: 700;
+  --ds-display-tracking: -0.03em;
+}
+[data-brand="caderno"][data-theme="dark"] {
+  --ds-page: #191919;
+  --ds-surface: #202020;
+  --ds-popover: #252525;
+  --ds-soft: #2a2a2a;
+  --ds-rail: #1c1c1c;
+  --ds-ink: #e9e9e7;
+  --ds-ink-soft: #c9c8c4;
+  --ds-muted: #9b9a97;
+  --ds-line: #2f2f2f;
+  --ds-line-strong: #3d3d3d;
+  --ds-on-ink: #191919;
+  --ds-primary: #4aa3f5;
+  --ds-on-primary: #0b1a2b;
+  --ds-blue: #6db5f7;
+  --ds-accent: #ffb110;
+  --ds-accent-deep: #ffc94d;
+  --ds-accent-soft: #3a2e12;
+  --ds-chart-1: #4aa3f5;
+  --ds-chart-2: #e9e9e7;
+}
+
+/* ==================================================================== */
+/* Tipografia: eixo independente da cor. <html data-type="editorial">     */
+/* Carregue as fontes no app (next/font ou Google Fonts).                 */
+/* ==================================================================== */
+[data-type="editorial"] {
+  --ds-font-sans: "Inter", system-ui, sans-serif;
+  --ds-font-display: "Source Serif 4", Georgia, serif;
+  --ds-display-weight: 500;
+  --ds-display-tracking: -0.015em;
+}
+[data-type="tecnica"] {
+  --ds-font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --ds-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ds-display-weight: 600;
+  --ds-display-tracking: -0.02em;
+}
+[data-type="neutra"] {
+  --ds-font-sans: "Inter", system-ui, sans-serif;
+  --ds-display-weight: 650;
+  --ds-display-tracking: -0.03em;
+}
+[data-type="suave"] {
+  --ds-font-sans: "Manrope", system-ui, sans-serif;
+  --ds-display-weight: 700;
+  --ds-display-tracking: -0.025em;
+}
+
+/* ---------------- G4 Institucional: a paleta do manual de marca aplicada à
+   interface. Para apresentações, portais, materiais e marketing. Neutros
+   quentes (Warm White, Royal Silver, Light Gray, Charcoal), Navy na ação,
+   Gold no destaque. O escuro segue neutro (não navy) com Silver na ação. --- */
+[data-brand="g4-institucional"] {
+  --ds-page: var(--g4-warm-white);
+  --ds-surface: var(--g4-white);
+  --ds-popover: var(--g4-white);
+  --ds-soft: var(--g4-royal-silver);
+  --ds-rail: var(--g4-royal-silver);
+  --ds-ink: var(--g4-charcoal);
+  --ds-ink-soft: var(--g4-dark-gray);
+  --ds-muted: #6e6b67; /* Mid Gray escurecido: 5,1:1 no Warm White (o #9a9895 fica em 2,8:1) */
+  --ds-line: var(--g4-light-gray);
+  --ds-line-strong: #d6d3cf;
+  --ds-primary: var(--g4-navy-blue);
+  --ds-on-primary: var(--g4-royal-silver);
+  --ds-blue: var(--g4-scaling-blue);
+  --ds-navy: var(--g4-navy-blue);
+  --ds-accent: var(--g4-royal-gold);
+  --ds-accent-deep: #8c6a3a;
+  --ds-accent-soft: #f5eee3;
+  --ds-chart-1: var(--g4-navy-blue);
+  --ds-chart-2: var(--g4-royal-gold);
+  --ds-chart-3: var(--g4-scaling-blue);
+  --ds-chart-4: var(--g4-ground-clay);
+  --ds-chart-5: var(--g4-mid-gray);
+  --ds-chart-grid: #efedea;
+}
+[data-brand="g4-institucional"][data-theme="dark"] {
+  --ds-page: #121110;
+  --ds-surface: #1a1917;
+  --ds-popover: #22201e;
+  --ds-soft: #24221f;
+  --ds-rail: #161513;
+  --ds-ink: var(--g4-royal-silver);
+  --ds-ink-soft: #cfccc7;
+  --ds-muted: #a29f9a;
+  --ds-line: #2e2c29;
+  --ds-line-strong: #403d39;
+  --ds-on-ink: #121110;
+  --ds-primary: var(--g4-royal-silver);
+  --ds-on-primary: var(--g4-navy-blue);
+  --ds-blue: #90b8d4;
+  --ds-accent: #c9a46f;
+  --ds-accent-deep: #dcbd8e;
+  --ds-accent-soft: #2e2619;
+  /* Semânticas do manual de marca (texto sobre escuro) */
+  --ds-ok: #a5d6a7;
+  --ds-amber: #ffcc80;
+  --ds-rose: #ef9a9a;
+  --ds-info: #90caf9;
+  --ds-chart-1: var(--g4-royal-silver);
+  --ds-chart-2: #c9a46f;
+  --ds-chart-3: #6fa8d6;
+}

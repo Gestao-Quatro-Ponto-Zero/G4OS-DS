@@ -1,0 +1,120 @@
+/*
+ * G4OS-DS · ponte shadcn/ui (opcional)
+ *
+ * Faz componentes do shadcn/ui, do 21st.dev e de qualquer registry que siga
+ * as variáveis do shadcn herdarem a aparência G4 sem editar cada arquivo.
+ *
+ * No globals.css do app, DEPOIS dos estilos do DS:
+ *   @import "tailwindcss";
+ *   @import "@g4os/ds/styles.css";
+ *   @import "@g4os/ds/shadcn.css";
+ *
+ * NÃO cole o bloco `:root { --background: oklch(...) }` nem o
+ * `@theme inline { --color-accent: var(--accent) ... }` que o `shadcn init`
+ * gera: este arquivo substitui os dois.
+ *
+ * Colisões de nome (leia docs/guias/shadcn.md):
+ *   bg-accent  → no DS é o dourado de marca; no shadcn é o hover neutro.
+ *   bg-muted / text-muted → no DS "muted" é a cor de TEXTO secundário;
+ *                no shadcn é um FUNDO. O DS vence nas duas.
+ *   Ao colar um componente, troque:
+ *     bg-accent            → bg-soft
+ *     text-accent-foreground → text-ink
+ *     bg-muted             → bg-soft
+ *     text-muted-foreground  → text-muted   (text-muted-foreground também funciona)
+ *
+ * Tema escuro e marca: todas as variáveis abaixo apontam para os semânticos
+ * (--ds-*), então seguem <html data-theme="dark"> e [data-brand] sozinhas.
+ * A variante `dark:` do Tailwind já está ligada a data-theme (tokens.css):
+ * os `dark:` dos componentes colados funcionam. Não use a classe `.dark`.
+ */
+
+:root {
+  /* Raio base do shadcn. O DS usa 8 px em controles e 12 px em cards. */
+  --radius: 0.5rem;
+
+  --background: var(--ds-page);
+  --foreground: var(--ds-ink);
+
+  --card: var(--ds-surface);
+  --card-foreground: var(--ds-ink);
+  --popover: var(--ds-popover);
+  --popover-foreground: var(--ds-ink);
+
+  /* Ação principal = primary do DS (tinta no G4; cor da marca em [data-brand]). */
+  --primary: var(--ds-primary);
+  --primary-foreground: var(--ds-on-primary);
+
+  /* Superfícies e ações secundárias = gelo. */
+  --secondary: var(--ds-soft);
+  --secondary-foreground: var(--ds-ink);
+  --muted: var(--ds-soft);
+  --muted-foreground: var(--ds-muted);
+  --accent: var(--ds-soft);
+  --accent-foreground: var(--ds-ink);
+
+  --destructive: var(--ds-rose);
+  --destructive-foreground: var(--ds-on-ink);
+
+  --border: var(--ds-line);
+  --input: var(--ds-line);
+  /* Foco do shadcn = anel neutro, igual ao DS (nunca azul). */
+  --ring: var(--ds-focus);
+
+  /* Gráficos (shadcn charts / Recharts): mesma ordem de séries do DS. */
+  --chart-1: var(--ds-chart-1);
+  --chart-2: var(--ds-chart-2);
+  --chart-3: var(--ds-chart-3);
+  --chart-4: var(--ds-chart-4);
+  --chart-5: var(--ds-chart-5);
+
+  /* Sidebar do shadcn (blocks sidebar-*): mesmo trilho do Sidebar do DS. */
+  --sidebar: var(--ds-rail);
+  --sidebar-foreground: var(--ds-ink-soft);
+  --sidebar-primary: var(--ds-primary);
+  --sidebar-primary-foreground: var(--ds-on-primary);
+  --sidebar-accent: var(--ds-surface);
+  --sidebar-accent-foreground: var(--ds-ink);
+  --sidebar-border: var(--ds-line);
+  --sidebar-ring: var(--ds-focus);
+}
+
+/*
+ * Utilitários com os nomes do shadcn que NÃO colidem com o DS.
+ * (accent, muted, primary, popover e chart-* já existem no DS e ficam com o
+ * significado dele: bg-primary/text-on-primary, bg-popover.)
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Borda padrão do shadcn (`* { @apply border-border }`) sem o @apply. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--ds-line);
+  }
+}

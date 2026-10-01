@@ -1,0 +1,21 @@
+name: Bug
+description: Algo não funciona como deveria
+labels: [bug]
+body:
+  - type: input
+    id: componente
+    attributes: { label: Componente ou bloco, placeholder: "DataGrid, AreaChart, crm-pipeline…" }
+    validations: { required: true }
+  - type: textarea
+    id: oque
+    attributes: { label: O que acontece, description: Inclua prints (claro/escuro) se for visual. }
+    validations: { required: true }
+  - type: textarea
+    id: esperado
+    attributes: { label: O que deveria acontecer }
+  - type: textarea
+    id: reproduzir
+    attributes: { label: Como reproduzir, placeholder: "1. … 2. …" }
+  - type: input
+    id: versao
+    attributes: { label: Versão do @g4os/ds e navegador }

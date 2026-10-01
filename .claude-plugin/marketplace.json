@@ -1,0 +1,14 @@
+{
+  "name": "g4os",
+  "owner": { "name": "G4 Educação" },
+  "metadata": { "description": "Ferramentas do G4OS-DS para agentes: criar, migrar, revisar e tematizar produtos com o design system." },
+  "plugins": [
+    {
+      "name": "g4os-ds",
+      "source": "./plugin",
+      "description": "Skills para usar o G4OS-DS em qualquer projeto: g4os-ds (regras), ds-create (telas novas), ds-migrate (adaptar projeto existente), ds-review (auditar e polir), ds-theme (marca de cliente e tema escuro).",
+      "version": "0.2.0",
+      "category": "design"
+    }
+  ]
+}

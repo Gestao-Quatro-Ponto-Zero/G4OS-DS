@@ -1,0 +1,133 @@
+/**
+ * Tokens em TypeScript: espelho dos semânticos (--ds-*) de
+ * src/styles/tokens.css para uso fora do CSS (e-mail, PDF, canvas, testes).
+ * No navegador prefira `var(--color-…)`: acompanha tema escuro e marca.
+ * A fonte da verdade é o CSS; scripts/check-tokens.mjs compara os dois.
+ */
+
+/** Tema claro (padrão G4). */
+export const color = {
+  page: "#ffffff",
+  surface: "#ffffff",
+  popover: "#ffffff",
+  soft: "#f8f8f9",
+  rail: "#fbfbfc",
+  ink: "#202124",
+  inkSoft: "#484a50",
+  muted: "#6b6e76",
+  line: "#e9eaed",
+  lineStrong: "#d2d4da",
+  onInk: "#ffffff",
+  primary: "#202124",
+  onPrimary: "#ffffff",
+  navy: "#031a26",
+  brand: "#001f35",
+  onBrand: "#f5f4f3",
+  brandAccent: "#b9915b",
+  navMarker: "#b9915b",
+  blue: "#184560",
+  clay: "#842e20",
+  claySoft: "#f6e7e3",
+  founders: "#441b1b",
+  accent: "#b9915b",
+  accentDeep: "#8c6a3a",
+  accentSoft: "#f5eee3",
+  ok: "#1b5e20",
+  okSoft: "#e8f5e9",
+  amber: "#e65100",
+  amberSoft: "#fff3e0",
+  rose: "#b71c1c",
+  roseSoft: "#ffebee",
+  info: "#0d47a1",
+  infoSoft: "#e3f2fd",
+  ai: "#18181b",
+  graph: "#121214",
+  chart1: "#202124",
+  chart2: "#184560",
+  chart3: "#b9915b",
+  chart4: "#842e20",
+  chart5: "#5f7f6f",
+  chart6: "#a3a7b0",
+  chartGrid: "#eef0f2",
+} as const;
+
+/** Tema escuro ([data-theme="dark"]). */
+export const colorDark = {
+  page: "#111113",
+  surface: "#18181b",
+  popover: "#1f1f23",
+  soft: "#202024",
+  rail: "#141416",
+  ink: "#ececef",
+  inkSoft: "#c5c6cc",
+  muted: "#8f929a",
+  line: "#2a2a2f",
+  lineStrong: "#3b3c43",
+  onInk: "#121214",
+  primary: "#ececef",
+  onPrimary: "#121214",
+  navy: "#0a2130",
+  brand: "#0a2236",
+  onBrand: "#f5f4f3",
+  brandAccent: "#c9a46f",
+  navMarker: "#c9a46f",
+  blue: "#8cb8da",
+  clay: "#e59a8a",
+  claySoft: "#3a211c",
+  founders: "#c98b8b",
+  accent: "#c9a46f",
+  accentDeep: "#dcbd8e",
+  accentSoft: "#2e2619",
+  ok: "#7fd18b",
+  okSoft: "#15291a",
+  amber: "#ffb163",
+  amberSoft: "#33240f",
+  rose: "#ff8f86",
+  roseSoft: "#3a1719",
+  info: "#90b8f8",
+  infoSoft: "#14233a",
+  ai: "#0e0e10",
+  graph: "#0b0b0d",
+  chart1: "#ececef",
+  chart2: "#6fa8d6",
+  chart3: "#c9a46f",
+  chart4: "#e08d7c",
+  chart5: "#8fbfa6",
+  chart6: "#6b6e76",
+  chartGrid: "#242428",
+} as const;
+
+/** Paleta de séries em ordem de uso. A 1 é sempre o número principal. */
+export const chart = [color.chart1, color.chart2, color.chart3, color.chart4, color.chart5, color.chart6] as const;
+
+/** Status de trabalho (claro). Em componentes use statusColor (var(--color-…)). */
+export const status = {
+  queued: color.chart6,
+  active: color.blue,
+  review: color.accent,
+  done: color.ok,
+  blocked: color.rose,
+} as const;
+
+/** Escala tipográfica nomeada (px). Use a classe Tailwind `text-<nome>` ou o valor. */
+export const text = {
+  overline: 10,
+  meta: 11,
+  caption: 12,
+  label: 12.5,
+  control: 13,
+  body: 13.5,
+  input: 14,
+  value: 15,
+  section: 18,
+  record: 20,
+  metric: 22,
+  title: 25,
+} as const;
+
+export const radius = { chip: 6, control: 8, tile: 10, card: 12, shell: 16 } as const;
+export const duration = { press: 100, state: 160, toast: 180, panel: 220, page: 280 } as const;
+export const z = { stickyLocal: 15, sticky: 20, stickyShell: 30, nav: 40, floating: 50, toast: 80, backdrop: 90, modal: 95, popup: 100 } as const;
+export const layout = { contentMax: 1440, readingMax: 620, sidebar: 224, sidebarRail: 64, drawer: 500 } as const;
+export const breakpoints = { sm: 640, md: 768, lg: 1024, xl: 1280 } as const;
+export const font = { family: '"Figtree", ui-sans-serif, system-ui, sans-serif' } as const;
