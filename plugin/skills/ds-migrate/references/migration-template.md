@@ -11,7 +11,7 @@
 - [ ] React 19  - [ ] Tailwind v4  - [ ] Base UI  - [ ] CSS do DS  - [ ] tema (data-theme + themeScript)  - [ ] fonte  - [ ] setLinkComponent
 
 ## Linha de base
-- `npx g4os-ds audit src --json --out ds-audit.baseline.json` → <E> erros / <W> avisos em <N> arquivos
+- `npx g4os-ds audit --no-baseline --format json --out ds-audit.json` → <E> erros / <W> avisos em <N> arquivos (baseline em `.g4os-ds-baseline.json`)
 
 ## Telas (ordem de migração)
 | # | Rota / arquivo | Bloco-alvo | Ocorrências antes | Depois | Estados (5) | 1440/390 · claro/escuro | Status |

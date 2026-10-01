@@ -59,6 +59,11 @@
     "./source": "./src/index.ts",
     "./ai/*": "./ai/*",
     "./llms.txt": "./ai/llms.txt",
+    "./eslint": {
+      "types": "./scripts/lint/eslint-plugin.d.mts",
+      "default": "./scripts/lint/eslint-plugin.mjs"
+    },
+    "./config.schema.json": "./scripts/lint/config.schema.json",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -76,7 +81,9 @@
     "README.md",
     "AGENTS.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "!scripts/lint/__fixtures__",
+    "!scripts/lint/test-lint.mjs"
   ],
   "bin": {
     "g4os-ds": "scripts/cli.mjs"
@@ -87,8 +94,8 @@
     "ai:build": "node scripts/build-ai-docs.mjs",
     "ai:check": "node scripts/build-ai-docs.mjs --check",
     "audit": "node scripts/cli.mjs audit",
-    "audit:self": "node scripts/cli.mjs audit src templates",
-    "check": "npm run check:tokens && npm run typecheck && npm run ai:check && npm run audit:self && npm run test:mcp",
+    "audit:self": "node scripts/cli.mjs audit",
+    "check": "npm run check:tokens && npm run typecheck && npm run lint && npm run ai:check && npm run audit:self && npm run test:lint && npm run test:mcp",
     "showcase:build": "node showcase/build.mjs",
     "showcase": "npm run showcase:build && npx --yes serve showcase/dist -l 4173",
     "showcase:watch": "node showcase/build.mjs --watch",
@@ -96,27 +103,41 @@
     "prepublishOnly": "npm run check && npm run build",
     "release": "changeset publish",
     "version-packages": "changeset version && npm install --package-lock-only --silent && npm run ai:build",
-    "test:mcp": "node scripts/test-mcp.mjs"
+    "test:mcp": "node scripts/test-mcp.mjs",
+    "lint": "eslint .",
+    "test:lint": "node scripts/lint/test-lint.mjs"
   },
   "peerDependencies": {
     "@base-ui/react": "^1.8.0",
     "lucide-react": ">=1.45.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "eslint": ">=9.0.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@base-ui/react": "1.8.0",
     "@changesets/cli": "^2.31.1",
+    "@eslint/js": "^9.39.5",
     "@modelcontextprotocol/sdk": "^1.31.0",
     "@tailwindcss/cli": "4.3.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
     "lucide-react": "1.45.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "tailwindcss": "4.3.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.71.0"
   }
 }

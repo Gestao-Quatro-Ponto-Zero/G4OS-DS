@@ -208,7 +208,7 @@ function csvCell(v: GridValue) {
 export function gridToCsv<T>(rows: T[], columns: GridColumn<T>[]) {
   const cols = columns.filter((c) => c.value);
   const lines = [cols.map((c) => csvCell(c.header)).join(";"), ...rows.map((r) => cols.map((c) => csvCell(c.value!(r))).join(";"))];
-  return `﻿${lines.join("\r\n")}`;
+  return `\uFEFF${lines.join("\r\n")}`;
 }
 
 export function downloadCsv(fileName: string, csv: string) {
@@ -482,7 +482,10 @@ export function DataGrid<T>(props: DataGridProps<T>) {
     if (shiftDown.current && lastClicked.current != null) {
       const [a, b] = [lastClicked.current, index].sort((x, y) => x - y);
       const on = !selected.has(key);
-      for (let i = a; i <= b; i++) on ? next.add(visibleKeys[i]) : next.delete(visibleKeys[i]);
+      for (let i = a; i <= b; i++) {
+        if (on) next.add(visibleKeys[i]);
+        else next.delete(visibleKeys[i]);
+      }
     } else if (next.has(key)) next.delete(key);
     else next.add(key);
     lastClicked.current = index;
@@ -987,21 +990,24 @@ export function DataGrid<T>(props: DataGridProps<T>) {
             key={key}
             data-key={key}
             data-tone={tone}
-            aria-selected={selectable ? selected.has(key) : undefined}
-            className={cn("dg-card rounded-xl border border-line bg-surface p-3", onRowOpen && "cursor-pointer")}
-            onClick={(e) => {
-              if ((e.target as HTMLElement).closest("button,a,input,[role=checkbox]")) return;
-              onRowOpen?.(row);
-            }}
+            data-selected={selectable && selected.has(key) ? "" : undefined}
+            className={cn("dg-card rounded-xl border border-line bg-surface p-3", onRowOpen && "linked-card cursor-pointer")}
           >
             <div className="flex items-start gap-2.5">
               {selectable && (
-                <span className="pt-0.5" onPointerDownCapture={(e) => (shiftDown.current = e.shiftKey)}>
+                <span className="relative z-[1] pt-0.5" onPointerDownCapture={(e) => (shiftDown.current = e.shiftKey)}>
                   <Checkbox label={`Selecionar ${rowLabel(row)}`} checked={selected.has(key)} onCheckedChange={() => toggleRow(index, key)} />
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[14px] font-medium">{title && render(title)}</div>
+                {/* Abrir o registro: botão esticado sobre o card (linked-card); checkbox e ações ficam por cima. */}
+                {onRowOpen ? (
+                  <button type="button" onClick={() => onRowOpen(row)} className="card-primary-link block w-full truncate rounded-[inherit] text-left text-[14px] font-medium">
+                    {title && render(title)}
+                  </button>
+                ) : (
+                  <div className="truncate text-[14px] font-medium">{title && render(title)}</div>
+                )}
                 {subtitle && <div className="mt-0.5 truncate text-[12.5px] text-muted">{render(subtitle)}</div>}
               </div>
               {actions.length > 0 && (

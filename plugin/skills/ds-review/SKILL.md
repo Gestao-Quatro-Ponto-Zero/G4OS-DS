@@ -10,11 +10,13 @@ Aplique antes a skill **g4os-ds** (localizar `DS`, ler `DS/ai/core.md`). Escopo:
 ## 1. Automático
 
 ```bash
-npx g4os-ds audit <arquivos ou pastas> --fix-hints
+npx g4os-ds audit <arquivos ou pastas> --format markdown   # ou --changed / --since main para só o que mudou
+npx g4os-ds audit <arquivos ou pastas> --preset strict --format json   # inclui as de estilo (opcional)
 npx tsc --noEmit
+npx eslint <arquivos>                                       # se o projeto usa ESLint (plugin @g4ai/ds/eslint)
 ```
 
-Toda ocorrência `erro` vira item "Alta" do relatório (a menos que tenha `ds-audit-ignore` com motivo válido).
+Toda ocorrência `erro` vira item "Alta" do relatório; `aviso` vira "Média"; `info` vira "Baixa" (a menos que tenha `g4os-ds-disable…`/`ds-audit-ignore` com motivo válido). Cada achado traz `docs` (link da regra) e, quando existe, a troca segura (`fixable`). Se houver baseline (`.g4os-ds-baseline.json`), revise também a dívida com `--no-baseline`.
 
 ## 2. Checklist humano
 
@@ -37,4 +39,4 @@ Use `references/output-format.md`: resumo, itens por gravidade (Alta = quebra re
 
 ## 4. Corrigir (se o usuário pedir ou a instrução disser "revise e corrija")
 
-Corrija da Alta para a Baixa, sem mudar comportamento. Depois rode de novo `audit` + `tsc` e mostre antes → depois (contagens). Não marque como corrigido o que não verificou.
+Corrija da Alta para a Baixa, sem mudar comportamento: primeiro `npx g4os-ds audit <escopo> --fix` (só trocas seguras), depois o resto à mão. Rode de novo `audit` + `tsc` e mostre antes → depois (contagens). Não marque como corrigido o que não verificou.

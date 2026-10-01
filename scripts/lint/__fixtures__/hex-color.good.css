@@ -1,0 +1,3 @@
+[data-brand="acme"] { --ds-primary: #0b5cff; }
+.a { color: var(--ds-ink); mask-image: linear-gradient(#000, transparent); background: url(#x); }
+/* comentário com #ffffff não conta */

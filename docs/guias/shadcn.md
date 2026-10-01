@@ -58,7 +58,7 @@ grep -rnE "bg-accent\b|bg-muted\b|hover:bg-accent\b|hover:bg-muted\b|data-\[.*\]
 
 ## 5. Checklist depois de colar um componente
 
-- [ ] **Cores**: sem hex, sem `zinc/slate/gray/violet-*`, sem `bg-white`/`text-white`. Neutros → `bg-surface`, `bg-soft`, `border-line`, `text-muted`, `text-ink`. Primário → `bg-primary text-on-primary`. Rode `npx g4os-ds audit components/ui --fix-hints`: ele lista cada troca.
+- [ ] **Cores**: sem hex, sem `zinc/slate/gray/violet-*`, sem `bg-white`/`text-white`. Neutros → `bg-surface`, `bg-soft`, `border-line`, `text-muted`, `text-ink`. Primário → `bg-primary text-on-primary`. Rode `npx g4os-ds audit components/ui`: ele lista cada troca, e `--fix` aplica as seguras (`bg-background`→`bg-page`, `text-muted-foreground`→`text-muted`, `hover:bg-accent`→`hover:bg-soft`…).
 - [ ] **`bg-accent` / `bg-muted`** trocados (tabela acima).
 - [ ] **Raio**: controles `rounded-lg` (8 px), cards/popups `rounded-xl` (12 px), modais `rounded-2xl` (16 px). O shadcn usa `rounded-md` em botões e inputs: troque para `rounded-lg`.
 - [ ] **Tamanhos de texto**: shadcn usa `text-sm` (14 px) em quase tudo. Troque para a escala do DS: corpo/itens de menu `text-body` (13.5), rótulos `text-label` (12.5), metadados `text-caption` (12). Títulos de card `text-input font-medium` (14), não `font-semibold text-lg`.

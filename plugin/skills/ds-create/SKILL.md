@@ -47,7 +47,7 @@ Para cada coleção ou dado assíncrono, entregue:
 ## 5. Verifique
 
 ```bash
-npx g4os-ds audit <arquivos novos>   # 0 erros
+npx g4os-ds audit <arquivos novos> --fix   # aplica as trocas seguras; depois 0 erros
 npx tsc --noEmit
 ```
 

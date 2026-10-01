@@ -1,0 +1,3 @@
+/* expect 1 */
+@import "tailwindcss";
+@import "@g4ai/ds/src/styles/index.css";

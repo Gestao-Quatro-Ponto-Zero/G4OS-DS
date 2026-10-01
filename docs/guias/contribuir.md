@@ -36,7 +36,7 @@ templates/       starters de app
    - Nomes exportados únicos no pacote inteiro.
 2. Exporte em `src/index.ts` (`export * from "./components/<arquivo>"`, se for arquivo novo).
 3. Documente no showcase (abaixo).
-4. `npm run ai:build` e `npm run check` (tokens + typecheck + `ai/` em dia + auditoria).
+4. `npm run ai:build` e `npm run check` (tokens + typecheck + lint + `ai/` em dia + auditoria + testes).
 
 ## Nova página de documentação (showcase)
 
@@ -115,7 +115,9 @@ Regras de bloco:
 
 ```bash
 npm run ai:build              # regenera ai/ (props, JSDoc e exemplos Demo code= viram guia para agentes)
-npm run check                 # tokens + registry + TypeScript + ai/ em dia + g4os-ds audit do próprio DS
+npm run check                 # tokens + registry + TypeScript + ESLint + ai/ em dia + g4os-ds audit do próprio DS + testes
+npm run lint                  # ESLint (typescript-eslint, react-hooks, jsx-a11y, @g4ai/ds/eslint)
+npm run test:lint             # fixtures das regras de auditoria, plugin ESLint, init, doctor
 npm run showcase:build        # compila o site em showcase/dist
 npm run showcase:watch        # recompila a cada mudança
 python3 -m http.server 4173 -d showcase/dist   # ou: npm run showcase

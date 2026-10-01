@@ -15,6 +15,7 @@ import {
   cn,
   contrast,
   deriveBrand,
+  formatNumber,
   useTheme,
   type BrandTokens,
 } from "@g4ai/ds";
@@ -140,7 +141,7 @@ export default function Page() {
             ))}
             <label className="block">
               <span className="flex justify-between text-[12.5px] font-medium">
-                Arredondamento <span className="font-mono text-muted">×{radius.toFixed(2).replace(".", ",")}</span>
+                Arredondamento <span className="font-mono text-muted">×{formatNumber(radius, 2)}</span>
               </span>
               <input type="range" min={0} max={1.6} step={0.05} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="mt-2 w-full" aria-label="Escala de raio" />
               <span className="mt-1 flex justify-between text-[11px] text-muted">

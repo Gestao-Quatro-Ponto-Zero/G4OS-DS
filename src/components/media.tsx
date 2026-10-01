@@ -161,6 +161,8 @@ export function Carousel({
     >
       <div
         ref={trackRef}
+        role="group"
+        aria-label={`${label}: slides`}
         tabIndex={0}
         onKeyDown={onKey}
         className="flex snap-x snap-mandatory overflow-x-auto rounded-xl outline-none [scrollbar-width:none] focus-visible:ring-2 focus-visible:ring-muted/40 [&::-webkit-scrollbar]:hidden"
@@ -426,6 +428,8 @@ export function SlideDeck({
     <section
       aria-roledescription="apresentação"
       aria-label={title}
+      // section rotulada = região; focável para navegar pelos slides com as setas
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       onKeyDown={onKey}
       className={cn("flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface outline-none focus-visible:ring-2 focus-visible:ring-muted/30", className)}

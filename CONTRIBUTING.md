@@ -27,9 +27,10 @@ Requisitos: Node 20+ (o CI usa Node 24). Para testar uma mudança num app antes 
 3. Documente: todo componente novo ganha página no showcase (`showcase/pages/*.tsx`) com exemplo vivo, código, props e regras.
 4. Rode a verificação completa:
    ```bash
-   npm run check     # tokens + typecheck + referências de IA + auditoria do próprio DS
+   npm run check     # tokens + typecheck + ESLint + referências de IA + auditoria do próprio DS + testes (lint e MCP)
    npm run build     # compila dist/
    ```
+   Partes isoladas: `npm run lint` (ESLint; `npx eslint --fix .` corrige o que der), `npm run audit:self` (`g4os-ds audit` em `src/`, `templates/`, `showcase/`; `node scripts/cli.mjs audit src --fix` aplica as trocas seguras), `npm run test:lint` (regras, plugin ESLint, init, doctor), `npm run test:mcp`.
 5. Registre a mudança para o changelog:
    ```bash
    npx changeset     # escolha patch (correção), minor (novo componente/prop) ou major (quebra)
@@ -62,7 +63,9 @@ Conferir a versão publicada: `npm view @g4ai/ds version`.
 ## Padrões de código
 
 - TypeScript estrito, React 19, Base UI para comportamento, Tailwind v4 para estilo.
-- Nada de cor crua: use os tokens (`bg-surface`, `text-muted`, `bg-primary text-on-primary`…). `npm run audit:self` aponta violações.
+- Nada de cor crua: use os tokens (`bg-surface`, `text-muted`, `bg-primary text-on-primary`…). `npm run audit:self` e `npm run lint` apontam violações.
+- Exceção a uma regra só com motivo escrito: `// g4os-ds-disable-next-line <regra> -- motivo` ou `// eslint-disable-next-line <regra> -- motivo`. Regra desligada no `eslint.config.mjs` também leva o motivo ao lado.
+- Regra nova de auditoria: `scripts/lint/rules.mjs` + fixtures `bad`/`good`(/`fixed`) em `scripts/lint/__fixtures__/` + seção em [docs/guias/auditoria.md](docs/guias/auditoria.md#contribuir-com-uma-regra).
 - Textos de interface em português do Brasil, seguindo [Escrita de interface](docs/fundamentos/escrita.md).
 - Comentários explicam **por quê**, não o quê.
 

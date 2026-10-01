@@ -216,7 +216,7 @@ pi install npm:pi-mcp-adapter
 
 O pi passa a ver uma ferramenta `mcp` que dá acesso às 9 do DS. Por exemplo: `mcp({ tool: "search", args: { query: "funil" } })`.
 
-**2. Sem MCP**, que é o jeito que o pi recomenda. Aponte o agente para o guia e a CLI do pacote no `AGENTS.md` do projeto. O agente lê `node_modules/@g4ai/ds/ai/core.md` e roda `npx g4os-ds audit src --fix-hints` e `npx g4os-ds doctor` pelo bash. O snippet pronto está em [`templates/AGENTS.snippet.md`](../../templates/AGENTS.snippet.md).
+**2. Sem MCP**, que é o jeito que o pi recomenda. Aponte o agente para o guia e a CLI do pacote no `AGENTS.md` do projeto. O agente lê `node_modules/@g4ai/ds/ai/core.md` e roda `npx g4os-ds audit --changed --fix` e `npx g4os-ds doctor` pelo bash. O snippet pronto está em [`templates/AGENTS.snippet.md`](../../templates/AGENTS.snippet.md).
 
 ### Qualquer outro cliente MCP
 

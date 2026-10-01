@@ -614,6 +614,7 @@ export function JsonView({ value, maxHeight = 240, className }: { value: unknown
   }, [value]);
   return (
     <pre className={cn("m-0 overflow-auto rounded-lg border border-line bg-soft/70 p-3 font-mono text-[11.5px] leading-[1.6] text-ink-soft", className)} style={{ maxHeight }}>
+      {/* g4os-ds-disable-next-line dangerous-html -- JSON escapado (&, <, >) antes do realce */}
       <code dangerouslySetInnerHTML={{ __html: html }} />
     </pre>
   );

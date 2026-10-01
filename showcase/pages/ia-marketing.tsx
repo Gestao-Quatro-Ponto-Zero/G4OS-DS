@@ -68,10 +68,10 @@ export default function Page() {
               description="Três dias de conteúdo prático com quem opera empresas de verdade."
               actions={
                 <>
-                  <button type="button" className="inline-flex h-10 items-center rounded-lg bg-white px-4 text-[13.5px] font-medium text-navy">
+                  <button type="button" className="inline-flex h-10 items-center rounded-lg bg-on-brand px-4 text-[13.5px] font-medium text-brand">
                     Garantir vaga
                   </button>
-                  <button type="button" className="inline-flex h-10 items-center rounded-lg px-4 text-[13.5px] font-medium text-white ring-1 ring-white/30 hover:bg-white/10">
+                  <button type="button" className="inline-flex h-10 items-center rounded-lg px-4 text-[13.5px] font-medium text-on-brand ring-1 ring-on-brand/25 hover:bg-on-brand/10">
                     Programação
                   </button>
                 </>

@@ -30,10 +30,13 @@ Siga `DS/docs/guias/instalacao.md`. Resumo:
 ## Fase 2 · Inventário
 
 ```bash
-npx g4os-ds audit src --json --out ds-audit.baseline.json
+npx g4os-ds init --baseline --hook lefthook             # config, scripts ds:*, CI e pre-commit (mostra o que muda; --dry-run antes se quiser)
+npx g4os-ds audit --fix                                  # trocas seguras de uma vez (bg-white, text-gray-500, rounded-[12px], imports…)
+npx g4os-ds audit --update-baseline                      # congela a dívida restante: CI e pre-commit só falham no que é novo
+npx g4os-ds audit --no-baseline --format json --out ds-audit.json   # inventário completo para o MIGRATION.md
 ```
 
-Crie `MIGRATION.md` com o modelo de `references/migration-template.md`: telas (rotas) ordenadas por tráfego/importância, contagem de ocorrências por arquivo (do JSON), dependências de UI a remover, decisões (marca do cliente? tema escuro no lançamento?).
+Em `g4os-ds.config.json`, use `"extends": "migration"` enquanto a dívida for grande (quase tudo vira aviso) e volte a `"recommended"` no fim. Crie `MIGRATION.md` com o modelo de `references/migration-template.md`: telas (rotas) ordenadas por tráfego/importância, contagem de ocorrências por arquivo (do JSON), dependências de UI a remover, decisões (marca do cliente? tema escuro no lançamento?).
 
 ## Fase 3 · Mapear
 
@@ -46,7 +49,7 @@ Ordem: **casca** (`AppShell` + `Sidebar` + `PageHeading`) → telas de maior tr�
 Para cada página:
 1. Leia a página e o bloco-alvo. Preserve dados, rotas, handlers e testes; troque só a apresentação.
 2. Substitua componentes pelo mapeamento; aplique os cinco estados (ver **ds-create** §4); textos em pt-BR.
-3. `npx g4os-ds audit <arquivos da página>` → 0 erros. `tsc` verde.
+3. `npx g4os-ds audit <arquivos da página> --fix --no-baseline` → 0 erros. `tsc` verde. Depois `npx g4os-ds audit --update-baseline` (a dívida só encolhe).
 4. Se houver dev server: 1440/390 px, claro/escuro.
 5. Atualize `MIGRATION.md` (✓ página, ocorrências antes → depois). **Commit por página ou grupo pequeno.**
 
@@ -54,16 +57,16 @@ Não faça "busca e troca" global cega de classes: o mesmo `bg-gray-100` pode se
 
 ## Fase 5 · Fechar
 
-- `npx g4os-ds audit src` → 0 erros (avisos justificados com `// ds-audit-ignore <regra>: motivo`).
+- `npx g4os-ds audit --no-baseline` → 0 erros (avisos justificados com `// g4os-ds-disable-next-line <regra> -- motivo`); apague `.g4os-ds-baseline.json` e a chave `baseline` da config; `extends` de volta a `recommended`.
 - Remova dependências de UI antigas, CSS morto, tema antigo.
 - Opcional: marca do cliente com **ds-theme**.
 
-**Pronto quando**: doctor ✓, audit 0 erros, tsc/build/testes verdes, todas as rotas do `MIGRATION.md` marcadas, telas principais conferidas nos dois temas.
+**Pronto quando**: doctor ✓, audit 0 erros sem baseline, tsc/build/testes verdes, todas as rotas do `MIGRATION.md` marcadas, telas principais conferidas nos dois temas.
 
 ## Modo atualização (versão nova do DS)
 
 1. Veja a versão instalada (`node_modules/@g4ai/ds/package.json`) e a última (`npm view @g4ai/ds version`). Atualize com o gerenciador do projeto: `pnpm up @g4ai/ds` (ou `npm i @g4ai/ds@latest`). Leia `DS/CHANGELOG.md` entre as duas: cada entrada diz o que o app precisa fazer. Em `0.x`, um minor novo pode quebrar.
-2. Aplique `DS/ai/renames.json` (exports e classes renomeados) com busca precisa, arquivo a arquivo.
+2. `npx g4os-ds audit --fix`: a regra `deprecated-export` aplica `DS/ai/renames.json` (exports viram `Novo as Antigo`; classes trocadas). O que sobrar, troque à mão, arquivo a arquivo.
 3. `audit` + `tsc`; registre em `MIGRATION.md` (seção "Atualizações").
 
 Mais detalhes humanos: `DS/docs/guias/migracao.md`.

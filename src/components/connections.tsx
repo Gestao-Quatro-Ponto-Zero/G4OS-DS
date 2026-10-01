@@ -25,9 +25,9 @@ type IconLike = ComponentType<{ className?: string; strokeWidth?: number }>;
 /* ------------------------------------------------------------------ */
 
 const iconSizes = {
-  xs: { box: "h-5 w-5 rounded-[6px]", glyph: "h-3 w-3", text: "text-[10px]" },
+  xs: { box: "h-5 w-5 rounded-chip", glyph: "h-3 w-3", text: "text-[10px]" },
   sm: { box: "h-7 w-7 rounded-lg", glyph: "h-3.5 w-3.5", text: "text-[10.5px]" },
-  md: { box: "h-9 w-9 rounded-[10px]", glyph: "h-[18px] w-[18px]", text: "text-[12px]" },
+  md: { box: "h-9 w-9 rounded-tile", glyph: "h-[18px] w-[18px]", text: "text-[12px]" },
   lg: { box: "h-10 w-10 rounded-xl", glyph: "h-5 w-5", text: "text-[13px]" },
   xl: { box: "h-14 w-14 rounded-2xl", glyph: "h-7 w-7", text: "text-[17px]" },
 } as const;

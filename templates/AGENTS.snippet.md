@@ -14,7 +14,7 @@ Este projeto usa o **G4OS-DS** (`@g4ai/ds`). Antes de criar, editar ou revisar q
 3. Ordem: bloco pronto → composição de componentes do DS → componente com outras props → do zero com tokens.
 4. Nunca: hex, `bg-white`, `text-white`, `gray-500`/`blue-600`, `<select>` nativo, `confirm`/`alert`, `toFixed` para dinheiro. Use `bg-surface`/`bg-popover`/`text-ink`/`bg-primary text-on-primary`, `Select`, `ConfirmDialog`, `notify`, `formatCurrency`.
 5. Texto em pt-BR; cinco estados em todo dado (carregando, vazio, vazio por filtro, erro, ideal); funciona em `data-theme="dark"`.
-6. Antes de concluir: `npx g4os-ds audit <pastas alteradas>` com 0 erros e o typecheck verde.
+6. Antes de concluir: `npx g4os-ds audit --changed --fix` e depois 0 erros, typecheck verde (e `eslint` se o projeto usa o plugin `@g4ai/ds/eslint`).
 
 Pedidos comuns (o agente deve seguir o fluxo correspondente em `node_modules/@g4ai/ds/plugin/skills/`):
 - "Adapte este projeto ao G4OS-DS" → `ds-migrate/SKILL.md` (doctor → instalar → inventário com audit → migrar por página → verificar; progresso em `MIGRATION.md`).

@@ -9,7 +9,7 @@ pnpm install                 # já traz @g4ai/ds, next, react, tailwindcss
 pnpm dev
 ```
 
-Conferir: `pnpm ds:doctor` (pré-requisitos) e `pnpm ds:audit` (o que foge do DS).
+Conferir: `pnpm ds:doctor` (pré-requisitos), `pnpm ds:audit` (o que foge do DS; `pnpm ds:audit:fix` corrige o que é seguro) e `pnpm lint` (as mesmas regras no ESLint e no editor). Para CI e pre-commit: `npx g4os-ds init --hook lefthook` (cria o workflow do GitHub Actions e o hook). Guia: `node_modules/@g4ai/ds/docs/guias/auditoria.md`.
 
 | Arquivo | O que faz |
 | --- | --- |
@@ -20,6 +20,8 @@ Conferir: `pnpm ds:doctor` (pré-requisitos) e `pnpm ds:audit` (o que foge do DS
 | `app/(app)/page.tsx` | dashboard: `KpiGrid`, `ChartCard`, `AreaChart`, `BarList` |
 | `app/(app)/negocios/page.tsx` | lista com `TableToolbar` + `DataTable` + `Empty` |
 | `next.config.ts` / `postcss.config.mjs` | config vazia (o DS vem compilado) e plugin do Tailwind |
+| `g4os-ds.config.json` | regras do `g4os-ds audit` (preset, pastas, exceções) |
+| `eslint.config.mjs` | plugin `@g4ai/ds/eslint`: as mesmas regras no editor |
 
 Próximos passos: copie blocos de `node_modules/@g4ai/ds/src/blocks/` (ou do site, aba Código) para telas completas (pipeline, registro, configurações, login) e siga o `AGENTS.md` do DS.
 

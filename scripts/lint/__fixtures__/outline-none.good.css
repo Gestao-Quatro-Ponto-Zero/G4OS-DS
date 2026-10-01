@@ -1,0 +1,4 @@
+.card:has(.link:focus-visible) { outline: 2px solid var(--ds-muted); }
+.card .link:focus-visible { outline: none; }
+.field:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ds-line); }
+.row { outline: none; }

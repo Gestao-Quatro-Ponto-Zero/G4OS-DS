@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/@g4ai/ds/scripts/lint/config.schema.json",
+  "extends": "recommended",
+  "include": ["app", "lib"],
+  "exclude": [],
+  "rules": {}
+}

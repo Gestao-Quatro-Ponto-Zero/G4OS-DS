@@ -44,6 +44,7 @@ export default function Page() {
         />
       </DocSection>
 
+      {/* g4os-ds-disable shadcn-class -- tabela de/para: as classes do shadcn aparecem de propósito */}
       <DocSection title="2. Colisões: bg-accent e bg-muted" rule="No DS, accent é o dourado de marca e muted é a cor de texto cinza. O DS vence. Ao colar código do shadcn, troque:">
         <GuideTable
           head={["Classe colada", "No shadcn", "No DS", "Troque por"]}
@@ -54,6 +55,7 @@ export default function Page() {
             ["bg-muted", "fundo neutro", "cinza de texto (#6b6e76)", "bg-soft"],
             ["text-muted-foreground", "cinza de texto", "funciona via ponte", "text-muted (opcional)"],
           ]}
+          /* g4os-ds-enable */
         />
         <CodeBlock code={`grep -rnE "(hover:|data-\\[[^]]*\\]:)?bg-(accent|muted)\\b" components/ui   # encontre e troque por bg-soft`} />
       </DocSection>

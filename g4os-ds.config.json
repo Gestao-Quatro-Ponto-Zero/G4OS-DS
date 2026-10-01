@@ -1,0 +1,7 @@
+{
+  "$schema": "./scripts/lint/config.schema.json",
+  "extends": "recommended",
+  "include": ["src", "templates", "showcase"],
+  "exclude": [],
+  "rules": {}
+}

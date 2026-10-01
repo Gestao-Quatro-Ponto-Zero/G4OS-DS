@@ -21,6 +21,7 @@ Requisitos: React 19, Tailwind CSS 4, Node 20+.
 pnpm add @g4ai/ds @base-ui/react lucide-react        # ou npm i / yarn add
 pnpm add -D tailwindcss @tailwindcss/postcss         # Vite: @tailwindcss/vite
 npx g4os-ds doctor                                    # confere React, Tailwind, CSS, tema e fonte
+npx g4os-ds init                                      # auditoria contínua: config, scripts ds:*, CI (ver "Qualidade")
 ```
 
 ```css
@@ -135,11 +136,36 @@ Ferramentas: `search`, `get_component`, `list_blocks`, `get_block`, `get_guide`,
 
 Depois peça: *"Adapte este projeto ao G4OS-DS"*, *"Crie a tela de pedidos com o design system"*, *"Revise esta tela"*, *"Tema do cliente Acme, azul #0b5cff"*. Guia: [docs/guias/usar-com-ia.md](docs/guias/usar-com-ia.md) · no site: **Guias › Agentes de IA**.
 
+## Qualidade: auditoria, lint e CI
+
+As regras do DS (tokens, tipografia, acessibilidade, formatação pt-BR, imports, React) viram checagens automáticas. Um motor só, usado pelo CLI, pelo plugin ESLint, pelo CI e pela tool `audit` do MCP. Guia completo: [docs/guias/auditoria.md](docs/guias/auditoria.md).
+
+```bash
+npx g4os-ds init                      # g4os-ds.config.json + scripts ds:* + workflow de CI (--eslint, --hook lefthook, --baseline)
+npx g4os-ds doctor                    # pré-requisitos: React 19, Tailwind v4, ordem do CSS, tema, fonte, React duplicado
+npx g4os-ds audit                     # o que foge do DS, com a troca sugerida
+npx g4os-ds audit --fix               # aplica as trocas seguras (bg-white→bg-surface, rounded-[12px]→rounded-card…)
+npx g4os-ds audit --changed           # só o que mudou (--staged no pre-commit, --since origin/main no PR)
+npx g4os-ds audit --baseline          # projeto legado: só achado novo falha
+npx g4os-ds audit --format sarif      # também: pretty, json, markdown, github (anotações no PR)
+npx g4os-ds rules                     # lista as 31 regras
+```
+
+```js
+// eslint.config.mjs: as mesmas regras no editor e no `eslint .`
+import g4osDs from "@g4ai/ds/eslint";
+export default [/* …sua config */ g4osDs.configs.recommended];
+```
+
+Exit code: `0` ok · `1` achados que falham · `2` erro de uso/config. Exceção com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`.
+
 ## CLI
 
 ```bash
+npx g4os-ds init                      # prepara o projeto (config, scripts, CI)
 npx g4os-ds doctor                    # o projeto pode usar o DS?
-npx g4os-ds audit src --fix-hints     # o que foge do DS, com a troca sugerida (--json para acompanhar)
+npx g4os-ds audit [pastas]            # auditoria (--fix, --format, --changed, --baseline)
+npx g4os-ds rules                     # regras, categorias e gravidades
 npx g4os-ds guide                     # imprime o caminho do guia ai/core.md
 npx g4os-ds mcp                       # servidor MCP (stdio; --http para Streamable HTTP)
 ```
@@ -148,7 +174,7 @@ npx g4os-ds mcp                       # servidor MCP (stdio; --http para Streama
 
 ```bash
 pnpm up @g4ai/ds                      # ou npm i @g4ai/ds@latest
-npx g4os-ds audit src                 # aponta nomes antigos e o que mudou de regra
+npx g4os-ds audit --fix               # troca nomes renomeados e o que for seguro; aponta regras novas
 ```
 
 Leia o [CHANGELOG](CHANGELOG.md) entre a sua versão e a nova: cada entrada diz o que o app precisa fazer. Renomeações ficam em `ai/renames.json`; com o plugin, peça *"Atualize o @g4ai/ds e ajuste o código"* (skill `ds-migrate`, modo atualização). Seguimos [SemVer](https://semver.org/lang/pt-BR/): enquanto estivermos em `0.x`, mudança que quebra sobe o **minor** e vem com "como migrar".
@@ -221,7 +247,7 @@ Para o que o DS não tem, traga do shadcn/ui ou do 21st.dev e importe `@g4ai/ds/
 git clone https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS.git && cd G4OS-DS
 npm ci
 npm run showcase:watch                # site local em showcase/dist
-npm run check                         # tokens + tipos + ai/ em dia + auditoria (critério de pronto)
+npm run check                         # tokens + tipos + lint + ai/ em dia + auditoria + testes (critério de pronto)
 npx changeset                         # descreve a mudança: patch, minor ou major
 ```
 
@@ -231,7 +257,10 @@ Fluxo completo: [CONTRIBUTING.md](CONTRIBUTING.md) · contratos técnicos (compo
 
 | Comando | Faz |
 | --- | --- |
-| `npm run check` | tokens CSS ↔ TS + TypeScript + `ai/` em dia + auditoria do próprio DS |
+| `npm run check` | tokens CSS ↔ TS + TypeScript + ESLint + `ai/` em dia + auditoria do próprio DS + testes do lint e do MCP |
+| `npm run lint` | ESLint (typescript-eslint, hooks, jsx-a11y e o plugin `@g4ai/ds/eslint`) |
+| `npm run audit:self` | `g4os-ds audit` em `src/`, `templates/` e `showcase/` |
+| `npm run test:lint` | fixtures de cada regra, RuleTester do ESLint, config, baseline, formatos, `init` e `doctor` |
 | `npm run build` | compila `dist/` (o que vai para o npm) |
 | `npm run ai:build` | regenera `ai/` (guia para agentes) a partir do código |
 | `npm run showcase` | compila o site e serve em http://localhost:4173 |
@@ -244,7 +273,7 @@ src/           styles/ (tokens, temas, componentes, shadcn.css) · tokens/ · li
 showcase/      site de documentação (main.tsx, kit.tsx, pages/*.tsx, build.mjs → também gera llms.txt)
 docs/          fundamentos · padroes · receitas · guias
 ai/            gerado: core.md · tokens.md · components/*.md · blocks/*.md · manifest.json · llms.txt · renames.json
-scripts/       cli.mjs (g4os-ds audit | doctor | guide | mcp) · mcp.mjs · build-ai-docs.mjs · build-lib.mjs
+scripts/       cli.mjs (g4os-ds audit | doctor | init | rules | guide | mcp) · lint/ (regras, motor, formatos, plugin ESLint) · mcp.mjs · build-ai-docs.mjs
 plugin/        plugin do Claude Code (skills) · .claude-plugin/marketplace.json
 templates/     next-app (starter) · AGENTS.snippet.md
 AGENTS.md      regras obrigatórias e qual bloco usar · CHANGELOG.md  o que mudou e o que o app precisa fazer

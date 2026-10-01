@@ -39,7 +39,7 @@ export default function Page() {
           <Frame tone="dont">
             <button type="button" className="rounded-full bg-accent px-4 py-2 text-[13.5px] font-medium text-on-ink">Novo negócio</button>
             <button type="button" className="rounded-full bg-blue px-4 py-2 text-[13.5px] font-medium text-on-ink">Exportar</button>
-            <button type="button" className="rounded-full bg-clay px-4 py-2 text-[13.5px] font-medium text-white">Mais</button>
+            <button type="button" className="rounded-full bg-clay px-4 py-2 text-[13.5px] font-medium text-on-ink">Mais</button>
           </Frame>
         </div>
       </DocSection>

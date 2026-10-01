@@ -397,6 +397,7 @@ export function SearchPalette({
             )}
             <input
               ref={inputRef}
+              aria-label="Buscar"
               autoFocus
               value={query}
               onChange={(e) => {

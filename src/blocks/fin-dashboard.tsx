@@ -119,7 +119,7 @@ export default function FinDashboard() {
               <div className="flex items-center gap-2 px-3 py-2.5 text-[14px] font-medium">
                 <ArrowLeftRight className="h-4 w-4" /> Conciliação bancária
               </div>
-              <div className="space-y-4 rounded-[12px] border border-line bg-surface p-4">
+              <div className="space-y-4 rounded-card border border-line bg-surface p-4">
                 <div>
                   <div className="flex justify-between text-[13px]">
                     <span className="font-medium">Itaú · extrato de hoje</span>

@@ -7,7 +7,8 @@ O DS foi feito para ser aplicado por agentes (Claude Code, Codex, Cursor, Copilo
 | **Servidor MCP** | Busca, componentes, blocos, guias, tokens, tema de marca, audit e doctor como ferramentas, mais prompts prontos | `npx -y @g4ai/ds mcp` (stdio) · `--http` |
 | **Web** | `llms.txt`, `llms-full.txt`, `ai/` e `docs/` publicados com o site | https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt |
 | **Guia gerado** | Regras, tokens, props de cada componente e catálogo de blocos (com o conceito de cada um), em Markdown e JSON | `node_modules/@g4ai/ds/ai/` (`core.md` é a porta de entrada) |
-| **CLI** | `g4os-ds doctor` (pré-requisitos), `g4os-ds audit` (o que foge do DS), `g4os-ds mcp` | `npx g4os-ds` |
+| **CLI** | `g4os-ds doctor` (pré-requisitos), `g4os-ds audit` (o que foge do DS, `--fix`), `g4os-ds init` (CI e pre-commit), `g4os-ds mcp` | `npx g4os-ds` |
+| **ESLint** | as mesmas regras do audit no editor e no `eslint .` | `@g4ai/ds/eslint` ([auditoria](auditoria.md#eslint)) |
 | **Skills** | Fluxos prontos: `g4os-ds`, `ds-create`, `ds-migrate`, `ds-review`, `ds-theme` | plugin do Claude Code |
 
 Tudo sai da mesma fonte (o código do DS) e vem dentro do pacote: o MCP e as skills leem a versão **instalada**, então nunca ficam desatualizados em relação ao projeto.
@@ -45,7 +46,7 @@ Com o DS instalado no projeto, `npx` usa a versão de `node_modules`. Fora de um
 | `get_guide` | guias, padrões, receitas e fundamentos (sem `slug`, lista todos; aceita `core` e `tokens`) |
 | `get_tokens` | tokens semânticos, presets de marca e de tipografia |
 | `theme_from_colors` | CSS `[data-brand]` claro e escuro a partir das cores do cliente, com contraste WCAG |
-| `audit` | violações numa pasta do projeto, com a troca sugerida |
+| `audit` | violações numa pasta do projeto (mesmas regras do CLI e do ESLint), com a troca sugerida e a troca segura quando existe; `format`, `preset`, `severity`, `rule`, `changed`, `since` |
 | `doctor` | pré-requisitos do projeto (React 19, Tailwind 4, CSS, tema, fonte) |
 
 Prompts: `criar-tela`, `revisar-tela`, `adaptar-projeto`. Respostas longas vêm em partes, com o `offset` para continuar. Recursos: `g4os-ds://core`, `g4os-ds://tokens`, `g4os-ds://llms`, `g4os-ds://components/<módulo>`, `g4os-ds://blocks/<slug>`, `g4os-ds://guides/<slug>`.
@@ -92,11 +93,12 @@ Qualquer pedido de interface num projeto com `@g4ai/ds` aciona a skill base `g4o
 ## Acompanhar uma migração
 
 ```bash
-npx g4os-ds audit src --json --out ds-audit.json   # totals.errors, byRule, byFile
-npx g4os-ds audit src/app/(app)/pedidos --fix-hints   # uma página, com a troca sugerida em cada linha
+npx g4os-ds audit --format json --out ds-audit.json   # totals.errors, byCategory, byRule, byFile
+npx g4os-ds audit "src/app/(app)/pedidos"            # uma página, com a troca sugerida em cada linha
+npx g4os-ds audit --changed --fix                     # o que o agente mudou: aplica as trocas seguras
 ```
 
-Compare `totals.errors` entre commits para ver o avanço. O `MIGRATION.md` (criado pela skill) guarda antes → depois por tela. Exceções legítimas ficam no código com motivo: `// ds-audit-ignore <regra>: motivo`.
+Compare `totals.errors` entre commits para ver o avanço. O `MIGRATION.md` (criado pela skill) guarda antes → depois por tela. Exceções legítimas ficam no código com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`. Para o CI só falhar no que é novo durante a migração: `npx g4os-ds init --baseline` ([auditoria](auditoria.md)).
 
 ## Mantendo o guia em dia (quem mexe no DS)
 

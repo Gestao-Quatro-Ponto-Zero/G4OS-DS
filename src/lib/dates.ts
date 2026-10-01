@@ -479,6 +479,7 @@ export function describeTimeZone(tz = typeof Intl !== "undefined" ? Intl.DateTim
   };
   let offset = "";
   try {
+    // g4os-ds-disable-next-line number-format -- só para ler o deslocamento ("GMT-3"); não é exibido como data
     const part = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "shortOffset" }).formatToParts(new Date()).find((p) => p.type === "timeZoneName");
     offset = part?.value.replace("-", "−") ?? "";
   } catch {

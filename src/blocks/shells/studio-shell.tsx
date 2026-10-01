@@ -152,7 +152,7 @@ function StudioSidebar({ current, mobileOpen, onQuick }: { current: string; mobi
           <Menu
             label={`Workspace: Estúdio ${org.name}`}
             align="start"
-            triggerClassName="!h-9 min-w-0 flex-1 !justify-start !gap-2 !rounded-lg !bg-transparent !px-1.5 !text-[14.5px] !font-semibold !ring-0 hover:!bg-ink/[0.05]"
+            triggerClassName="!h-9 min-w-0 flex-1 !justify-start !gap-2 !rounded-lg !bg-transparent !px-1.5 !text-[15px] !font-semibold !ring-0 hover:!bg-ink/[0.05]"
             trigger={
               <>
                 <AppIcon letter="G4" color="var(--ds-accent)" size="sm" variant="soft" />

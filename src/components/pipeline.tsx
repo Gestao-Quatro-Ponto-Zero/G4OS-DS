@@ -133,7 +133,7 @@ export function RecordCard({
       }}
       onDragStart={onDragStart}
       className={cn(
-        "kanban-task surface-card w-full rounded-[10px] border bg-surface p-3 text-left",
+        "kanban-task surface-card w-full rounded-tile border bg-surface p-3 text-left",
         onOpen && "surface-interactive cursor-pointer hover:border-line-strong",
         draggable && "cursor-grab active:cursor-grabbing",
         tone === "bad" ? "border-rose/30" : tone === "warn" ? "border-amber/35" : "border-line",

@@ -260,7 +260,6 @@ export function RichTextEditor({
       highlight: !!closest("MARK"),
       alignCenter: document.queryCommandState("justifyCenter"),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -473,6 +472,7 @@ export function RichTextEditor({
         <div
           ref={ref}
           role="textbox"
+          tabIndex={0}
           aria-multiline="true"
           aria-label={label}
           contentEditable={!readOnly}

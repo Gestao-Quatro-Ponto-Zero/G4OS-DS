@@ -1,6 +1,6 @@
 # Mapeamentos para migração
 
-Decida pelo **papel** do elemento, não pela cor. Na dúvida, rode `npx g4os-ds audit <arquivo> --fix-hints`.
+Decida pelo **papel** do elemento, não pela cor. Na dúvida, rode `npx g4os-ds audit <arquivo>` (cada achado traz a troca sugerida; `--fix` aplica só as que não dependem de papel).
 
 ## Paleta do Tailwind → tokens
 

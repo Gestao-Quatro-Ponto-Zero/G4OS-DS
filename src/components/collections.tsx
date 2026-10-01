@@ -359,7 +359,7 @@ export function ListPanel({
         </h2>
         {action && <div className="ml-auto shrink-0 text-[12px] text-muted [&_a:hover]:text-ink">{action}</div>}
       </div>
-      <div className="overflow-hidden rounded-[12px] border border-line bg-surface">{children}</div>
+      <div className="overflow-hidden rounded-card border border-line bg-surface">{children}</div>
     </section>
   );
 }
@@ -606,7 +606,7 @@ export function KanbanCard({
   actions?: ReactNode;
 }) {
   return (
-    <article
+    <div
       draggable={draggable}
       role="button"
       tabIndex={0}
@@ -620,7 +620,7 @@ export function KanbanCard({
       }}
       onDragStart={onDragStart}
       className={cn(
-        "kanban-task surface-card surface-interactive w-full cursor-grab rounded-[10px] border bg-surface p-3 text-left hover:border-line-strong active:cursor-grabbing",
+        "kanban-task surface-card surface-interactive w-full cursor-grab rounded-tile border bg-surface p-3 text-left hover:border-line-strong active:cursor-grabbing",
         blocked ? "border-rose/30" : "border-line",
       )}
     >
@@ -657,7 +657,7 @@ export function KanbanCard({
           )}
         </div>
       )}
-    </article>
+    </div>
   );
 }
 

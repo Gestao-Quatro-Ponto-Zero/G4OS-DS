@@ -14,7 +14,8 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { audit } from "./ds-audit.mjs";
+import { auditSync } from "./lint/engine.mjs";
+import { format } from "./lint/format.mjs";
 import { doctor } from "./doctor.mjs";
 import { brandCss, contrast, deriveBrand } from "../plugin/skills/ds-theme/scripts/contrast.mjs";
 
@@ -118,7 +119,7 @@ const tools = {
       out.sort((a, b) => b.s - a.s);
       const lim = clamp(limit, 1, 50, 12);
       const off = clamp(offset, 0, 1e6, 0);
-      const top = out.slice(off, off + lim).map(({ s, ...r }) => r);
+      const top = out.slice(off, off + lim).map(({ s: _s, ...r }) => r);
       if (!top.length) return `Nada encontrado para "${query}"${off ? ` a partir de offset=${off}` : ""}. Tente termos mais gerais ("tabela", "gráfico", "formulário") ou list_blocks.`;
       const more = out.length > off + lim ? `\n\nMais ${out.length - off - lim} resultado(s): search ${JSON.stringify({ query, kind, limit: lim, offset: off + lim })}` : "";
       return JSON.stringify(top, null, 2) + more;
@@ -260,22 +261,50 @@ const tools = {
   audit: {
     title: "Auditar código",
     description:
-      "Audita um caminho do projeto: cores fixas, bg-white/text-white, paleta Tailwind crua, classes shadcn, <select> nativo, confirm/alert, formatação en-US, texto fora da escala. Use para medir migração e revisar telas. Prefira caminho absoluto (alguns clientes iniciam o servidor fora do projeto).",
+      "Audita um caminho do projeto com as regras do G4OS-DS (as mesmas do CLI g4os-ds audit e do plugin ESLint): tokens (cor fixa, bg-white, paleta Tailwind, shadcn, raio/sombra/z-index), tipografia, acessibilidade (botão só com ícone, img sem alt, campo sem rótulo, onClick em div), formatação pt-BR, imports internos, React. Respeita g4os-ds.config.json e a baseline. Cada achado traz regra, linha, sugestão e a troca segura quando existe (aplique com `g4os-ds audit --fix`). Prefira caminho absoluto.",
     inputSchema: {
       type: "object",
       properties: {
         path: { type: "string", description: "Pasta ou arquivo. Absoluto, ou relativo ao diretório em que o servidor foi iniciado." },
-        limit: { type: "integer", description: "Máximo de achados listados (1–200). Padrão: 60." },
-        offset: { type: "integer", description: "Pula os N primeiros achados (paginação). Padrão: 0." },
+        format: { type: "string", enum: ["json", "markdown", "sarif", "github"], description: "json (padrão, paginado), markdown (resumo legível), sarif ou github (anotações)." },
+        preset: { type: "string", enum: ["recommended", "strict", "migration"], description: "Conjunto de regras. Padrão: o da config do projeto (recommended)." },
+        severity: { type: "string", enum: ["error", "warn", "info"], description: "Gravidade mínima listada. Padrão: info (tudo)." },
+        rule: { type: "string", description: "Lista só esta regra (ex.: white-black)." },
+        changed: { type: "boolean", description: "Só arquivos alterados no git (working tree + staged + novos)." },
+        since: { type: "string", description: "Só arquivos alterados desde este ref do git (ex.: origin/main)." },
+        limit: { type: "integer", description: "Máximo de achados listados no json (1–200). Padrão: 60." },
+        offset: { type: "integer", description: "Pula os N primeiros achados (paginação do json). Padrão: 0." },
       },
       required: ["path"],
     },
-    run({ path, limit, offset }) {
+    run({ path, format: fmt = "json", preset, severity = "info", rule, changed, since, limit, offset }) {
       const lim = clamp(limit, 1, 200, 60);
       const off = clamp(offset, 0, 1e7, 0);
-      const r = audit(resolve(process.cwd(), path));
+      const r = auditSync(resolve(process.cwd(), path), { preset, changed, since });
+      const rank = { info: 1, warn: 2, error: 3 };
+      r.findings = r.findings.filter((f) => rank[f.severity] >= (rank[severity] ?? 1) && (!rule || f.rule === rule));
+      r.toolVersion = pkg.version;
+      if (fmt !== "json") return format(r, fmt, { fixHints: true });
       const next = r.findings.length > off + lim ? { next: `audit ${JSON.stringify({ path, limit: lim, offset: off + lim })}` } : {};
-      return JSON.stringify({ target: path, filesScanned: r.filesScanned, totals: r.totals, byRule: r.byRule, shown: `${Math.min(off + 1, r.findings.length)}–${Math.min(off + lim, r.findings.length)} de ${r.findings.length}`, ...next, findings: r.findings.slice(off, off + lim) }, null, 2);
+      const findings = r.findings.slice(off, off + lim).map(({ start: _s, end: _e, lineText: _l, fix, ...f }) => ({ ...f, ...(fix ? { fixable: true, replacement: fix.text } : {}) }));
+      return JSON.stringify(
+        {
+          target: path,
+          preset: r.preset,
+          config: r.config,
+          filesScanned: r.filesScanned,
+          totals: r.totals,
+          byCategory: r.byCategory,
+          byRule: r.byRule,
+          ...(r.baseline ? { baseline: r.baseline } : {}),
+          shown: `${Math.min(off + 1, r.findings.length)}–${Math.min(off + lim, r.findings.length)} de ${r.findings.length}`,
+          ...next,
+          findings,
+          ...(r.totals.fixable ? { tip: `${r.totals.fixable} achados têm troca segura: rode \`npx g4os-ds audit ${path} --fix\` no projeto.` } : {}),
+        },
+        null,
+        2,
+      );
     },
   },
 
@@ -492,9 +521,9 @@ export function createSession(notify = () => {}) {
         return r;
       }
       case "resources/list":
-        return { resources: page(resources.map(({ file, title, ...r }) => (newer(session.protocolVersion, "2025-06-18") ? { ...r, title } : { ...r, description: r.description ?? title })), params.cursor) };
+        return { resources: page(resources.map(({ file: _file, title, ...r }) => (newer(session.protocolVersion, "2025-06-18") ? { ...r, title } : { ...r, description: r.description ?? title })), params.cursor) };
       case "resources/templates/list":
-        return { resourceTemplates: page(resourceTemplates.map(({ values, title, ...t }) => (newer(session.protocolVersion, "2025-06-18") ? { ...t, title } : { ...t, description: title })), params.cursor) };
+        return { resourceTemplates: page(resourceTemplates.map(({ values: _values, title, ...t }) => (newer(session.protocolVersion, "2025-06-18") ? { ...t, title } : { ...t, description: title })), params.cursor) };
       case "resources/read": {
         if (typeof params.uri !== "string") throw new RpcError(-32602, "uri é obrigatório");
         const r = resources.find((x) => x.uri === params.uri) ?? resources.find((x) => x.uri === params.uri.replace(/\/+$/, ""));
@@ -583,7 +612,7 @@ export function startMcp() {
   });
   let buf = "";
   const flush = (line) => {
-    line = line.replace(/^﻿/, "").trim();
+    line = line.replace(/^\uFEFF/, "").trim();
     if (!line) return;
     const out = rpc.handleText(line);
     if (out) write(out);

@@ -1,0 +1,819 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/blob/main/scripts/lint/config.schema.json",
+  "title": "g4os-ds.config.json",
+  "description": "Configuração do g4os-ds audit (CLI, plugin ESLint e MCP). Docs: docs/guias/auditoria.md",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "extends": {
+      "enum": [
+        "recommended",
+        "strict",
+        "migration"
+      ],
+      "default": "recommended",
+      "description": "recommended: regras do AGENTS.md. strict: liga também as de estilo (escala de texto do Tailwind, z-index por token). migration: quase tudo vira aviso; use com baseline."
+    },
+    "include": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Pastas/arquivos auditados quando o comando não recebe caminhos. Padrão: [\".\"]."
+    },
+    "exclude": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Globs ignorados (relativos à raiz da config), ex.: \"src/legacy/**\"."
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hex-color": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Cor fixa (hex/rgb/hsl). Use o token: bg-surface, text-ink, border-line; em SVG/style, var(--ds-…)."
+        },
+        "white-black": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "bg-white / text-white / *-black. bg-surface (card), bg-popover (menu), text-on-primary (sobre primary), text-on-ink (sobre ink/rose/ok). text-white só sobre bg-navy/bg-brand."
+        },
+        "tailwind-palette": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Cor da paleta do Tailwind. Troque pelo token semântico sugerido (text-muted, border-line, bg-ok-soft…)."
+        },
+        "shadcn-class": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Classe semântica do shadcn. Troque pelo equivalente do DS (ou importe @g4ai/ds/shadcn.css e troque aos poucos)."
+        },
+        "hardcoded-dark": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "dark: trocando cor que o token já troca. Remova: bg-surface/text-ink/border-line já mudam no tema escuro. dark: só para imagem e ilustração."
+        },
+        "arbitrary-radius": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Raio arbitrário igual a um token. rounded-chip (6) · rounded-control (8) · rounded-tile (10) · rounded-card (12) · rounded-shell (16): seguem --ds-radius-scale da marca."
+        },
+        "arbitrary-shadow": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Sombra arbitrária sem token. shadow-surface · shadow-raised · shadow-popup · shadow-toast · shadow-overlay (mudam no tema escuro)."
+        },
+        "z-index": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "z-index acima da camada de popup. A pilha do DS vai até --z-popup (100). Acima disso, menus e selects ficam por baixo."
+        },
+        "z-index-token": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "z-index numérico igual a uma camada do DS. z-[var(--z-sticky)] · z-[var(--z-modal)] · z-[var(--z-popup)]…"
+        },
+        "text-size": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Tamanho de texto fora da escala. text-caption/label/control/body/input/section/title ou um px da escala (10–25, 30)."
+        },
+        "tailwind-text-scale": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Escala de texto do Tailwind (text-sm, text-lg…). Use a escala do DS: text-caption (12), text-input (14), text-section (18), text-record (20)."
+        },
+        "native-select": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<select> nativo. Select (lista curta) ou Combobox (entidades)."
+        },
+        "native-date": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<input type=\"date|datetime-local|month\">. DatePicker · DateTimePicker · MonthPicker · TimePicker."
+        },
+        "confirm-alert": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "window.confirm / alert / prompt. ConfirmDialog para confirmar; notify para avisar; Modal com campo para perguntar."
+        },
+        "deprecated-export": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Export ou classe renomeada. Troque pelo nome novo (ai/renames.json)."
+        },
+        "as-any-props": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "as any em prop de componente. Tipos do DS documentam o contrato: ajuste o dado, não silencie o tipo."
+        },
+        "icon-button-label": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Botão só com ícone sem nome acessível. IconButton label=… ou aria-label no <button>."
+        },
+        "img-alt": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<img> sem alt. alt=\"descrição\" (ou alt=\"\" se for decorativa)."
+        },
+        "field-label": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Campo sem rótulo. Envolva em FieldBlock label=… (rótulo visível) ou dê aria-label."
+        },
+        "clickable-div": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "onClick em div/span sem teclado. Use <button type=\"button\"> (ou role, tabIndex={0} e onKeyDown)."
+        },
+        "outline-none": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Foco removido sem substituto. Mantenha um foco visível: focus-visible:ring-2 ring-primary/40, ou deixe o foco global do DS."
+        },
+        "positive-tabindex": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "tabIndex positivo. Use 0 ou -1; a ordem do teclado segue o DOM."
+        },
+        "html-lang": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<html> sem lang=\"pt-BR\". <html lang=\"pt-BR\" className=\"ds-app\" data-theme=\"system\">"
+        },
+        "number-format": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Formatação fora do pt-BR. formatCurrency / formatNumber / formatPercent / formatDate de @g4ai/ds."
+        },
+        "locale-missing": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "toLocaleString/Intl sem locale. Sem locale, o formato muda com o navegador. Use os formatadores de @g4ai/ds (pt-BR)."
+        },
+        "date-format": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Formato de data fixo. formatDate / formatRelative de @g4ai/ds (dd/mm/aaaa, '12 mar', 'há 2 dias')."
+        },
+        "effect-return": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Efeito devolve algo que não é limpeza. useEffect(() => { x(); }, …): um efeito só pode devolver uma função de limpeza (Promise ou valor quebra o React)."
+        },
+        "deep-import": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Import interno do pacote. Importe de \"@g4ai/ds\" (e CSS de \"@g4ai/ds/styles.css\"): caminhos internos mudam entre versões."
+        },
+        "target-blank": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "target=\"_blank\" sem rel=\"noopener\". Adicione rel=\"noopener noreferrer\"."
+        },
+        "dangerous-html": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "dangerouslySetInnerHTML. Só com HTML gerado por você e escapado (themeScript é seguro). Conteúdo de usuário: RichTextView."
+        },
+        "icon-star-import": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "import * de \"lucide-react\". Importe só os ícones usados: import { Plus } from \"lucide-react\"."
+        }
+      }
+    },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "files",
+          "rules"
+        ],
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rules": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "hex-color": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Cor fixa (hex/rgb/hsl). Use o token: bg-surface, text-ink, border-line; em SVG/style, var(--ds-…)."
+              },
+              "white-black": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "bg-white / text-white / *-black. bg-surface (card), bg-popover (menu), text-on-primary (sobre primary), text-on-ink (sobre ink/rose/ok). text-white só sobre bg-navy/bg-brand."
+              },
+              "tailwind-palette": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Cor da paleta do Tailwind. Troque pelo token semântico sugerido (text-muted, border-line, bg-ok-soft…)."
+              },
+              "shadcn-class": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Classe semântica do shadcn. Troque pelo equivalente do DS (ou importe @g4ai/ds/shadcn.css e troque aos poucos)."
+              },
+              "hardcoded-dark": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "dark: trocando cor que o token já troca. Remova: bg-surface/text-ink/border-line já mudam no tema escuro. dark: só para imagem e ilustração."
+              },
+              "arbitrary-radius": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Raio arbitrário igual a um token. rounded-chip (6) · rounded-control (8) · rounded-tile (10) · rounded-card (12) · rounded-shell (16): seguem --ds-radius-scale da marca."
+              },
+              "arbitrary-shadow": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Sombra arbitrária sem token. shadow-surface · shadow-raised · shadow-popup · shadow-toast · shadow-overlay (mudam no tema escuro)."
+              },
+              "z-index": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "z-index acima da camada de popup. A pilha do DS vai até --z-popup (100). Acima disso, menus e selects ficam por baixo."
+              },
+              "z-index-token": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "z-index numérico igual a uma camada do DS. z-[var(--z-sticky)] · z-[var(--z-modal)] · z-[var(--z-popup)]…"
+              },
+              "text-size": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Tamanho de texto fora da escala. text-caption/label/control/body/input/section/title ou um px da escala (10–25, 30)."
+              },
+              "tailwind-text-scale": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Escala de texto do Tailwind (text-sm, text-lg…). Use a escala do DS: text-caption (12), text-input (14), text-section (18), text-record (20)."
+              },
+              "native-select": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "<select> nativo. Select (lista curta) ou Combobox (entidades)."
+              },
+              "native-date": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "<input type=\"date|datetime-local|month\">. DatePicker · DateTimePicker · MonthPicker · TimePicker."
+              },
+              "confirm-alert": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "window.confirm / alert / prompt. ConfirmDialog para confirmar; notify para avisar; Modal com campo para perguntar."
+              },
+              "deprecated-export": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Export ou classe renomeada. Troque pelo nome novo (ai/renames.json)."
+              },
+              "as-any-props": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "as any em prop de componente. Tipos do DS documentam o contrato: ajuste o dado, não silencie o tipo."
+              },
+              "icon-button-label": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Botão só com ícone sem nome acessível. IconButton label=… ou aria-label no <button>."
+              },
+              "img-alt": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "<img> sem alt. alt=\"descrição\" (ou alt=\"\" se for decorativa)."
+              },
+              "field-label": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Campo sem rótulo. Envolva em FieldBlock label=… (rótulo visível) ou dê aria-label."
+              },
+              "clickable-div": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "onClick em div/span sem teclado. Use <button type=\"button\"> (ou role, tabIndex={0} e onKeyDown)."
+              },
+              "outline-none": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Foco removido sem substituto. Mantenha um foco visível: focus-visible:ring-2 ring-primary/40, ou deixe o foco global do DS."
+              },
+              "positive-tabindex": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "tabIndex positivo. Use 0 ou -1; a ordem do teclado segue o DOM."
+              },
+              "html-lang": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "<html> sem lang=\"pt-BR\". <html lang=\"pt-BR\" className=\"ds-app\" data-theme=\"system\">"
+              },
+              "number-format": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Formatação fora do pt-BR. formatCurrency / formatNumber / formatPercent / formatDate de @g4ai/ds."
+              },
+              "locale-missing": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "toLocaleString/Intl sem locale. Sem locale, o formato muda com o navegador. Use os formatadores de @g4ai/ds (pt-BR)."
+              },
+              "date-format": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Formato de data fixo. formatDate / formatRelative de @g4ai/ds (dd/mm/aaaa, '12 mar', 'há 2 dias')."
+              },
+              "effect-return": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Efeito devolve algo que não é limpeza. useEffect(() => { x(); }, …): um efeito só pode devolver uma função de limpeza (Promise ou valor quebra o React)."
+              },
+              "deep-import": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Import interno do pacote. Importe de \"@g4ai/ds\" (e CSS de \"@g4ai/ds/styles.css\"): caminhos internos mudam entre versões."
+              },
+              "target-blank": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "target=\"_blank\" sem rel=\"noopener\". Adicione rel=\"noopener noreferrer\"."
+              },
+              "dangerous-html": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "dangerouslySetInnerHTML. Só com HTML gerado por você e escapado (themeScript é seguro). Conteúdo de usuário: RichTextView."
+              },
+              "icon-star-import": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "import * de \"lucide-react\". Importe só os ícones usados: import { Plus } from \"lucide-react\"."
+              }
+            }
+          }
+        }
+      }
+    },
+    "baseline": {
+      "type": "string",
+      "description": "Arquivo de baseline (dívida conhecida). Com ele, só achados novos falham."
+    },
+    "maxWarnings": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

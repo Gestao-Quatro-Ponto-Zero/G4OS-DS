@@ -67,7 +67,7 @@ export default function Page() {
           <Spinner size="lg" />
           <span className="mx-2 h-6 w-px bg-line" />
           <Button size="sm" disabled>
-            <Spinner size="sm" className="border-white/30 border-t-white" /> Salvando…
+            <Spinner size="sm" className="border-on-primary/30 border-t-on-primary" /> Salvando…
           </Button>
         </Demo>
         <Demo className="block p-0">

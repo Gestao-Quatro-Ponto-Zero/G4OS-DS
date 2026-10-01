@@ -219,6 +219,7 @@ export function CodeBlock({ code, maxHeight = 520, className }: { code: string; 
         {copied ? "Copiado" : "Copiar"}
       </button>
       <pre className="code-view m-0 overflow-auto p-4 pr-24 font-mono text-[12px] leading-[1.65] text-ink" style={{ maxHeight }}>
+        {/* g4os-ds-disable-next-line dangerous-html -- highlight() escapa o código antes de envolver em <span> */}
         <code dangerouslySetInnerHTML={{ __html: highlight(text) }} />
       </pre>
     </div>
@@ -392,7 +393,7 @@ function BlockConceptView({ block }: { block: BlockModule }) {
       <div className="space-y-6">
         <div>
           <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Objetivo</p>
-          <p className="m-0 text-[14.5px] leading-relaxed text-ink">{c?.goal ?? block.meta.description}</p>
+          <p className="m-0 text-[15px] leading-relaxed text-ink">{c?.goal ?? block.meta.description}</p>
         </div>
         {list("Padrões aplicados", c?.patterns)}
         {list("Quando usar e o que adaptar", c?.adapt)}

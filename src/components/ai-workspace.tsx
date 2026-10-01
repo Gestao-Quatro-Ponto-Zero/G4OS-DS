@@ -1311,7 +1311,7 @@ export function Waveform({ active, className, barClassName = "bg-rose/80", bars:
     }
     const t = setInterval(() => setBars((b) => [...b.slice(1), 0.15 + Math.random() * 0.85]), 90);
     return () => clearInterval(t);
-  }, [active]);
+  }, [active, count]);
   return (
     <span className={cn("flex h-6 flex-1 items-center gap-[3px] overflow-hidden", className)} aria-hidden>
       {bars.map((h, i) => (

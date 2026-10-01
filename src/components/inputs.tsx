@@ -1409,6 +1409,8 @@ export function Rating({
     );
   return (
     <span className={cn("inline-flex items-center gap-3", className)}>
+      {/* radiogroup é composto: o foco fica nos role="radio" (tabindex móvel), não no grupo */}
+      {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
       <span role="radiogroup" aria-label={label} className="inline-flex items-center gap-1" onMouseLeave={() => setHover(null)}>
         {items.map((i) => (
           <button

@@ -32,7 +32,9 @@ function writeRegistry() {
     let files = [];
     try {
       files = readdirSync(abs).filter((f) => /\.(tsx?|json)$/.test(f)).sort();
-    } catch {}
+    } catch {
+      /* pasta opcional */
+    }
     files.forEach((f) => support.push(`${dir}/${f}`));
   }
   support.forEach((f, i) => lines.push(`import s${i} from "../../src/blocks/${f}?raw";`));

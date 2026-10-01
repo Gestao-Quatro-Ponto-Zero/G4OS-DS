@@ -1489,6 +1489,7 @@ export function SessionDetails({
             </button>
             {notesOpen && (
               <textarea
+                aria-label="Notas da sessão"
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
                 rows={4}

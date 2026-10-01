@@ -78,7 +78,8 @@ Imports por módulo também funcionam: `@g4ai/ds/components/charts`, `@g4ai/ds/l
 
 ## Conferir
 
-- [ ] `npx g4os-ds doctor` sem itens ✗ (React 19, Tailwind v4, Base UI, CSS, tema, fonte).
+- [ ] `npx g4os-ds doctor` sem itens ✗ (React 19, Tailwind v4, Base UI, CSS e ordem dos imports, tema, fonte).
+- [ ] `npx g4os-ds init`: config da auditoria, scripts `ds:*` e workflow de CI (opcional: `--eslint`, `--hook lefthook`). Ver [auditoria](auditoria.md).
 - [ ] Um `Button` aparece em tinta escura com cantos de 8 px → CSS carregou.
 - [ ] `data-theme="dark"` no `<html>` deixa tudo escuro sem mexer em componente → tokens OK.
 - [ ] Classes como `bg-soft`, `text-muted` funcionam no seu código → tokens carregados.

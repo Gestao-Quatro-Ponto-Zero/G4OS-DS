@@ -23,6 +23,7 @@ import { cn } from "../lib/cn";
 type LinkLike = ComponentType<
   AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
 >;
+// eslint-disable-next-line jsx-a11y/anchor-has-content -- o conteúdo chega por props.children
 let LinkComponent: LinkLike = (props) => <a {...props} />;
 export function setLinkComponent(component: LinkLike) {
   LinkComponent = component;
@@ -157,14 +158,13 @@ export function EntityMark({
   return (
     <span
       className={cn(
-        "entity-avatar grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-[10px] text-[13px] font-medium",
+        "entity-avatar grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-tile text-[13px] font-medium",
         className,
       )}
       style={{ background: `color-mix(in oklab, ${tint} var(--ds-mark-bg), transparent)`, color: `color-mix(in oklab, ${tint} var(--ds-mark-text), var(--ds-ink))` }}
       aria-hidden="true"
     >
       {logo ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={logo} alt="" className="h-full w-full object-contain" />
       ) : (
         text

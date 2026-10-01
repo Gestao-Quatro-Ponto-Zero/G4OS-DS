@@ -599,7 +599,7 @@
 .data-grid tr[data-tone="ok"] > td:first-child { box-shadow: inset 2px 0 0 var(--ds-ok); }
 .data-grid .dg-card[data-tone="warn"] { box-shadow: inset 3px 0 0 var(--ds-amber); }
 .data-grid .dg-card[data-tone="bad"] { box-shadow: inset 3px 0 0 var(--ds-rose); }
-.data-grid .dg-card[aria-selected="true"] { border-color: color-mix(in oklab, var(--ds-primary) 40%, var(--ds-line)); background: color-mix(in oklab, var(--ds-primary) 5%, var(--ds-surface)); }
+.data-grid .dg-card[data-selected] { border-color: color-mix(in oklab, var(--ds-primary) 40%, var(--ds-line)); background: color-mix(in oklab, var(--ds-primary) 5%, var(--ds-surface)); }
 
 .data-grid .dg-group > td {
   --dg-row-bg: var(--ds-soft);

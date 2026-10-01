@@ -50,7 +50,7 @@ Chame essa pasta de `DS`. Se o projeto ainda não tem o pacote, instale (`pnpm a
 ## 5. Antes de dizer "pronto"
 
 ```bash
-npx g4os-ds audit <pastas alteradas>     # 0 erros
+npx g4os-ds audit --changed --fix        # só o que mudou; trocas seguras aplicadas; depois 0 erros
 npx tsc --noEmit                          # ou o typecheck do projeto
 ```
 

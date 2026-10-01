@@ -27,8 +27,13 @@ pnpm add @g4ai/ds @base-ui/react lucide-react
 ## 2. Linha de base e plano
 
 ```bash
-npx g4os-ds audit src --json --out ds-audit.baseline.json
+npx g4os-ds init --baseline --hook lefthook   # config (preset migration abaixo), scripts, CI e pre-commit
+npx g4os-ds audit --fix                        # trocas seguras de uma vez (bg-white, text-gray-500, rounded-[12px]…)
+npx g4os-ds audit --update-baseline            # congela o que sobrou: daqui em diante só achado novo falha
+npx g4os-ds audit --no-baseline --format json --out ds-audit.json   # dívida total, para acompanhar
 ```
+
+Em `g4os-ds.config.json`, comece com `"extends": "migration"` (quase tudo vira aviso) e volte para `"recommended"` quando a baseline estiver perto de zero. Detalhes em [auditoria](auditoria.md#projeto-legado-baseline). A cada tela migrada, `--update-baseline` encolhe a dívida; o CI garante que ela nunca cresce.
 
 Liste as telas por importância (tráfego, dinheiro, frequência) e, para cada uma, o bloco do DS mais parecido (`ai/blocks/`). Registre em `MIGRATION.md` (modelo em `plugin/skills/ds-migrate/references/migration-template.md`).
 
@@ -44,18 +49,18 @@ Liste as telas por importância (tráfego, dinheiro, frequência) e, para cada u
 - Preserve dados, rotas, validação e testes; troque só a apresentação.
 - Decida cada cor pelo **papel** ([mapeamentos](../../plugin/skills/ds-migrate/references/mapping.md)): o mesmo `bg-gray-100` pode ser `bg-soft` (hover) ou `bg-surface` (card). Nada de trocar em massa sem olhar.
 - Cinco estados, textos em pt-BR, números por `format*`.
-- `npx g4os-ds audit <arquivos>` → 0 erros; typecheck verde; 1440/390 px, claro/escuro.
+- `npx g4os-ds audit <arquivos> --fix` e depois → 0 erros sem baseline (`--no-baseline`); typecheck verde; 1440/390 px, claro/escuro.
 
 ## 5. Pronto
 
-`doctor` ✓ · `audit src` com 0 erros · build/testes verdes · todas as telas do `MIGRATION.md` marcadas · libs antigas removidas.
+`doctor` ✓ · `audit --no-baseline` com 0 erros (e a baseline apagada) · build/testes verdes · todas as telas do `MIGRATION.md` marcadas · libs antigas removidas.
 
 ## Atualizar de versão
 
 ```bash
 npm view @g4ai/ds version            # última publicada
 pnpm up @g4ai/ds                     # ou: npm i @g4ai/ds@latest
-npx g4os-ds audit src                # aponta nomes antigos e regras novas
+npx g4os-ds audit --fix              # troca nomes renomeados e o que for seguro; aponta regras novas
 ```
 
 1. Leia o [CHANGELOG](../../CHANGELOG.md) entre a sua versão e a nova. Cada entrada diz o que o app precisa fazer.

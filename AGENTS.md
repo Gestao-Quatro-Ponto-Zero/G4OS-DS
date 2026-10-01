@@ -9,6 +9,7 @@ Quem constrói um app **com** o DS: leia "Regras obrigatórias", "Começar um ap
 ```bash
 pnpm add @g4ai/ds @base-ui/react lucide-react && pnpm add -D tailwindcss @tailwindcss/postcss
 npx g4os-ds doctor                              # pré-requisitos
+npx g4os-ds init                                # auditoria contínua: config, scripts ds:*, CI (--eslint, --hook, --baseline)
 claude mcp add g4os-ds -- npx -y @g4ai/ds mcp   # MCP: search, get_component, get_block, get_guide, audit…
 ```
 
@@ -17,9 +18,11 @@ Guia da versão instalada: `node_modules/@g4ai/ds/ai/core.md`. Na web: https://g
 ## Comandos (neste repositório)
 
 ```bash
-npm run check            # tokens CSS↔TS + TypeScript + ai/ atualizado + auditoria do próprio DS (critério de pronto)
+npm run check            # tokens CSS↔TS + TypeScript + ESLint + ai/ atualizado + auditoria + testes (critério de pronto)
 npm run ai:build         # regenera ai/ (guia para agentes) a partir do código
-npm run audit:self       # g4os-ds audit em src/ e templates/
+npm run lint             # ESLint: typescript-eslint, react-hooks, jsx-a11y e o plugin @g4ai/ds/eslint
+npm run audit:self       # g4os-ds audit em src/, templates/ e showcase/ (--fix aplica as trocas seguras)
+npm run test:lint        # regras de auditoria (fixtures), plugin ESLint, init, doctor
 npm run showcase:build   # compila o site de documentação em showcase/dist
 npm run showcase:watch   # recompila a cada mudança
 npm run showcase         # build + servidor em localhost:4173
@@ -102,7 +105,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 7. **Início**: copie o bloco de dashboard do tipo de app; 3–5 KPIs, gráfico principal, "Precisa de você".
 8. **Listas e quadros**: copie o bloco de lista/pipeline; `TableToolbar` + `DataTable` + `useSort`/`useSelection`/`Pagination`; quadro com `KanbanBoard` + `RecordCard` quando há etapas.
 9. **Registro e formulários**: página de registro (`ContextBar` + `StagePath` + `SplitLayout` + `PropertyList`), criar/editar em `Drawer` com `useOperation`; login/onboarding/configurações pelos blocos.
-10. **Estados e verificação**: os cinco estados em cada tela, escrita revisada, teclado, 1440 e 390 px em claro e escuro, `npx g4os-ds audit src` sem violações, `npm run check` do app verde.
+10. **Estados e verificação**: os cinco estados em cada tela, escrita revisada, teclado, 1440 e 390 px em claro e escuro, `npx g4os-ds audit --fix` e depois sem erros, `npm run check` do app verde. Deixe a checagem contínua com `npx g4os-ds init` (CI + pre-commit) e, se usar ESLint, `@g4ai/ds/eslint`.
 
 ## Qual bloco usar
 
@@ -127,7 +130,7 @@ Catálogo completo com descrições no [README](README.md#blocos).
 | Tokens (CSS / TS) | `src/styles/tokens.css` (3 camadas), `src/styles/themes.css` (marcas), `src/tokens/index.ts` (`color` / `colorDark`) |
 | Tema e marca no app | `src/lib/theme.ts` (`useTheme`, `themeScript`), `ThemeToggle` |
 | Guia para IA (outros repositórios) | `ai/core.md`, `ai/components/*.md`, `ai/blocks/*.md`, plugin em `plugin/`, [usar-com-ia.md](docs/guias/usar-com-ia.md) |
-| Auditoria / pré-requisitos | `npx g4os-ds audit <pasta>`, `npx g4os-ds doctor` |
+| Auditoria / lint / pré-requisitos | `npx g4os-ds audit` (`--fix`, `--changed`, `--baseline`, `--format sarif\|github`), `npx g4os-ds doctor`, `npx g4os-ds init`, plugin `@g4ai/ds/eslint`; regras em `scripts/lint/rules.mjs`, guia em [auditoria](docs/guias/auditoria.md) |
 | Componentes | `src/components/*.tsx`, exportados por `src/index.ts` |
 | Formatação pt-BR | `src/lib/format.ts`; texto: `src/lib/text.ts` |
 | Blocos de tela | `src/blocks/*.tsx` |
@@ -146,6 +149,7 @@ Catálogo completo com descrições no [README](README.md#blocos).
 - Novo componente: arquivo da família em `src/components/`, export em `src/index.ts`, página em `showcase/pages/<slug>.tsx` (registro automático; contrato em `showcase/kit.tsx`). Ver [contribuir.md](docs/guias/contribuir.md).
 - Novo bloco: `src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order, concept } as const` e `export default function`. `concept` é obrigatório (`goal`, `patterns` começando pela anatomia, `adapt`, `avoid`) e aparece na aba Conceito do showcase. Importa só de `@g4ai/ds`; dados de exemplo no topo; realista em pt-BR.
 - Mudou token: CSS **e** TS (`color` e `colorDark`), `npm run check:tokens`, docs de fundamentos.
+- Regra de auditoria: `scripts/lint/rules.mjs` (uma fonte para CLI, ESLint e MCP), fixtures em `scripts/lint/__fixtures__/` e seção em `docs/guias/auditoria.md` (o `test:lint` cobra os três). Exceção no código só com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`.
 - Mudou export, prop ou bloco: `npm run ai:build` (o `check` falha se `ai/` estiver desatualizado). Renomeou um export: registre em `ai/renames.json` e no `CHANGELOG.md`.
 - Nomes exportados são únicos no pacote inteiro.
 - `templates/` fica fora do typecheck do DS (o DS não instala `next`).

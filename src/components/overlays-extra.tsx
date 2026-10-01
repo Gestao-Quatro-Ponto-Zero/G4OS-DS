@@ -500,6 +500,7 @@ export function CommandPalette({
           <div className="flex h-[52px] shrink-0 items-center gap-2.5 border-b border-line px-4">
             <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden />
             <input
+              aria-label="Buscar comando"
               autoFocus
               value={query}
               onChange={(e) => {
@@ -545,6 +546,8 @@ export function CommandPalette({
                   const i = idx;
                   const on = i === active;
                   return (
+                    // opção de listbox com aria-activedescendant: o foco fica no campo de busca
+                    // eslint-disable-next-line jsx-a11y/interactive-supports-focus
                     <div
                       key={`${s.group}-${c.id}`}
                       id={`cmd-${c.id}`}

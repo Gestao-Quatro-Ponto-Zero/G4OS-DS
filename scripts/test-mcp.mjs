@@ -130,6 +130,24 @@ for (const v of VERSIONS) {
   );
 }
 
+await test("audit: mesmo motor do CLI (json com fixable, markdown, filtros)", () =>
+  withStdioClient("2025-06-18", async (c) => {
+    const bad = join(root, "scripts", "lint", "__fixtures__", "white-black.bad.tsx");
+    const j = JSON.parse(text(await c.callTool({ name: "audit", arguments: { path: bad } })));
+    assert.equal(j.totals.errors, 4);
+    assert.ok(j.findings.some((f) => f.rule === "white-black" && f.fixable && f.replacement === "bg-surface" && f.docs.includes("#white-black")));
+    assert.match(j.tip, /--fix/);
+    const md = text(await c.callTool({ name: "audit", arguments: { path: bad, format: "markdown" } }));
+    assert.match(md, /# Auditoria G4OS-DS/);
+    const only = JSON.parse(text(await c.callTool({ name: "audit", arguments: { path: join(root, "scripts", "lint", "__fixtures__"), rule: "img-alt", limit: 200 } })));
+    assert.ok(only.findings.length >= 1 && only.findings.every((f) => f.rule === "img-alt"));
+    const strict = JSON.parse(text(await c.callTool({ name: "audit", arguments: { path: join(root, "scripts", "lint", "__fixtures__", "tailwind-text-scale.bad.tsx"), preset: "strict", severity: "warn" } })));
+    assert.equal(strict.findings.filter((f) => f.rule === "tailwind-text-scale").length, 2);
+    const err = await c.callTool({ name: "audit", arguments: { path: "/nao/existe" } });
+    assert.ok(err.isError);
+  }),
+);
+
 await test("erros: ferramenta/prompt desconhecidos → -32602; argumento inválido → isError", () =>
   withStdioClient("2025-06-18", async (c) => {
     await assert.rejects(c.callTool({ name: "nao_existe", arguments: {} }), (e) => e.code === -32602);
@@ -207,7 +225,7 @@ console.log("MCP · stdio cru");
 await test("CRLF, linhas vazias, pedaços parciais, BOM, lote, lixo, método desconhecido, EOF sem \\n", async () => {
   const init = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2099-01-01", capabilities: {}, clientInfo: { name: "raw", version: "0" } } });
   const { code, msgs, out } = await rawSession([
-    `﻿${init.slice(0, 30)}`,
+    `\uFEFF${init.slice(0, 30)}`,
     `${init.slice(30)}\r\n`,
     "\r\n\n   \n",
     `${JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" })}\n`,

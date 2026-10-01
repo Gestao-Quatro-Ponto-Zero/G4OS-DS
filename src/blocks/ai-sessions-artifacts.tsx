@@ -485,7 +485,7 @@ export default function AiSessionsArtifacts() {
 
   /* ---------------------------- Conversa --------------------------- */
 
-  const thread = active?.thread ?? [];
+  const thread = useMemo(() => active?.thread ?? [], [active]);
   const lastAnswerId = [...thread].reverse().find((e) => e.kind === "answer")?.id;
   const minimap: MinimapItem[] = useMemo(
     () =>
