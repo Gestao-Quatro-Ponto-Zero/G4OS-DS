@@ -19,9 +19,10 @@ export default function Page() {
           <DataGrid label="Contas" rows={rows} columns={contaColumns.map((c) => (c.key === "status" ? { ...c, pinned: "right" as const } : c))} rowKey={(r) => r.id} rowLabel={(r) => r.empresa} height={420} columnMenu={false} />
         </Demo>
       </DocSection>
-      <DocSection title="Redimensionar, ocultar e lembrar" rule="Arraste a borda do cabeçalho (clique duplo ajusta ao conteúdo). O menu Colunas mostra/oculta. Com storageKey, larguras e colunas ficam salvas por pessoa neste navegador; “Restaurar” volta ao padrão.">
+      <DocSection title="Redimensionar, mover, fixar, ocultar e lembrar" rule="Arraste a borda do cabeçalho (clique duplo ajusta ao conteúdo). A seta de cada cabeçalho (aparece no hover e no foco) ordena, move para os lados, fixa à esquerda e oculta. O menu Colunas mostra/oculta todas. Com storageKey, larguras, ordem, fixação e colunas ficam salvas por pessoa neste navegador; “Restaurar” volta ao padrão.">
         <Demo bare code={`<DataGrid storageKey="contas" … />   // localStorage: ds-grid:contas
-// coluna: { width: 160, minWidth: 80, maxWidth: 480, resizable: true, hideable: true, defaultHidden: false }`}>
+// coluna: { width: 160, minWidth: 80, maxWidth: 480, resizable: true, hideable: true, defaultHidden: false, menu: true }
+// menu do cabeçalho: Ordenar crescente/decrescente · Mover para a esquerda/direita · Fixar à esquerda · Ocultar coluna`}>
           <DataGrid label="Contas" rows={rows} columns={contaColumns} rowKey={(r) => r.id} rowLabel={(r) => r.empresa} height={360} storageKey="doc-colunas" defaultSort={{ key: "mrr", dir: "desc" }} />
         </Demo>
         <PropsTable
@@ -32,8 +33,9 @@ export default function Page() {
             ["columns[].value", "(row) => valor", "—", "Base para ordenar, exportar, copiar e destacar a busca."],
             ["columns[].tooltip", "string", "—", "Explica a métrica no cabeçalho (ícone ?)."],
             ["defaultSort · sort · onSortChange", "{ key, dir } | null", "—", "Ordenação não controlada ou controlada. manualSort para ordenar no servidor."],
-            ["storageKey", "string", "—", "Persiste larguras e colunas visíveis."],
-            ["columnMenu", "boolean", "true", "Mostra o menu Colunas."],
+            ["storageKey", "string", "—", "Persiste larguras, ordem, fixação e colunas visíveis."],
+            ["columnMenu", "boolean", "true", "Mostra o menu Colunas e o menu de cada cabeçalho."],
+            ["columns[].menu", "boolean", "true", "false tira o menu do cabeçalho daquela coluna."],
           ]}
         />
       </DocSection>

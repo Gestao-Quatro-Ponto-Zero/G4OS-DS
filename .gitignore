@@ -5,3 +5,5 @@ showcase/dist
 showcase/.generated
 dist
 .publicar.sh
+qa-report
+.eval/

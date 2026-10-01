@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber, formatPercent } from "../lib/format";
+import { useReadableFills } from "../lib/readable";
 import { BarChart, ChartLegend, ChartTooltip, chartColor, niceDomain, useElementWidth, type ChartDatum } from "./charts";
 
 /*
@@ -106,13 +107,18 @@ export function DivergingBarChart({
   scale?: string[];
   className?: string;
 }) {
+  const box = useRef<HTMLDivElement>(null);
+  useReadableFills(box, [rows, scale]);
   const k = scale.length;
   const mid = Math.floor(k / 2);
   const hasNeutral = k % 2 === 1;
   const strengthOf = (i: number) => (hasNeutral && i === mid ? 0 : i < mid ? (mid - i) / mid : (i - (hasNeutral ? mid : mid - 1)) / mid);
   const colors = scale.map((_, i) => {
     if (hasNeutral && i === mid) return "var(--ds-line-strong)";
-    return `color-mix(in oklab, ${i < mid ? "var(--ds-rose)" : "var(--ds-ok)"} ${Math.round(45 + strengthOf(i) * 55)}%, transparent)`;
+    // Dois níveis bem separados (forte = cor cheia, moderado = 30 %): a faixa do
+    // meio não deixa nenhum texto em 4,5:1.
+    const st = strengthOf(i);
+    return `color-mix(in oklab, ${i < mid ? "var(--ds-rose)" : "var(--ds-ok)"} ${st >= 0.99 ? 100 : Math.round(18 + st * 24)}%, transparent)`;
   });
   const data = rows.map((r) => {
     const total = r.values.reduce((s, n) => s + n, 0) || 1;
@@ -124,19 +130,19 @@ export function DivergingBarChart({
   const maxPos = Math.max(...data.map((d) => 1 - d.negSum), 0.01);
   const span = maxNeg + maxPos;
   return (
-    <div className={cn("min-w-0", className)}>
+    <div ref={box} className={cn("min-w-0", className)}>
       <ChartLegend className="mb-3" items={scale.map((s, i) => ({ label: s, color: colors[i] }))} />
       <div className="space-y-2">
         {data.map((d) => {
           const positive = d.pct.slice(hasNeutral ? mid + 1 : mid).reduce((s, n) => s + n, 0);
           return (
-            <div key={d.label} className="grid grid-cols-[minmax(80px,200px)_1fr_48px] items-center gap-3" aria-label={`${d.label}: ${formatPercent(positive, 0)} positivo`}>
+            <div key={d.label} role="group" className="grid grid-cols-[minmax(80px,200px)_1fr_48px] items-center gap-3" aria-label={`${d.label}: ${formatPercent(positive, 0)} positivo`}>
               <span className="truncate text-[12.5px] text-ink-soft">{d.label}</span>
               <div className="relative h-6">
                 <span aria-hidden className="absolute inset-y-[-4px] w-px bg-line-strong" style={{ left: `${(maxNeg / span) * 100}%` }} />
                 <div className="absolute inset-y-0 flex overflow-hidden rounded" style={{ left: `${((maxNeg - d.negSum) / span) * 100}%`, width: `${(1 / span) * 100}%` }}>
                   {d.pct.map((p, i) => (
-                    <span key={i} title={`${scale[i]}: ${formatPercent(p, 0)}`} className={cn("flex items-center justify-center text-[10.5px] font-medium tabular-nums", strengthOf(i) >= 0.99 ? "text-on-ink" : "text-ink")} style={{ width: `${p * 100}%`, background: colors[i] }}>
+                    <span key={i} title={`${scale[i]}: ${formatPercent(p, 0)}`} data-fill="" className="flex items-center justify-center text-[10.5px] font-medium tabular-nums" style={{ width: `${p * 100}%`, background: colors[i] }}>
                       {p >= 0.09 ? formatPercent(p, 0) : ""}
                     </span>
                   ))}
@@ -249,7 +255,7 @@ export function DumbbellChart({
         {rows.map((r) => {
           const [l, h] = r.a <= r.b ? [r.a, r.b] : [r.b, r.a];
           return (
-            <div key={r.label} className="grid grid-cols-[minmax(80px,160px)_1fr_auto] items-center gap-3 py-1" aria-label={`${r.label}: ${aLabel} ${format(r.a)}, ${bLabel} ${format(r.b)}`}>
+            <div key={r.label} role="group" className="grid grid-cols-[minmax(80px,160px)_1fr_auto] items-center gap-3 py-1" aria-label={`${r.label}: ${aLabel} ${format(r.a)}, ${bLabel} ${format(r.b)}`}>
               <span className="truncate text-[12.5px] text-ink-soft">{r.label}</span>
               <div className="relative h-4">
                 <span aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-line" />
@@ -381,6 +387,7 @@ export function BoxPlot({
             <span className="flex h-9 items-center truncate text-[12.5px] text-ink-soft">{s.label}</span>
             <div
               className="relative h-9"
+              role="img"
               onPointerEnter={() => setActive(i)}
               onPointerLeave={() => setActive(null)}
               aria-label={`${s.label}: mediana ${format(s.med)}, 50% entre ${format(s.q1)} e ${format(s.q3)}`}
@@ -478,7 +485,7 @@ export function PunchCard({
 }) {
   const max = Math.max(1, ...values.flat());
   return (
-    <div className={cn("min-w-0 overflow-x-auto", className)}>
+    <div className={cn("min-w-0 overflow-x-auto", className)} tabIndex={0} role="region" aria-label="Distribuição por dia e hora">
       <div className="inline-grid items-center gap-x-1 gap-y-1.5" style={{ gridTemplateColumns: `auto repeat(${columns.length}, 32px)` }}>
         <span />
         {columns.map((c) => (

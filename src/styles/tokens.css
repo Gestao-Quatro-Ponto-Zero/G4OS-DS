@@ -29,7 +29,7 @@
   --g4-gray-100: #e9eaed;
   --g4-gray-200: #d2d4da;
   --g4-gray-400: #a3a7b0;
-  --g4-gray-500: #6b6e76;
+  --g4-gray-500: #63666e;
   --g4-gray-700: #484a50;
   --g4-gray-900: #202124;
   --g4-gray-950: #121214;
@@ -51,7 +51,7 @@
   --g4-navy-900: #031a26;
   --g4-navy-700: #184560;
   --g4-gold-500: #b9915b;
-  --g4-gold-700: #8c6a3a;
+  --g4-gold-700: #7d5e33;
   --g4-gold-50: #f5eee3;
   --g4-clay-700: #842e20;
   --g4-clay-50: #f6e7e3;
@@ -61,6 +61,7 @@
   --g4-green-800: #1b5e20;
   --g4-green-50: #e8f5e9;
   --g4-orange-800: #e65100;
+  --g4-orange-900: #b54500; /* texto de alerta: 5,5:1 no branco, 5:1 no orange-50 */
   --g4-orange-50: #fff3e0;
   --g4-red-800: #b71c1c;
   --g4-red-50: #ffebee;
@@ -114,7 +115,7 @@
   /* Estados */
   --ds-ok: var(--g4-green-800);
   --ds-ok-soft: var(--g4-green-50);
-  --ds-amber: var(--g4-orange-800);
+  --ds-amber: var(--g4-orange-900);
   --ds-amber-soft: var(--g4-orange-50);
   --ds-rose: var(--g4-red-800);
   --ds-rose-soft: var(--g4-red-50);

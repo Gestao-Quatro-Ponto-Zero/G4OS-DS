@@ -1422,7 +1422,7 @@ export function CalendarHeatmap({
   const total = values.reduce((s, v) => s + v.value, 0);
   return (
     <div className={cn("min-w-0", className)}>
-      <div className="overflow-x-auto" role="img" aria-label={`${formatNumber(total)} ${noun} nas últimas ${weeks} semanas`}>
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={`${formatNumber(total)} ${noun} nas últimas ${weeks} semanas`}>
         <div className="inline-grid gap-1" style={{ gridTemplateColumns: "auto 1fr" }}>
           <span />
           <div className="relative h-4 text-[10.5px] text-muted">
@@ -1502,7 +1502,7 @@ export function ProgressRing({
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-label={label}
+      aria-label={label ?? "Progresso"}
     >
       <svg width={size} height={size} className="absolute inset-0 -rotate-90" aria-hidden>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--ds-line)" strokeWidth={thickness} />

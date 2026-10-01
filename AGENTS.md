@@ -10,7 +10,7 @@ Quem constrói um app **com** o DS: leia "Regras obrigatórias", "Começar um ap
 pnpm add @g4ai/ds @base-ui/react lucide-react && pnpm add -D tailwindcss @tailwindcss/postcss
 npx g4os-ds doctor                              # pré-requisitos
 npx g4os-ds init                                # auditoria contínua: config, scripts ds:*, CI (--eslint, --hook, --baseline)
-claude mcp add g4os-ds -- npx -y @g4ai/ds mcp   # MCP: search, get_component, get_block, get_guide, audit…
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp   # MCP: plan_screen, search, get_component, get_block, get_guide, audit…
 ```
 
 Guia da versão instalada: `node_modules/@g4ai/ds/ai/core.md`. Na web: https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt. Detalhes: [usar com IA](docs/guias/usar-com-ia.md).
@@ -67,7 +67,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 7. **Nenhum `<select>` cru** (use `Select` para lista curta, `Combobox` para entidades, `MultiSelect`/`CheckboxGroup` para vários valores, `NativeSelect` quando o seletor do sistema é melhor, como lista longa no celular), nenhum `<input type="date">` (use `DatePicker`), nenhum `window.confirm` (use `ConfirmDialog`), nenhum `alert` (use `notify`).
 8. **Rótulo visível acima de todo campo**: o `label` dos campos do DS já desenha o rótulo (dentro de `FieldBlock` o rótulo é do FieldBlock); `hideLabel` só em toolbar, tabela e filtro. Placeholder é exemplo. Botão desabilitado sem motivo óbvio leva `disabledReason`. Coluna estreita: `<Page width="narrow">`, nunca `mx-auto max-w-*` só no corpo.
 9. **Superfície certa**: página para entidade; `Drawer` para criar/editar sem perder a lista; `Modal` para decisão curta; `ConfirmDialog` para irreversível; `Popover` para explicação; inline para um campo. **Drawer nunca abre drawer.**
-10. **Status é controle inline** (selo que abre menu), nunca um `Select` por linha.
+10. **Status é controle inline** (selo que abre menu: `InlineSelect`), nunca um `Select` por linha.
 
 ### Navegação e densidade
 11. Trilha **só com ancestrais**; página global não tem trilha; página de registro usa `ContextBar` e **não herda o cabeçalho do pai**.

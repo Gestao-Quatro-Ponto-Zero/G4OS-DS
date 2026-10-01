@@ -6,16 +6,27 @@ Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, S
 
 ## Avatar
 
-Pessoa. Iniciais brancas sobre tinta escura (#3f3f46 padrão, #202124 para o responsável).
+Pessoa. Iniciais brancas sobre a tinta da pessoa (#3f3f46 padrão, #202124 para o responsável); com `src`, a foto (as iniciais ficam de reserva se a imagem falhar).
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `initials` * | `string` |  |  |
+| `badge` | `ReactNode` |  | Selo no canto (ícone 10–12 px): verificado, admin, bot. |
+| `className` | `string \| undefined` |  |  |
+| `initials` | `string \| undefined` |  | Padrão: calculadas a partir de `name`. |
 | `name` | `string \| undefined` |  |  |
-| `size` | `"sm" \| "md" \| "lg" \| undefined` | `"md"` |  |
+| `shape` | `"circle" \| "square" \| undefined` | `"circle"` |  |
+| `size` | `AvatarSize \| undefined` | `"md"` |  |
+| `src` | `string \| undefined` |  | Foto. Sem ela (ou se falhar), as iniciais. |
+| `status` | `AvatarStatus \| undefined` |  | Ponto de presença no canto. |
 | `tint` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/base-avatar-e-teclas`):
+
+```tsx
+<Avatar name="Ana Lopes" size="xs" /> … <Avatar name="Ana Lopes" size="xl" />
+```
 
 ## AvatarGroup
 
@@ -23,10 +34,35 @@ Até `max` avatares e um "+N" com os nomes restantes no title.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `people` * | `{ name: string; initials: string; tint?: string; }[]` |  |  |
+| `people` * | `{ name: string; initials?: string; tint?: string; src?: string; }[]` |  |  |
+| `action` | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
 | `max` | `number \| undefined` | `4` |  |
+| `size` | `AvatarSize \| undefined` | `"sm"` |  |
+| `stacked` | `boolean \| undefined` | `false` |  |
+| `total` | `number \| undefined` |  | Total real (quando `people` é só uma amostra). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/base-avatar-e-teclas`):
+
+```tsx
+<AvatarGroup people={time} max={4} />
+<AvatarGroup people={time} max={3} stacked total={18} />
+<AvatarGroup people={time} max={3} stacked action={<IconButton label="Convidar pessoa" size="sm"><Plus /></IconButton>} />
+```
+
+## AvatarSize (type)
+
+```ts
+type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl"
+```
+
+## AvatarStatus (type)
+
+```ts
+type AvatarStatus = "online" | "away" | "busy" | "offline"
+```
 
 ## Badge
 
@@ -65,6 +101,14 @@ Um primário por área.
 | `variant` | `ButtonVariant \| undefined` | `"primary"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ Bloqueado com motivo: `<Button disabled={demo} disabledReason="Demonstração: nada é gravado">Salvar</Button>` (fica legível, focável e explica).
+
+**Evite**
+
+- ✗ `<span className="opacity-50"><span className="pointer-events-none"><Button disabled>…` (fica invisível; regra `disabled-wrapper`). Title Case ("Criar Nova Vaga").
 
 Exemplo (showcase `#/p/ia-avisos`):
 
@@ -147,11 +191,36 @@ Estado vazio. Diga o que falta e ofereça a próxima ação.
 | --- | --- | --- | --- |
 | `title` * | `string` |  |  |
 | `action` | `ReactNode` |  |  |
+| `description` | `ReactNode` |  | Alias de `hint`, com o nome usado em StateView. |
 | `framed` | `boolean \| undefined` | `true` | false dentro de um painel/lista que já tem borda. |
-| `hint` | `string \| undefined` |  |  |
+| `hint` | `ReactNode` |  | Uma frase sobre o que falta ou o que fazer. |
 | `icon` | `ReactNode` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ `<Empty title="Nenhuma vaga com esses filtros" hint="Tente outro termo." action={<Button variant="ghost" onClick={limpar}>Limpar filtros</Button>} />`: texto de apoio em `hint`. Dentro de card/tabela: `framed={false}`.
+
+**Evite**
+
+- ✗ `description=` no `Empty` (não existe; é `hint`). Tela inteira de erro/404: use `StateView` (esse sim tem `description`).
+
+Exemplo (showcase `#/p/data-tabela-estado`):
+
+```tsx
+<DataTable label="Faturas" rows={rows} columns={columns} rowKey={(r) => r.id}
+  loading={isFetching}                       // sem linhas: esqueleto · com linhas: barra + linhas esmaecidas
+  error={error && { message: error.message, onRetry: refetch }}
+  rowTone={(r) => (r.status === "vencido" ? "bad" : undefined)}
+  empty={<Empty framed={false} title="Nenhuma fatura emitida" action={<Button size="sm">Emitir fatura</Button>} />} />
+
+// rodapé com total: qualquer coluna com footer
+{ key: "value", header: "Valor", align: "right", cell: …, footer: formatCurrency(total) }
+
+// lista longa numa área fixa: rola por dentro com cabeçalho e rodapé fixos
+<DataTable maxHeight={420} … />
+```
 
 ## EntityMark
 
@@ -227,51 +296,64 @@ Botão quadrado só com ícone.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ov-tooltip`):
+Exemplo (showcase `#/p/_shadcn-extras`):
 
 ```tsx
-<TooltipGroup>
-  <Tooltip content="Negrito" shortcut={["⌘", "B"]}>
-    <IconButton label="Negrito"><Bold /></IconButton>
-  </Tooltip>
-  …
-</TooltipGroup>
+<Collapsible variant="card" label="Automações" description="Regras que rodam sozinhas" meta="3 ativas" actions={<IconButton …/>}>…</Collapsible>
 ```
 
 ## Kbd
 
-Tecla de atalho.
+Tecla de atalho. `size="sm"` dentro de itens densos; `md` ao lado de texto corrido.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `size` | `"sm" \| "md" \| undefined` | `"sm"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/form-grupos-e-complementos`):
+Exemplo (showcase `#/p/base-avatar-e-teclas`):
 
 ```tsx
-<Label htmlFor="slug">Endereço do convite</Label>
-<InputGroup>
-  <InputGroupAddon><InputGroupText>app.g4os.com.br/</InputGroupText></InputGroupAddon>
-  <InputGroupInput id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
-  <InputGroupAddon align="inline-end"><CopyButton value={link} label="Copiar link" iconOnly /></InputGroupAddon>
-</InputGroup>
+<KbdGroup keys={["mod", "K"]} />
+<KbdGroup keys={["mod", "shift", "P"]} />
+<Kbd>Esc</Kbd>
+<Button>Salvar <KbdGroup keys={["mod", "S"]} /></Button>
+<Tooltip content="Buscar" shortcut={["mod", "K"]}>…</Tooltip>
+```
 
-<InputGroup>
-  <InputGroupAddon><Search /></InputGroupAddon>
-  <InputGroupInput aria-label="Buscar negócios" placeholder="Buscar negócios" />
-  <InputGroupAddon align="inline-end"><Kbd>/</Kbd></InputGroupAddon>
-</InputGroup>
+## KbdGroup
 
-<InputGroup>
-  <InputGroupTextarea aria-label="Mensagem" placeholder="Escreva para o time…" />
-  <InputGroupAddon align="block-end">
-    <InputGroupButton label="Anexar"><Paperclip /></InputGroupButton>
-    <InputGroupButton label="Mencionar"><AtSign /></InputGroupButton>
-    <InputGroupButton variant="primary" label="Enviar" className="ml-auto"><ArrowUp /></InputGroupButton>
-  </InputGroupAddon>
-</InputGroup>
+Combinação de teclas.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `keys` | `string[] \| undefined` |  |  |
+| `label` | `string \| undefined` |  |  |
+| `size` | `"sm" \| "md" \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/base-avatar-e-teclas`):
+
+```tsx
+<KbdGroup keys={["mod", "K"]} />
+<KbdGroup keys={["mod", "shift", "P"]} />
+<Kbd>Esc</Kbd>
+<Button>Salvar <KbdGroup keys={["mod", "S"]} /></Button>
+<Tooltip content="Buscar" shortcut={["mod", "K"]}>…</Tooltip>
+```
+
+## keyLabel (function)
+
+Converte nomes de tecla ("mod", "shift", "enter") no símbolo da plataforma.
+
+```ts
+keyLabel(key, mac): string
 ```
 
 ## LinkedCard
@@ -329,6 +411,14 @@ Indicador. O valor é o protagonista (22px, tabular).
 | `width` | `"full" \| "wide" \| "medium" \| "narrow" \| "reading" \| undefined` | `"full"` | Largura máxima do conteúdo (cabeçalho incluso). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ `<Page width="narrow">` para coluna estreita (configurações, automações, formulário longo): cabeçalho, PageToolbar e corpo no mesmo eixo. `wide` 1200 · `medium` 1024 · `narrow` 896 · `reading` 720 px.
+
+**Evite**
+
+- ✗ `<Page><PageHeading/><div className="mx-auto max-w-4xl">…` (título à esquerda, corpo no meio). Regra `page-width-wrapper`.
 
 Exemplo (showcase `#/p/dash-como-montar`):
 
@@ -407,3 +497,11 @@ type Tone = "neutral" | "ok" | "warn" | "bad" | "info" | "accent"
 ## toneDot (const)
 
 ## toneText (const)
+
+## useIsMac (hook)
+
+true no macOS/iOS (para escolher ⌘ ou Ctrl).
+
+```ts
+useIsMac(): boolean
+```

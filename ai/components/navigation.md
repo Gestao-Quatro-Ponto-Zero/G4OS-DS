@@ -96,6 +96,14 @@ Título da tela + descrição opcional + ações à direita.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ Primeiro filho de `Page`. Uma ação primária em `actions` (as demais `variant="ghost"` ou no `ActionMenu`). Registro: `crumbs` com os ancestrais.
+
+**Evite**
+
+- ✗ `<h1>` solto (regra `page-heading`); embrulhar o `PageHeading` num `div` só dele (quebra o cabeçalho fixo).
+
 Exemplo (showcase `#/p/filtros-datas`):
 
 ```tsx

@@ -2,7 +2,7 @@
 
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { ArrowUpRight, Inbox } from "lucide-react";
-import { useId } from "react";
+import { useEffect, useId, useState } from "react";
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
@@ -10,6 +10,8 @@ import type {
   ReactNode,
 } from "react";
 import { cn } from "../lib/cn";
+import { tintFill } from "../lib/color";
+import { initials as initialsOf } from "../lib/text";
 
 /* ------------------------------------------------------------------ */
 /* Link adapter                                                        */
@@ -67,68 +69,150 @@ export const toneText: Record<Tone, string> = {
 /* Avatar                                                              */
 /* ------------------------------------------------------------------ */
 
+export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type AvatarStatus = "online" | "away" | "busy" | "offline";
+
+const avatarDim: Record<AvatarSize, string> = {
+  xs: "h-5 w-5 text-[10px]",
+  sm: "h-7 w-7 text-[11px]",
+  md: "h-8 w-8 text-[11px]",
+  lg: "h-10 w-10 text-[14px]",
+  xl: "h-14 w-14 text-[18px]",
+};
+const avatarCountDim: Record<AvatarSize, string> = {
+  xs: "h-5 min-w-5 text-[10px]",
+  sm: "h-7 min-w-7 text-[11px]",
+  md: "h-8 min-w-8 text-[11px]",
+  lg: "h-10 min-w-10 text-[12.5px]",
+  xl: "h-14 min-w-14 text-[14px]",
+};
+const statusFill: Record<AvatarStatus, string> = { online: "bg-ok", away: "bg-amber", busy: "bg-rose", offline: "bg-line-strong" };
+const statusLabel: Record<AvatarStatus, string> = { online: "online", away: "ausente", busy: "ocupado", offline: "offline" };
+
 /**
- * Pessoa. Iniciais brancas sobre tinta escura (#3f3f46 padrão, #202124 para o
- * responsável). Nunca use foto aqui; foto é outro componente.
+ * Pessoa. Iniciais brancas sobre a tinta da pessoa (#3f3f46 padrão, #202124
+ * para o responsável); com `src`, a foto (as iniciais ficam de reserva se a
+ * imagem falhar). `status` põe o ponto de presença; `badge` um selo de ícone
+ * (verificado, papel). `shape="square"` para contas de serviço e bots.
  */
 export function Avatar({
   initials,
   tint,
   size = "md",
   name,
+  src,
+  status,
+  badge,
+  shape = "circle",
+  className,
 }: {
-  initials: string;
+  /** Padrão: calculadas a partir de `name`. */
+  initials?: string;
   tint?: string;
-  size?: "sm" | "md" | "lg";
+  size?: AvatarSize;
   name?: string;
+  /** Foto. Sem ela (ou se falhar), as iniciais. */
+  src?: string;
+  /** Ponto de presença no canto. */
+  status?: AvatarStatus;
+  /** Selo no canto (ícone 10–12 px): verificado, admin, bot. */
+  badge?: ReactNode;
+  shape?: "circle" | "square";
+  className?: string;
 }) {
-  const dim =
-    size === "sm"
-      ? "h-7 w-7 text-[11px]"
-      : size === "lg"
-        ? "h-10 w-10 text-sm"
-        : "h-8 w-8 text-[11px]";
-  return (
+  const [failed, setFailed] = useState(false);
+  const text = initials ?? (name ? initialsOf(name) : "—");
+  const showImg = src && !failed;
+  const round = shape === "square" ? (size === "xs" || size === "sm" ? "rounded-md" : "rounded-lg") : "rounded-full";
+  const label = name ? (status ? `${name} (${statusLabel[status]})` : name) : undefined;
+  const face = (
     <span
       className={cn(
         // ds-audit-ignore white-black: iniciais brancas sobre `tint` escuro (identidade da pessoa)
-        "inline-grid shrink-0 place-items-center overflow-hidden rounded-full align-middle text-center font-medium leading-none whitespace-nowrap text-white",
-        dim,
+        "inline-grid shrink-0 place-items-center overflow-hidden align-middle text-center font-medium leading-none whitespace-nowrap text-white",
+        avatarDim[size],
+        round,
+        !(status || badge) && className,
       )}
-      style={{ background: tint ?? "#3f3f46" }}
+      style={showImg ? undefined : { background: tintFill(tint) }}
       title={name}
-      aria-label={name}
-      role={name ? "img" : undefined}
+      aria-label={status || badge ? undefined : label}
+      role={!(status || badge) && name ? "img" : undefined}
       data-avatar=""
     >
-      <span className="block leading-none">{initials}</span>
+      {showImg ? <img src={src} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} /> : <span className="block leading-none">{text}</span>}
+    </span>
+  );
+  if (!status && !badge) return face;
+  return (
+    <span className={cn("relative inline-flex shrink-0 align-middle", className)} role={name ? "img" : undefined} aria-label={label} data-avatar="">
+      {face}
+      {status && (
+        <span
+          aria-hidden
+          className={cn("absolute bottom-0 right-0 block rounded-full ring-2 ring-surface", statusFill[status], size === "xs" || size === "sm" ? "h-2 w-2" : size === "xl" ? "h-3.5 w-3.5" : "h-2.5 w-2.5")}
+        />
+      )}
+      {badge && !status && (
+        <span
+          aria-hidden
+          className={cn(
+            "absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface [&_svg]:h-2.5 [&_svg]:w-2.5",
+            size === "xl" ? "h-5 w-5 [&_svg]:h-3 [&_svg]:w-3" : "h-4 w-4",
+          )}
+        >
+          {badge}
+        </span>
+      )}
     </span>
   );
 }
 
-/** Até `max` avatares e um "+N" com os nomes restantes no title. */
+/**
+ * Até `max` avatares e um "+N" com os nomes restantes no title.
+ * `stacked` sobrepõe (pilha compacta em cards e cabeçalhos); `total` usa
+ * a contagem real quando a lista veio paginada; `action` fica no fim
+ * (ex.: botão "Adicionar pessoa").
+ */
 export function AvatarGroup({
   people,
   max = 4,
+  size = "sm",
+  stacked = false,
+  total,
+  action,
+  className,
 }: {
-  people: { name: string; initials: string; tint?: string }[];
+  people: { name: string; initials?: string; tint?: string; src?: string }[];
   max?: number;
+  size?: AvatarSize;
+  stacked?: boolean;
+  /** Total real (quando `people` é só uma amostra). */
+  total?: number;
+  action?: ReactNode;
+  className?: string;
 }) {
-  if (!people.length) return null;
+  if (!people.length && !action) return null;
+  const count = total ?? people.length;
+  const shown = people.slice(0, max);
+  const extra = count - shown.length;
+  const ring = stacked ? "ring-2 ring-surface" : undefined;
   return (
-    <span className="inline-flex shrink-0 items-center gap-1.5" data-avatar-group="">
-      {people.slice(0, max).map((p, i) => (
-        <Avatar key={`${p.name}-${i}`} {...p} size="sm" />
+    <span className={cn("inline-flex shrink-0 items-center", stacked ? "-space-x-1.5" : "gap-1.5", className)} data-avatar-group="">
+      {shown.map((p, i) => (
+        <Avatar key={`${p.name}-${i}`} {...p} size={size} className={ring} />
       ))}
-      {people.length > max && (
+      {extra > 0 && (
         <span
-          className="inline-grid h-7 min-w-7 shrink-0 place-items-center rounded-full bg-soft px-1 text-[11px] leading-none text-muted"
-          title={people.slice(max).map((p) => p.name).join(", ")}
-          aria-label={`Mais ${people.length - max} pessoas`}
+          className={cn("inline-grid shrink-0 place-items-center rounded-full bg-soft px-1 leading-none text-muted", avatarCountDim[size], ring)}
+          title={people.slice(max).map((p) => p.name).join(", ") || undefined}
+          role="img"
+          aria-label={`Mais ${extra} ${extra === 1 ? "pessoa" : "pessoas"}`}
         >
-          +{people.length - max}
+          +{extra}
         </span>
       )}
+      {action && <span className={cn("inline-flex shrink-0", stacked && "pl-2.5")}>{action}</span>}
     </span>
   );
 }
@@ -431,18 +515,23 @@ export function FactLine({ facts }: { facts: { label: string; value: ReactNode }
 /** Estado vazio. Diga o que falta e ofereça a próxima ação. */
 export function Empty({
   title,
-  hint,
+  hint: hintProp,
+  description,
   action,
   icon,
   framed = true,
 }: {
   title: string;
-  hint?: string;
+  /** Uma frase sobre o que falta ou o que fazer. Igual a `description` (mesmo nome de StateView). */
+  hint?: ReactNode;
+  /** Alias de `hint`, com o nome usado em StateView. */
+  description?: ReactNode;
   action?: ReactNode;
   icon?: ReactNode;
   /** false dentro de um painel/lista que já tem borda. */
   framed?: boolean;
 }) {
+  const hint = hintProp ?? description;
   return (
     <div
       className={cn(
@@ -613,7 +702,7 @@ export function Meter({
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-label={label}
+      aria-label={label ?? "Progresso"}
       className={cn("w-full overflow-hidden rounded-full bg-line", thick ? "h-1" : "h-px")}
     >
       <div className={cn("h-full rounded-full", fill)} style={{ width: `${Math.max(pct ? 4 : 0, pct)}%` }} />
@@ -724,11 +813,58 @@ export function Section({
   );
 }
 
-/** Tecla de atalho. */
-export function Kbd({ children }: { children: ReactNode }) {
+/** Tecla de atalho. `size="sm"` dentro de itens densos; `md` ao lado de texto corrido. */
+export function Kbd({ children, size = "sm", className }: { children: ReactNode; size?: "sm" | "md"; className?: string }) {
   return (
-    <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-line bg-soft px-1 font-sans text-[11px] text-muted">
+    <kbd
+      className={cn(
+        "inline-flex items-center justify-center rounded border border-line bg-soft font-sans text-muted",
+        size === "md" ? "h-6 min-w-6 px-1.5 text-[12px]" : "h-5 min-w-5 px-1 text-[11px]",
+        className,
+      )}
+    >
       {children}
     </kbd>
+  );
+}
+
+const macKeys: Record<string, string> = { mod: "⌘", cmd: "⌘", ctrl: "⌃", alt: "⌥", option: "⌥", shift: "⇧", enter: "↵", backspace: "⌫", esc: "Esc", tab: "⇥", up: "↑", down: "↓", left: "←", right: "→" };
+const pcKeys: Record<string, string> = { mod: "Ctrl", cmd: "Ctrl", ctrl: "Ctrl", alt: "Alt", option: "Alt", shift: "Shift", enter: "Enter", backspace: "Backspace", esc: "Esc", tab: "Tab", up: "↑", down: "↓", left: "←", right: "→" };
+
+/** true no macOS/iOS (para escolher ⌘ ou Ctrl). Falso no servidor e no primeiro render. */
+export function useIsMac() {
+  const [mac, setMac] = useState(false);
+  useEffect(() => {
+    const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
+    setMac(/mac|iphone|ipad|ipod/i.test(nav.userAgentData?.platform ?? navigator.platform ?? navigator.userAgent));
+  }, []);
+  return mac;
+}
+
+/** Converte nomes de tecla ("mod", "shift", "enter") no símbolo da plataforma. */
+export function keyLabel(key: string, mac: boolean) {
+  const k = key.toLowerCase();
+  return (mac ? macKeys : pcKeys)[k] ?? (key.length === 1 ? key.toUpperCase() : key);
+}
+
+/**
+ * Combinação de teclas. Com `keys`, "mod" vira ⌘ no Mac e Ctrl nos outros
+ * (o mesmo para shift, alt, enter). Ou passe Kbd como filhos.
+ *
+ *   <KbdGroup keys={["mod", "K"]} />   → ⌘ K  /  Ctrl K
+ */
+export function KbdGroup({ keys, children, size, label, className }: { keys?: string[]; children?: ReactNode; size?: "sm" | "md"; /** Nome para leitor de tela (padrão: as teclas por extenso). */ label?: string; className?: string }) {
+  const mac = useIsMac();
+  const shown = keys?.map((k) => keyLabel(k, mac));
+  return (
+    <span className={cn("inline-flex items-center gap-0.5", className)} aria-label={label ?? shown?.join(" + ")} role={shown ? "img" : undefined}>
+      {shown
+        ? shown.map((k, i) => (
+            <Kbd key={`${k}-${i}`} size={size}>
+              {k}
+            </Kbd>
+          ))
+        : children}
+    </span>
   );
 }

@@ -88,7 +88,7 @@ export function FieldBlock({
   const labelText = (
     <>
       {label}
-      {optional && <span className="ml-1 text-muted/80">(opcional)</span>}
+      {optional && <span className="ml-1 text-muted">(opcional)</span>}
     </>
   );
   return (
@@ -157,7 +157,7 @@ export function useControlLabel({ id, label, hideLabel, hint, error, optional }:
         {showLabel && (
           <label htmlFor={controlId} className="mb-1.5 block text-[12.5px] text-muted">
             {label}
-            {optional && <span className="ml-1 text-muted/80">(opcional)</span>}
+            {optional && <span className="ml-1 text-muted">(opcional)</span>}
           </label>
         )}
         {control}
@@ -836,7 +836,7 @@ export function Checkbox({
       aria-label={visible ? undefined : label}
       aria-describedby={visible && description ? descId : undefined}
       className={cn(
-        "inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-[5px] border text-on-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/40 data-disabled:cursor-not-allowed",
+        "ds-hit inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-[5px] border text-on-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/40 data-disabled:cursor-not-allowed",
         checked || indeterminate
           ? "border-primary bg-primary data-disabled:opacity-55"
           : "border-line-strong bg-surface hover:border-ink data-disabled:bg-soft data-disabled:hover:border-line-strong",
@@ -925,7 +925,7 @@ export function CheckboxGroup({
       {showLabel && (
         <div id={`${ids}-lbl`} className="mb-2 text-[12.5px] text-muted">
           {label}
-          {optional && <span className="ml-1 text-muted/80">(opcional)</span>}
+          {optional && <span className="ml-1 text-muted">(opcional)</span>}
         </div>
       )}
       {selectAll && max == null && enabled.length > 1 && (

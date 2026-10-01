@@ -73,10 +73,26 @@ export function AspectFrame({ ratio = 16 / 9, children, className }: { ratio?: n
 /* Carousel                                                            */
 /* ------------------------------------------------------------------ */
 
+/** Controle do carrossel por fora (botões próprios, "3 de 8", sincronizar com outra lista). */
+export type CarouselApi = {
+  /** Página atual (0…count-1). */
+  index: number;
+  /** Número de páginas (itens − por vez + 1). */
+  count: number;
+  canPrev: boolean;
+  canNext: boolean;
+  goTo: (index: number) => void;
+  next: () => void;
+  prev: () => void;
+};
+
 /**
  * Carrossel com rolagem nativa (arrasta no toque, trackpad funciona),
- * encaixe por item, setas, pontos e ←/→ quando focado. `perView` itens
- * lado a lado no desktop; `perViewMobile` abaixo de 640px.
+ * encaixe por item, setas, pontos ou miniaturas, ←/→ (↑/↓ na vertical)
+ * quando focado. `perView` itens lado a lado no desktop; `perViewMobile`
+ * abaixo de 640px. `orientation="vertical"` pede `height`. `loop` volta ao
+ * primeiro depois do último. Controle por fora com `index`/`onIndexChange`
+ * ou `setApi`.
  */
 export function Carousel({
   children,
@@ -87,6 +103,14 @@ export function Carousel({
   autoplay,
   arrows = true,
   dots = true,
+  orientation = "horizontal",
+  height,
+  loop = false,
+  index: indexProp,
+  onIndexChange,
+  setApi,
+  thumbnails,
+  counter = false,
   className,
 }: {
   children: ReactNode;
@@ -95,43 +119,78 @@ export function Carousel({
   perView?: number;
   perViewMobile?: number;
   gap?: number;
-  /** Intervalo em ms. Pausa no hover/foco e com movimento reduzido. */
+  /** Intervalo em ms. Pausa no hover/foco e com movimento reduzido. Implica `loop`. */
   autoplay?: number;
   arrows?: boolean;
   dots?: boolean;
+  orientation?: "horizontal" | "vertical";
+  /** Altura em px (obrigatória na vertical). */
+  height?: number;
+  loop?: boolean;
+  /** Página atual (controlado). */
+  index?: number;
+  onIndexChange?: (index: number) => void;
+  /** Recebe o controle (index, count, goTo, next, prev) a cada mudança. */
+  setApi?: (api: CarouselApi) => void;
+  /** Miniaturas no lugar dos pontos (uma por item; use com perView 1). */
+  thumbnails?: ReactNode[];
+  /** Mostra "2 de 8" sobre o canto. */
+  counter?: boolean;
   className?: string;
 }) {
   const items = Children.toArray(children);
+  const vertical = orientation === "vertical";
   const [wrapRef, width] = useWidth<HTMLDivElement>();
   const trackRef = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(indexProp ?? 0);
+  const indexRef = useRef(index);
+  const changeRef = useRef(onIndexChange);
+  changeRef.current = onIndexChange;
   const [paused, setPaused] = useState(false);
   const reduced = useReducedMotion();
   const n = width && width < 640 ? perViewMobile : perView;
   const pages = Math.max(1, items.length - n + 1);
+  const wraps = loop || !!autoplay;
 
   const goTo = useCallback(
     (i: number) => {
       const track = trackRef.current;
       if (!track) return;
-      const clamped = (i + pages) % pages;
-      const child = track.children[clamped] as HTMLElement | undefined;
-      track.scrollTo({ left: child ? child.offsetLeft - track.offsetLeft : 0, behavior: reduced ? "auto" : "smooth" });
+      const target = wraps ? (i + pages) % pages : Math.max(0, Math.min(pages - 1, i));
+      const child = track.children[target] as HTMLElement | undefined;
+      const behavior = reduced ? "auto" : "smooth";
+      if (vertical) track.scrollTo({ top: child ? child.offsetTop - track.offsetTop : 0, behavior });
+      else track.scrollTo({ left: child ? child.offsetLeft - track.offsetLeft : 0, behavior });
     },
-    [pages, reduced],
+    [pages, reduced, wraps, vertical],
   );
+
+  // Índice controlado: rola até ele quando muda por fora.
+  useEffect(() => {
+    if (indexProp != null && indexProp !== index) goTo(indexProp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só reage ao valor vindo de fora
+  }, [indexProp]);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
     const on = () => {
-      const w = track.clientWidth;
-      const step = (w + gap) / n;
-      setIndex(Math.min(pages - 1, Math.round(track.scrollLeft / (step || 1))));
+      const size = vertical ? track.clientHeight : track.clientWidth;
+      const step = (size + gap) / n;
+      const pos = vertical ? track.scrollTop : track.scrollLeft;
+      const next = Math.min(pages - 1, Math.round(pos / (step || 1)));
+      if (next === indexRef.current) return;
+      indexRef.current = next;
+      setIndex(next);
+      changeRef.current?.(next);
     };
     track.addEventListener("scroll", on, { passive: true });
     return () => track.removeEventListener("scroll", on);
-  }, [gap, n, pages]);
+  }, [gap, n, pages, vertical]);
+
+  useEffect(() => {
+    setApi?.({ index, count: pages, canPrev: wraps || index > 0, canNext: wraps || index < pages - 1, goTo, next: () => goTo(index + 1), prev: () => goTo(index - 1) });
+  }, [setApi, index, pages, wraps, goTo]);
 
   useEffect(() => {
     if (!autoplay || paused || reduced || pages < 2) return;
@@ -140,20 +199,28 @@ export function Carousel({
   }, [autoplay, paused, reduced, index, pages, goTo]);
 
   const onKey = (e: KeyboardEvent) => {
-    if (e.key === "ArrowRight") goTo(index + 1);
-    else if (e.key === "ArrowLeft") goTo(index - 1);
+    const nextKey = vertical ? "ArrowDown" : "ArrowRight";
+    const prevKey = vertical ? "ArrowUp" : "ArrowLeft";
+    if (e.key === nextKey) goTo(index + 1);
+    else if (e.key === prevKey) goTo(index - 1);
+    else if (e.key === "Home") goTo(0);
+    else if (e.key === "End") goTo(pages - 1);
     else return;
     e.preventDefault();
   };
 
-  const arrow = "absolute top-1/2 z-[2] hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface/95 text-ink shadow-raised backdrop-blur hover:bg-surface disabled:opacity-0 sm:flex";
+  const arrow = cn(
+    "absolute z-[2] hidden h-9 w-9 items-center justify-center rounded-full border border-line bg-surface/95 text-ink shadow-raised backdrop-blur hover:bg-surface disabled:opacity-0 sm:flex",
+    vertical ? "left-1/2 -translate-x-1/2" : "top-1/2 -translate-y-1/2",
+  );
+  const basis = `calc((100% - ${gap * (n - 1)}px) / ${n})`;
 
   return (
     <section
       ref={wrapRef}
       aria-roledescription="carrossel"
       aria-label={label}
-      className={cn("relative min-w-0", className)}
+      className={cn("relative w-full min-w-0", className)}
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -165,8 +232,11 @@ export function Carousel({
         aria-label={`${label}: slides`}
         tabIndex={0}
         onKeyDown={onKey}
-        className="flex snap-x snap-mandatory overflow-x-auto rounded-xl outline-none [scrollbar-width:none] focus-visible:ring-2 focus-visible:ring-muted/40 [&::-webkit-scrollbar]:hidden"
-        style={{ gap }}
+        className={cn(
+          "flex rounded-xl outline-none [scrollbar-width:none] focus-visible:ring-2 focus-visible:ring-muted/40 [&::-webkit-scrollbar]:hidden",
+          vertical ? "snap-y snap-mandatory flex-col overflow-y-auto" : "snap-x snap-mandatory overflow-x-auto",
+        )}
+        style={{ gap, height: vertical ? height : undefined }}
       >
         {items.map((child, i) => (
           <div
@@ -174,36 +244,62 @@ export function Carousel({
             role="group"
             aria-roledescription="slide"
             aria-label={`${i + 1} de ${items.length}`}
-            className="min-w-0 shrink-0 snap-start"
-            style={{ flexBasis: `calc((100% - ${gap * (n - 1)}px) / ${n})` }}
+            className="min-h-0 min-w-0 shrink-0 snap-start"
+            style={{ flexBasis: basis }}
           >
             {child}
           </div>
         ))}
       </div>
+      {counter && pages > 1 && (
+        <span aria-hidden className="pointer-events-none absolute right-3 top-3 z-[2] rounded-full bg-popover/90 px-2 py-0.5 text-[11.5px] tabular-nums text-ink-soft shadow-surface backdrop-blur">
+          {index + 1} de {pages}
+        </span>
+      )}
       {arrows && pages > 1 && (
         <>
-          <button type="button" aria-label="Anterior" onClick={() => goTo(index - 1)} disabled={!autoplay && index === 0} className={cn(arrow, "left-3")}>
-            <ChevronLeft className="h-4 w-4" />
+          <button type="button" aria-label="Anterior" onClick={() => goTo(index - 1)} disabled={!wraps && index === 0} className={cn(arrow, vertical ? "top-3" : "left-3")}>
+            <ChevronLeft className={cn("h-4 w-4", vertical && "rotate-90")} />
           </button>
-          <button type="button" aria-label="Próximo" onClick={() => goTo(index + 1)} disabled={!autoplay && index >= pages - 1} className={cn(arrow, "right-3")}>
-            <ChevronRight className="h-4 w-4" />
+          <button type="button" aria-label="Próximo" onClick={() => goTo(index + 1)} disabled={!wraps && index >= pages - 1} className={cn(arrow, vertical ? "bottom-3" : "right-3")}>
+            <ChevronRight className={cn("h-4 w-4", vertical && "rotate-90")} />
           </button>
         </>
       )}
-      {dots && pages > 1 && (
-        <div className="mt-3 flex items-center justify-center gap-1.5" role="group" aria-label="Escolher slide">
-          {Array.from({ length: pages }).map((_, i) => (
+      {thumbnails && thumbnails.length > 1 ? (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]" role="group" aria-label="Escolher slide">
+          {thumbnails.map((t, i) => (
             <button
               key={i}
               type="button"
               aria-label={`Ir para ${i + 1}`}
               aria-current={i === index ? "true" : undefined}
               onClick={() => goTo(i)}
-              className={cn("h-1.5 rounded-full transition-all duration-200", i === index ? "w-5 bg-ink" : "w-1.5 bg-line-strong hover:bg-ink-soft")}
-            />
+              className={cn(
+                "h-14 w-20 shrink-0 overflow-hidden rounded-lg ring-1 transition-[box-shadow,opacity] [&>img]:h-full [&>img]:w-full [&>img]:object-cover",
+                i === index ? "ring-2 ring-ink" : "opacity-70 ring-line hover:opacity-100",
+              )}
+            >
+              {t}
+            </button>
           ))}
         </div>
+      ) : (
+        dots &&
+        pages > 1 && (
+          <div className="mt-3 flex items-center justify-center gap-1.5" role="group" aria-label="Escolher slide">
+            {Array.from({ length: pages }).map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Ir para ${i + 1}`}
+                aria-current={i === index ? "true" : undefined}
+                onClick={() => goTo(i)}
+                className={cn("ds-hit h-1.5 rounded-full transition-all duration-200", i === index ? "w-5 bg-ink" : "w-1.5 bg-line-strong hover:bg-ink-soft")}
+              />
+            ))}
+          </div>
+        )
       )}
     </section>
   );
@@ -233,7 +329,7 @@ export function Slide({ theme = "light", children, footer, className }: { theme?
   return (
     <div className={cn("relative flex flex-col overflow-hidden font-sans", slideTheme[theme], className)} style={{ width: SLIDE_WIDTH, height: SLIDE_HEIGHT, padding: "72px 80px 56px" }}>
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-      {footer && <div className={cn("mt-6 flex items-center justify-between text-[15px]", theme === "navy" ? "text-white/45" : "text-muted")}>{footer}</div>}
+      {footer && <div className={cn("mt-6 flex items-center justify-between text-[15px]", theme === "navy" ? "text-white/70" : "text-muted")}>{footer}</div>}
     </div>
   );
 }
@@ -241,7 +337,7 @@ export function Slide({ theme = "light", children, footer, className }: { theme?
 /** Rótulo pequeno acima do título do slide, com fio dourado. */
 function SlideKicker({ children, dark }: { children: ReactNode; dark?: boolean }) {
   return (
-    <div className={cn("mb-6 flex items-center gap-3 text-[16px] font-medium uppercase tracking-[0.14em]", dark ? "text-accent" : "text-accent-deep")}>
+    <div className={cn("mb-6 flex items-center gap-3 text-[16px] font-medium uppercase tracking-[0.14em]", dark ? "text-brand-accent" : "text-accent-deep")}>
       <span className="h-[2px] w-10 bg-accent" />
       {children}
     </div>
@@ -272,7 +368,7 @@ export function SlideBullets({ kicker, title, items, theme = "light", footer }: 
       <ul className="mt-12 flex list-none flex-col gap-6 p-0">
         {items.map((it, i) => (
           <li key={i} className="flex items-baseline gap-5 text-[26px] leading-snug">
-            <span className={cn("w-9 shrink-0 text-[20px] font-semibold tabular-nums", dark ? "text-accent" : "text-accent-deep")}>{String(i + 1).padStart(2, "0")}</span>
+            <span className={cn("w-9 shrink-0 text-[20px] font-semibold tabular-nums", dark ? "text-brand-accent" : "text-accent-deep")}>{String(i + 1).padStart(2, "0")}</span>
             <span className={dark ? "text-white/85" : "text-ink-soft"}>{it}</span>
           </li>
         ))}
@@ -335,11 +431,11 @@ export function SlideQuote({ quote, author, role, theme = "soft", footer }: { qu
   return (
     <Slide theme={theme} footer={footer}>
       <div className="flex flex-1 flex-col justify-center">
-        <span aria-hidden className={cn("text-[140px] font-semibold leading-[0.6]", dark ? "text-accent" : "text-accent")}>“</span>
+        <span aria-hidden className={cn("text-[140px] font-semibold leading-[0.6]", dark ? "text-brand-accent" : "text-accent")}>“</span>
         <blockquote className="m-0 mt-6 max-w-[1000px] text-[44px] font-medium leading-[1.25] tracking-[-0.02em]">{quote}</blockquote>
         <div className="mt-10 text-[22px]">
           <span className="font-semibold">{author}</span>
-          {role && <span className={dark ? "text-white/60" : "text-muted"}> · {role}</span>}
+          {role && <span className={dark ? "text-white/75" : "text-muted"}> · {role}</span>}
         </div>
       </div>
     </Slide>
@@ -442,14 +538,14 @@ export function SlideDeck({
         </span>
         <span aria-hidden className="mx-1 h-4 w-px bg-line" />
         <button type="button" aria-pressed={notes} onClick={() => setNotes((n) => !n)} className={tool}>
-          <NotebookText /> <span className="hidden sm:inline">Notas</span>
+          <NotebookText /> <span className="max-sm:sr-only">Notas</span>
         </button>
         <button type="button" onClick={toggleFull} className={tool} aria-label="Tela cheia (F)" title="Tela cheia (F)">
           <Maximize2 />
         </button>
       </header>
-      <div className="flex min-h-0 flex-1 flex-col-reverse md:flex-row">
-        <div ref={railRef} className="flex shrink-0 gap-2 overflow-x-auto border-t border-line bg-soft/50 p-2.5 md:w-[188px] md:flex-col md:overflow-y-auto md:overflow-x-hidden md:border-r md:border-t-0" role="tablist" aria-label="Slides">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col-reverse md:flex-row">
+        <div ref={railRef} className="flex min-w-0 shrink-0 gap-2 overflow-x-auto [contain:inline-size] border-t border-line bg-soft/50 p-2.5 md:w-[188px] md:flex-col md:overflow-y-auto md:overflow-x-hidden md:border-r md:border-t-0" role="tablist" aria-label="Slides">
           {slides.map((s, i) => (
             <button
               key={s.id}
@@ -458,7 +554,7 @@ export function SlideDeck({
               aria-selected={i === index}
               data-slide={i}
               onClick={() => go(i)}
-              className="group flex w-[132px] shrink-0 items-start gap-2 text-left md:w-full"
+              className="group relative flex w-[132px] shrink-0 items-start gap-2 text-left md:w-full"
             >
               <span className={cn("mt-0.5 w-4 shrink-0 text-right text-[11px] tabular-nums", i === index ? "font-semibold text-ink" : "text-muted")}>{i + 1}</span>
               <span className={cn("block min-w-0 flex-1 overflow-hidden rounded-md ring-1 transition-shadow", i === index ? "ring-2 ring-accent" : "ring-line group-hover:ring-line-strong")}>

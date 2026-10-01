@@ -48,3 +48,9 @@ Estados de página inteira em `states.tsx`: `NotFoundState` (404), `ErrorState`,
 - Título curto: o que não há. Dica: por que e como resolver. Ação: botão com o verbo.
 - Ícone relacionado ao conteúdo (lucide, 20 px), nunca ilustração decorativa grande dentro do app.
 - Dentro de moldura (`ListPanel`, card), `framed={false}`.
+
+## Notificações, novidades e tour
+
+- **`NotificationCenter`** (sino da barra superior): ponto só quando há não lida, nunca o total; "Marcar todas como lidas" só quando há o que marcar; filtro Todas/Não lidas a partir de 8 itens. Cada notificação diz quem fez o quê e onde, e abre o registro (`href`/`onSelect`, que também marca como lida).
+- **`Announcement`**: uma pílula "Novo · …" por vez, levando ao recurso ou ao changelog. Some quando a pessoa já viu.
+- **`Tour`** + `useTour(chave)`: 3–5 balões ancorados aos elementos reais para apresentar um recurso novo. Pode ser pulado (Esc), não volta sozinho depois de visto e pula etapas cujo alvo não está na tela. Se a tela precisa de tour para ser entendida, o problema costuma ser o rótulo.

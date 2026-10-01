@@ -11,11 +11,14 @@ Marque cada item: ✓ ok · ✗ falha (vai para o relatório) · — não se apl
 ## Densidade e layout
 - [ ] Controles só quando há o que controlar (busca ≥ 12, filtro ≥ 8, alternador ≥ 8).
 - [ ] Sem card dentro de card; superfícies separadas por borda, não sombra.
+- [ ] Título e corpo no mesmo eixo: coluna estreita por `Page width`, não por wrapper `mx-auto max-w-*`.
 - [ ] Largura de leitura ≤ 620 px em texto corrido; números alinhados à direita com `tabular-nums`.
 
 ## Componentes e superfícies
 - [ ] Sem `<select>`, `<input type="date">`, `confirm`, `alert`.
-- [ ] Rótulo visível acima de todo campo; placeholder é exemplo.
+- [ ] Rótulo visível acima de todo campo; placeholder é exemplo; nenhum rótulo duplicado (FieldBlock + label do campo).
+- [ ] Checkbox fora de tabela com texto visível; seleção múltipla em `CheckboxGroup`/`MultiSelect`.
+- [ ] Desabilitado legível e com motivo (`disabledReason`), sem wrapper de opacidade.
 - [ ] Criar/editar em `Drawer`; decisão curta em `Modal`; irreversível em `ConfirmDialog` (título = pergunta com o objeto, botão = verbo).
 - [ ] Filtros no padrão `FilterBar` (ativos visíveis como chips, "Limpar"), estado na URL quando a lista é compartilhável.
 

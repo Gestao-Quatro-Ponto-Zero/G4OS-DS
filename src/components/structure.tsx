@@ -2,7 +2,7 @@
 
 import { ScrollArea as BaseScrollArea } from "@base-ui/react/scroll-area";
 import { Separator as BaseSeparator } from "@base-ui/react/separator";
-import type { CSSProperties, HTMLAttributes, ReactNode, TdHTMLAttributes, ThHTMLAttributes } from "react";
+import { createContext, useContext, type CSSProperties, type HTMLAttributes, type ReactNode, type TdHTMLAttributes, type ThHTMLAttributes } from "react";
 import { cn } from "../lib/cn";
 import { DsLink } from "./primitives";
 
@@ -232,18 +232,23 @@ export function Item({
     href && "no-underline transition-colors hover:bg-soft",
     className,
   );
-  if (href)
-    return (
+  const inGroup = useContext(ItemGroupContext);
+  if (href) {
+    const link = (
       <DsLink href={href} className={cls}>
         {children}
       </DsLink>
     );
+    return inGroup ? <div role="listitem">{link}</div> : link;
+  }
   return (
-    <div className={cls} {...rest}>
+    <div role={inGroup ? "listitem" : undefined} className={cls} {...rest}>
       {children}
     </div>
   );
 }
+
+const ItemGroupContext = createContext(false);
 
 /** Mídia à esquerda do Item: "icon" = quadrado gelo com ícone 16 px; "image" = miniatura 40 px. */
 export function ItemMedia({ children, variant = "default", className }: { children: ReactNode; variant?: "default" | "icon" | "image"; className?: string }) {
@@ -281,9 +286,11 @@ export function ItemActions({ children, className }: { children: ReactNode; clas
 /** Lista de Items com borda única e divisórias. */
 export function ItemGroup({ children, label, className }: { children: ReactNode; /** Nome acessível da lista. */ label?: string; className?: string }) {
   return (
-    <div role="list" aria-label={label} className={cn("divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface [&>*]:rounded-none", className)}>
-      {children}
-    </div>
+    <ItemGroupContext.Provider value>
+      <div role="list" aria-label={label} className={cn("divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface [&>*]:rounded-none [&>*>a]:rounded-none", className)}>
+        {children}
+      </div>
+    </ItemGroupContext.Provider>
   );
 }
 

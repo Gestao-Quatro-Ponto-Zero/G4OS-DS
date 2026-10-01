@@ -85,7 +85,7 @@ Exemplo (showcase `#/p/ia-conexoes`):
 | `icon` | `IconLike \| undefined` |  |  |
 | `label` | `string \| undefined` |  | Nome do app para leitor de tela (omita se o nome já aparece ao lado). |
 | `letter` | `string \| undefined` |  | Alternativa ao ícone: 1–2 letras. |
-| `size` | `"sm" \| "md" \| "lg" \| "xs" \| "xl" \| undefined` | `"md"` |  |
+| `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| undefined` | `"md"` |  |
 | `variant` | `"plain" \| "soft" \| "tile" \| undefined` | `"tile"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.

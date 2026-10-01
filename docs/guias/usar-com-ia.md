@@ -98,7 +98,20 @@ npx g4os-ds audit "src/app/(app)/pedidos"            # uma página, com a troca 
 npx g4os-ds audit --changed --fix                     # o que o agente mudou: aplica as trocas seguras
 ```
 
-Compare `totals.errors` entre commits para ver o avanço. O `MIGRATION.md` (criado pela skill) guarda antes → depois por tela. Exceções legítimas ficam no código com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`. Para o CI só falhar no que é novo durante a migração: `npx g4os-ds init --baseline` ([auditoria](auditoria.md)).
+Compare `totals.errors` entre commits para ver o avanço. **"0 erros" não é o fim**: as regras de anatomia e composição (`page-width-wrapper`, `disabled-wrapper`, `field-double-label`, `raw-input`…) são avisos e pegam exatamente o que deixa uma tela migrada "esquisita". Zere os avisos também. O `MIGRATION.md` (criado pela skill) guarda antes → depois por tela. Exceções legítimas ficam no código com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`. Para o CI só falhar no que é novo durante a migração: `npx g4os-ds init --baseline` ([auditoria](auditoria.md)).
+
+## Medir se os agentes acertam (eval)
+
+O repositório tem um eval que roda agentes de verdade contra o pacote empacotado, num app Vite limpo (`templates/vite-app`) com o `AGENTS.snippet.md` e o MCP — o mesmo ambiente de quem usa o DS:
+
+```bash
+node scripts/eval/run.mjs --label antes --agents claude,codex --tasks all   # 6 tarefas: lista, registro, 2 migrações, configurações, dashboard
+# … mude docs/regras/MCP …
+node scripts/eval/run.mjs --label depois --agents claude,codex --tasks all
+node scripts/eval/report.mjs antes depois                                   # tabela + falhas mais comuns
+```
+
+A nota (0–100) soma typecheck, build, render sem erro, 390 px sem estouro, axe, verificações visuais (título e corpo no mesmo eixo, desabilitado legível, checkbox com texto), `audit --preset strict` e uma rubrica por tarefa. Custa tokens: não roda no `check`. Saída em `.eval/` (fora do git).
 
 ## Mantendo o guia em dia (quem mexe no DS)
 

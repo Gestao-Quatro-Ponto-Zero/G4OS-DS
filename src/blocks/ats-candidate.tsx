@@ -52,7 +52,7 @@ export const meta = {
 function Score({ value }: { value: number }) {
   if (!value) return <span className="text-[12px] text-muted">—</span>;
   return (
-    <span className="inline-flex" aria-label={`${value} de 5`}>
+    <span className="inline-flex" role="img" aria-label={`${value} de 5`}>
       {[1, 2, 3, 4, 5].map((i) => (
         <Star key={i} aria-hidden className="h-3.5 w-3.5" strokeWidth={1.5} fill={i <= value ? "var(--ds-accent)" : "none"} stroke={i <= value ? "var(--ds-accent)" : "var(--ds-line-strong)"} />
       ))}

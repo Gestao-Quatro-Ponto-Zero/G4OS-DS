@@ -36,7 +36,7 @@ export function StagePath({
 }) {
   const idx = stages.findIndex((s) => s.id === current);
   return (
-    <ol aria-label={label} className={cn("flex list-none gap-1 overflow-x-auto p-0", className)}>
+    <ol aria-label={label} tabIndex={onSelect ? undefined : 0} className={cn("flex min-w-0 list-none gap-1 overflow-x-auto p-0 outline-none focus-visible:ring-2 focus-visible:ring-muted/50", className)}>
       {stages.map((s, i) => {
         const state = outcome ? (i <= idx ? "done" : "skipped") : i < idx ? "done" : i === idx ? "current" : "upcoming";
         const inner = (
@@ -52,7 +52,7 @@ export function StagePath({
           state === "done" && "bg-primary font-medium text-on-primary",
           state === "current" && "bg-accent-soft font-medium text-accent-deep ring-1 ring-inset ring-accent/50",
           state === "upcoming" && "bg-soft text-muted",
-          state === "skipped" && "bg-soft text-muted/70",
+          state === "skipped" && "bg-soft text-muted",
           onSelect && state !== "current" && "hover:brightness-95",
         );
         return (

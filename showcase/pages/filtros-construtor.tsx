@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActiveFilterChip, AddFilterMenu, Button, ConditionEditor, FilterSheet, QuickFilter, filterOperators, useFilters, type FilterCondition, type FilterType } from "@g4ai/ds";
+import { ActiveFilterChip, AddFilterMenu, Button, ConditionEditor, FilterSheet, MatchToggle, QuickFilter, filterOperators, useFilters, type FilterCondition, type FilterType } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { dealFields, dealSearch, deals, me, now } from "./_filtros-data";
 
@@ -45,11 +45,13 @@ export default function Page() {
           className="flex flex-wrap items-center gap-2"
           code={`<QuickFilter filters={filters} field={fields[0]} />     // Etapa ▾
 <AddFilterMenu filters={filters} />                       // + Filtro: campo → operador → valor
+{filters.active.length > 1 && <MatchToggle filters={filters} />}  // "Atende a todos ▾" ⇄ "qualquer um" (E / OU)
 {filters.active.map((c) => <ActiveFilterChip key={c.id} filters={filters} condition={c} />)}
 <FilterSheet filters={filters} open={open} onClose={…} /> // todos os campos, “Aplicar (N)”`}
         >
           <QuickFilter filters={filters} field={dealFields[1]} />
           <AddFilterMenu filters={filters} />
+          {filters.active.length > 1 && <MatchToggle filters={filters} />}
           {filters.active
             .filter((c) => c.field !== "owner")
             .map((c) => (
@@ -68,7 +70,7 @@ export default function Page() {
       </DocSection>
 
       <DocSection title="Operadores por tipo" rule="A ordem é a de uso mais comum; o primeiro é o padrão ao escolher o campo. Operadores sem valor (“é hoje”, “sou eu”, “está vazio”) aplicam direto.">
-        <div className="overflow-x-auto rounded-xl border border-line">
+        <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
           <table className="w-full text-left text-[13px]">
             <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
               <tr>
@@ -118,11 +120,12 @@ export default function Page() {
             ["options.fields", "FilterField<T>[]", "—", "Campos filtráveis."],
             ["options.search", "(row) => string[]", "—", "Textos da busca livre (todas as palavras em E, sem acento)."],
             ["options.me · now", "string · Date", "—", "Pessoa atual (“sou eu”) e data de referência (“hoje”)."],
-            ["options.url", "boolean | string", "false", "Sincroniza com ?q=&f=. String = prefixo."],
+            ["options.url", "boolean | string", "false", "Sincroniza com ?q=&f=&m=. String = prefixo."],
             ["options.initial", "FilterState", "vazio", "Recorte inicial (ex.: visão padrão)."],
             ["filters.rows · shown · total", "T[] · number · number", "", "Resultado e contagens."],
             ["filters.add · update · remove · clear · removeLast", "", "", "Mexem nas condições."],
             ["filters.setQuery · setFacet · countFor", "", "", "Busca, faceta rápida, prévia de contagem para um estado."],
+            ["filters.match · setMatch", '"and" | "or"', '"and"', "Combina os filtros em E (todos) ou OU (qualquer um). A busca livre sempre restringe. MatchToggle mostra a troca na barra (só com 2+ filtros); a FilterBar já inclui."],
           ]}
         />
       </DocSection>

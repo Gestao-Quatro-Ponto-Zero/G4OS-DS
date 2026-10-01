@@ -175,7 +175,7 @@ export default function SettingsBillingBlock() {
             const pr = price(p);
             return (
               <article key={p.id} className={cn("relative flex flex-col rounded-2xl border bg-surface p-5", isCurrent ? "border-ink shadow-[0_0_0_1px_var(--ds-ink)]" : "border-line")}>
-                {p.featured && <span className="absolute -top-2.5 left-5 rounded-md bg-accent px-2 py-0.5 text-[10.5px] font-semibold text-on-ink">Mais escolhido</span>}
+                {p.featured && <span className="absolute -top-2.5 left-5 rounded-md bg-brand-accent px-2 py-0.5 text-[10.5px] font-semibold text-brand">Mais escolhido</span>}
                 <h4 className="m-0 text-[15px] font-semibold">{p.name}</h4>
                 <p className="m-0 mt-0.5 text-[12.5px] text-muted">{p.blurb}</p>
                 <p className="m-0 mt-4 flex items-baseline gap-1">

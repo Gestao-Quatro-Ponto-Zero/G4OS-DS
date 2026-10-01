@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { splitVariants, tagBody } from "./source.mjs";
+import { scanTags, splitVariants, tagBody } from "./source.mjs";
 
 export const DOCS_BASE = "https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/blob/main/docs/guias/auditoria.md";
 
@@ -16,6 +16,8 @@ export const CATEGORIES = {
   tipografia: "Tipografia",
   a11y: "Acessibilidade",
   formatacao: "Formatação pt-BR",
+  escrita: "Escrita",
+  layout: "Anatomia de página",
   componentes: "Componentes",
   react: "React",
   imports: "Imports",
@@ -74,6 +76,24 @@ export const RULES = {
   "dangerous-html": { category: "seguranca", severity: "warn", fixable: false, title: "dangerouslySetInnerHTML", hint: "Só com HTML gerado por você e escapado (themeScript é seguro). Conteúdo de usuário: RichTextView." },
   // performance
   "icon-star-import": { category: "performance", severity: "warn", fixable: false, title: 'import * de "lucide-react"', hint: "Importe só os ícones usados: import { Plus } from \"lucide-react\"." },
+  // anatomia de página e composição (erros que agentes cometem com frequência)
+  "page-width-wrapper": { category: "layout", severity: "warn", fixable: false, title: "Largura da página num wrapper (mx-auto max-w-*)", hint: 'Use <Page width="wide|medium|narrow|reading">: cabeçalho, filtros e corpo ficam no mesmo eixo. Um wrapper só centraliza o corpo e desalinha o título.' },
+  "page-heading": { category: "layout", severity: "info", strict: "warn", fixable: false, title: "<h1> solto numa tela com Page", hint: "Use <PageHeading title=… description=… actions=…>: título fixo, ações e subnavegação no lugar certo." },
+  "disabled-wrapper": { category: "componentes", severity: "warn", fixable: false, title: "Wrapper com opacity/pointer-events em volta de controle desabilitado", hint: "Use disabled + disabledReason=\"…\" no Button (fica legível, focável e explica o motivo). Opacidade extra deixa o botão invisível." },
+  "redundant-children": { category: "componentes", severity: "info", fixable: true, title: "Texto repetido em label e children", hint: "Checkbox/Switch já mostram o label. Remova os children (ou use children só para texto rico)." },
+  "field-double-label": { category: "componentes", severity: "warn", fixable: false, title: "FieldBlock em volta de campo que já tem rótulo", hint: "TextField, NumberField, CurrencyField, TextareaField… já desenham o label. Remova o FieldBlock (ou o label do campo)." },
+  "nested-drawer": { category: "componentes", severity: "warn", fixable: false, title: "Drawer dentro de Drawer", hint: "Drawer nunca abre drawer: troque o conteúdo do mesmo Drawer (passos) ou use Modal para a decisão curta." },
+  "multiple-primary": { category: "componentes", severity: "warn", fixable: false, title: "Mais de um botão primário na mesma área", hint: 'Um primário por área; o resto variant="ghost" ou no ActionMenu (⋯).' },
+  "select-per-row": { category: "componentes", severity: "warn", fixable: false, title: "Select/Combobox dentro de célula de tabela", hint: "Status é controle inline: selo (StatusLabel/Badge) que abre Menu. Select por linha pesa e confunde." },
+  "cell-control-label": { category: "a11y", severity: "warn", fixable: true, title: "Checkbox/Switch em célula sem hideLabel", hint: "Na tabela o rótulo vira só nome acessível: <Checkbox label=\"Selecionar …\" hideLabel />. Sem hideLabel o texto aparece na célula." },
+  "raw-input": { category: "componentes", severity: "warn", fixable: false, title: "<input>/<textarea> cru", hint: "TextField, TextareaField, NumberField, CurrencyField, SearchInput, Checkbox, RadioGroup: rótulo, erro, foco e tema já resolvidos." },
+  "raw-table": { category: "componentes", severity: "info", strict: "warn", fixable: false, title: "<table> cru", hint: "DataTable (dados com ordenação, seleção, celular) ou Table (estática)." },
+  "data-states": { category: "componentes", severity: "info", strict: "warn", fixable: false, title: "Tabela com dados assíncronos sem estado de carregamento", hint: "Cinco estados: Skeleton/LoadingState enquanto carrega, Empty (vazio e vazio por filtro), erro com saída." },
+  "manual-format": { category: "formatacao", severity: "info", strict: "warn", fixable: false, title: "Formatação pt-BR feita à mão", hint: "formatCurrency / formatPercent / formatNumber de @g4ai/ds: mesmo arredondamento e abreviação em todo o app." },
+  // escrita
+  "copy-tone": { category: "escrita", severity: "warn", fixable: false, title: 'Texto com "com sucesso" ou exclamação', hint: 'Particípio + objeto: "Vaga criada", "Convite enviado". Sem "com sucesso" e sem "!".' },
+  "english-copy": { category: "escrita", severity: "warn", fixable: false, title: "Texto de interface em inglês", hint: "pt-BR em tudo: Salvar, Cancelar, Carregando…, Buscar, Excluir, Voltar." },
+  "title-case": { category: "escrita", severity: "info", strict: "warn", fixable: false, title: "Botão em Title Case", hint: 'Só a primeira letra maiúscula: "Criar nova vaga", não "Criar Nova Vaga".' },
 };
 
 for (const [id, r] of Object.entries(RULES)) r.docs = `${DOCS_BASE}#${id}`;
@@ -300,6 +320,16 @@ export function checkTag(tag, { code, raw = code, report, ext }) {
   const at = [tag.start, Math.min(tag.end, tag.start + name.length + 1)];
 
   if (name === "select") report("native-select", ...at);
+  // campo "nu" dentro de uma casca própria (ds-bare/bg-transparent) ou com fieldClass/areaClass do DS é composição sancionada
+  const bare = /(?<![\w-])(ds-bare|bg-transparent)(?![\w-])|\b(fieldClass|areaClass|inputClass)\b/.test(a("className")?.value ?? "");
+  if (name === "textarea" && ext !== ".css" && !bare) report("raw-input", ...at, { suggestion: "TextareaField (rótulo, contador e erro prontos)." });
+  if (name === "input" && ext !== ".css" && !bare) {
+    const t = strVal("type");
+    if (t === "checkbox") report("raw-input", ...at, { suggestion: "Checkbox / CheckboxGroup." });
+    else if (t === "radio") report("raw-input", ...at, { suggestion: "RadioGroup / ChoiceCards." });
+    else if (t === undefined || /^(text|email|tel|url|number|search|password)$/.test(t ?? "")) report("raw-input", ...at, { suggestion: t === "number" ? "NumberField / CurrencyField." : t === "search" ? "SearchInput." : t === "password" ? "PasswordField." : "TextField." });
+  }
+  if (name === "table" && ext !== ".css") report("raw-table", ...at);
   if (name === "input" && /^(date|datetime-local|month|week|time)$/.test(strVal("type") ?? "")) report("native-date", ...at);
   if (name === "html" && ext !== ".css") {
     const lang = strVal("lang");
@@ -369,6 +399,163 @@ export function checkTag(tag, { code, raw = code, report, ext }) {
       if (/\bas\s+any\b/.test(codeOnly)) report("as-any-props", x.start, x.end);
     }
   }
+
+  checkComposition(tag, { code, raw, report, ext, clsRaw, strVal });
+}
+
+/* ------------------------------------------------------------------ */
+/* Composição e anatomia (padrões que agentes erram)                   */
+/* ------------------------------------------------------------------ */
+
+/** Componente aberto envolvendo a posição (mesma lógica de insideLabel, para nomes JSX). */
+export function insideOpen(code, at, names, window = 20000) {
+  return openAt(code, at, names, window) >= 0;
+}
+
+/** Índice do `<Nome` aberto que envolve a posição, ou -1. */
+export function openAt(code, at, names, window = 20000) {
+  const base = Math.max(0, at - window);
+  const before = code.slice(base, at);
+  const re = new RegExp(`<(/?)(${names.join("|")})(?=[\\s/>])`, "g");
+  const marks = [...before.matchAll(re)];
+  let depth = 0;
+  for (let k = marks.length - 1; k >= 0; k--) {
+    if (marks[k][1]) depth++;
+    else {
+      // <Page … /> autocontido não envolve nada
+      const rest = before.slice(marks[k].index);
+      const end = rest.search(/\/?>/);
+      if (end >= 0 && rest[end] === "/") continue;
+      if (depth === 0) return base + marks[k].index;
+      depth--;
+    }
+  }
+  return -1;
+}
+
+const PAGE_WIDTH = { "7xl": "wide", "6xl": "wide", screen: "wide", "5xl": "medium", "4xl": "narrow", "3xl": "reading", "2xl": "reading", prose: "reading" };
+/** Campos que desenham o próprio rótulo (Frame) e não leem o FieldBlock em volta. */
+const FRAME_FIELDS = "TextField|TextareaField|PasswordField|NumberField|CurrencyField|MaskedField|TagInput|FileDropzone|RadioGroup|ChoiceCards";
+const DISABLED_CONTROL = /<(Button|OperationButton|IconButton|SplitButton|BrandButton|Switch|Checkbox)\b[^>]*\bdisabled\b/;
+const TITLE_CASE_NOUNS = /^(Novo|Nova|Novos|Novas|Todos|Todas|Detalhes|Alterações|Configurações|Conta|Dados|Arquivo|Item|Itens|Usuário|Usuários|Cliente|Clientes|Vaga|Vagas|Pedido|Pedidos|Relatório|Agora|Mais|Selecionados|Selecionadas|Registro|Negócio|Contato|Fatura|Faturas|Lista|Filtro|Filtros|Senha|Perfil|Membro|Equipe)$/;
+
+function checkComposition(tag, { code, report, ext, clsRaw, strVal }) {
+  if (ext === ".css" || ext === ".html") return;
+  const { name } = tag;
+  const at = [tag.start, Math.min(tag.end, tag.start + name.length + 1)];
+  const lower = name[0] === name[0].toLowerCase();
+  const cls = tag.attr("className");
+
+  // largura da página num wrapper dentro de <Page>
+  if (lower && cls && clsRaw) {
+    const toks = clsRaw.split(/[\s"'`{}()?:,]+/);
+    const mw = toks.map((t) => /^max-w-(\w+|\[[^\]]+\])$/.exec(t)).find(Boolean);
+    const page = toks.includes("mx-auto") && mw ? openAt(code, tag.start, ["Page"]) : -1;
+    // o erro é o cabeçalho FORA do wrapper (título num eixo, corpo em outro)
+    // papel/cartão centralizado (borda, fundo, sombra) é um objeto da página, não a largura dela
+    const object = toks.some((t) => /^(border|rounded|shadow|bg-(surface|popover|soft))/.test(t));
+    if (page >= 0 && !object && /<PageHeading[\s/>]/.test(code.slice(page, tag.start))) {
+      const w = PAGE_WIDTH[mw[1]] ?? (/^\[/.test(mw[1]) ? "medium" : null);
+      if (w) report("page-width-wrapper", cls.start, cls.end, { suggestion: `<Page width="${w}"> e tire mx-auto ${mw[0]} deste wrapper.` });
+    }
+  }
+
+  // wrapper apagando um controle desabilitado
+  // (classes condicionais — `dirty ? "" : "opacity-0 pointer-events-none"` — são estado visual, não wrapper)
+  if (lower && clsRaw && !(cls?.kind === "expr" && /\?|&&|\|\|/.test(cls.value))) {
+    const plain = clsRaw.split(/[\s"'`{}()?:,]+/);
+    const pe = plain.includes("pointer-events-none");
+    const op = plain.some((t) => /^opacity-(?:[1-6]0|[1-9]|\[0?\.[0-6]\d*\])$/.test(t));
+    if (pe || op) {
+      const body = tagBody(code, tag) ?? "";
+      const wraps = DISABLED_CONTROL.test(body) || (op && tag.has("aria-disabled"));
+      if (wraps) report("disabled-wrapper", ...at);
+    }
+  }
+
+  if (lower) return;
+
+  // label repetido nos children
+  if (/^(Checkbox|Switch)$/.test(name) && !tag.selfClosing && tag.has("label")) {
+    const body = tagBody(code, tag);
+    const l = tag.attr("label");
+    if (body != null) {
+      const b = body.trim();
+      const same = l.kind === "string" ? b === l.value.trim() : b.replace(/\s+/g, "") === `{${l.value.replace(/\s+/g, "")}}`;
+      if (same && b) {
+        const closeEnd = tag.end + body.length + `</${name}>`.length;
+        const ws = /\s/.test(code[tag.end - 2] ?? "");
+        report("redundant-children", ...at, { fix: { start: tag.end - 1, end: closeEnd, text: ws ? "/>" : " />" } });
+      }
+    }
+  }
+
+  // FieldBlock em volta de campo com rótulo próprio
+  if (name === "FieldBlock" && tag.has("label") && !tag.selfClosing) {
+    const body = tagBody(code, tag) ?? "";
+    const m = new RegExp(`<(${FRAME_FIELDS})\\b([^>]*)>`).exec(body);
+    if (m && /\blabel=/.test(m[2]) && !/\bhideLabel\b/.test(m[2])) report("field-double-label", ...at, { suggestion: `${m[1]} já mostra o label: remova o FieldBlock.` });
+  }
+
+  // drawer dentro de drawer
+  if (name === "Drawer" && !tag.selfClosing) {
+    const body = tagBody(code, tag) ?? "";
+    if (/<Drawer[\s/>]/.test(body)) report("nested-drawer", ...at);
+  }
+
+  // mais de um primário em actions={…}
+  const actions = tag.attr("actions");
+  if (actions?.kind === "expr") {
+    const primaries = [...actions.value.matchAll(/<(Button|OperationButton)\b([^>]*)>/g)].filter((m) => !/\bvariant=/.test(m[2]) || /\bvariant=["']primary["']/.test(m[2]));
+    // `cond ? <Button>A</Button> : <Button>B</Button>`: um ou outro, não dois
+    const alternatives = (actions.value.match(/:\s*\(?\s*<(Button|OperationButton)\b/g) ?? []).length;
+    if (primaries.length - alternatives >= 2) report("multiple-primary", actions.start, actions.end);
+  }
+
+  // botão em Title Case
+  if (/^(Button|OperationButton|BrandButton)$/.test(name) && !tag.selfClosing) {
+    const text = (tagBody(code, tag) ?? "").replace(/<[^>]*>/g, " ").replace(/\{[^}]*\}/g, " ").trim();
+    const words = text.split(/\s+/).filter(Boolean);
+    const caps = words.slice(1).filter((w) => /^[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]{2,}$/.test(w));
+    if (caps.length >= 2 && caps.some((w) => TITLE_CASE_NOUNS.test(w))) report("title-case", ...at, { suggestion: `"${words[0]} ${words.slice(1).join(" ").toLowerCase()}"` });
+  }
+  void strVal;
+}
+
+/** Fim de uma expressão de arrow function (corpo entre parênteses, chaves ou JSX direto). */
+export function arrowBodyEnd(code, from) {
+  let i = from;
+  while (/\s/.test(code[i] ?? "")) i++;
+  const c = code[i];
+  if (c === "{") return matchPair(code, i, "{", "}");
+  if (c === "(") return matchPair(code, i, "(", ")");
+  // expressão sem delimitador: até a próxima vírgula/chave de fechamento no nível 0
+  let depth = 0;
+  for (let k = i; k < code.length; k++) {
+    const ch = code[k];
+    if ("({[".includes(ch)) depth++;
+    else if (")}]".includes(ch)) {
+      if (depth === 0) return k;
+      depth--;
+    } else if (ch === "," && depth === 0) return k;
+  }
+  return code.length;
+}
+
+function matchPair(code, from, open, close) {
+  let depth = 0;
+  for (let i = from; i < code.length; i++) {
+    const c = code[i];
+    if (c === '"' || c === "'" || c === "`") {
+      let j = i + 1;
+      while (j < code.length && code[j] !== c) j += code[j] === "\\" ? 2 : 1;
+      i = j;
+      continue;
+    }
+    if (c === open) depth++;
+    else if (c === close && --depth === 0) return i;
+  }
+  return code.length;
 }
 
 /* ------------------------------------------------------------------ */
@@ -446,6 +633,60 @@ export function checkCode({ code, strings, report, ext }) {
   }
 
   for (const m of code.matchAll(/import\s+\*\s+as\s+\w+\s+from\s*["']lucide-react["']/g)) report("icon-star-import", m.index, m.index + m[0].length);
+
+  checkCompositionCode({ code, strings, report });
+}
+
+export const ENGLISH_UI = /^(save|save changes|cancel|delete|edit|submit|search|search\.\.\.|search…|loading|loading\.\.\.|loading…|close|back|next|previous|settings|sign in|sign out|sign up|log in|log out|logout|create|add|add new|no results|no data|confirm|continue|done|apply|reset|clear|clear filters|export|import|select|select\.\.\.|yes|no|actions|name|password|amount|due date|customer|customers|invoice|invoices|overview|details|view|view all|remove|update|send|retry|try again|something went wrong|are you sure\??)$/i;
+const COPY_ATTRS = /(?:^|[\s{(,])(title|description|label|hint|placeholder|message|noun|emptyTitle|emptyHint|confirmLabel|cancelLabel|aria-label)\s*=\s*$/;
+
+function checkCompositionCode({ code, strings, report }) {
+  // <h1> numa tela com Page
+  if (/<Page[\s>]/.test(code)) for (const m of code.matchAll(/<h1(?=[\s>])/g)) if (insideOpen(code, m.index, ["Page"])) report("page-heading", m.index, m.index + 3);
+
+  // Texto de interface: strings de atributos de texto, primeiro argumento de notify(), texto JSX.
+  const copy = [];
+  for (const s of strings) {
+    if (s.quote === "`") continue;
+    const before = code.slice(Math.max(0, s.start - 30), s.start - 1);
+    const notifyArg = /\bnotify(?:Promise)?\(\s*$/.test(code.slice(Math.max(0, s.start - 20), s.start - 1));
+    if (COPY_ATTRS.test(before) || notifyArg) copy.push({ text: s.value, start: s.start, end: s.end });
+  }
+  for (const m of code.matchAll(/>([^<>{}]*[A-Za-zÀ-ÿ][^<>{}]*)</g)) {
+    const t = m[1];
+    if (!t.trim() || t.trim().length > 80 || /=>|&&|\|\||[;=]\s/.test(t)) continue; // código entre comparações ou parágrafo de conteúdo, não texto de interface
+    const start = m.index + 1 + t.search(/\S/);
+    copy.push({ text: t.trim(), start, end: start + t.trim().length, jsx: true });
+  }
+  for (const c of copy) {
+    if (/\bcom sucesso\b/i.test(c.text)) report("copy-tone", c.start, c.end, { suggestion: 'Tire "com sucesso": o particípio já diz que deu certo ("Vaga criada").' });
+    else if (/[A-Za-zÀ-ÿ)]\s*!$/.test(c.text) && /\s/.test(c.text.trim())) report("copy-tone", c.start, c.end, { suggestion: "Sem exclamação: a interface informa, não comemora." });
+    if (ENGLISH_UI.test(c.text.trim())) report("english-copy", c.start, c.end);
+  }
+
+  // controles dentro de renderizadores de célula: cell: (row) => …, header: …, render…: …
+  for (const m of code.matchAll(/\b(cell|header|render\w*)\s*:\s*(?:\(([^()]*)\)|[\w$]+)\s*=>/g)) {
+    const from = m.index + m[0].length;
+    const end = arrowBodyEnd(code, from);
+    const body = code.slice(from, end);
+    for (const t of scanTags(body)) {
+      const s = from + t.start;
+      if (/^(Select|Combobox|NativeSelect)$/.test(t.name)) report("select-per-row", s, s + 1 + t.name.length);
+      // autocontido sem hideLabel: o label vira texto dentro da célula
+      if (/^(Checkbox|Switch)$/.test(t.name) && t.selfClosing && !t.spread && !t.has("hideLabel")) {
+        const nameEnd = s + 1 + t.name.length;
+        report("cell-control-label", s, nameEnd, { fix: { start: nameEnd, end: nameEnd, text: " hideLabel" } });
+      }
+    }
+  }
+
+  // dados assíncronos numa tabela sem estado de carregamento
+  const table = /<(DataTable|DataGrid)\b/.exec(code);
+  if (table && /\b(fetch\(|await\s|\.then\(|useQuery\(|useSWR\(|useSuspenseQuery\()/.test(code) && !/\b(Skeleton\w*|LoadingState|StateView)\b|\bloading\s*[=:{]/.test(code)) report("data-states", table.index, table.index + table[0].length);
+
+  // formatação pt-BR à mão (Intl/toLocaleString com style) e porcentagem por toFixed
+  for (const m of code.matchAll(/(?:\.toLocaleString\(|new Intl\.NumberFormat\()\s*["'`]pt-BR["'`]\s*,\s*\{[^}]*style\s*:\s*["'`](currency|percent)/g)) report("manual-format", m.index, m.index + m[0].length, { suggestion: m[1] === "currency" ? "formatCurrency(valor)" : "formatPercent(fração)" });
+  for (const m of code.matchAll(/\.toFixed\(\s*\d\s*\)\s*\+\s*["'`]\s*%/g)) report("number-format", m.index, m.index + m[0].length, { suggestion: "formatPercent(fração) de @g4ai/ds (vírgula decimal, sinal, arredondamento)." });
 }
 
 /** Caminho interno → troca segura ("" = sem troca automática; undefined = está ok). */

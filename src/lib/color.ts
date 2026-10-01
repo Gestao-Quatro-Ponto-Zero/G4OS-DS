@@ -44,6 +44,16 @@ export function bestOn(bg: string, candidates: string[] = ["#ffffff", "#121214"]
   return candidates.reduce((best, c) => (contrast(bg, c) > contrast(bg, best) ? c : best), candidates[0]);
 }
 
+/**
+ * Preenchimento de identidade (avatar, agente, app) com iniciais brancas:
+ * tints claros escurecem até 4,6:1. Aceita hex; outras cores (var, oklch)
+ * escurecem 20 % por color-mix.
+ */
+export function tintFill(tint: string | undefined, fallback = "#3f3f46") {
+  if (!tint) return fallback;
+  return /^#[0-9a-f]{6}$/i.test(tint) ? ensureContrast(tint, "#ffffff", 4.6) : `color-mix(in oklab, ${tint} 62%, black)`;
+}
+
 /** Escurece (ou clareia) `color` até atingir `min` de contraste contra `against`. */
 export function ensureContrast(color: string, against: string, min = 4.5) {
   const toward = luminance(against) > 0.5 ? "#000000" : "#ffffff";
@@ -65,7 +75,8 @@ export type BrandTokens = {
 /**
  * Deriva os tokens de marca para claro e escuro a partir da cor de ação
  * (primary) e, opcionalmente, da cor de destaque (accent). Garante AA:
- * on-primary ≥ 4,5 sobre primary; accent-deep ≥ 4,5 sobre a superfície.
+ * on-primary ≥ 4,5 sobre primary; accent-deep ≥ 4,6 sobre accent-soft (o
+ * fundo mais escuro em que ele aparece: selo, etapa atual), logo também na superfície.
  */
 export function deriveBrand(primary: string, accent = primary) {
   const lightSurface = "#ffffff";
@@ -74,7 +85,7 @@ export function deriveBrand(primary: string, accent = primary) {
     primary,
     onPrimary: bestOn(primary),
     accent,
-    accentDeep: ensureContrast(accent, lightSurface, 4.5),
+    accentDeep: ensureContrast(accent, mix(accent, lightSurface, 0.88), 4.6),
     accentSoft: mix(accent, lightSurface, 0.88),
     blue: ensureContrast(primary, lightSurface, 4.5),
     chart1: primary,
@@ -84,7 +95,7 @@ export function deriveBrand(primary: string, accent = primary) {
     primary: darkPrimary,
     onPrimary: bestOn(darkPrimary),
     accent: ensureContrast(mix(accent, "#ffffff", 0.2), darkSurface, 3),
-    accentDeep: ensureContrast(mix(accent, "#ffffff", 0.35), darkSurface, 4.5),
+    accentDeep: ensureContrast(mix(accent, "#ffffff", 0.35), mix(accent, darkSurface, 0.82), 4.6),
     accentSoft: mix(accent, darkSurface, 0.82),
     blue: ensureContrast(mix(primary, "#ffffff", 0.5), darkSurface, 4.5),
     chart1: darkPrimary,

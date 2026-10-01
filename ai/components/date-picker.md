@@ -33,6 +33,14 @@ Seletor de data (Popover + Calendar, pt-BR).
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ `<DatePicker label="Início" value={iso} onValueChange={setIso} clearable />` com data ISO ("2026-10-01"). Hora: `TimePicker`; data e hora: `DateTimePicker`.
+
+**Evite**
+
+- ✗ `<input type="date">` (abre em inglês no iPhone; regra `native-date`); `new Date("2026-10-01")` para exibir (fuso): use `formatDate`.
+
 Exemplo (showcase `#/p/datas-data`):
 
 ```tsx

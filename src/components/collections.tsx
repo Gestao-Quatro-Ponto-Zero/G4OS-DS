@@ -4,9 +4,12 @@ import { AlignJustify, Check, ChevronDown, Columns3, LayoutGrid, List, X } from 
 import { useEffect, useId, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../lib/cn";
+import { normalize } from "../lib/text";
+import { SortHeader, type SortState } from "./data";
+import { Skeleton } from "./feedback";
 import { SearchInput } from "./forms";
 import { SegmentedControl } from "./navigation";
-import { Avatar } from "./primitives";
+import { Avatar, Button } from "./primitives";
 
 /*
  * Coleções: toolbar, filtros, visualização, densidade, tabela, kanban.
@@ -57,7 +60,7 @@ export function TableToolbar({
       )}
       {children}
       {onClear && dirty && (
-        <button type="button" onClick={onClear} className="inline-flex h-8 items-center gap-1 rounded-md px-2.5 text-[13px] text-muted hover:bg-soft hover:text-ink">
+        <button type="button" onClick={onClear} className="inline-flex h-10 items-center gap-1 rounded-lg px-2.5 text-[13px] text-muted hover:bg-soft hover:text-ink">
           <X className="h-3.5 w-3.5" />
           Limpar
         </button>
@@ -73,10 +76,21 @@ export function TableToolbar({
 /* FacetFilter                                                         */
 /* ------------------------------------------------------------------ */
 
+export type FacetOption = {
+  /** Identificador (aceita `id` ou `value`, como nos outros controles). */
+  id?: string;
+  value?: string;
+  label: string;
+  /** Quantos itens têm este valor (com os outros filtros aplicados). 0 = opção esmaecida. */
+  count?: number;
+  icon?: ReactNode;
+};
+
 /**
- * Filtro multi-seleção por atributo. Gatilho mostra o contador escuro quando
- * ativo. Busca interna a partir de 8 opções. Portal com posição calculada,
- * abre para cima se faltar espaço, fecha em scroll/resize/Esc.
+ * Filtro multi-seleção por atributo. Gatilho mostra o contador quando ativo.
+ * Busca interna (sem acento e caixa) a partir de 8 opções; contagem por
+ * opção quando informada. Portal com posição calculada, abre para cima se
+ * faltar espaço, fecha em scroll/resize/Esc.
  */
 export function FacetFilter({
   label,
@@ -86,7 +100,7 @@ export function FacetFilter({
   align = "right",
 }: {
   label: string;
-  options: { id: string; label: string }[];
+  options: FacetOption[];
   value: string[];
   onChange: (next: string[]) => void;
   align?: "left" | "right";
@@ -138,8 +152,10 @@ export function FacetFilter({
   }
   const toggle = (optionId: string) =>
     onChange(value.includes(optionId) ? value.filter((v) => v !== optionId) : [...value, optionId]);
-  const needle = q.trim().toLowerCase();
-  const visible = needle ? options.filter((o) => o.label.toLowerCase().includes(needle)) : options;
+  const keyOf = (o: FacetOption) => o.id ?? o.value ?? o.label;
+  const needle = normalize(q.trim());
+  const visible = needle ? options.filter((o) => normalize(o.label).includes(needle)) : options;
+  const selectedLabels = options.filter((o) => value.includes(keyOf(o))).map((o) => o.label);
 
   return (
     <div
@@ -166,6 +182,7 @@ export function FacetFilter({
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={id}
+        aria-label={value.length ? `${label}: ${selectedLabels.join(", ")}` : undefined}
         type="button"
         onClick={() => (open ? setOpen(false) : openMenu())}
         className={cn(
@@ -174,13 +191,13 @@ export function FacetFilter({
         )}
       >
         {label}
-        {value.length > 0 && <span className="rounded-sm bg-ink px-1.5 text-[11px] font-medium text-on-ink">{value.length}</span>}
+        {value.length > 0 && <span className="rounded-md bg-primary px-1.5 text-[11px] font-medium tabular-nums text-on-primary">{value.length}</span>}
         <ChevronDown className="h-3.5 w-3.5 text-muted" />
       </button>
       {open &&
         createPortal(
           <div ref={menu} id={id} role="menu" aria-label={label} style={position} className="fixed z-[100] flex flex-col overflow-hidden rounded-xl bg-popover py-2 shadow-lg ring-1 ring-line">
-            {options.length > 7 && (
+            {options.length >= collectionThresholds.facets && (
               <div className="px-2 pb-1 pt-1">
                 <input
                   aria-label={`Buscar em ${label}`}
@@ -194,20 +211,26 @@ export function FacetFilter({
             )}
             <div className="min-h-0 overflow-y-auto">
               {visible.map((o) => {
-                const on = value.includes(o.id);
+                const key = keyOf(o);
+                const on = value.includes(key);
                 return (
                   <button
-                    key={o.id}
+                    key={key}
                     role="menuitemcheckbox"
                     aria-checked={on}
                     type="button"
-                    onClick={() => toggle(o.id)}
-                    className="flex w-full items-start gap-3 px-4 py-2.5 text-left text-[13px] leading-relaxed hover:bg-soft"
+                    onClick={() => toggle(key)}
+                    className={cn(
+                      "flex w-full items-start gap-3 px-4 py-2.5 text-left text-[13px] leading-relaxed outline-none hover:bg-soft focus-visible:bg-soft",
+                      o.count === 0 && !on && "text-muted",
+                    )}
                   >
                     <span className={cn("mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm ring-1", on ? "bg-primary text-on-primary ring-primary" : "ring-line-strong")}>
                       {on && <Check className="h-3 w-3" />}
                     </span>
-                    {o.label}
+                    {o.icon && <span className="mt-0.5 shrink-0 text-muted [&_svg]:h-4 [&_svg]:w-4">{o.icon}</span>}
+                    <span className="min-w-0 flex-1">{o.label}</span>
+                    {o.count != null && <span className="shrink-0 text-[12px] tabular-nums text-muted">{o.count}</span>}
                   </button>
                 );
               })}
@@ -285,7 +308,7 @@ export function DensityControl({ density, onChange }: { density: Density; onChan
       )}
     >
       <AlignJustify className="h-3.5 w-3.5" />
-      <span className="hidden sm:inline">Compacto</span>
+      <span className="max-sm:sr-only">Compacto</span>
     </button>
   );
 }
@@ -420,16 +443,32 @@ export type Column<T> = {
   wide?: boolean;
   /** Coluna de ação: separada por linha no mobile. */
   action?: boolean;
+  /** Coluna de seleção (selectionColumn): fica ao lado do título no mobile. */
+  selection?: boolean;
   mobileHidden?: boolean;
   nowrap?: boolean;
-  align?: "left" | "right";
+  align?: "left" | "right" | "center";
+  /** Chave do `useSort`: o cabeçalho vira botão de ordenação com aria-sort. Exige `header` em texto. */
+  sortKey?: string;
+  /** Célula do rodapé (total, média). Com qualquer coluna com footer, a tabela ganha <tfoot>. */
+  footer?: ReactNode;
+  /** Largura fixa da coluna no desktop (px ou CSS). */
+  width?: number | string;
   className?: string;
 };
+
+/** O que a tabela precisa de um `useSort` (passe o retorno inteiro). */
+export type TableSort = { sort: SortState; toggle: (key: string) => void };
 
 /**
  * Tabela padrão: contorno arredondado, cabeçalho gelo 12px, linhas 13.5px
  * com divisória, vira blocos rotulados abaixo de 1024px (o rótulo vem do
  * header quando é string). `view="cards"` mostra a mesma coleção em cards.
+ *
+ * Estados: `loading` sem linhas mostra esqueleto; com linhas (recarregando)
+ * mantém as linhas e mostra uma barra de progresso. `error` mostra o bloco
+ * com "Tentar de novo". `empty` quando não há linhas (use EmptyFilterResult
+ * quando o vazio é do filtro). `maxHeight` rola por dentro com cabeçalho fixo.
  */
 export function DataTable<T>({
   rows,
@@ -440,6 +479,15 @@ export function DataTable<T>({
   empty,
   view = "list",
   density,
+  label,
+  sort,
+  loading,
+  loadingRows = 5,
+  error,
+  maxHeight,
+  rowSelected,
+  rowTone,
+  footerLabel,
   className,
 }: {
   rows: T[];
@@ -450,68 +498,163 @@ export function DataTable<T>({
   empty?: ReactNode;
   view?: "list" | "cards";
   density?: Density;
+  /** Nome da tabela para leitores de tela ("Contas a receber"). */
+  label?: string;
+  /** Retorno do useSort; colunas com `sortKey` ganham cabeçalho ordenável. */
+  sort?: TableSort;
+  loading?: boolean;
+  /** Linhas de esqueleto no primeiro carregamento. */
+  loadingRows?: number;
+  error?: { message: string; onRetry?: () => void };
+  /** Altura máxima: rola por dentro com o cabeçalho fixo. */
+  maxHeight?: number | string;
+  /** Linha selecionada (seleção em massa ou registro aberto ao lado). */
+  rowSelected?: (row: T) => boolean;
+  /** Linha que pede atenção (atrasado, bloqueado): faixa à esquerda. */
+  rowTone?: (row: T) => "warn" | "bad" | undefined;
+  /** Rótulo da primeira célula do rodapé quando ela não tem `footer`. */
+  footerLabel?: string;
   className?: string;
 }) {
+  const refreshing = !!loading && rows.length > 0;
+  const firstLoad = !!loading && rows.length === 0;
+  const hasFooter = columns.some((c) => c.footer !== undefined) && rows.length > 0 && !firstLoad && !error;
+  const selectable = columns.some((c) => c.selection);
+  const labelAt = columns.findIndex((c) => !c.selection && c.footer === undefined);
+  const alignCls = (a?: Column<T>["align"]) => (a === "right" ? "text-right" : a === "center" ? "text-center" : undefined);
   return (
     <div
       data-density={density}
       data-view={view}
-      className={cn("collection-table overflow-x-auto rounded-xl border border-line bg-surface", className)}
+      aria-busy={loading || undefined}
+      className={cn("collection-table relative overflow-x-auto rounded-xl border border-line bg-surface", maxHeight != null && view === "list" && "overflow-y-auto", className)}
+      style={maxHeight != null && view === "list" ? { maxHeight } : undefined}
     >
-      <table className="responsive-table w-full text-left text-[13.5px]">
+      {refreshing && (
+        <div role="status" aria-label="Atualizando" className="pointer-events-none sticky left-0 top-0 z-[3] h-0.5 w-full overflow-hidden">
+          <span className="ds-progress-indeterminate block h-full w-1/3 bg-primary" />
+        </div>
+      )}
+      <table aria-label={label} className={cn("responsive-table w-full text-left text-[13.5px]", selectable && "selectable-table", maxHeight != null && "sticky-head-table")}>
         <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
           <tr>
-            {columns.map((c) => (
-              <th key={c.key} className={cn("font-medium", c.align === "right" && "text-right")}>
-                {c.header}
-              </th>
-            ))}
+            {columns.map((c) => {
+              const active = !!sort && !!c.sortKey && sort.sort?.key === c.sortKey;
+              const dir = active ? sort!.sort!.dir : undefined;
+              return (
+                <th
+                  key={c.key}
+                  scope="col"
+                  aria-sort={c.sortKey && sort ? (active ? (dir === "asc" ? "ascending" : "descending") : "none") : undefined}
+                  style={c.width != null ? { width: c.width } : undefined}
+                  className={cn("font-medium", alignCls(c.align))}
+                >
+                  {c.sortKey && sort && typeof c.header === "string" ? (
+                    <SortHeader label={c.header} active={active} dir={dir} onToggle={() => sort.toggle(c.sortKey!)} align={c.align === "right" ? "right" : "left"} />
+                  ) : (
+                    c.header
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
-        <tbody>
-          {rows.length === 0 && (
+        <tbody className={cn(refreshing && "opacity-60 transition-opacity")}>
+          {firstLoad &&
+            Array.from({ length: loadingRows }, (_, i) => (
+              <tr key={`sk${i}`} aria-hidden>
+                {columns.map((c) => (
+                  <td key={c.key} data-primary={c.primary ? "" : undefined} data-wide={c.wide ? "" : undefined} data-mobile-hidden={c.mobileHidden || c.action ? "" : undefined}>
+                    {c.selection ? <Skeleton className="h-4 w-4" /> : c.action ? null : <Skeleton className={cn("h-3.5", c.primary ? "w-3/4" : i % 2 ? "w-1/2" : "w-2/3", c.align === "right" && "ml-auto")} />}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          {!loading && error && (
+            <tr>
+              <td colSpan={columns.length} className="p-0">
+                <div role="alert" className="flex flex-col items-center gap-3 px-6 py-10 text-center">
+                  <p className="m-0 text-[14px] font-medium text-ink">Não foi possível carregar</p>
+                  <p className="m-0 max-w-sm text-[13px] text-muted">{error.message}</p>
+                  {error.onRetry && (
+                    <Button size="sm" variant="ghost" onClick={error.onRetry}>
+                      Tentar de novo
+                    </Button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          )}
+          {!loading && !error && rows.length === 0 && (
             <tr>
               <td colSpan={columns.length} className="p-4">
                 {empty}
               </td>
             </tr>
           )}
-          {rows.map((row) => (
-            <tr
-              key={rowKey(row)}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              tabIndex={onRowClick ? 0 : undefined}
-              aria-label={onRowClick && rowLabel ? rowLabel(row) : undefined}
-              onKeyDown={
-                onRowClick
-                  ? (e) => {
-                      if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
-                        e.preventDefault();
-                        onRowClick(row);
-                      }
-                    }
-                  : undefined
-              }
-              className={cn(onRowClick && "cursor-pointer hover:bg-soft/50")}
-            >
-              {columns.map((c) => (
+          {!firstLoad &&
+            !(error && !loading) &&
+            rows.map((row) => {
+              const selected = rowSelected?.(row);
+              const tone = rowTone?.(row);
+              return (
+                <tr
+                  key={rowKey(row)}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  aria-label={onRowClick && rowLabel ? rowLabel(row) : undefined}
+                  aria-selected={selected === undefined ? undefined : selected}
+                  data-selected={selected ? "" : undefined}
+                  data-tone={tone}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+                            e.preventDefault();
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={cn("ds-table-row", onRowClick && "cursor-pointer hover:bg-soft/50 focus-visible:bg-soft/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent/50")}
+                >
+                  {columns.map((c) => (
+                    <td
+                      key={c.key}
+                      data-label={typeof c.header === "string" && !c.primary && !c.selection ? c.header : undefined}
+                      data-primary={c.primary ? "" : undefined}
+                      data-wide={c.wide ? "" : undefined}
+                      data-action={c.action && !c.selection ? "" : undefined}
+                      data-selection={c.selection ? "" : undefined}
+                      data-mobile-hidden={c.mobileHidden ? "" : undefined}
+                      data-nowrap={c.nowrap ? "" : undefined}
+                      className={cn(alignCls(c.align), c.primary && "font-medium", c.className)}
+                      onClick={c.action || c.selection ? (e) => e.stopPropagation() : undefined}
+                    >
+                      {c.cell(row)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+        </tbody>
+        {hasFooter && (
+          <tfoot className="border-t border-line bg-soft/40 text-[13px] font-medium">
+            <tr>
+              {columns.map((c, i) => (
                 <td
                   key={c.key}
-                  data-label={typeof c.header === "string" && !c.primary ? c.header : undefined}
-                  data-primary={c.primary ? "" : undefined}
-                  data-wide={c.wide ? "" : undefined}
-                  data-action={c.action ? "" : undefined}
-                  data-mobile-hidden={c.mobileHidden ? "" : undefined}
-                  data-nowrap={c.nowrap ? "" : undefined}
-                  className={cn(c.align === "right" && "text-right", c.primary && "font-medium", c.className)}
-                  onClick={c.action ? (e) => e.stopPropagation() : undefined}
+                  data-label={typeof c.header === "string" && c.footer !== undefined ? c.header : undefined}
+                  data-primary={i === labelAt ? "" : undefined}
+                  data-mobile-hidden={c.footer === undefined && i !== labelAt ? "" : undefined}
+                  className={cn("tabular-nums", alignCls(c.align))}
                 >
-                  {c.cell(row)}
+                  {c.footer !== undefined ? c.footer : i === labelAt ? footerLabel ?? "Total" : null}
                 </td>
               ))}
             </tr>
-          ))}
-        </tbody>
+          </tfoot>
+        )}
       </table>
     </div>
   );

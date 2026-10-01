@@ -49,9 +49,17 @@ Ordem: **casca** (`AppShell` + `Sidebar` + `PageHeading`) → telas de maior tr�
 Para cada página:
 1. Leia a página e o bloco-alvo. Preserve dados, rotas, handlers e testes; troque só a apresentação.
 2. Substitua componentes pelo mapeamento; aplique os cinco estados (ver **ds-create** §4); textos em pt-BR.
-3. `npx g4os-ds audit <arquivos da página> --fix --no-baseline` → 0 erros. `tsc` verde. Depois `npx g4os-ds audit --update-baseline` (a dívida só encolhe).
+3. `npx g4os-ds audit <arquivos da página> --fix --no-baseline` → 0 erros **e 0 avisos** (leia o resto com `--format json`). `tsc` verde. Depois `npx g4os-ds audit --update-baseline` (a dívida só encolhe).
 4. Se houver dev server: 1440/390 px, claro/escuro.
 5. Atualize `MIGRATION.md` (✓ página, ocorrências antes → depois). **Commit por página ou grupo pequeno.**
+
+**Armadilhas de migração** (vistas em projetos reais; o `audit` pega quase todas, mas "0 erros" não basta: zere também os avisos e confira a tela):
+- Wrapper `mx-auto max-w-*` em volta do corpo deixa o título fora do eixo → `<Page width="narrow|medium|wide">`. [`page-width-wrapper`]
+- Botão de "modo demonstração/sem permissão" dentro de `span` com `opacity-50 pointer-events-none` fica invisível → `disabled disabledReason="…"`. [`disabled-wrapper`]
+- Lista de `<input type="checkbox">` vira lista de `Checkbox`: use `CheckboxGroup` (ou `MultiSelect`). `label` é visível; não repita como children. [`redundant-children`]
+- `<label>` + `FieldBlock` + campo com `label` = rótulo duplo → só o campo. [`field-double-label`]
+- `<textarea>`/`<input>` crus com classe do DS → `TextareaField`/`TextField`; `<h1>` → `PageHeading`; `<table>` → `DataTable`/`Table`. [`raw-input`, `page-heading`, `raw-table`]
+- `select` de fuso/opções → `Select`/`NativeSelect`; `type="time"`/`"date"` → `TimePicker`/`DatePicker`; `toLocaleString()` → `formatDate`/`formatRelative`.
 
 Não faça "busca e troca" global cega de classes: o mesmo `bg-gray-100` pode ser `bg-soft` (hover) ou `bg-surface` (card). Decida pelo papel.
 

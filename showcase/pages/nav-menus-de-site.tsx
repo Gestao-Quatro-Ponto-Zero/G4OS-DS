@@ -2,6 +2,7 @@ import { BarChart3, BookOpen, Copy, FileDown, LifeBuoy, Newspaper, Scissors, Use
 import { useState } from "react";
 import { Menubar, NavigationMenu, ProductMark, notify } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
+import { NavigationMenuShadcnExamples } from "./_shadcn-extras";
 
 export const meta: PageMeta = {
   title: "Menus de site e de documento",
@@ -16,7 +17,7 @@ export default function Page() {
   const ok = (msg: string) => () => notify(msg);
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
-      <DocSection title="NavigationMenu" rule="Topo de site público, portal do cliente ou central de ajuda. Painel com até 8 links, cada um com título e uma linha de descrição. App de gestão: Sidebar/AppShell. No celular, troque por um botão que abre Sheet.">
+      <DocSection title="NavigationMenu" rule="Topo de site público, portal do cliente ou central de ajuda. Painel com até 8 links, cada um com título e uma linha de descrição. App de gestão: Sidebar/AppShell. No celular (abaixo de 768 px), vira um botão Menu com todos os links.">
         <Demo
           bare
           code={`<NavigationMenu
@@ -62,6 +63,8 @@ export default function Page() {
           </div>
         </Demo>
       </DocSection>
+
+      <NavigationMenuShadcnExamples />
 
       <DocSection title="Menubar" rule="Só em apps de documento com muitas ações (editor de proposta, planilha, construtor de formulário). ←/→ alternam os menus abertos; itens no mesmo formato do Menu (atalhos, marcações, escolha única, submenus).">
         <Demo

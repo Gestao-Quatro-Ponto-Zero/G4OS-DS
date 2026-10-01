@@ -134,7 +134,7 @@ export function scanJs(text) {
       lastSig = c;
       continue;
     }
-    if (c === "/" && (lastSig === "" || /[(,=:[!&|?{};+\-*%<>~^]/.test(lastSig) || /\b(return|typeof|case|in|of)\s*$/.test(text.slice(Math.max(0, i - 8), i)))) {
+    if (c === "/" && d !== ">" && (lastSig === "" || /[(,=:[!&|?{};+\-*%<>~^]/.test(lastSig) || /\b(return|typeof|case|in|of)\s*$/.test(text.slice(Math.max(0, i - 8), i)))) {
       // regex literal
       let j = i + 1;
       let cls = false;

@@ -14,7 +14,7 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `rail` | `--ds-rail` | `#fbfbfc` | `#141416` | sidebar |
 | `ink` | `--ds-ink` | `#202124` | `#ececef` | texto principal |
 | `ink-soft` | `--ds-ink-soft` | `#484a50` | `#c5c6cc` | texto secundário forte |
-| `muted` | `--ds-muted` | `#6b6e76` | `#8f929a` | metadado, rótulo, placeholder (AA) |
+| `muted` | `--ds-muted` | `#63666e` | `#8f929a` | metadado, rótulo, placeholder (AA) |
 | `line` | `--ds-line` | `#e9eaed` | `#2a2a2f` | toda borda e divisória |
 | `line-strong` | `--ds-line-strong` | `#d2d4da` | `#3b3c43` | hover de card, borda de checkbox |
 | `on-ink` | `--ds-on-ink` | `#ffffff` | `#121214` | texto sobre preenchimento forte (ink, rose, ok…) |
@@ -30,11 +30,11 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `magenta-soft` | `--ds-clay-soft` | `#f6e7e3` | `#3a211c` |  |
 | `founders` | `--ds-founders` | `#441b1b` | `#c98b8b` |  |
 | `accent` | `--ds-accent` | `#b9915b` | `#c9a46f` | SÓ preenchimento: progresso, foco, próximo passo |
-| `accent-deep` | `--ds-accent-deep` | `#8c6a3a` | `#dcbd8e` | texto na cor de destaque |
+| `accent-deep` | `--ds-accent-deep` | `#7d5e33` | `#dcbd8e` | texto na cor de destaque |
 | `accent-soft` | `--ds-accent-soft` | `#f5eee3` | `#2e2619` | Estados |
 | `ok` | `--ds-ok` | `#1b5e20` | `#7fd18b` |  |
 | `ok-soft` | `--ds-ok-soft` | `#e8f5e9` | `#15291a` |  |
-| `amber` | `--ds-amber` | `#e65100` | `#ffb163` |  |
+| `amber` | `--ds-amber` | `#b54500` | `#ffb163` |  |
 | `amber-soft` | `--ds-amber-soft` | `#fff3e0` | `#33240f` |  |
 | `rose` | `--ds-rose` | `#b71c1c` | `#ff8f86` |  |
 | `rose-soft` | `--ds-rose-soft` | `#ffebee` | `#3a1719` |  |
@@ -69,7 +69,7 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `tag-red-fg` | `--ds-tag-red-fg` | `#a8302a` | `#f4a29b` | Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo |
 | — | `--ds-mark-text` | `70%` | `38%` |  |
 | — | `--ds-mark-bg` | `8%` | `16%` | Foco e sobreposição |
-| — | `--ds-focus` | `#6b6e76` | `#8f929a` |  |
+| — | `--ds-focus` | `#63666e` | `#8f929a` |  |
 | — | `--ds-backdrop` | `rgb(0 0 0 / 0.2)` | `rgb(0 0 0 / 0.55)` | Sombras: quase invisíveis no claro |
 | — | `--ds-shadow-surface` | `0 1px 2px #20212403` | `0 1px 2px #00000040` |  |
 | — | `--ds-shadow-raised` | `0 3px 12px #20212407` | `0 4px 16px #00000059` |  |

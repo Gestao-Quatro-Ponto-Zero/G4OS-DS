@@ -1,5 +1,38 @@
 # Tabelas e coleções
 
+## Qual usar
+
+| A coleção é… | Use | Por quê |
+| --- | --- | --- |
+| A própria tela (CRM, pedidos, títulos, candidatos), a pessoa age sobre as linhas, 50+ itens | `DataGrid` + `FilterBar` | rolagem interna, colunas fixas, seleção em massa, edição, teclado, virtualização |
+| Lista de leitura ou seção de página, até ~50 itens por página | `DataTable` (+ `useDataView`) | leve, vira blocos rotulados no celular |
+| 3–5 itens dentro de um dashboard ou registro, com “Ver todos” | `ListPanel` + `ListRow` | prévia, não ferramenta |
+| Itens com imagem/identidade forte (arquivos, produtos, vagas públicas) | `DataTable view="cards"` ou grade de cards | o visual decide |
+| Itens que passam por etapas | `KanbanBoard` (e lista como alternativa) | a etapa é a coluna |
+
+Na dúvida entre DataTable e DataGrid: se a pessoa vai **selecionar, editar ou rolar muito**, é DataGrid.
+
+## useDataView: a receita da tela de lista
+
+Busca, filtros, visões salvas, ordenação, paginação, seleção e URL num hook, na ordem certa (filtra → ordena → pagina). Filtrar volta à página 1; a seleção fica só com o que ainda aparece; `emptyKind` diz se o vazio é falta de dados (`"none"`) ou do filtro (`"filtered"`).
+
+```tsx
+const view = useDataView(deals, {
+  rowKey: (d) => d.id, fields, search: (d) => [d.name, d.company],
+  sortBy: { valor: (d) => d.value }, defaultSort: { key: "valor", dir: "desc" },
+  pageSize: 20, pageSizeOptions: [20, 50, 100], me: userId, url: true,
+});
+
+<FilterBar filters={view.filters} noun="negócio" search={<TableSearch value={view.filters.state.query} onChange={view.filters.setQuery} total={view.total} noun="negócio" />} />
+<DataTable label="Negócios" rows={view.rows} sort={view.sort} rowKey={(d) => d.id}
+  columns={[selectionColumn(view.selection, (d) => d.id, (d) => d.name), { key: "valor", header: "Valor", sortKey: "valor", align: "right", cell: … }]}
+  rowSelected={(d) => view.selection.has(d.id)}
+  empty={view.emptyKind === "filtered" ? <EmptyFilterResult filters={view.filters} noun="negócio" /> : <Empty title="Nenhum negócio ainda" action={…} />} />
+<Pagination {...view.pagination} noun="negócio" />
+```
+
+Servidor (10 mil+ registros): `useUrlState` para `sort`/`page`, `useFilters([], { fields, url: true })` só para o estado, `serializeFilters(state)` na chamada, e `loading` mantendo as linhas.
+
 ## Anatomia de uma página de lista
 
 ```
@@ -16,12 +49,20 @@ BulkBar (flutua no rodapé quando há seleção)
 const columns: Column<Deal>[] = [
   { key: "nome", header: "Negócio", cell: (d) => d.name, primary: true },
   { key: "empresa", header: "Empresa", cell: (d) => d.company },
-  { key: "valor", header: <SortHeader label="Valor" {...sort.header("valor")} />, cell: (d) => formatCurrency(d.value), align: "right", nowrap: true },
+  { key: "valor", header: "Valor", sortKey: "valor", cell: (d) => formatCurrency(d.value), align: "right", nowrap: true, footer: formatCurrency(total) },
   { key: "etapa", header: "Etapa", cell: (d) => <StatusLabel … /> },
   { key: "acoes", header: "", cell: (d) => <ActionMenu actions={…} />, action: true },
 ];
-<DataTable rows={page.rows} columns={columns} rowKey={(d) => d.id} onRowClick={open} rowLabel={(d) => `Abrir ${d.name}`} empty={<Empty framed={false} … />} />
+<DataTable label="Negócios" rows={page.rows} columns={columns} rowKey={(d) => d.id} sort={sort}
+  onRowClick={open} rowLabel={(d) => `Abrir ${d.name}`}
+  loading={isFetching} error={error && { message, onRetry: refetch }}
+  empty={<Empty framed={false} … />} />
 ```
+
+- **Estados embutidos**: `loading` sem linhas = esqueleto com a forma das colunas; `loading` **com** linhas (recarregando) mantém as linhas esmaecidas com uma barra de progresso no topo — a tabela não pula. `error` mostra o bloco com “Tentar de novo”. `empty` só quando não há linhas.
+- **Ordenação**: `sort={useSort(...)}` + `sortKey` na coluna → cabeçalho clicável com `aria-sort`. Ordenou ou filtrou → volte à página 1 (`usePagination(rows, 20, { resetKey })`, já automático no `useDataView`).
+- **Seleção**: `selectionColumn` fica ao lado do título também no celular; `rowSelected` pinta a linha.
+- `footer` na coluna cria o rodapé de totais (soma do que está filtrado); `maxHeight` rola por dentro com cabeçalho e rodapé fixos; `rowTone` marca exceções (warn/bad).
 
 - **Abaixo de 1024 px a tabela vira blocos rotulados** (o rótulo vem do `header` string). `primary` vai para o topo do bloco; `wide` ocupa a linha; `action` fica separado; `mobileHidden` some.
 - A linha inteira abre o registro (`onRowClick`) e funciona com Enter/Espaço. Ações da linha (menu ⋯) param a propagação sozinhas (`action: true`).
@@ -42,9 +83,11 @@ Use `DataGrid` quando **a lista é a tela** e a pessoa age sobre as linhas (cont
 | Coluna de identificação e ações fixas ao rolar para o lado | | ✓ `pinned` |
 | Seleção em massa, “selecionar todos os N” | ↔ `selectionColumn` | ✓ `selectable`, `totalCount`, `bulkActions` |
 | Ações rápidas por linha + clique direito | | ✓ `rowActions` (`inline` = ícone no hover) |
-| Mostrar/ocultar, redimensionar e lembrar colunas | | ✓ menu Colunas, arrastar borda, `storageKey` |
+| Mostrar/ocultar, redimensionar, mover, fixar e lembrar colunas | | ✓ menu Colunas, menu do cabeçalho, arrastar borda, `storageKey` |
 | Expandir detalhe, agrupar com subtotal, total no rodapé | | ✓ `renderExpanded`, `groupBy` + `aggregate`, `footer` |
-| Editar na célula | | ✓ `editable` + `onEdit` |
+| Editar na célula, com validação | | ✓ `editable` + `validate` + `onEdit` |
+| Recarregar do servidor sem pular | ✓ `loading` com linhas | ✓ `loading` com linhas + `manualSort` |
+| Vazio por filtro com saída | `EmptyFilterResult` em `empty` | ✓ `filtered` + `onClearFilters` |
 | Centenas a milhares de linhas | | ✓ virtualização automática (> 200) |
 | Celular | blocos rotulados | rolagem com 1ª coluna fixa ou `mobile="cards"` |
 
@@ -57,7 +100,8 @@ Regras:
 5. **Seleção**: shift+clique marca intervalo; com `totalCount` maior que a página aparece “Selecionar todos os N”; a ação em massa recebe `allMatching` e deve rodar no filtro (servidor), não só nas linhas carregadas. Use `gender="f"` para concordância (“3 contas selecionadas”).
 6. **Totais**: `footer` soma o que está filtrado; diga isso no `tooltip` da coluna. Não some percentuais.
 7. **Tom**: `rowTone` (warn/bad/ok) para exceções — 5 a 10 % das linhas, com a palavra correspondente na linha.
-8. **Edição inline**: campos curtos e frequentes (dono, estágio, prazo, valor). Salve na hora, com toast e desfazer. Formulário longo → Drawer.
+8. **Edição inline**: campos curtos e frequentes (dono, estágio, prazo, valor). Salve na hora, com toast e desfazer. `validate` devolve a mensagem (“Entre 1 e 5.000”); Enter com erro mantém o editor, sair do campo desfaz. Formulário longo → Drawer.
+11. **Menu do cabeçalho** (seta no hover/foco): ordenar, mover para os lados, fixar à esquerda, ocultar. Com `storageKey` a escolha fica salva; “Restaurar colunas” volta ao padrão. `columns[].menu = false` tira o menu de uma coluna.
 9. **Teclado**: ↑↓/PgUp/PgDn/Home/End movem, Enter abre, →/← expandem, Espaço/X selecionam, E edita, Esc limpa a seleção.
 10. **Exportar**: `exportFileName` gera CSV pt-BR (`;`, decimal com vírgula, BOM) do que está na tela ou só dos selecionados.
 
@@ -67,17 +111,20 @@ Exemplos vivos: showcase › Coleções › DataGrid. Em blocos: `crm-contacts`,
 
 | Hook / componente | Para |
 | --- | --- |
-| `useSort(rows, { chave: acessor })` + `SortHeader` | ordenação por coluna (asc → desc → sem) em pt-BR |
-| `useSelection(idsVisiveis)` + `selectionColumn(...)` | checkbox por linha e "selecionar todos" (com indeterminado) |
+| `useDataView(rows, opções)` | tudo junto: filtros + ordenação + paginação + seleção + URL |
+| `useSort(rows, { chave: acessor })` + `sortKey` / `SortHeader` | ordenação por coluna (asc → desc → sem) em pt-BR, números do texto em ordem natural |
+| `useSelection(idsVisiveis)` + `selectionColumn(...)` | checkbox por linha e "selecionar todos" (com indeterminado); `hiddenCount` / `keepOnly` para não agir sobre o que o filtro escondeu |
 | `BulkBar` | ações em massa flutuando no rodapé enquanto há seleção |
-| `usePagination(rows, 20)` + `Pagination` | paginação no cliente ("1–20 de 312") |
+| `usePagination(rows, 20, { resetKey })` + `Pagination` | paginação no cliente ("1–20 de 312"), "Por página" (`pageSizeOptions`), "2 de 9" no celular |
+| `useUrlState(chave, inicial, { parse, serialize })` | um valor (aba, ordenação, página) espelhado na URL |
+| `gridToCsv(rows, colunas)` + `downloadCsv(nome, csv)` | exportar o filtrado em CSV pt-BR (`;`, vírgula decimal, BOM) |
 
 Com 10 mil+ registros, pagine/ordene no servidor e use os hooks só na página atual. Ordem e filtros vão para a URL.
 
 ## Filtros
 
 - Busca textual normaliza acento e caixa (`normalize` de `lib/text`).
-- `FacetFilter` por atributo com multi-seleção; o gatilho mostra contador quando ativo.
+- Listas com `FilterBar` (padrão, ver [filtros.md](filtros.md)). `FacetFilter` é a versão simples para barras com `TableToolbar`: multi-seleção, contagem por opção (`count`), busca sem acento a partir de 8 opções.
 - "Limpar" aparece só com filtro ativo. A contagem "X de Y" é `aria-live`.
 - Filtro rápido binário ("Minhas", "Atrasadas") é `FilterChip`.
 - No celular, filtros além do primeiro recolhem em "Filtros" (drawer ou popover).

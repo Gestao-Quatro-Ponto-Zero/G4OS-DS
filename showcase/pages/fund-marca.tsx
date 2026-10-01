@@ -28,9 +28,9 @@ const palette: { group: string; items: [string, string, string, string][] }[] = 
     ],
   },
   {
-    group: "Neutros quentes (preset Institucional)",
+    group: "Neutros quentes (materiais impressos e slides; a interface usa os neutros do clássico)",
     items: [
-      ["Warm White", "#FAFAF9", "--g4-warm-white", "Fundo de página"],
+      ["Warm White", "#FAFAF9", "--g4-warm-white", "Fundo de slides e materiais"],
       ["Light Gray", "#E8E6E3", "--g4-light-gray", "Bordas e divisórias"],
       ["Mid Gray", "#9A9895", "--g4-mid-gray", "Ícones (como texto, use #6E6B67 para AA)"],
       ["Dark Gray", "#4A4845", "--g4-dark-gray", "Texto secundário"],
@@ -48,7 +48,7 @@ export default function Page() {
           {[
             ["1 · Toque (padrão G4)", "Interface neutra. A marca aparece no marcador dourado da navegação, no progresso e nos selos. É o tema de todos os produtos."],
             ["2 · Momento", "Um BrandPanel navy por tela, onde há emoção ou abertura: login, fim de onboarding, capa de relatório, saudação da IA, conquista."],
-            ["3 · Institucional", "Preset data-brand=\"g4-institucional\": neutros quentes, Navy na ação, Gold no destaque. Para apresentações, portais e marketing."],
+            ["3 · Institucional", "Preset data-brand=\"g4-institucional\": fundo do clássico, Navy na ação, Gold no destaque e nos gráficos. Para apresentações, portais e marketing."],
           ].map(([title, body], i) => (
             <div key={title} className={cn("rounded-xl border p-4", i === 0 ? "border-accent/40 bg-accent-soft/30" : "border-line bg-surface")}>
               <div className="text-[13.5px] font-semibold">{title}</div>
@@ -131,7 +131,7 @@ export default function Page() {
                   ["NPS", "+72"],
                 ].map(([k, v]) => (
                   <div key={k}>
-                    <div className="text-on-brand/60">{k}</div>
+                    <div className="text-on-brand/80">{k}</div>
                     <div className="text-[18px] font-semibold tabular-nums">{v}</div>
                   </div>
                 ))}
@@ -147,7 +147,7 @@ export default function Page() {
         </Demo>
       </DocSection>
 
-      <DocSection title="Nível 3 · Preset G4 Institucional" rule="Para apresentações, portal do cliente, páginas públicas. O escuro continua neutro (não navy), com Royal Silver na ação e as semânticas do manual.">
+      <DocSection title="Nível 3 · Preset G4 Institucional" rule="Para apresentações, portal do cliente, páginas públicas. Fundo e superfícies iguais ao clássico; o escuro continua neutro (não navy), com Royal Silver na ação e as semânticas do manual.">
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4">
           <span className="text-[13px] text-ink-soft">Ver o site inteiro com o preset:</span>
           <Button size="sm" variant={t.brand === "g4-institucional" ? "primary" : "ghost"} onClick={() => t.setBrand(t.brand === "g4-institucional" ? "g4" : "g4-institucional")}>

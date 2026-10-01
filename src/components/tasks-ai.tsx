@@ -65,7 +65,7 @@ export function SubtaskRow({ subtask, onToggle }: { subtask: Subtask; onToggle?:
         aria-checked={!!subtask.done}
         aria-label={`${subtask.done ? "Reabrir" : "Concluir"}: ${subtask.title}`}
         onClick={onToggle}
-        className={cn("grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border transition-colors", subtask.done ? "border-ok bg-ok text-on-ink" : "border-line-strong hover:border-ink")}
+        className={cn("ds-hit grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border transition-colors", subtask.done ? "border-ok bg-ok text-on-ink" : "border-line-strong hover:border-ink")}
       >
         {subtask.done && <Check className="h-3 w-3" strokeWidth={3} />}
       </button>
@@ -215,7 +215,7 @@ export function TaskProposalCard({
                 <span className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-surface pl-1.5 pr-1 text-[12.5px] ring-1 ring-line">
                   <Avatar {...proposal.assignee} size="sm" />
                   {proposal.assignee.name.split(" ")[0]}
-                  <button type="button" onClick={() => onChange?.({ assignee: undefined })} aria-label="Remover responsável" className="grid h-5 w-5 place-items-center rounded text-muted hover:bg-soft hover:text-ink">
+                  <button type="button" onClick={() => onChange?.({ assignee: undefined })} aria-label="Remover responsável" className="ds-hit grid h-5 w-5 place-items-center rounded text-muted hover:bg-soft hover:text-ink">
                     <X className="h-3 w-3" />
                   </button>
                 </span>

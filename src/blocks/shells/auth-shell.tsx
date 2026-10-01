@@ -93,7 +93,7 @@ export function AuthSplit({ children, footer }: { children: ReactNode; footer?: 
           <div className="mb-8 grid grid-cols-2 gap-3">
             {brand.stats.map((s) => (
               <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
-                <div className="text-[26px] font-semibold tabular-nums tracking-tight text-accent">{s.value}</div>
+                <div className="text-[26px] font-semibold tabular-nums tracking-tight text-brand-accent">{s.value}</div>
                 <div className="mt-0.5 text-[12.5px] text-white/70">{s.label}</div>
               </div>
             ))}

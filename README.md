@@ -138,7 +138,7 @@ Depois peça: *"Adapte este projeto ao G4OS-DS"*, *"Crie a tela de pedidos com o
 
 ## Qualidade: auditoria, lint e CI
 
-As regras do DS (tokens, tipografia, acessibilidade, formatação pt-BR, imports, React) viram checagens automáticas. Um motor só, usado pelo CLI, pelo plugin ESLint, pelo CI e pela tool `audit` do MCP. Guia completo: [docs/guias/auditoria.md](docs/guias/auditoria.md).
+As regras do DS (tokens, tipografia, anatomia de página, composição de componentes, acessibilidade, formatação e escrita pt-BR, imports, React) viram checagens automáticas. Um motor só, usado pelo CLI, pelo plugin ESLint, pelo CI e pela tool `audit` do MCP. Guia completo: [docs/guias/auditoria.md](docs/guias/auditoria.md).
 
 ```bash
 npx g4os-ds init                      # g4os-ds.config.json + scripts ds:* + workflow de CI (--eslint, --hook lefthook, --baseline)
@@ -148,7 +148,7 @@ npx g4os-ds audit --fix               # aplica as trocas seguras (bg-white→bg-
 npx g4os-ds audit --changed           # só o que mudou (--staged no pre-commit, --since origin/main no PR)
 npx g4os-ds audit --baseline          # projeto legado: só achado novo falha
 npx g4os-ds audit --format sarif      # também: pretty, json, markdown, github (anotações no PR)
-npx g4os-ds rules                     # lista as 31 regras
+npx g4os-ds rules                     # lista as 47 regras
 ```
 
 ```js
@@ -158,6 +158,8 @@ export default [/* …sua config */ g4osDs.configs.recommended];
 ```
 
 Exit code: `0` ok · `1` achados que falham · `2` erro de uso/config. Exceção com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`.
+
+As regras de anatomia e composição pegam o que deixa uma tela migrada "esquisita" mesmo com 0 erros: corpo centralizado fora do eixo do título (`page-width-wrapper`), botão desabilitado apagado por wrapper (`disabled-wrapper`), rótulo duplicado (`field-double-label`), controles crus (`raw-input`), `Select` por linha (`select-per-row`), texto em inglês ou "com sucesso!" (`english-copy`, `copy-tone`). Para medir se agentes de IA acertam com essas instruções, há um eval em `scripts/eval/` ([usar com IA](docs/guias/usar-com-ia.md#medir-se-os-agentes-acertam-eval)).
 
 ## CLI
 

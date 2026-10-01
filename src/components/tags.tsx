@@ -86,7 +86,7 @@ export function TagPill({
           type="button"
           onClick={onRemove}
           aria-label={`Remover ${typeof children === "string" ? children : "etiqueta"}`}
-          className="grid h-4 w-4 place-items-center rounded opacity-70 hover:bg-ink/10 hover:opacity-100"
+          className="ds-hit grid h-4 w-4 place-items-center rounded opacity-70 hover:bg-ink/10 hover:opacity-100"
         >
           <X />
         </button>

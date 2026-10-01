@@ -38,10 +38,16 @@ Uma seção opcional: "Opções avançadas", "Mostrar detalhes".
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
 | `label` * | `ReactNode` |  |  |
+| `actions` | `ReactNode` |  | Ações à direita do gatilho (fora do botão). |
 | `className` | `string \| undefined` |  |  |
 | `defaultOpen` | `boolean \| undefined` | `false` |  |
+| `description` | `ReactNode` |  | Linha de apoio sob o rótulo (row/card). |
+| `disabled` | `boolean \| undefined` |  |  |
+| `icon` | `ReactNode` |  |  |
+| `meta` | `ReactNode` |  | Texto à direita do rótulo: "3 regras", "Opcional". |
 | `onOpenChange` | `((open: boolean) => void) \| undefined` |  |  |
 | `open` | `boolean \| undefined` |  |  |
+| `variant` | `"card" \| "inline" \| "row" \| undefined` | `"inline"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -49,6 +55,62 @@ Exemplo (showcase `#/p/nav-revelacao`):
 
 ```tsx
 <Collapsible label="Opções avançadas">…</Collapsible>
+```
+
+## CollapsibleContent
+
+Conteúdo componível com altura animada (respeita "reduzir movimento").
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` * | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/_shadcn-extras`):
+
+```tsx
+<CollapsibleRoot>\n  <CollapsibleTrigger><Folder /> propostas</CollapsibleTrigger>\n  <CollapsibleContent>…</CollapsibleContent>\n</CollapsibleRoot>
+```
+
+## CollapsibleRoot
+
+Raiz componível (controlada com `open`/`onOpenChange`).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` * | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `defaultOpen` | `boolean \| undefined` |  |  |
+| `disabled` | `boolean \| undefined` |  |  |
+| `onOpenChange` | `((open: boolean) => void) \| undefined` |  |  |
+| `open` | `boolean \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/_shadcn-extras`):
+
+```tsx
+<CollapsibleRoot>\n  <CollapsibleTrigger><Folder /> propostas</CollapsibleTrigger>\n  <CollapsibleContent>…</CollapsibleContent>\n</CollapsibleRoot>
+```
+
+## CollapsibleTrigger
+
+Gatilho componível. Sem `className`, vem com o visual de linha (chevron gira ao abrir via `group-data-panel-open:`).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` * | `ReactNode` |  |  |
+| `chevron` | `boolean \| undefined` | `true` |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/_shadcn-extras`):
+
+```tsx
+<CollapsibleRoot>\n  <CollapsibleTrigger><Folder /> propostas</CollapsibleTrigger>\n  <CollapsibleContent>…</CollapsibleContent>\n</CollapsibleRoot>
 ```
 
 ## DescriptionToggle

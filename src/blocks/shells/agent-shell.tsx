@@ -59,7 +59,7 @@ export function AgentShell({ current, children }: { current: string; children: R
           currentPath={current}
           mobileOpen={mobileOpen}
           mark={
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-on-primary" aria-label="Agente G4">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-on-primary" role="img" aria-label="Agente G4">
               <Sparkles className="h-4 w-4" />
             </span>
           }

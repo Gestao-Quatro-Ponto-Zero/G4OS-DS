@@ -3,10 +3,10 @@
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { ArrowRight, Check, Clock, Copy, CornerDownLeft, ImageOff, MoveHorizontal, Sparkles, X } from "lucide-react";
-import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
-import { Kbd } from "./primitives";
+import { Kbd, KbdGroup } from "./primitives";
 
 /*
  * Interação e marketing. Regras (docs/padroes/interacao.md):
@@ -522,7 +522,7 @@ export type Logo = { name: string; src?: string; mark?: ReactNode };
 /** Logos de clientes/parceiros em tom neutro (sem competir com a marca). */
 export function LogoCloud({ title, logos, scrolling = false, className }: { title?: ReactNode; logos: Logo[]; scrolling?: boolean; className?: string }) {
   const items = logos.map((l) => (
-    <span key={l.name} className="inline-flex shrink-0 items-center gap-2 text-[17px] font-semibold tracking-tight text-muted opacity-80 grayscale transition-opacity hover:opacity-100" title={l.name}>
+    <span key={l.name} className="inline-flex shrink-0 items-center gap-2 text-[17px] font-semibold tracking-tight text-muted grayscale transition-colors hover:text-ink-soft" title={l.name}>
       {l.src ? <img src={l.src} alt={l.name} className="h-7 w-auto" /> : (
         <>
           {l.mark}
@@ -793,8 +793,9 @@ export function NumberTicker({ value, format = (n) => formatNumber(n), duration 
   }, [value, duration, reduced]);
   const isInt = Number.isInteger(value);
   return (
-    <span ref={ref} className={cn("tabular-nums", className)} aria-label={format(value)}>
+    <span ref={ref} className={cn("tabular-nums", className)}>
       <span aria-hidden>{format(isInt ? Math.round(shown) : shown)}</span>
+      <span className="sr-only">{format(value)}</span>
     </span>
   );
 }
@@ -945,15 +946,10 @@ export function CopyButton({ value, label = "Copiar", copiedLabel = "Copiado", i
   );
 }
 
-/** Combinação de teclas: ["⌘", "K"] → ⌘ K. Use em menus, dicas e documentação. */
+/**
+ * Combinação de teclas: ["⌘", "K"] → ⌘ K. Nomes ("mod", "shift", "enter")
+ * viram o símbolo da plataforma (⌘ no Mac, Ctrl nos outros). Igual a KbdGroup.
+ */
 export function KeyCombo({ keys, className }: { keys: string[]; className?: string }) {
-  return (
-    <span className={cn("inline-flex items-center gap-0.5", className)} aria-label={keys.join(" + ")}>
-      {keys.map((k, i) => (
-        <Fragment key={i}>
-          <Kbd>{k}</Kbd>
-        </Fragment>
-      ))}
-    </span>
-  );
+  return <KbdGroup keys={keys} className={className} />;
 }

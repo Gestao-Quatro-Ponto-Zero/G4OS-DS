@@ -15,7 +15,7 @@ export default function Page() {
         </Demo>
       </DocSection>
       <DocSection title="RadarChart" rule="Perfil em critérios ganhou página própria com 10 variantes.">
-        <p className="m-0 text-[13px]"><a className="font-medium text-blue hover:underline" href="#/p/graficos-radar">Ver Gráficos › Radar →</a></p>
+        <p className="m-0 text-[13px]"><a className="font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue" href="#/p/graficos-radar">Ver Gráficos › Radar →</a></p>
       </DocSection>
       <DocSection title="HeatmapMatrix" rule="Duas dimensões: coorte × mês, dia × hora, pessoa × etapa. Uma cor, intensidade contínua, valor na célula.">
         <Demo bare code={`<HeatmapMatrix rows={["jan/26", …]} columns={["M0", "M1", …]} values={[[100, 88, …], …]} format={(n) => \`\${n}%\`} max={100} />`}>

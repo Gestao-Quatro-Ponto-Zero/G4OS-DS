@@ -157,7 +157,7 @@ Perfil em 3–8 critérios na mesma escala (scorecard de entrevista, avaliação
 | `dots` | `boolean \| undefined` | `true` |  |
 | `fill` | `boolean \| undefined` | `true` | false = só contorno (comparar perfis sem sobrepor manchas). |
 | `format` | `((n: number) => string) \| undefined` | `(n: number) => formatNumber(n, 1)` |  |
-| `grid` | `"none" \| "polygon" \| "circle" \| undefined` | `"polygon"` |  |
+| `grid` | `"circle" \| "none" \| "polygon" \| undefined` | `"polygon"` |  |
 | `gridFill` | `boolean \| undefined` | `false` | Anel externo preenchido com soft. |
 | `label` | `string \| undefined` | `"Perfil"` |  |
 | `legend` | `boolean \| undefined` |  |  |

@@ -15,7 +15,7 @@ type CollectionView = "cards" | "list" | "board"
 ## Column (type)
 
 ```ts
-type Column = { key: string; header: ReactNode; cell: (row: T) => ReactNode; primary?: boolean; wide?: boolean; action?: boolean; mobileHidden?: boolean; nowrap?: boolean; align?: "left" | "right"; className?: string; }
+type Column = { key: string; header: ReactNode; cell: (row: T) => ReactNode; primary?: boolean; wide?: boolean; action?: boolean; selection?: boolean; mobileHidden?: boolean; nowrap?: boolean; align?: "left" | "right" | "center"; sortKey?: string; footer?: ReactNode; width?: number | string; className?: string; }
 ```
 
 ## DataTable
@@ -30,11 +30,28 @@ Tabela padrão: contorno arredondado, cabeçalho gelo 12px, linhas 13.5px com di
 | `className` | `string \| undefined` |  |  |
 | `density` | `Density \| undefined` |  |  |
 | `empty` | `ReactNode` |  |  |
+| `error` | `{ message: string; onRetry?: () => void; } \| undefined` |  |  |
+| `footerLabel` | `string \| undefined` |  | Rótulo da primeira célula do rodapé quando ela não tem `footer`. |
+| `label` | `string \| undefined` |  | Nome da tabela para leitores de tela ("Contas a receber"). |
+| `loading` | `boolean \| undefined` |  |  |
+| `loadingRows` | `number \| undefined` | `5` | Linhas de esqueleto no primeiro carregamento. |
+| `maxHeight` | `string \| number \| undefined` |  | Altura máxima: rola por dentro com o cabeçalho fixo. |
 | `onRowClick` | `((row: T) => void) \| undefined` |  |  |
 | `rowLabel` | `((row: T) => string) \| undefined` |  |  |
+| `rowSelected` | `((row: T) => boolean) \| undefined` |  | Linha selecionada (seleção em massa ou registro aberto ao lado). |
+| `rowTone` | `((row: T) => "warn" \| "bad" \| undefined) \| undefined` |  | Linha que pede atenção (atrasado, bloqueado): faixa à esquerda. |
+| `sort` | `TableSort \| undefined` |  | Retorno do useSort; colunas com `sortKey` ganham cabeçalho ordenável. |
 | `view` | `"cards" \| "list" \| undefined` | `"list"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ Dados assíncronos: passe `loading`, `error` e `empty={<Empty title=… action=… />}`. Seleção: `selectionColumn(sel, rowKey, rowLabel)` + `BulkBar`. Ordenação `useSort`, páginas `usePagination` + `Pagination`.
+
+**Evite**
+
+- ✗ `<table>` cru (regra `raw-table`); checkbox de linha sem `hideLabel`; `Select` por linha.
 
 Exemplo (showcase `#/p/busca-tabelas`):
 
@@ -102,11 +119,17 @@ Filtro multi-seleção por atributo.
 | --- | --- | --- | --- |
 | `label` * | `string` |  |  |
 | `onChange` * | `(next: string[]) => void` |  |  |
-| `options` * | `{ id: string; label: string; }[]` |  |  |
+| `options` * | `FacetOption[]` |  |  |
 | `value` * | `string[]` |  |  |
 | `align` | `"left" \| "right" \| undefined` | `"right"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+## FacetOption (type)
+
+```ts
+type FacetOption = { id?: string; value?: string; label: string; count?: number; icon?: ReactNode; }
+```
 
 ## KanbanBoard
 
@@ -219,6 +242,14 @@ Linha de uma ListPanel: marcador · (contexto / título) · meta · seta.
 | `onClick` | `(() => void) \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+## TableSort (type)
+
+O que a tabela precisa de um `useSort` (passe o retorno inteiro).
+
+```ts
+type TableSort = { sort: SortState; toggle: (key: string) => void }
+```
 
 ## TableToolbar
 

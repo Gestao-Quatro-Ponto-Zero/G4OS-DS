@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { DataTable, Pagination, usePagination, type Column } from "@g4ai/ds";
+import { DataTable, Pagination, formatCurrency, usePagination, type Column } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -18,7 +18,7 @@ export default function Page() {
   const cols: Column<Fat>[] = [
     { key: "n", header: "Número", cell: (r) => r.numero, primary: true, nowrap: true },
     { key: "c", header: "Cliente", cell: (r) => r.cliente },
-    { key: "v", header: "Valor", cell: (r) => r.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }), align: "right", nowrap: true },
+    { key: "v", header: "Valor", cell: (r) => <span className="tabular-nums">{formatCurrency(r.valor)}</span>, align: "right", nowrap: true },
   ];
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
@@ -27,17 +27,19 @@ export default function Page() {
           className="block"
           code={`const p = usePagination(faturas, 20);
 <DataTable rows={p.rows} … />
-<Pagination page={p.page} pageCount={p.pageCount} onPage={p.setPage} total={p.total} pageSize={p.pageSize} />`}
+<Pagination page={p.page} pageCount={p.pageCount} onPage={p.setPage} total={p.total} pageSize={p.pageSize}
+  pageSizeOptions={[20, 50, 100]} onPageSizeChange={p.setPageSize} noun="fatura" />`}
         >
-          <DataTable rows={p.rows} columns={cols} rowKey={(r) => r.id} />
-          <Pagination className="mt-3" page={p.page} pageCount={p.pageCount} onPage={p.setPage} total={p.total} pageSize={p.pageSize} />
+          <DataTable label="Faturas" rows={p.rows} columns={cols} rowKey={(r) => r.id} />
+          <Pagination className="mt-3" page={p.page} pageCount={p.pageCount} onPage={p.setPage} total={p.total} pageSize={p.pageSize} pageSizeOptions={[8, 20, 50]} onPageSizeChange={p.setPageSize} noun="fatura" />
         </Demo>
         <PropsTable
           rows={[
             ["page / pageCount", "number", "—", "Página atual (1-based) e total de páginas."],
             ["onPage", "(page: number) => void", "—", "Troca de página."],
             ["total / pageSize", "number", "—", "Mostra “1–20 de 312” quando informados."],
-            ["usePagination(rows, pageSize?)", "hook", "pageSize=20", "Retorna { rows, page, pageCount, total, setPage }."],
+            ["usePagination(rows, pageSize?, { resetKey? })", "hook", "pageSize=20", "Retorna { rows, page, pageCount, pageSize, total, setPage, setPageSize }. resetKey (filtro, ordenação) volta à página 1."],
+            ["Pagination pageSizeOptions · onPageSizeChange · noun", "number[] · (n) => void · string", "—", "“Por página” e “1–20 de 312 faturas”. No celular: “2 de 9” entre as setas."],
           ]}
         />
       </DocSection>

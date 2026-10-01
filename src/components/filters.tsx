@@ -72,7 +72,12 @@ export type FilterOperator =
 
 export type FilterValue = string | number | string[] | [string | number, string | number] | undefined;
 export type FilterCondition = { id: string; field: string; op: FilterOperator; value?: FilterValue };
-export type FilterState = { query: string; conditions: FilterCondition[] };
+export type FilterState = {
+  query: string;
+  conditions: FilterCondition[];
+  /** Como os filtros se combinam: "and" (padrão, todos) ou "or" (qualquer um). A busca livre sempre restringe. */
+  match?: "and" | "or";
+};
 export const emptyFilterState: FilterState = { query: "", conditions: [] };
 
 const OPS: Record<FilterType, { op: FilterOperator; label: string }[]> = {
@@ -227,18 +232,20 @@ export function matchesQuery(query: string, texts: (string | number | null | und
 }
 
 /**
- * Aplica busca + filtros (tudo em E). Função pura: use no cliente ou
- * espelhe a mesma semântica no servidor.
+ * Aplica busca + filtros. Filtros em E por padrão; `state.match = "or"`
+ * passa a linha que atende a qualquer um. A busca livre sempre restringe.
+ * Função pura: use no cliente ou espelhe a mesma semântica no servidor.
  */
 export function applyFilters<T>(rows: T[], fields: FilterField<T>[], state: FilterState, options: FilterContext & { search?: (row: T) => (string | number | null | undefined)[] } = {}) {
-  const active = state.conditions.filter(isComplete);
+  const active = state.conditions.filter(isComplete).flatMap((c) => {
+    const f = fields.find((x) => x.key === c.field);
+    return f ? [{ c, f }] : [];
+  });
+  const any = state.match === "or";
   return rows.filter((row) => {
     if (state.query && options.search && !matchesQuery(state.query, options.search(row))) return false;
-    for (const c of active) {
-      const f = fields.find((x) => x.key === c.field);
-      if (f && !matches(f, c, row, options)) return false;
-    }
-    return true;
+    if (!active.length) return true;
+    return any ? active.some(({ c, f }) => matches(f, c, row, options)) : active.every(({ c, f }) => matches(f, c, row, options));
   });
 }
 
@@ -282,6 +289,7 @@ export function describeCondition<T>(field: FilterField<T>, c: FilterCondition, 
 export function serializeFilters(state: FilterState) {
   const p = new URLSearchParams();
   if (state.query) p.set("q", state.query);
+  if (state.match === "or") p.set("m", "or");
   for (const c of state.conditions.filter(isComplete)) {
     let v = "";
     if (Array.isArray(c.value)) v = c.op === "between" || c.op === "range" ? `${c.value[0] ?? ""}..${c.value[1] ?? ""}` : c.value.join("|");
@@ -304,7 +312,7 @@ export function parseFilters(params: URLSearchParams): FilterState {
     else value = raw || undefined;
     return [{ id: newId(), field, op: op as FilterOperator, value }];
   });
-  return { query: params.get("q") ?? "", conditions };
+  return { query: params.get("q") ?? "", conditions, ...(params.get("m") === "or" ? { match: "or" as const } : {}) };
 }
 
 /**
@@ -320,6 +328,7 @@ export function useUrlFilters(state: FilterState, setState: (s: FilterState) => 
     url.searchParams.forEach((v, k) => {
       if (k === `${prefix}q`) mine.append("q", v);
       if (k === `${prefix}f`) mine.append("f", v);
+      if (k === `${prefix}m`) mine.append("m", v);
     });
     if (mine.toString()) setState(parseFilters(mine));
     loaded.current = true;
@@ -330,6 +339,7 @@ export function useUrlFilters(state: FilterState, setState: (s: FilterState) => 
     const url = new URL(window.location.href);
     url.searchParams.delete(`${prefix}q`);
     url.searchParams.delete(`${prefix}f`);
+    url.searchParams.delete(`${prefix}m`);
     serializeFilters(state).forEach((v, k) => url.searchParams.append(`${prefix}${k}`, v));
     if (url.href !== window.location.href) window.history.replaceState(window.history.state, "", url);
   }, [state, enabled, prefix]);
@@ -379,6 +389,9 @@ export function useFilters<T>(
     me,
     countFor,
     setQuery: (query: string) => setState((s) => ({ ...s, query })),
+    /** "and": atende a todos os filtros · "or": a qualquer um. */
+    match: state.match ?? "and",
+    setMatch: (match: "and" | "or") => setState((s) => ({ ...s, match })),
     add: (c: Omit<FilterCondition, "id">) => setState((s) => ({ ...s, conditions: [...s.conditions, { ...c, id: newId() }] })),
     update: (id: string, patch: Partial<FilterCondition>) => setState((s) => ({ ...s, conditions: s.conditions.map((c) => (c.id === id ? { ...c, ...patch } : c)) })),
     remove: (id: string) => setState((s) => ({ ...s, conditions: s.conditions.filter((c) => c.id !== id) })),
@@ -927,6 +940,31 @@ export function FilterSheet<T>({ filters, open, onClose, noun = "resultado", nou
 }
 
 /* ------------------------------------------------------------------ */
+/* E / OU                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Alterna como os filtros se combinam. Aparece só com 2+ filtros ativos.
+ * Texto em linguagem de gente: "Atende a todos" / "Atende a qualquer um".
+ */
+export function MatchToggle<T>({ filters, className }: { filters: FiltersApi<T>; className?: string }) {
+  const any = filters.match === "or";
+  return (
+    <button
+      type="button"
+      onClick={() => filters.setMatch(any ? "and" : "or")}
+      aria-label={any ? "Mostrando o que atende a qualquer filtro. Trocar para todos os filtros" : "Mostrando o que atende a todos os filtros. Trocar para qualquer filtro"}
+      title="Trocar entre E (todos) e OU (qualquer um)"
+      className={cn(chipBase, "bg-soft text-ink-soft ring-transparent hover:text-ink", className)}
+    >
+      <span className="text-muted">Atende a</span>
+      <span className="font-medium text-ink">{any ? "qualquer um" : "todos"}</span>
+      <ChevronDown className="h-3 w-3 text-muted" aria-hidden />
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* FilterBar                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -991,8 +1029,9 @@ export function FilterBar<T>({
           {actions}
         </div>
       </div>
-      {chips.length > 0 && (
+      {(chips.length > 0 || filters.active.length > 1) && (
         <div className="hidden flex-wrap items-center gap-1.5 sm:flex" aria-label="Filtros ativos">
+          {filters.active.length > 1 && <MatchToggle filters={filters} />}
           {chips.map((c) => (
             <ActiveFilterChip key={c.id} filters={filters} condition={c} />
           ))}
@@ -1002,10 +1041,14 @@ export function FilterBar<T>({
         </div>
       )}
       {filters.active.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 sm:hidden">
+        <div className="flex flex-wrap items-center gap-1.5 sm:hidden" aria-label="Filtros ativos">
+          {filters.active.length > 1 && <MatchToggle filters={filters} />}
           {filters.active.map((c) => (
             <ActiveFilterChip key={c.id} filters={filters} condition={c} />
           ))}
+          <button type="button" onClick={filters.clear} className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-[12.5px] text-muted hover:bg-soft hover:text-ink">
+            <RotateCcw className="h-3.5 w-3.5" /> Limpar tudo
+          </button>
         </div>
       )}
       <FilterSheet filters={filters} open={sheet} onClose={() => setSheet(false)} noun={noun} nounPlural={plural} />
@@ -1310,7 +1353,20 @@ export function DateRangeFilter({
  * Nenhum resultado com o recorte atual. Diz qual é o recorte e oferece
  * as duas saídas: afrouxar (remover o último filtro) ou recomeçar.
  */
-export function EmptyFilterResult<T>({ filters, noun = "resultado", nounPlural, framed = false }: { filters: FiltersApi<T>; noun?: string; nounPlural?: string; framed?: boolean }) {
+export function EmptyFilterResult<T>({
+  filters,
+  noun = "resultado",
+  nounPlural,
+  gender = "m",
+  framed = false,
+}: {
+  filters: FiltersApi<T>;
+  noun?: string;
+  nounPlural?: string;
+  /** Concordância: "f" → "Nenhuma fatura com esse recorte". */
+  gender?: "m" | "f";
+  framed?: boolean;
+}) {
   const last = filters.active[filters.active.length - 1];
   const plural = nounPlural ?? `${noun}s`;
   return (
@@ -1318,7 +1374,9 @@ export function EmptyFilterResult<T>({ filters, noun = "resultado", nounPlural, 
       <span className="mb-3 grid h-9 w-9 place-items-center rounded-xl border border-line bg-soft/60 text-muted">
         <SearchX className="h-4.5 w-4.5" strokeWidth={1.6} />
       </span>
-      <p className="m-0 text-[14px] font-medium">Nenhum {noun} com esse recorte</p>
+      <p className="m-0 text-[14px] font-medium">
+        {gender === "f" ? "Nenhuma" : "Nenhum"} {noun} com esse recorte
+      </p>
       <p className="m-0 mt-1.5 max-w-sm text-[13px] leading-relaxed text-muted">
         {filters.state.query && (
           <>

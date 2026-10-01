@@ -385,7 +385,7 @@
   border-radius: inherit;
   z-index: 0;
 }
-.linked-card :is(a:not(.card-primary-link), button, input, select, textarea, summary) {
+.linked-card :is(a, button, input, select, textarea, summary):not(.card-primary-link) {
   position: relative;
   z-index: 1;
 }
@@ -536,6 +536,44 @@
   font-size: var(--text-meta);
 }
 
+/* DataTable: linha selecionada, tom, cabeçalho fixo, rodapé, recarregando. */
+.responsive-table tbody tr[data-selected] { background: color-mix(in oklab, var(--ds-primary) 6%, var(--ds-surface)); }
+.responsive-table tbody tr[data-tone="warn"] > td:first-child { box-shadow: inset 2px 0 0 var(--ds-amber); }
+.responsive-table tbody tr[data-tone="bad"] > td:first-child { box-shadow: inset 2px 0 0 var(--ds-rose); }
+.responsive-table tfoot td { padding: 10px 16px; }
+.responsive-table tfoot td:first-child { padding-left: 20px; }
+.responsive-table tfoot td:last-child { padding-right: 20px; }
+@media (min-width: 1024px) {
+  .sticky-head-table thead th { position: sticky; top: 0; z-index: 2; background: color-mix(in oklab, var(--ds-soft) 60%, var(--ds-surface)); box-shadow: inset 0 -1px 0 var(--ds-line); }
+  .sticky-head-table tfoot td { position: sticky; bottom: 0; z-index: 2; background: color-mix(in oklab, var(--ds-soft) 40%, var(--ds-surface)); box-shadow: inset 0 1px 0 var(--ds-line); }
+}
+@media (max-width: 1023.98px) {
+  .responsive-table tbody tr[data-tone] > td:first-child { box-shadow: none; }
+  .responsive-table tbody tr[data-tone="warn"] { box-shadow: inset 3px 0 0 var(--ds-amber); }
+  .responsive-table tbody tr[data-tone="bad"] { box-shadow: inset 3px 0 0 var(--ds-rose); }
+  .responsive-table tfoot { display: block; }
+  .responsive-table tfoot tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; padding: 12px 16px; }
+  .responsive-table tfoot td { display: block; padding: 0 !important; text-align: left; }
+  .responsive-table tfoot td[data-primary] { grid-column: 1 / -1; }
+  .responsive-table tfoot td[data-mobile-hidden] { display: none; }
+  .responsive-table tfoot td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--ds-muted);
+    font-size: var(--text-meta);
+    font-weight: 400;
+  }
+}
+@keyframes ds-progress-indeterminate {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+.ds-progress-indeterminate { animation: ds-progress-indeterminate 1.1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .ds-progress-indeterminate { animation: none !important; width: 100%; opacity: 0.5; }
+}
+
 /* ==================================================================== */
 /* Densidade                                                             */
 /* ==================================================================== */
@@ -606,6 +644,10 @@
   vertical-align: middle;
 }
 .data-grid .dg-th[data-pin] { z-index: 4; }
+.data-grid .dg-colmenu { opacity: 0; transition: opacity 120ms; }
+.data-grid .dg-th:is(:hover, :focus-within) .dg-colmenu,
+.data-grid .dg-colmenu[data-popup-open] { opacity: 1; }
+@media (hover: none) { .data-grid .dg-colmenu { opacity: 1; } }
 .data-grid[data-scrolled-y] .dg-th { box-shadow: 0 6px 10px -8px color-mix(in oklab, var(--ds-ink) 22%, transparent); }
 
 .data-grid .dg-cell {
@@ -616,6 +658,9 @@
   overflow: hidden;
 }
 .data-grid .dg-cell[data-pin] { z-index: 2; }
+/* Célula em edição: a mensagem de erro/prévia de data sai da célula por cima da linha de baixo. */
+.data-grid .dg-cell.dg-editing { overflow: visible; z-index: 5; }
+.data-grid .dg-cell.dg-editing:not([data-pin]) { position: relative; }
 
 .data-grid tr[data-row] { outline: none; }
 .data-grid tr[data-even] { --dg-row-bg: color-mix(in oklab, var(--ds-soft) 55%, var(--ds-surface)); }
@@ -766,6 +811,12 @@
     overflow-y: auto;
     transform-origin: bottom center !important;
   }
+  /* Com lista própria: a folha vira coluna e só a lista rola (nada cortado no rodapé). */
+  .ds-sheet-sm > *:has(.ds-sheet-list) {
+    display: flex !important;
+    flex-direction: column;
+    overflow: hidden;
+  }
   .ds-sheet-sm > *::before {
     content: "";
     display: block;
@@ -775,7 +826,7 @@
     border-radius: 999px;
     background: var(--ds-line-strong);
   }
-  .ds-sheet-sm .ds-sheet-list { max-height: calc(min(78dvh, 560px) - 64px) !important; }
+  .ds-sheet-sm .ds-sheet-list { flex: 1 1 auto; min-height: 0; max-height: none !important; }
 
   /* Combobox, MultiSelect: têm busca (teclado sobe), então ficam ancorados ao
      campo, mas com a largura toda da tela. */
@@ -786,4 +837,26 @@
     width: calc(100vw - 24px) !important;
     max-width: none !important;
   }
+}
+
+/* Texto sobre preenchimento calculado (heatmap, treemap, barra empilhada):
+   useReadableFills marca data-on conforme o fundo resolvido no tema atual. */
+[data-fill][data-on="dark"] { color: var(--ds-on-ink); }
+[data-fill][data-on="light"] { color: var(--ds-ink); }
+
+/* Área de toque mínima (WCAG 2.5.8, 24 px) para controles visualmente
+   pequenos: checkbox, remover etiqueta, ícone de 16–20 px. O desenho não muda. */
+.ds-hit { position: relative; }
+.ds-hit::before {
+  content: "";
+  position: absolute;
+  inset: min(0px, calc((100% - 28px) / 2));
+}
+
+/* Tour: o elemento explicado ganha um anel dourado (o "próximo passo" do DS). */
+[data-tour-active] {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+  transition: outline-offset 150ms;
 }

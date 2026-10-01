@@ -1,0 +1,131 @@
+{
+  "$comment": "Notas de uso por export (certo/errado), coladas no ai/components/<módulo>.md pelo npm run ai:build. Vêm de erros reais de agentes e migrações. Cada export precisa existir.",
+  "Page": {
+    "do": [
+      "`<Page width=\"narrow\">` para coluna estreita (configurações, automações, formulário longo): cabeçalho, PageToolbar e corpo no mesmo eixo. `wide` 1200 · `medium` 1024 · `narrow` 896 · `reading` 720 px."
+    ],
+    "dont": [
+      "`<Page><PageHeading/><div className=\"mx-auto max-w-4xl\">…` (título à esquerda, corpo no meio). Regra `page-width-wrapper`."
+    ]
+  },
+  "PageHeading": {
+    "do": [
+      "Primeiro filho de `Page`. Uma ação primária em `actions` (as demais `variant=\"ghost\"` ou no `ActionMenu`). Registro: `crumbs` com os ancestrais."
+    ],
+    "dont": [
+      "`<h1>` solto (regra `page-heading`); embrulhar o `PageHeading` num `div` só dele (quebra o cabeçalho fixo)."
+    ]
+  },
+  "Button": {
+    "do": [
+      "Bloqueado com motivo: `<Button disabled={demo} disabledReason=\"Demonstração: nada é gravado\">Salvar</Button>` (fica legível, focável e explica)."
+    ],
+    "dont": [
+      "`<span className=\"opacity-50\"><span className=\"pointer-events-none\"><Button disabled>…` (fica invisível; regra `disabled-wrapper`). Title Case (\"Criar Nova Vaga\")."
+    ]
+  },
+  "Checkbox": {
+    "do": [
+      "`<Checkbox label=\"Aceito os termos\" checked={v} onCheckedChange={setV} />`: o `label` aparece ao lado. Em célula de tabela: `hideLabel` (ou `selectionColumn`)."
+    ],
+    "dont": [
+      "`<Checkbox label={x}>{x}</Checkbox>` (texto repetido; regra `redundant-children`). Lista de checkboxes para escolher vários: use `CheckboxGroup`."
+    ]
+  },
+  "CheckboxGroup": {
+    "do": [
+      "Escolher vários de até ~12 itens, todos visíveis: `<CheckboxGroup label=\"Cargos que recebem o pedido\" options={cargos.map((c) => ({ value: c, label: c }))} value={sel} onValueChange={setSel} columns={2} selectAll />`. Item indisponível: `disabledReason` na opção."
+    ],
+    "dont": [
+      "`map` de `Checkbox` com estado em `Set` montado à mão."
+    ]
+  },
+  "MultiSelect": {
+    "do": [
+      "Vários de uma lista longa ou com pouco espaço: `<MultiSelect label=\"Responsáveis\" options={…} value={v} onValueChange={setV} />` (busca automática a partir de 8 opções; gatilho mostra \"3 selecionados\")."
+    ],
+    "dont": [
+      "`<select multiple>`; vários `Select`."
+    ]
+  },
+  "Select": {
+    "do": [
+      "1 opção de até ~7: `<Select label=\"Situação\" options={…} value={v} onValueChange={setV} />` (o `label` é visível; em toolbar use `size=\"compact\"`)."
+    ],
+    "dont": [
+      "`<select>` cru; `Select` dentro de célula de tabela (regra `select-per-row`: use selo + `Menu`)."
+    ]
+  },
+  "NativeSelect": {
+    "do": [
+      "Seletor do sistema estilizado quando o nativo é melhor (celular, lista longa sem busca): `<NativeSelect label=\"Fuso\" options={…} value={v} onValueChange={setV} />`."
+    ],
+    "dont": [
+      "`<select>` cru com classes à mão."
+    ]
+  },
+  "FieldBlock": {
+    "do": [
+      "Para controles sem rótulo próprio (grupo de botões, controle custom). `Select`, `Combobox`, `MultiSelect` e `DatePicker` dentro dele não repetem o rótulo."
+    ],
+    "dont": [
+      "Em volta de `TextField`/`NumberField`/`CurrencyField`/`TextareaField` com o mesmo `label` (rótulo duplo; regra `field-double-label`)."
+    ]
+  },
+  "TextField": {
+    "do": [
+      "`<TextField label=\"Nome\" value={v} onChange={setV} />`: rótulo, dica, erro e foco prontos. Texto longo: `TextareaField`."
+    ],
+    "dont": [
+      "`<input>` cru (regra `raw-input`); `FieldBlock` com o mesmo rótulo em volta."
+    ]
+  },
+  "DatePicker": {
+    "do": [
+      "`<DatePicker label=\"Início\" value={iso} onValueChange={setIso} clearable />` com data ISO (\"2026-10-01\"). Hora: `TimePicker`; data e hora: `DateTimePicker`."
+    ],
+    "dont": [
+      "`<input type=\"date\">` (abre em inglês no iPhone; regra `native-date`); `new Date(\"2026-10-01\")` para exibir (fuso): use `formatDate`."
+    ]
+  },
+  "DataTable": {
+    "do": [
+      "Dados assíncronos: passe `loading`, `error` e `empty={<Empty title=… action=… />}`. Seleção: `selectionColumn(sel, rowKey, rowLabel)` + `BulkBar`. Ordenação `useSort`, páginas `usePagination` + `Pagination`."
+    ],
+    "dont": [
+      "`<table>` cru (regra `raw-table`); checkbox de linha sem `hideLabel`; `Select` por linha."
+    ]
+  },
+  "BulkBar": {
+    "do": [
+      "Filhos são `<button type=\"button\">` simples com ícone + verbo: a barra escura já estiliza (`<BulkBar count={sel.count} noun=\"vaga\" gender=\"f\" onClear={sel.clear}><button type=\"button\" onClick={arquivar}><Archive /> Arquivar</button></BulkBar>`). Ação irreversível abre `ConfirmDialog`."
+    ],
+    "dont": [
+      "`Button` do DS dentro do `BulkBar` (cores de superfície clara sobre a barra escura)."
+    ]
+  },
+  "Drawer": {
+    "do": [
+      "Criar/editar sem sair da lista: `<Drawer open={o} onClose={fechar} title=\"Editar cliente\" footer={<OperationButton operation={op} onClick={salvar}>Salvar alterações</OperationButton>}>`."
+    ],
+    "dont": [
+      "`Drawer` dentro de `Drawer` (regra `nested-drawer`); formulário de uma linha em `Drawer` (edite inline)."
+    ]
+  },
+  "KpiCard": {
+    "do": [
+      "`delta` é fração (`0.12` = +12 %); custo, churn, prazo, inadimplência com `goodWhen=\"down\"`; `value` já formatado (`formatCurrency(v, { compact: true })`)."
+    ],
+    "dont": [
+      "Montar KPI com `Card` + textos; delta em pontos (`12`)."
+    ]
+  },
+  "Empty": {
+    "do": [
+      "`<Empty title=\"Nenhuma vaga com esses filtros\" hint=\"Tente outro termo.\" action={<Button variant=\"ghost\" onClick={limpar}>Limpar filtros</Button>} />`: texto de apoio em `hint`. Dentro de card/tabela: `framed={false}`."
+    ],
+    "dont": [
+      "`description=` no `Empty` (não existe; é `hint`). Tela inteira de erro/404: use `StateView` (esse sim tem `description`)."
+    ]
+  }
+}

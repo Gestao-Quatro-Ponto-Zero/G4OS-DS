@@ -101,3 +101,11 @@ type Rgb = [number, number, number]
 ```ts
 rgbToHex([r, g, b]): string
 ```
+
+## tintFill (function)
+
+Preenchimento de identidade (avatar, agente, app) com iniciais brancas: tints claros escurecem até 4,6:1.
+
+```ts
+tintFill(tint, fallback?): string
+```

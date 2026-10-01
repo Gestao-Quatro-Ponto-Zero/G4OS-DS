@@ -22,7 +22,7 @@ import { cn } from "../lib/cn";
 import { normalize } from "../lib/text";
 import { usePortalContainer } from "../lib/portal";
 import { popupClass } from "./overlays";
-import { Kbd } from "./primitives";
+import { Kbd, KbdGroup } from "./primitives";
 
 /*
  * Sobreposições complementares. Regra de escolha (docs/padroes/superficies.md):
@@ -138,16 +138,52 @@ export function HoverCard({
 /* ------------------------------------------------------------------ */
 
 export type MenuEntry =
-  | { type?: "item"; label: string; icon?: ReactNode; shortcut?: string; onSelect?: () => void; href?: string; disabled?: boolean; tone?: "neutral" | "danger" }
+  | {
+      type?: "item";
+      label: string;
+      icon?: ReactNode;
+      /** Segunda linha em cinza. */
+      description?: string;
+      /** "⌘D" (texto) ou ["mod", "D"] (teclas: ⌘ no Mac, Ctrl nos outros). */
+      shortcut?: string | string[];
+      onSelect?: () => void;
+      href?: string;
+      disabled?: boolean;
+      tone?: "neutral" | "danger";
+    }
   | { type: "separator" }
   | { type: "label"; label: string }
-  | { type: "checkbox"; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; icon?: ReactNode }
-  | { type: "radio"; value: string; onValueChange: (value: string) => void; options: { value: string; label: string }[] }
-  | { type: "submenu"; label: string; icon?: ReactNode; items: MenuEntry[] };
+  /** Bloco livre no topo (conta logada: avatar, nome, e-mail). Não é focável. */
+  | { type: "header"; content: ReactNode }
+  | { type: "checkbox"; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; icon?: ReactNode; description?: string; disabled?: boolean }
+  | {
+      type: "radio";
+      value: string;
+      onValueChange: (value: string) => void;
+      options: { value: string; label: string; icon?: ReactNode; description?: string; disabled?: boolean }[];
+    }
+  | { type: "submenu"; label: string; icon?: ReactNode; items: MenuEntry[]; disabled?: boolean };
 
 const itemClass =
-  "flex w-full cursor-default select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] outline-none data-highlighted:bg-soft data-disabled:opacity-40 data-popup-open:bg-soft";
+  "flex w-full cursor-default select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] outline-none data-highlighted:bg-soft data-disabled:cursor-not-allowed data-disabled:text-muted data-disabled:[&_svg]:opacity-60 data-popup-open:bg-soft";
 const menuPopup = cn(popupClass, "min-w-[200px] max-h-[var(--available-height)] overflow-y-auto p-1.5");
+
+function MenuText({ label, description }: { label: string; description?: string }) {
+  return (
+    <span className="min-w-0 flex-1">
+      <span className="block truncate">{label}</span>
+      {description && <span className="mt-0.5 block truncate text-[12px] leading-snug text-muted">{description}</span>}
+    </span>
+  );
+}
+
+function MenuShortcut({ shortcut }: { shortcut: string | string[] }) {
+  return Array.isArray(shortcut) ? (
+    <KbdGroup keys={shortcut} className="shrink-0 pl-4" />
+  ) : (
+    <span className="shrink-0 pl-4 text-[11.5px] tracking-wide text-muted">{shortcut}</span>
+  );
+}
 
 function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTMLElement | null }) {
   return (
@@ -157,6 +193,12 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
         switch (it.type) {
           case "separator":
             return <BaseMenu.Separator key={key} className="my-1 h-px bg-line" />;
+          case "header":
+            return (
+              <div key={key} className="-mx-1.5 -mt-1.5 mb-1 border-b border-line px-3 py-2.5">
+                {it.content}
+              </div>
+            );
           case "label":
             return (
               <div key={key} className="px-2.5 pb-1 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted">
@@ -165,9 +207,9 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
             );
           case "checkbox":
             return (
-              <BaseMenu.CheckboxItem key={key} checked={it.checked} onCheckedChange={(c) => it.onCheckedChange(c)} closeOnClick={false} className={itemClass}>
+              <BaseMenu.CheckboxItem key={key} checked={it.checked} onCheckedChange={(c) => it.onCheckedChange(c)} closeOnClick={false} disabled={it.disabled} className={itemClass}>
                 <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>
-                <span className="min-w-0 flex-1 truncate">{it.label}</span>
+                <MenuText label={it.label} description={it.description} />
                 <BaseMenu.CheckboxItemIndicator className="shrink-0">
                   <Check className="h-4 w-4" aria-hidden />
                 </BaseMenu.CheckboxItemIndicator>
@@ -177,13 +219,22 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
             return (
               <BaseMenu.RadioGroup key={key} value={it.value} onValueChange={(v) => it.onValueChange(v as string)}>
                 {it.options.map((o) => (
-                  <BaseMenu.RadioItem key={o.value} value={o.value} closeOnClick={false} className={itemClass}>
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                      <BaseMenu.RadioItemIndicator>
-                        <span className="block h-1.5 w-1.5 rounded-full bg-ink" />
+                  <BaseMenu.RadioItem key={o.value} value={o.value} closeOnClick={false} disabled={o.disabled} className={itemClass}>
+                    {o.icon ? (
+                      <span className="flex h-4 w-4 shrink-0 items-center justify-center text-ink-soft [&_svg]:h-4 [&_svg]:w-4">{o.icon}</span>
+                    ) : (
+                      <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                        <BaseMenu.RadioItemIndicator>
+                          <span className="block h-1.5 w-1.5 rounded-full bg-ink" />
+                        </BaseMenu.RadioItemIndicator>
+                      </span>
+                    )}
+                    <MenuText label={o.label} description={o.description} />
+                    {o.icon && (
+                      <BaseMenu.RadioItemIndicator className="shrink-0">
+                        <Check className="h-4 w-4" aria-hidden />
                       </BaseMenu.RadioItemIndicator>
-                    </span>
-                    <span className="min-w-0 flex-1 truncate">{o.label}</span>
+                    )}
                   </BaseMenu.RadioItem>
                 ))}
               </BaseMenu.RadioGroup>
@@ -191,7 +242,7 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
           case "submenu":
             return (
               <BaseMenu.SubmenuRoot key={key}>
-                <BaseMenu.SubmenuTrigger className={itemClass}>
+                <BaseMenu.SubmenuTrigger disabled={it.disabled} className={itemClass}>
                   <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>
                   <span className="min-w-0 flex-1 truncate">{it.label}</span>
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
@@ -210,8 +261,8 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
             const body = (
               <>
                 <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>
-                <span className="min-w-0 flex-1 truncate">{it.label}</span>
-                {it.shortcut && <span className="shrink-0 pl-4 text-[11.5px] tracking-wide text-muted">{it.shortcut}</span>}
+                <MenuText label={it.label} description={it.description} />
+                {it.shortcut && <MenuShortcut shortcut={it.shortcut} />}
               </>
             );
             return it.href ? (
@@ -235,12 +286,23 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
  * marcações (checkbox), escolha única (radio) e submenus. Para o "⋯" simples
  * de linha, ActionMenu basta.
  */
+const menuTrigger = {
+  button: "h-9 gap-2 rounded-lg bg-surface px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft data-popup-open:bg-soft",
+  ghost: "h-9 gap-2 rounded-lg px-3 text-[13px] font-medium text-ink-soft hover:bg-soft hover:text-ink data-popup-open:bg-soft data-popup-open:text-ink",
+  icon: "h-8 w-8 justify-center rounded-lg text-muted hover:bg-soft hover:text-ink data-popup-open:bg-soft data-popup-open:text-ink",
+  bare: "rounded-full",
+} as const;
+
 export function Menu({
   trigger,
   items,
   label,
   align = "start",
   side = "bottom",
+  triggerVariant = "button",
+  width,
+  open,
+  onOpenChange,
   triggerClassName,
 }: {
   /** Conteúdo do botão gatilho. */
@@ -249,16 +311,24 @@ export function Menu({
   label: string;
   align?: "start" | "center" | "end";
   side?: "top" | "bottom" | "left" | "right";
+  /** `button` (contorno, padrão) · `ghost` · `icon` (só ícone, 32 px) · `bare` (sem estilo: avatar como gatilho). */
+  triggerVariant?: keyof typeof menuTrigger;
+  /** Largura do menu em px (padrão: conteúdo, mínimo 200). */
+  width?: number;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   triggerClassName?: string;
 }) {
   const [ref, container] = usePortalContainer();
   return (
-    <BaseMenu.Root modal={false}>
+    <BaseMenu.Root modal={false} open={open} onOpenChange={onOpenChange ? (o) => onOpenChange(o) : undefined}>
       <BaseMenu.Trigger
         ref={ref}
         aria-label={label}
         className={cn(
-          "inline-flex h-9 items-center gap-2 rounded-lg bg-surface px-3 text-[13px] font-medium text-ink ring-1 ring-line outline-none hover:bg-soft focus-visible:ring-2 focus-visible:ring-accent/40 data-popup-open:bg-soft [&_svg]:h-4 [&_svg]:w-4",
+          "inline-flex shrink-0 items-center outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+          triggerVariant !== "bare" && "[&_svg]:h-4 [&_svg]:w-4",
+          menuTrigger[triggerVariant],
           triggerClassName,
         )}
       >
@@ -266,7 +336,7 @@ export function Menu({
       </BaseMenu.Trigger>
       <BaseMenu.Portal container={container}>
         <BaseMenu.Positioner side={side} align={align} sideOffset={6} collisionPadding={12} className="z-[100] outline-none">
-          <BaseMenu.Popup className={menuPopup}>
+          <BaseMenu.Popup className={menuPopup} style={width ? { width, maxWidth: "calc(100vw - 24px)" } : undefined}>
             <MenuEntries items={items} container={container} />
           </BaseMenu.Popup>
         </BaseMenu.Positioner>

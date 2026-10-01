@@ -1,9 +1,10 @@
 "use client";
 
 import { NavigationMenu as BaseNav } from "@base-ui/react/navigation-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu as MenuIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { Menu, type MenuEntry } from "./overlays-extra";
 import { DsLink } from "./primitives";
 
 /*
@@ -19,9 +20,10 @@ export type NavigationMenuLinkItem = {
 };
 
 export type NavigationMenuEntry =
-  | { label: string; href: string; active?: boolean }
+  | { label: string; href: string; active?: boolean; icon?: ReactNode }
   | {
       label: string;
+      icon?: ReactNode;
       /** Links do painel. Com mais de 4, o painel vira duas colunas. */
       links: NavigationMenuLinkItem[];
       /** Destaque à esquerda do painel (card de produto, novidade). */
@@ -29,7 +31,8 @@ export type NavigationMenuEntry =
       active?: boolean;
     };
 
-const triggerClass =
+/** Visual do gatilho do NavigationMenu, para links soltos ao lado dele (equivale a navigationMenuTriggerStyle). */
+export const navigationMenuTriggerClass =
   "inline-flex h-9 select-none items-center gap-1 rounded-lg px-3 text-[13.5px] font-medium text-ink-soft no-underline outline-none transition-colors hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/40 data-popup-open:bg-soft data-popup-open:text-ink data-[active]:text-ink";
 
 /**
@@ -38,14 +41,48 @@ const triggerClass =
  * Abre ao passar o mouse ou por teclado; links usam o componente de rota
  * configurado em setLinkComponent. No celular, esconda e use um Sheet/menu.
  */
-export function NavigationMenu({ items, label, className }: { items: NavigationMenuEntry[]; /** Nome acessível ("Navegação principal"). */ label: string; className?: string }) {
+function mobileEntries(items: NavigationMenuEntry[]): MenuEntry[] {
+  const out: MenuEntry[] = [];
+  for (const it of items) {
+    if ("links" in it) {
+      if (out.length) out.push({ type: "separator" });
+      out.push({ type: "label", label: it.label });
+      for (const l of it.links) out.push({ label: l.title, href: l.href, icon: l.icon, description: l.description });
+    } else out.push({ label: it.label, href: it.href, icon: it.icon });
+  }
+  return out;
+}
+
+export function NavigationMenu({
+  items,
+  label,
+  indicator = false,
+  mobile = "menu",
+  className,
+}: {
+  items: NavigationMenuEntry[];
+  /** Nome acessível ("Navegação principal"). */
+  label: string;
+  /** Seta apontando do painel para o item aberto. */
+  indicator?: boolean;
+  /** Abaixo de 768px: `menu` troca a barra por um botão "Menu" com todos os links; `none` não muda nada (você cuida). */
+  mobile?: "menu" | "none";
+  className?: string;
+}) {
   return (
-    <BaseNav.Root aria-label={label} className={cn("relative", className)}>
+    <>
+      {mobile === "menu" && (
+        <div className={cn("md:hidden", className)}>
+          <Menu label={label} trigger={<><MenuIcon aria-hidden /> Menu</>} triggerVariant="ghost" items={mobileEntries(items)} width={300} />
+        </div>
+      )}
+    <BaseNav.Root aria-label={label} className={cn("relative", mobile === "menu" && "max-md:hidden", className)}>
       <BaseNav.List className="m-0 flex list-none items-center gap-0.5 p-0">
         {items.map((it) =>
           "links" in it ? (
             <BaseNav.Item key={it.label}>
-              <BaseNav.Trigger className={triggerClass} data-active={it.active ? "" : undefined}>
+              <BaseNav.Trigger className={navigationMenuTriggerClass} data-active={it.active ? "" : undefined}>
+                {it.icon && <span className="inline-flex text-muted [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>}
                 {it.label}
                 <BaseNav.Icon className="text-muted transition-transform duration-200 data-popup-open:rotate-180 motion-reduce:transition-none">
                   <ChevronDown aria-hidden className="h-3.5 w-3.5" />
@@ -81,8 +118,9 @@ export function NavigationMenu({ items, label, className }: { items: NavigationM
                 active={it.active}
                 render={<DsLink href={it.href} />}
                 aria-current={it.active ? "page" : undefined}
-                className={triggerClass}
+                className={navigationMenuTriggerClass}
               >
+                {it.icon && <span className="inline-flex text-muted [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>}
                 {it.label}
               </BaseNav.Link>
             </BaseNav.Item>
@@ -99,8 +137,12 @@ export function NavigationMenu({ items, label, className }: { items: NavigationM
           <BaseNav.Popup className="relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)] overflow-hidden rounded-xl border border-line bg-popover text-ink shadow-xl shadow-black/10 outline-none transition-[opacity,scale,width,height] duration-200 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0 motion-reduce:transition-none">
             <BaseNav.Viewport className="relative h-full w-full overflow-hidden" />
           </BaseNav.Popup>
+          {indicator && (
+            <BaseNav.Arrow className="h-2.5 w-2.5 rotate-45 border-l border-t border-line bg-popover transition-[left] duration-200 data-[side=bottom]:-top-[5px] motion-reduce:transition-none" />
+          )}
         </BaseNav.Positioner>
       </BaseNav.Portal>
     </BaseNav.Root>
+    </>
   );
 }

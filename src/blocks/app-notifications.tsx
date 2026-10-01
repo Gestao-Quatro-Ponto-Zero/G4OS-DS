@@ -152,7 +152,7 @@ export default function NotificationsBlock() {
                             </button>
                           </Tooltip>
                           <ActionMenu actions={[{ label: n.unread ? "Marcar como lida" : "Marcar como não lida", onSelect: () => toggleRead(n.id) }, { label: "Silenciar este assunto", onSelect: () => notify("Assunto silenciado", undefined, "info") }, { label: "Arquivar", onSelect: () => archive(n.id), separator: true }]} />
-                          <span aria-label={n.unread ? "Não lida" : undefined} className={cn("mt-2.5 h-2 w-2 rounded-full", n.unread ? "bg-blue" : "bg-transparent")} />
+                          <span role={n.unread ? "img" : undefined} aria-label={n.unread ? "Não lida" : undefined} className={cn("mt-2.5 h-2 w-2 rounded-full", n.unread ? "bg-blue" : "bg-transparent")} />
                         </div>
                       </li>
                     ))}

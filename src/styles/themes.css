@@ -90,6 +90,8 @@
   --ds-font-sans: "IBM Plex Sans", "Figtree", ui-sans-serif, system-ui, sans-serif;
 }
 [data-brand="grafite"][data-theme="dark"] {
+  --ds-primary: #e4e4e7; /* grafite claro no escuro: o #2b2d31 sumia no fundo */
+  --ds-on-primary: #18181b;
   --ds-accent: #8f929a;
   --ds-accent-deep: #c5c6cc;
   --ds-accent-soft: #26272b;
@@ -134,11 +136,11 @@
   --ds-rail: #ebe9e0;
   --ds-ink: #141413;
   --ds-ink-soft: #3d3d3a;
-  --ds-muted: #6b6a64;
+  --ds-muted: #5f5e58; /* 5,2:1 sobre o soft */
   --ds-line: #dedcd4;
   --ds-line-strong: #cccbc8;
   --ds-on-ink: #faf9f5;
-  --ds-primary: #b85a3a; /* argila escurecida: 4,1:1 sobre o marfim, texto branco 4,9:1 */
+  --ds-primary: #a24e30; /* argila escurecida: 4,6:1 sobre o soft, texto branco 5,7:1 */
   --ds-on-primary: #ffffff;
   --ds-blue: #9a4a2c;
   --ds-accent: #d97757;
@@ -250,9 +252,9 @@
   --ds-muted: #615d59;
   --ds-line: #e9e8e5;
   --ds-line-strong: #d9d8d4;
-  --ds-primary: #0075de;
+  --ds-primary: #0068c9; /* 4,8:1 sobre o soft (o #0075de ficava em 4,0) */
   --ds-on-primary: #ffffff;
-  --ds-blue: #0075de;
+  --ds-blue: #0068c9;
   --ds-accent: #ffb110;
   --ds-accent-deep: #8a5a00;
   --ds-accent-soft: #fff4dc;
@@ -316,46 +318,26 @@
 }
 
 /* ---------------- G4 Institucional: a paleta do manual de marca aplicada à
-   interface. Para apresentações, portais, materiais e marketing. Neutros
-   quentes (Warm White, Royal Silver, Light Gray, Charcoal), Navy na ação,
-   Gold no destaque. O escuro segue neutro (não navy) com Silver na ação. --- */
+   interface. Para apresentações, portais, materiais e marketing. Fundo,
+   superfícies, texto e bordas iguais ao G4 clássico (neutros frios, nada de
+   bege); Navy na ação, Gold no destaque e nos gráficos. O escuro segue o
+   neutro do clássico com Silver na ação. --- */
 [data-brand="g4-institucional"] {
-  --ds-page: var(--g4-warm-white);
-  --ds-surface: var(--g4-white);
-  --ds-popover: var(--g4-white);
-  --ds-soft: var(--g4-royal-silver);
-  --ds-rail: var(--g4-royal-silver);
-  --ds-ink: var(--g4-charcoal);
-  --ds-ink-soft: var(--g4-dark-gray);
-  --ds-muted: #6e6b67; /* Mid Gray escurecido: 5,1:1 no Warm White (o #9a9895 fica em 2,8:1) */
-  --ds-line: var(--g4-light-gray);
-  --ds-line-strong: #d6d3cf;
   --ds-primary: var(--g4-navy-blue);
   --ds-on-primary: var(--g4-royal-silver);
   --ds-blue: var(--g4-scaling-blue);
   --ds-navy: var(--g4-navy-blue);
   --ds-accent: var(--g4-royal-gold);
-  --ds-accent-deep: #8c6a3a;
+  --ds-accent-deep: #7d5e33;
   --ds-accent-soft: #f5eee3;
   --ds-chart-1: var(--g4-navy-blue);
   --ds-chart-2: var(--g4-royal-gold);
   --ds-chart-3: var(--g4-scaling-blue);
   --ds-chart-4: var(--g4-ground-clay);
   --ds-chart-5: var(--g4-mid-gray);
-  --ds-chart-grid: #efedea;
 }
 [data-brand="g4-institucional"][data-theme="dark"] {
-  --ds-page: #121110;
-  --ds-surface: #1a1917;
-  --ds-popover: #22201e;
-  --ds-soft: #24221f;
-  --ds-rail: #161513;
   --ds-ink: var(--g4-royal-silver);
-  --ds-ink-soft: #cfccc7;
-  --ds-muted: #a29f9a;
-  --ds-line: #2e2c29;
-  --ds-line-strong: #403d39;
-  --ds-on-ink: #121110;
   --ds-primary: var(--g4-royal-silver);
   --ds-on-primary: var(--g4-navy-blue);
   --ds-blue: #90b8d4;

@@ -30,13 +30,13 @@ Por que `@theme inline`: os utilitários saem como `background-color: var(--ds-s
 | `rail` | sidebar | `#fbfbfc` | `#141416` |
 | `ink` | texto principal | `#202124` | `#ececef` |
 | `ink-soft` | texto secundário forte | `#484a50` | `#c5c6cc` |
-| `muted` | metadado, rótulo, placeholder (**cor de texto**) | `#6b6e76` | `#8f929a` |
+| `muted` | metadado, rótulo, placeholder (**cor de texto**) | `#63666e` | `#8f929a` |
 | `line` / `line-strong` | bordas / hover de borda | `#e9eaed` / `#d2d4da` | `#2a2a2f` / `#3b3c43` |
 | `primary` / `on-primary` | ação principal e seleção / texto sobre ela | `#202124` / `#ffffff` | `#ececef` / `#121214` |
 | `on-ink` | texto sobre `bg-ink`, `bg-rose`, `bg-ok`… | `#ffffff` | `#121214` |
 | `navy` | superfície de marca (escura nos dois temas) | `#031a26` | `#0a2130` |
 | `blue` | link, ação textual, "em andamento" | `#184560` | `#8cb8da` |
-| `accent` / `accent-deep` / `accent-soft` | destaque: preenchimento / texto / fundo | `#b9915b` / `#8c6a3a` / `#f5eee3` | `#c9a46f` / `#dcbd8e` / `#2e2619` |
+| `accent` / `accent-deep` / `accent-soft` | destaque: preenchimento / texto / fundo | `#b9915b` / `#7d5e33` / `#f5eee3` | `#c9a46f` / `#dcbd8e` / `#2e2619` |
 | `clay` / `clay-soft` | ênfase editorial | `#842e20` / `#f6e7e3` | `#e59a8a` / `#3a211c` |
 | `ok`, `amber`, `rose`, `info` (+`-soft`) | estados | tons fortes / fundos claros | tons claros / fundos escuros |
 | `chart-1…6`, `chart-grid` | séries e grade | ink, azul, dourado, clay, sálvia, cinza | versões claras |

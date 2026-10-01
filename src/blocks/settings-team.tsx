@@ -10,7 +10,7 @@ import {
   DataTable,
   Meter,
   Modal,
-  Select,
+  InlineSelect,
   TableToolbar,
   TagInput,
   cn,
@@ -110,12 +110,11 @@ export default function SettingsTeamBlock() {
       key: "papel",
       header: "Papel",
       cell: (m) => (
-        <Select
+        <InlineSelect
           label={`Papel de ${m.name}`}
-          size="compact"
           options={roleOptions}
           value={m.role}
-          disabled={m.role === "admin" && admins === 1}
+          disabledReason={m.role === "admin" && admins === 1 ? "Único administrador: promova outra pessoa antes" : undefined}
           onValueChange={(v) => {
             setMembers((xs) => xs.map((x) => (x.id === m.id ? { ...x, role: v as Role } : x)));
             notify(`${m.name.split(" ")[0]} agora é ${roleOptions.find((r) => r.value === v)?.label.toLowerCase()}`);

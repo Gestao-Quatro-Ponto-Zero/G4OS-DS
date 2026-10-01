@@ -103,28 +103,25 @@ type LightboxImage = { src: string; alt: string; caption?: ReactNode }
 
 ## Menu
 
-Menu completo: itens com ícone e atalho, rótulos de grupo, separadores, marcações (checkbox), escolha única (radio) e submenus.
-
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `items` * | `MenuEntry[]` |  |  |
 | `label` * | `string` |  |  |
 | `trigger` * | `ReactNode` |  | Conteúdo do botão gatilho. |
 | `align` | `"start" \| "center" \| "end" \| undefined` | `"start"` |  |
+| `onOpenChange` | `((open: boolean) => void) \| undefined` |  |  |
+| `open` | `boolean \| undefined` |  |  |
 | `side` | `"top" \| "bottom" \| "left" \| "right" \| undefined` | `"bottom"` |  |
 | `triggerClassName` | `string \| undefined` |  |  |
+| `triggerVariant` | `"ghost" \| "icon" \| "button" \| "bare" \| undefined` | `"button"` | `button` (contorno, padrão) · `ghost` · `icon` (só ícone, 32 px) · `bare` (sem estilo: avatar como gatilho). |
+| `width` | `number \| undefined` |  | Largura do menu em px (padrão: conteúdo, mínimo 200). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ov-menus`):
+Exemplo (showcase `#/p/_shadcn-extras`):
 
 ```tsx
-<Menu label="Exibição" trigger={<><Columns3 /> Exibição</>} items={[
-  { type: "label", label: "Ordenar por" },
-  { type: "radio", value: sort, onValueChange: setSort, options: [...] },
-  { type: "separator" },
-  { type: "checkbox", label: "Valor", checked, onCheckedChange },
-]} />
+<Menu label="${title}" trigger="Abrir" items={…} />
 ```
 
 ## Menubar
@@ -158,7 +155,7 @@ Exemplo (showcase `#/p/nav-menus-de-site`):
 ## MenuEntry (type)
 
 ```ts
-type MenuEntry = | { type?: "item"; label: string; icon?: ReactNode; shortcut?: string; onSelect?: () => void; href?: string; disabled?: boolean; tone?: "neutral" | "danger" } | { type: "separator" } | { type: "label"; label: string } | { type: "checkbox"; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; icon?: ReactNode } | { type: "radio"; value: string; onValueChange: (value: str…
+type MenuEntry = | { type?: "item"; label: string; icon?: ReactNode; description?: string; shortcut?: string | string[]; onSelect?: () => void; href?: string; disabled?: boolean; tone?: "neutral" | "danger"; } | { type: "separator" } | { type: "label"; label: string } | { type: "header"; content: ReactNode } | { type: "checkbox"; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; icon…
 ```
 
 ## Sheet

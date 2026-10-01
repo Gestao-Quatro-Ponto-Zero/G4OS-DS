@@ -26,6 +26,14 @@ Caixa 20px, marcada = primária.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ `<Checkbox label="Aceito os termos" checked={v} onCheckedChange={setV} />`: o `label` aparece ao lado. Em célula de tabela: `hideLabel` (ou `selectionColumn`).
+
+**Evite**
+
+- ✗ `<Checkbox label={x}>{x}</Checkbox>` (texto repetido; regra `redundant-children`). Lista de checkboxes para escolher vários: use `CheckboxGroup`.
+
 Exemplo (showcase `#/p/form-listas`):
 
 ```tsx
@@ -56,6 +64,14 @@ Vários valores com TODAS as opções visíveis (2–8 itens, até ~12 em grade)
 | `selectAll` | `string \| boolean \| undefined` |  | Caixa "Selecionar todos" (tri-estado) acima das opções. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ Escolher vários de até ~12 itens, todos visíveis: `<CheckboxGroup label="Cargos que recebem o pedido" options={cargos.map((c) => ({ value: c, label: c }))} value={sel} onValueChange={setSel} columns={2} selectAll />`. Item indisponível: `disabledReason` na opção.
+
+**Evite**
+
+- ✗ `map` de `Checkbox` com estado em `Set` montado à mão.
 
 Exemplo (showcase `#/p/form-listas`):
 
@@ -146,6 +162,14 @@ Rótulo + controle + ajuda/erro.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ Para controles sem rótulo próprio (grupo de botões, controle custom). `Select`, `Combobox`, `MultiSelect` e `DatePicker` dentro dele não repetem o rótulo.
+
+**Evite**
+
+- ✗ Em volta de `TextField`/`NumberField`/`CurrencyField`/`TextareaField` com o mesmo `label` (rótulo duplo; regra `field-double-label`).
+
 Exemplo (showcase `#/p/form-listas`):
 
 ```tsx
@@ -198,6 +222,14 @@ Vários valores de uma lista (cargos, equipes, etiquetas) num popup com busca, c
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ Vários de uma lista longa ou com pouco espaço: `<MultiSelect label="Responsáveis" options={…} value={v} onValueChange={setV} />` (busca automática a partir de 8 opções; gatilho mostra "3 selecionados").
+
+**Evite**
+
+- ✗ `<select multiple>`; vários `Select`.
+
 Exemplo (showcase `#/p/form-listas`):
 
 ```tsx
@@ -229,6 +261,14 @@ type MultiSelectOption = { value: string; label: string; description?: string; g
 | `size` | `"sm" \| "md" \| undefined` | `"md"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ Seletor do sistema estilizado quando o nativo é melhor (celular, lista longa sem busca): `<NativeSelect label="Fuso" options={…} value={v} onValueChange={setV} />`.
+
+**Evite**
+
+- ✗ `<select>` cru com classes à mão.
 
 Exemplo (showcase `#/p/form-listas`):
 
@@ -314,6 +354,14 @@ Lista curta e fixa (status, prioridade, tipo).
 | `tone` | `"neutral" \| "ok" \| "warn" \| "bad" \| undefined` | `"neutral"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ 1 opção de até ~7: `<Select label="Situação" options={…} value={v} onValueChange={setV} />` (o `label` é visível; em toolbar use `size="compact"`).
+
+**Evite**
+
+- ✗ `<select>` cru; `Select` dentro de célula de tabela (regra `select-per-row`: use selo + `Menu`).
 
 Exemplo (showcase `#/p/form-listas`):
 

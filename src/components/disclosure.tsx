@@ -68,13 +68,29 @@ export function Accordion({
   );
 }
 
-/** Uma seção opcional: "Opções avançadas", "Mostrar detalhes". */
+const collapsiblePanel =
+  "h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] data-ending-style:h-0 data-starting-style:h-0 motion-reduce:transition-none";
+
+/**
+ * Uma seção opcional: "Opções avançadas", "Mostrar detalhes".
+ * `variant`: `inline` (link discreto, padrão), `row` (linha cheia com
+ * divisória, para listas de configurações) ou `card` (emoldurado).
+ * `description` e `meta` aparecem no gatilho; `actions` à direita.
+ * Para montar à mão (árvore de arquivos, painel com gatilho próprio), use
+ * CollapsibleRoot + CollapsibleTrigger + CollapsibleContent.
+ */
 export function Collapsible({
   label,
   children,
   defaultOpen = false,
   open,
   onOpenChange,
+  variant = "inline",
+  description,
+  meta,
+  actions,
+  icon,
+  disabled,
   className,
 }: {
   label: ReactNode;
@@ -82,18 +98,115 @@ export function Collapsible({
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  variant?: "inline" | "row" | "card";
+  /** Linha de apoio sob o rótulo (row/card). */
+  description?: ReactNode;
+  /** Texto à direita do rótulo: "3 regras", "Opcional". */
+  meta?: ReactNode;
+  /** Ações à direita do gatilho (fora do botão). */
+  actions?: ReactNode;
+  icon?: ReactNode;
+  disabled?: boolean;
+  className?: string;
+}) {
+  if (variant === "inline")
+    return (
+      <BaseCollapsible.Root defaultOpen={defaultOpen} open={open} onOpenChange={(o) => onOpenChange?.(o)} disabled={disabled} className={className}>
+        <div className="flex items-center gap-2">
+          <BaseCollapsible.Trigger className="group -mx-1.5 inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] font-medium text-ink-soft outline-none hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/40 data-disabled:cursor-not-allowed data-disabled:text-muted">
+            <ChevronRight className="h-3.5 w-3.5 text-muted transition-transform duration-200 group-data-panel-open:rotate-90" aria-hidden />
+            {icon && <span className="inline-flex text-muted [&_svg]:h-4 [&_svg]:w-4">{icon}</span>}
+            {label}
+            {meta && <span className="font-normal text-muted">{meta}</span>}
+          </BaseCollapsible.Trigger>
+          {actions && <div className="ml-auto flex shrink-0 items-center gap-1">{actions}</div>}
+        </div>
+        <BaseCollapsible.Panel className={collapsiblePanel}>
+          <div className="pt-3">{children}</div>
+        </BaseCollapsible.Panel>
+      </BaseCollapsible.Root>
+    );
+  return (
+    <BaseCollapsible.Root
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={(o) => onOpenChange?.(o)}
+      disabled={disabled}
+      className={cn(variant === "card" ? "overflow-hidden rounded-xl border border-line bg-surface" : "border-b border-line", className)}
+    >
+      <div className={cn("flex items-center gap-2", variant === "card" ? "pr-3" : "")}>
+        <BaseCollapsible.Trigger
+          className={cn(
+            "group flex min-w-0 flex-1 items-center gap-3 text-left outline-none hover:bg-soft/50 focus-visible:bg-soft/60 data-disabled:cursor-not-allowed data-disabled:text-muted",
+            variant === "card" ? "px-4 py-3.5" : "py-3.5",
+          )}
+        >
+          {icon && <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line bg-surface text-ink-soft [&_svg]:h-4 [&_svg]:w-4">{icon}</span>}
+          <span className="min-w-0 flex-1">
+            <span className="flex flex-wrap items-baseline gap-x-2 text-[13.5px] font-medium">
+              <span className="min-w-0">{label}</span>
+              {meta && <span className="shrink-0 text-[12px] font-normal text-muted">{meta}</span>}
+            </span>
+            {description && <span className="mt-0.5 block text-[12px] text-muted">{description}</span>}
+          </span>
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted transition-transform duration-200 group-data-panel-open:rotate-180" aria-hidden />
+        </BaseCollapsible.Trigger>
+        {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}
+      </div>
+      <BaseCollapsible.Panel className={collapsiblePanel}>
+        <div className={cn("pb-4 text-[13px] leading-relaxed text-ink-soft", variant === "card" ? "px-4" : "")}>{children}</div>
+      </BaseCollapsible.Panel>
+    </BaseCollapsible.Root>
+  );
+}
+
+/** Raiz componível (controlada com `open`/`onOpenChange`). */
+export function CollapsibleRoot({
+  children,
+  open,
+  defaultOpen,
+  onOpenChange,
+  disabled,
+  className,
+}: {
+  children: ReactNode;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  disabled?: boolean;
   className?: string;
 }) {
   return (
-    <BaseCollapsible.Root defaultOpen={defaultOpen} open={open} onOpenChange={(o) => onOpenChange?.(o)} className={className}>
-      <BaseCollapsible.Trigger className="group -mx-1.5 inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] font-medium text-ink-soft outline-none hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/40">
-        <ChevronRight className="h-3.5 w-3.5 text-muted transition-transform duration-200 group-data-panel-open:rotate-90" aria-hidden />
-        {label}
-      </BaseCollapsible.Trigger>
-      <BaseCollapsible.Panel className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] data-ending-style:h-0 data-starting-style:h-0">
-        <div className="pt-3">{children}</div>
-      </BaseCollapsible.Panel>
+    <BaseCollapsible.Root open={open} defaultOpen={defaultOpen} onOpenChange={(o) => onOpenChange?.(o)} disabled={disabled} className={className}>
+      {children}
     </BaseCollapsible.Root>
+  );
+}
+
+/**
+ * Gatilho componível. Sem `className`, vem com o visual de linha (chevron
+ * gira ao abrir via `group-data-panel-open:`). `chevron={false}` para um gatilho todo seu.
+ */
+export function CollapsibleTrigger({ children, chevron = true, className }: { children: ReactNode; chevron?: boolean; className?: string }) {
+  return (
+    <BaseCollapsible.Trigger
+      className={cn(
+        "group inline-flex min-w-0 items-center gap-1.5 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/40 data-disabled:cursor-not-allowed data-disabled:text-muted",
+        className,
+      )}
+    >
+      {chevron && <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200 group-data-panel-open:rotate-90 motion-reduce:transition-none" aria-hidden />}
+      {children}
+    </BaseCollapsible.Trigger>
+  );
+}
+
+/** Conteúdo componível com altura animada (respeita "reduzir movimento"). */
+export function CollapsibleContent({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <BaseCollapsible.Panel className={collapsiblePanel}>
+      <div className={className}>{children}</div>
+    </BaseCollapsible.Panel>
   );
 }
 

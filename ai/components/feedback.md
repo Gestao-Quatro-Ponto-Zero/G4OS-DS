@@ -52,6 +52,7 @@ Botão que conta o progresso ("Salvando…") e se desabilita enquanto confirma o
 | --- | --- | --- | --- |
 | `operation` * | `Pick<{ busy: boolean; error: string; uncertain: boolean; pending: boolean; busyLabel: string; run: (task: (…` |  |  |
 | `busyLabel` | `string \| undefined` |  |  |
+| `disabledReason` | `ReactNode` |  | Por que está desabilitado (tooltip + leitor de tela), igual a Button. |
 | `size` | `"sm" \| "md" \| undefined` |  |  |
 | `variant` | `ButtonVariant \| undefined` |  |  |
 

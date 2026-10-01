@@ -4,9 +4,12 @@ Meta: WCAG 2.2 AA. Os componentes já resolvem a maior parte; estas regras cobre
 
 ## Contraste
 
-- Texto normal ≥ 4,5:1. `muted` (#6b6e76) é o cinza mais claro permitido para texto sobre branco.
-- Dourado (`accent`) não passa como texto: use `accent-deep`.
+- Texto normal ≥ 4,5:1. `muted` (#63666e) é o cinza mais claro permitido para texto, e passa também sobre `soft`, seleção e `accent-soft`.
+- **Sem opacidade em cor de texto.** `text-muted/80`, `text-rose/80`, `opacity-60` num rótulo derrubam o contraste abaixo de AA. A hierarquia vem de `ink` → `ink-soft` → `muted`, não de transparência.
+- Dourado (`accent`) não passa como texto: use `accent-deep`. Laranja de alerta é `amber` (#b54500, AA no branco e no `amber-soft`).
 - Texto sobre `-soft` usa a cor forte do mesmo tom (`text-amber` em `bg-amber-soft`).
+- **Texto sobre preenchimento calculado** (heatmap, treemap, barra empilhada com rótulo): marque a célula com `data-fill` e chame `useReadableFills(ref)`; o DS mede o fundo resolvido no tema atual e escolhe `ink` ou `on-ink`. Rampas de intensidade pulam a faixa do meio (40–70 %), onde nenhum texto chega a 4,5:1.
+- **Iniciais sobre `tint`** (avatar, agente, app): `tintFill(tint)` (em `lib/color`) escurece tints claros até 4,6:1 com o branco. `Avatar` já usa.
 
 ## Teclado
 
@@ -19,7 +22,10 @@ Meta: WCAG 2.2 AA. Os componentes já resolvem a maior parte; estas regras cobre
 
 ## Nomes acessíveis
 
-- `IconButton` exige `label`. Ícones decorativos `aria-hidden`.
+- `IconButton` exige `label`. Ícones decorativos `aria-hidden`. `Button` só com ícone também precisa de `aria-label`.
+- **Rótulo que some no celular vira `max-sm:sr-only`, nunca `hidden sm:inline`**: o botão continua com nome para o leitor de tela.
+- `aria-label` só em elemento com papel (`button`, `a`, `role="img"`, `role="group"`, `role="region"`…). Em `<span>`/`<div>` sem `role` ele é ignorado: use `role="img"` (ícone, estrela, ponto) ou texto `sr-only`.
+- Região que rola na horizontal sem nada focável dentro (código, tabela larga, heatmap) recebe `tabIndex={0}` + `role="region"` + `aria-label`, para rolar pelo teclado.
 - `Dot` sem texto exige `label`. Cor nunca é a única pista.
 - Gráficos recebem `label` (resumo em uma frase) e geram tabela `sr-only` com os valores.
 - `Meter`, `GoalMeter`, `ProgressRing` são `role="progressbar"` com `aria-label` e valor.
@@ -36,8 +42,12 @@ Meta: WCAG 2.2 AA. Os componentes já resolvem a maior parte; estas regras cobre
 
 - `prefers-reduced-motion` zera animações (global).
 - Zoom de 200 % sem perda: nada de altura fixa em texto; tabela vira blocos.
-- Alvos de toque ≥ 32 px (40 px preferível no celular).
+- Alvos de toque ≥ 24 px (WCAG 2.5.8); 32–40 px no celular para ações principais. Controle visualmente pequeno (checkbox de 20 px, remover etiqueta, ícone de 16 px) usa a classe `ds-hit`, que amplia a área clicável para 28 px sem mudar o desenho.
 - `lang="pt-BR"` no `<html>`.
+
+## Varredura automática (no repositório do DS)
+
+`npm run showcase:build && npm run qa:sweep` visita todas as páginas e blocos do showcase em 1440 e 390 px, claro e escuro, e procura: rolagem horizontal, elemento cortado por ancestral (`overflow: hidden`), axe-core WCAG 2.1 AA (contraste, nomes, rótulos), erros de console, popup fora da tela, alvo de toque < 24 px e foco sem indicador. Relatório em `qa-report/sweep.md`, agrupado por causa (assinatura), não por ocorrência. Filtros: `--filter crm`, `--only blocks`, `--viewport 390`, `--theme dark`, `--checks axe,clipped`. Exemplos "Evite" propositalmente errados ficam num contêiner com `data-qa-ignore`.
 
 ## Checklist antes de publicar uma tela
 

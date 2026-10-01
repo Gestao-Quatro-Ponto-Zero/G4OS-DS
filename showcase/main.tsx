@@ -113,7 +113,7 @@ function Appearance() {
             ))}
           </div>
         </div>
-        <a href="#/p/fund-temas" className="block text-[12px] font-medium text-blue hover:underline">
+        <a href="#/p/fund-temas" className="block text-[12px] font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">
           Criar a marca de um cliente →
         </a>
       </div>
@@ -223,7 +223,7 @@ function SiteSearch() {
   let i = -1;
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex h-8 min-w-0 shrink items-center gap-2 rounded-lg border border-line bg-surface px-2.5 text-[12.5px] text-muted hover:border-line-strong sm:w-52 lg:w-60">
+      <button type="button" onClick={() => setOpen(true)} aria-label="Buscar no DS (⌘K)" className="inline-flex h-8 min-w-0 shrink items-center gap-2 rounded-lg border border-line bg-surface px-2.5 text-[12.5px] text-muted hover:border-line-strong sm:w-52 lg:w-60">
         <Search className="h-3.5 w-3.5 shrink-0" />
         <span className="hidden min-w-0 flex-1 truncate whitespace-nowrap text-left sm:inline">Buscar no DS…</span>
         <kbd className="hidden shrink-0 rounded border border-line bg-soft px-1 font-sans text-[10.5px] sm:inline">⌘K</kbd>
@@ -378,7 +378,7 @@ function Home() {
         </div>
         <InstallCommand />
         <p className="m-0 mt-3 text-[12px] text-muted">
-          Para agentes de IA: <a href="./llms.txt" className="text-blue hover:underline">llms.txt</a> · <a href="#/p/guia-agentes" className="text-blue hover:underline">servidor MCP</a>
+          Para agentes de IA: <a href="./llms.txt" className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">llms.txt</a> · <a href="#/p/guia-agentes" className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">servidor MCP</a>
         </p>
       </section>
       {current && (
@@ -433,7 +433,7 @@ function BlocksPage({ category }: { category?: string }) {
             className={cn("shrink-0 rounded-lg px-3 py-1.5 text-[13px]", on ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-soft hover:text-ink")}
           >
             {label}
-            {label !== "Destaque" && <span className={cn("ml-1.5 text-[11px] tabular-nums", on ? "text-on-primary/60" : "text-muted/70")}>{byCategory(label).length}</span>}
+            {label !== "Destaque" && <span className={cn("ml-1.5 text-[11px] tabular-nums", on ? "text-on-primary/60" : "text-muted")}>{byCategory(label).length}</span>}
           </a>
         ))}
       </nav>

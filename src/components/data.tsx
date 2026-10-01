@@ -1,11 +1,11 @@
 "use client";
 
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
 import type { Column } from "./collections";
-import { Checkbox } from "./forms";
+import { Checkbox, NativeSelect } from "./forms";
 
 /*
  * Estado de tabela sem biblioteca: ordenação, seleção, paginação e ações em
@@ -22,7 +22,8 @@ export type SortState = { key: string; dir: SortDir } | null;
 
 /**
  * Ordena `rows` por chaves declaradas em `by`. Clique alterna
- * asc → desc → sem ordenação. Texto compara em pt-BR (acentos, caixa).
+ * asc → desc → sem ordenação. Texto compara em pt-BR (acentos, caixa) e
+ * números dentro do texto em ordem natural ("Pedido 2" antes de "Pedido 10").
  *
  *   const sort = useSort(deals, { valor: (d) => d.value, nome: (d) => d.name });
  *   header: <SortHeader label="Valor" {...sort.header("valor")} />
@@ -39,7 +40,7 @@ export function useSort<T>(rows: T[], by: Record<string, (row: T) => string | nu
       if (x == null && y == null) return 0;
       if (x == null) return 1;
       if (y == null) return -1;
-      if (typeof x === "string" && typeof y === "string") return x.localeCompare(y, "pt-BR", { sensitivity: "base" }) * mul;
+      if (typeof x === "string" && typeof y === "string") return x.localeCompare(y, "pt-BR", { sensitivity: "base", numeric: true }) * mul;
       return (Number(x) - Number(y)) * mul;
     });
     // `by` costuma ser literal recriado a cada render; a chave basta.
@@ -75,6 +76,17 @@ export function SortHeader({ label, active, dir, onToggle, align = "left" }: { l
 export function useSelection(visible: string[]) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const visibleSelected = visible.filter((id) => selected.has(id)).length;
+  const visibleSet = new Set(visible);
+  const keepOnly = useCallback(
+    (ids: string[]) =>
+      setSelected((s) => {
+        if (!s.size) return s;
+        const keep = new Set(ids);
+        const n = new Set([...s].filter((id) => keep.has(id)));
+        return n.size === s.size ? s : n;
+      }),
+    [],
+  );
   const all = visible.length > 0 && visibleSelected === visible.length;
   const some = visibleSelected > 0 && !all;
   return {
@@ -98,6 +110,13 @@ export function useSelection(visible: string[]) {
         return n;
       }),
     clear: () => setSelected(new Set()),
+    /** Selecionados que estão na lista atual (página/filtro). */
+    visibleCount: visibleSelected,
+    /** Selecionados escondidos pelo filtro ou em outra página: avise antes de uma ação em massa. */
+    hiddenCount: [...selected].filter((id) => !visibleSet.has(id)).length,
+    /** Mantém só os ids informados (use ao filtrar, para a ação em massa não pegar o que a pessoa não vê). */
+    keepOnly,
+    set: (ids: Iterable<string>) => setSelected(new Set(ids)),
   };
 }
 
@@ -107,8 +126,7 @@ export function selectionColumn<T>(sel: ReturnType<typeof useSelection>, rowKey:
     key: "__select",
     header: <Checkbox hideLabel label="Selecionar todos" checked={sel.all} indeterminate={sel.some} onCheckedChange={sel.toggleAll} />,
     cell: (row) => <Checkbox hideLabel label={`Selecionar ${rowLabel(row)}`} checked={sel.has(rowKey(row))} onCheckedChange={() => sel.toggle(rowKey(row))} />,
-    action: true,
-    mobileHidden: true,
+    selection: true,
     className: "w-10",
   };
 }
@@ -139,18 +157,48 @@ export function BulkBar({ count, noun = "item", nounPlural, onClear, children, g
 /* Paginação                                                           */
 /* ------------------------------------------------------------------ */
 
-/** Pagina uma lista no cliente. Volta para a página 1 quando a lista muda de tamanho. */
-export function usePagination<T>(rows: T[], pageSize = 20) {
+/**
+ * Pagina uma lista no cliente. A página nunca passa da última (excluir a
+ * última linha da página 3 leva à página 2) e volta para a 1 quando
+ * `resetKey` muda — passe o estado de busca/filtro/ordenação:
+ *
+ *   const pages = usePagination(filters.rows, 20, { resetKey: filters.state });
+ */
+export function usePagination<T>(rows: T[], pageSize = 20, options: { resetKey?: unknown } = {}) {
   const [page, setPage] = useState(1);
-  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  const [size, setSize] = useState(pageSize);
+  const [prevSize, setPrevSize] = useState(pageSize);
+  if (prevSize !== pageSize) {
+    setPrevSize(pageSize);
+    setSize(pageSize);
+  }
+  const resetSig = useMemo(() => {
+    try {
+      return JSON.stringify(options.resetKey ?? null);
+    } catch {
+      return String(options.resetKey);
+    }
+  }, [options.resetKey]);
+  const [prevReset, setPrevReset] = useState(resetSig);
+  if (prevReset !== resetSig) {
+    setPrevReset(resetSig);
+    setPage(1);
+  }
+  const pageCount = Math.max(1, Math.ceil(rows.length / size));
   const current = Math.min(page, pageCount);
   return {
     page: current,
     pageCount,
-    pageSize,
+    pageSize: size,
     total: rows.length,
-    rows: rows.slice((current - 1) * pageSize, current * pageSize),
+    rows: rows.slice((current - 1) * size, current * size),
     setPage,
+    /** Troca o tamanho da página mantendo o primeiro item visível. */
+    setPageSize: (next: number) => {
+      const first = (current - 1) * size;
+      setSize(next);
+      setPage(Math.floor(first / next) + 1);
+    },
   };
 }
 
@@ -161,6 +209,10 @@ export function Pagination({
   onPage,
   total,
   pageSize,
+  pageSizeOptions,
+  onPageSizeChange,
+  noun,
+  nounPlural,
   className,
 }: {
   page: number;
@@ -168,32 +220,61 @@ export function Pagination({
   onPage: (page: number) => void;
   total?: number;
   pageSize?: number;
+  /** Mostra "Por página" com estas opções (ex.: [20, 50, 100]). Precisa de onPageSizeChange. */
+  pageSizeOptions?: number[];
+  onPageSizeChange?: (size: number) => void;
+  /** "1–20 de 312 contatos". */
+  noun?: string;
+  nounPlural?: string;
   className?: string;
 }) {
   if (pageCount <= 1 && total == null) return null;
+  const sizes = pageSizeOptions && onPageSizeChange && pageSize ? pageSizeOptions : null;
+  const unit = noun ? ` ${total === 1 ? noun : nounPlural ?? `${noun}s`}` : "";
   const pages: (number | "…")[] = [];
   for (let p = 1; p <= pageCount; p++) {
     if (p === 1 || p === pageCount || Math.abs(p - page) <= 1) pages.push(p);
     else if (pages[pages.length - 1] !== "…") pages.push("…");
   }
-  const btn = "inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[12.5px] tabular-nums disabled:opacity-40";
+  const box = "h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[12.5px] tabular-nums disabled:cursor-not-allowed disabled:text-muted/50 disabled:hover:bg-transparent";
+  const btn = cn("inline-flex", box);
   return (
     <nav aria-label="Paginação" className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
-      {total != null && pageSize ? (
-        <span className="text-[12px] tabular-nums text-muted">
-          {total === 0 ? "0" : `${formatNumber((page - 1) * pageSize + 1)}–${formatNumber(Math.min(total, page * pageSize))}`} de {formatNumber(total)}
-        </span>
-      ) : (
-        <span />
-      )}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        {total != null && pageSize ? (
+          <span className="text-[12px] tabular-nums text-muted" aria-live="polite">
+            {total === 0 ? "0" : `${formatNumber((page - 1) * pageSize + 1)}–${formatNumber(Math.min(total, page * pageSize))}`} de {formatNumber(total)}
+            {unit}
+          </span>
+        ) : (
+          <span />
+        )}
+        {sizes && (
+          <span className="inline-flex items-center gap-2 text-[12px] text-muted">
+            <span aria-hidden>Por página</span>
+            <NativeSelect
+              label="Itens por página"
+              hideLabel
+              size="sm"
+              value={String(pageSize)}
+              onValueChange={(v) => onPageSizeChange!(Number(v))}
+              options={sizes.map((n) => ({ value: String(n), label: String(n) }))}
+              className="w-[76px]"
+            />
+          </span>
+        )}
+      </div>
       {pageCount > 1 && (
         <div className="flex items-center gap-1">
+          <span className="px-2 text-[12px] tabular-nums text-muted sm:hidden">
+            {page} de {pageCount}
+          </span>
           <button type="button" className={cn(btn, "text-muted hover:bg-soft hover:text-ink")} disabled={page <= 1} onClick={() => onPage(page - 1)} aria-label="Página anterior">
             <ChevronLeft className="h-4 w-4" />
           </button>
           {pages.map((p, i) =>
             p === "…" ? (
-              <span key={`e${i}`} className="px-1 text-[12px] text-muted">
+              <span key={`e${i}`} aria-hidden className="hidden px-1 text-[12px] text-muted sm:inline">
                 …
               </span>
             ) : (
@@ -201,8 +282,9 @@ export function Pagination({
                 key={p}
                 type="button"
                 aria-current={p === page ? "page" : undefined}
+                aria-label={`Página ${p}`}
                 onClick={() => onPage(p)}
-                className={cn(btn, p === page ? "bg-surface font-medium text-ink shadow-surface ring-1 ring-line" : "text-muted hover:bg-soft hover:text-ink")}
+                className={cn(box, "hidden sm:inline-flex", p === page ? "bg-surface font-medium text-ink shadow-surface ring-1 ring-line" : "text-muted hover:bg-soft hover:text-ink")}
               >
                 {p}
               </button>

@@ -196,7 +196,7 @@ export function Rules({ items }: { items: { do: ReactNode; dont?: ReactNode }[] 
 /** Tabela de props: [nome, tipo, padrão, descrição]. */
 export function PropsTable({ rows }: { rows: [string, string, string, string][] }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-line">
+    <div tabIndex={0} role="region" aria-label="Props" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
       <table className="w-full text-left text-[12.5px]">
         <thead className="border-b border-line bg-soft/60 text-[11.5px] text-muted">
           <tr>
@@ -256,7 +256,7 @@ export function CodeBlock({ code, maxHeight = 520, className }: { code: string; 
         {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
         {copied ? "Copiado" : "Copiar"}
       </button>
-      <pre className="code-view m-0 overflow-auto p-4 pr-24 font-mono text-[12px] leading-[1.65] text-ink" style={{ maxHeight }}>
+      <pre tabIndex={0} role="region" aria-label="Código" className="code-view m-0 overflow-auto p-4 pr-24 font-mono text-[12px] leading-[1.65] text-ink outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted/50" style={{ maxHeight }}>
         {/* g4os-ds-disable-next-line dangerous-html -- highlight() escapa o código antes de envolver em <span> */}
         <code dangerouslySetInnerHTML={{ __html: highlight(text) }} />
       </pre>

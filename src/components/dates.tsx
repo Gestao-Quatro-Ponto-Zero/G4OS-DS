@@ -71,7 +71,7 @@ function Field({ label, hint, error, optional, htmlFor, descId, className, child
       {label && (
         <label htmlFor={htmlFor} className="mb-1.5 block text-[12.5px] text-muted">
           {label}
-          {optional && <span className="ml-1 text-muted/80">(opcional)</span>}
+          {optional && <span className="ml-1 text-muted">(opcional)</span>}
         </label>
       )}
       {children}
@@ -309,7 +309,7 @@ export function Calendar({
         <table role="grid" aria-label={`${label}, ${monthNames[toDate(first).getMonth()]} de ${first.slice(0, 4)}`} className="border-separate border-spacing-y-0.5">
           <thead>
             <tr>
-              {weekNumbers && <th className="w-7 text-[10.5px] font-normal text-muted/70">sem</th>}
+              {weekNumbers && <th className="w-7 text-[10.5px] font-normal text-muted">sem</th>}
               {weekdayInitials.map((d, i) => (
                 <th key={i} scope="col" abbr={weekdayShort[i]} className="h-7 w-9 text-center text-[11.5px] font-normal text-muted">
                   {d}
@@ -323,7 +323,7 @@ export function Calendar({
               const weekHover = weekMode && hover && week.includes(hover);
               return (
                 <tr key={week[0]} className={cn(weekMode && "group/week")} onPointerLeave={() => setHover(null)}>
-                  {weekNumbers && <td className="text-center text-[10.5px] tabular-nums text-muted/70">{isoWeek(week[0])}</td>}
+                  {weekNumbers && <td className="text-center text-[10.5px] tabular-nums text-muted">{isoWeek(week[0])}</td>}
                   {week.map((iso, i) => {
                     const out = !inMonth(iso);
                     if (out && months === 2) return <td key={iso} className="h-9 w-9" />;
@@ -372,8 +372,8 @@ export function Calendar({
                           onPointerEnter={() => setHover(iso)}
                           className={cn(
                             "relative grid h-9 w-9 place-items-center rounded-lg text-[13px] tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ink/40",
-                            out && "text-muted/50",
-                            !out && isWeekendIso(iso) && !isSel && "text-muted",
+                            out && "text-muted",
+                            !out && isWeekendIso(iso) && !isSel && "text-ink-soft",
                             !isSel && !off && "hover:bg-soft",
                             isSel && "bg-primary font-medium text-on-primary hover:bg-primary/90",
                             off && "cursor-not-allowed text-muted/40 line-through decoration-muted/40",
@@ -1777,7 +1777,7 @@ export function MonthCalendar({
                   aria-label={formatDateLong(iso)}
                   className={cn(
                     "grid h-6 min-w-6 place-items-center rounded-full px-1 text-[12px] tabular-nums",
-                    iso === now ? "bg-primary font-semibold text-on-primary" : out ? "text-muted/60" : "text-ink-soft hover:bg-soft",
+                    iso === now ? "bg-primary font-semibold text-on-primary" : out ? "text-muted hover:bg-soft" : "text-ink-soft hover:bg-soft",
                   )}
                 >
                   {Number(iso.slice(8))}
@@ -1797,7 +1797,7 @@ export function MonthCalendar({
                     title={`${e.time ? `${e.time} · ` : ""}${e.title}`}
                     className={cn("flex w-full min-w-0 items-center gap-1 rounded px-1.5 py-0.5 text-left text-[11.5px] leading-tight hover:brightness-95", eventTone[e.tone ?? "neutral"])}
                   >
-                    {e.time && <span className="shrink-0 tabular-nums opacity-80">{e.time}</span>}
+                    {e.time && <span className="shrink-0 tabular-nums">{e.time}</span>}
                     <span className="truncate">{e.title}</span>
                   </button>
                 ))}
@@ -1829,7 +1829,7 @@ function DayOverflow({ count, iso, events, onEventClick }: { count: number; iso:
             }}
             className={cn("mb-0.5 flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-[12px]", eventTone[e.tone ?? "neutral"])}
           >
-            {e.time && <span className="tabular-nums opacity-80">{e.time}</span>}
+            {e.time && <span className="tabular-nums">{e.time}</span>}
             <span className="truncate">{e.title}</span>
           </button>
         ))}

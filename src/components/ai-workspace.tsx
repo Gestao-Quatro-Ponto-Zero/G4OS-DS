@@ -574,6 +574,12 @@ export function ArtifactPanel({
     ...(onShare ? [{ label: "Compartilhar", icon: <Share2 className="h-4 w-4" />, onSelect: onShare }] : []),
   ];
   const onTabKey = (e: KeyboardEvent, i: number) => {
+    // Delete fecha a aba focada (o "×" fica fora da árvore de acessibilidade do tablist).
+    if ((e.key === "Delete" || e.key === "Backspace") && tabs[i].closable && onCloseTab) {
+      e.preventDefault();
+      onCloseTab(tabs[i].id);
+      return;
+    }
     const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : -1;
     if (next < 0 || next >= tabs.length) return;
     e.preventDefault();
@@ -597,6 +603,7 @@ export function ArtifactPanel({
             return (
               <div
                 key={t.id}
+                role="presentation"
                 // Aba ativa = sublinhado de 2px alinhado à linha do cabeçalho (mesma convenção de Tabs).
                 className={cn("group relative -mb-px flex shrink-0 items-center border-b-2", on ? "border-ink" : "border-transparent")}
               >
@@ -608,6 +615,7 @@ export function ArtifactPanel({
                   onKeyDown={(e) => onTabKey(e, i)}
                   onClick={() => onActiveChange(t.id)}
                   aria-label={iconOnly ? t.title : undefined}
+                  aria-keyshortcuts={t.closable && onCloseTab ? "Delete" : undefined}
                   title={iconOnly ? t.title : undefined}
                   className={cn(
                     "my-1.5 flex h-8 max-w-[200px] items-center gap-1.5 rounded-md text-[12.5px] transition-colors",
@@ -622,7 +630,9 @@ export function ArtifactPanel({
                   <button
                     type="button"
                     onClick={() => onCloseTab(t.id)}
-                    aria-label={`Fechar ${t.title}`}
+                    tabIndex={-1}
+                    aria-hidden
+                    title={`Fechar ${t.title} (Delete)`}
                     className={cn("mr-1 grid h-5 w-5 place-items-center rounded text-muted hover:bg-soft hover:text-ink", !on && "opacity-0 group-hover:opacity-100 focus-visible:opacity-100")}
                   >
                     <X className="h-3 w-3" />
@@ -631,19 +641,19 @@ export function ArtifactPanel({
               </div>
             );
           })}
-          {addOptions && addOptions.length > 0 && (
-            <Menu
-              label="Adicionar visão"
-              align="start"
-              triggerClassName="!h-8 !w-8 shrink-0 self-center justify-center !gap-0 !rounded-lg !bg-transparent !px-0 !text-muted !ring-0 hover:!bg-soft hover:!text-ink"
-              trigger={<Plus className="h-4 w-4" />}
-              items={addOptions.map((o): MenuEntry => {
-                const Icon = artifactIcons[o.kind];
-                return { label: o.label, icon: <Icon className="h-4 w-4" />, onSelect: o.onSelect };
-              })}
-            />
-          )}
         </div>
+        {addOptions && addOptions.length > 0 && (
+          <Menu
+            label="Adicionar visão"
+            align="start"
+            triggerClassName="!h-8 !w-8 shrink-0 self-center justify-center !gap-0 !rounded-lg !bg-transparent !px-0 !text-muted !ring-0 hover:!bg-soft hover:!text-ink"
+            trigger={<Plus className="h-4 w-4" />}
+            items={addOptions.map((o): MenuEntry => {
+              const Icon = artifactIcons[o.kind];
+              return { label: o.label, icon: <Icon className="h-4 w-4" />, onSelect: o.onSelect };
+            })}
+          />
+        )}
         {(overflow || tabs.length > 4) && (
           <Menu
             label="Todas as abas"

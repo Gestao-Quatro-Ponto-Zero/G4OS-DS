@@ -89,7 +89,7 @@ export default function Page() {
       </DocSection>
 
       <DocSection title="Qual escolher">
-        <div className="overflow-x-auto rounded-xl border border-line">
+        <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
           <table className="w-full text-left text-[13px]">
             <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
               <tr>

@@ -23,7 +23,7 @@ Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, P
 | `rail` | `#fbfbfc` | fundo da sidebar |
 | `line` | `#e9eaed` | toda borda e divisória |
 | `line-strong` | `#d2d4da` | hover de card, borda de checkbox, separador `›` |
-| `muted` | `#6b6e76` | metadado, rótulo, placeholder (contraste AA sobre branco) |
+| `muted` | `#63666e` | metadado, rótulo, placeholder (contraste AA sobre branco) |
 | `ink-soft` | `#484a50` | texto secundário forte, ícone ativo |
 | `ink` | `#202124` | texto principal, série 1 de gráfico |
 | `primary` / `on-primary` | `#202124` / `#ffffff` | ação principal e seleção / texto sobre ela (troca com a marca) |
@@ -39,7 +39,7 @@ Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, P
 | `blue` | `#184560` | link, ação textual, estado "em andamento", tom `info` em texto |
 | `clay` / `clay-soft` | `#842e20` / `#f6e7e3` | ênfase editorial, identidade de conta |
 | `accent` | `#b9915b` | **só preenchimento**: progresso de marca, moldura de próximo passo, destaque de série |
-| `accent-deep` | `#8c6a3a` | texto dourado (o `accent` não passa em contraste como texto) |
+| `accent-deep` | `#7d5e33` | texto dourado (o `accent` não passa em contraste como texto) |
 | `accent-soft` | `#f5eee3` | fundo de "próximo passo", seleção de texto |
 | `founders` | `#441b1b` | legado; uso restrito a produtos do programa Founders |
 
@@ -52,7 +52,7 @@ Cada tom tem a versão forte (texto, ícone, ponto) e a `-soft` (fundo).
 | Tom | Forte | Suave | Significa |
 | --- | --- | --- | --- |
 | `ok` | `#1b5e20` | `#e8f5e9` | concluído, aprovado, dentro da meta, pago |
-| `amber` (warn) | `#e65100` | `#fff3e0` | atenção, prazo próximo, abaixo do ritmo, parado |
+| `amber` (warn) | `#b54500` | `#fff3e0` | atenção, prazo próximo, abaixo do ritmo, parado |
 | `rose` (bad) | `#b71c1c` | `#ffebee` | erro, bloqueado, atrasado, vencido, perdido |
 | `info` | `#0d47a1` | `#e3f2fd` | informação neutra do sistema (novidade, dica) |
 
@@ -87,8 +87,16 @@ Paleta própria `chart-1…6` e regras em [dados.md](dados.md).
 
 `ai` e `graph` são fundos de canvas (grafo, painel de IA) e continuam escuros nos dois temas. O **tema escuro** do produto é outra coisa: `<html data-theme="dark">` troca todos os semânticos ([temas-e-dark-mode.md](temas-e-dark-mode.md)). Componentes não precisam de `dark:` se usarem tokens.
 
+## Contraste garantido
+
+- Texto nunca leva opacidade (`text-muted/80`, `opacity-70`): hierarquia é `ink` → `ink-soft` → `muted`.
+- Texto sobre preenchimento que varia (heatmap, treemap, barra com rótulo): `data-fill` + `useReadableFills(ref)` escolhe `ink` ou `on-ink` pelo fundo real, no tema atual.
+- Iniciais sobre `tint`: `tintFill(tint)` escurece o tint até AA com branco.
+- Varredura: `npm run qa:sweep` (axe-core em claro e escuro) acusa qualquer par abaixo de 4,5:1.
+
 ## Nunca
 
+- Opacidade em cor de texto (`text-muted/70`, `text-on-brand/60`): reprova contraste. Use o próximo degrau da escala.
 - Hex solto em componente (`text-[#842e20]`, `style={{ color: "#..." }}`), `bg-white`, `text-white` fora de `bg-navy`, paleta do Tailwind (`gray-500`, `blue-600`). Use o token. Exceções documentadas: `tint` de `Avatar`/`EntityMark` (identidade do registro) e logos de terceiros.
 - Gradiente decorativo, sombra colorida, fundo de página colorido.
 - Azul "de link" genérico do navegador. Link é `text-blue` com sublinhado no hover, ou `text-ink` com seta.

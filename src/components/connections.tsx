@@ -60,7 +60,7 @@ export function AppIcon({
   const s = iconSizes[size];
   const style: CSSProperties =
     variant === "soft"
-      ? { background: `color-mix(in oklab, ${color} 16%, transparent)`, color }
+      ? { background: `color-mix(in oklab, ${color} 14%, transparent)`, color: `color-mix(in oklab, ${color} 58%, var(--ds-ink))` }
       : { color };
   return (
     <span
@@ -358,7 +358,7 @@ export function AccountRow({
             aria-controls={id}
             className="inline-flex h-8 shrink-0 items-center gap-1 rounded-lg px-2 text-[12.5px] text-muted hover:bg-soft hover:text-ink"
           >
-            <span className="hidden sm:inline">Permissões</span>
+            <span className="max-sm:sr-only">Permissões</span>
             <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
           </button>
         )}

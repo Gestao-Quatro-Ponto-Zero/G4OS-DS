@@ -165,7 +165,7 @@ export default function AiWorkspace() {
         {!panelOpen && (
           <button type="button" onClick={() => setPanelOpen(true)} className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-ink-soft ring-1 ring-line hover:bg-soft" aria-label="Abrir artefatos">
             <PanelRightOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Artefatos</span>
+            <span className="max-sm:sr-only">Artefatos</span>
             <span className="tabular-nums text-muted">{tabs.length}</span>
           </button>
         )}

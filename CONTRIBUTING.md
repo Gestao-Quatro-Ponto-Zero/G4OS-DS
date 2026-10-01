@@ -60,6 +60,18 @@ Ninguém roda `npm publish` à mão. O caminho é sempre:
 
 Conferir a versão publicada: `npm view @g4ai/ds version`.
 
+## Varredura visual e de acessibilidade
+
+Mexeu em componente compartilhado (layout, campo, popup, cor)? Antes do PR:
+
+```bash
+npm run showcase:build
+npm run qa:sweep                    # todas as páginas e blocos, 1440/390, claro/escuro (~5 min)
+npm run qa:sweep -- --filter crm    # só o que tem "crm" no slug
+```
+
+Procura rolagem horizontal, elemento cortado, contraste e nomes (axe-core), erros de console, popup fora da tela, alvo de toque pequeno e foco invisível. O relatório (`qa-report/sweep.md`) agrupa por causa; corrija no componente, não na página. Precisa do Playwright (`npx playwright install chromium` ou `PLAYWRIGHT_PATH`) e de um Chrome/Chromium. Não faz parte do `npm run check`.
+
 ## Padrões de código
 
 - TypeScript estrito, React 19, Base UI para comportamento, Tailwind v4 para estilo.

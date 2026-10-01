@@ -1,7 +1,8 @@
 "use client";
 
+import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Select as BaseSelect } from "@base-ui/react/select";
-import { Check, ChevronRight, Columns3, Download, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, ChevronDown, ChevronRight, Columns3, Download, EyeOff, Pin, PinOff, RotateCcw } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -36,9 +37,9 @@ import { Spinner } from "./states";
  *   rolagem interna ...... height/maxHeight; cabeçalho e rodapé fixos; colunas fixas (pinned)
  *   seleção .............. checkbox, shift+clique, "selecionar todos os N", BulkBar
  *   ações de linha ....... ícones no hover + ⋯ + clique direito (mesmas ações)
- *   colunas .............. ordenar, mostrar/ocultar, redimensionar, persistir (storageKey)
+ *   colunas .............. ordenar, mostrar/ocultar, redimensionar, mover, fixar (menu do cabeçalho), persistir (storageKey)
  *   linhas ............... expandir, agrupar com subtotal, totais no rodapé, tom de atenção
- *   edição inline ........ texto, número, moeda, lista, data
+ *   edição inline ........ texto, número, moeda, lista, data, com validação (validate)
  *   teclado .............. ↑↓ Home End · Enter abre · Espaço/X seleciona · E edita · Esc limpa
  *   desempenho ........... virtualização automática acima de 200 itens
  *   extras ............... CSV (pt-BR), copiar célula, destaque da busca, cards no celular
@@ -74,7 +75,11 @@ export type GridColumn<T> = {
   hideable?: boolean;
   defaultHidden?: boolean;
   resizable?: boolean;
+  /** false = sem menu no cabeçalho (ordenar, mover, fixar, ocultar). */
+  menu?: boolean;
   editable?: GridEditor;
+  /** Valida a edição inline: devolva a mensagem ("Valor acima do limite") ou undefined. Enter mantém o editor aberto com o erro. */
+  validate?: (value: GridValue, row: T) => string | undefined;
   /** Célula do rodapé fixo (total, média). Recebe todas as linhas. */
   footer?: (rows: T[]) => ReactNode;
   /** Subtotal no cabeçalho de grupo. */
@@ -114,7 +119,7 @@ export type DataGridProps<T> = {
   /** Salva larguras e colunas visíveis no localStorage com esta chave. */
   storageKey?: string;
   toolbar?: ReactNode;
-  /** Mostra o menu "Colunas". Padrão: true. */
+  /** Mostra o menu "Colunas" e o menu de cada cabeçalho (mover, fixar, ocultar). Padrão: true. */
   columnMenu?: boolean;
   /** Habilita "Exportar CSV" com este nome de arquivo (sem extensão). */
   exportFileName?: string;
@@ -154,7 +159,11 @@ export type DataGridProps<T> = {
   onEdit?: (row: T, key: string, value: GridValue) => void;
 
   // estados
+  /** Sem linhas: esqueleto. Com linhas (servidor recarregando): mantém as linhas com uma barra de progresso. */
   loading?: boolean;
+  /** O vazio vem de busca/filtro: o padrão vira "Nenhum X com estes filtros" + "Limpar filtros". */
+  filtered?: boolean;
+  onClearFilters?: () => void;
   error?: { message: string; onRetry?: () => void };
   empty?: ReactNode;
   hasMore?: boolean;
@@ -223,7 +232,14 @@ export function downloadCsv(fileName: string, csv: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-type Prefs = { widths: Record<string, number>; hidden: string[] | null };
+type Prefs = {
+  widths: Record<string, number>;
+  hidden: string[] | null;
+  /** Ordem escolhida pela pessoa (menu do cabeçalho). */
+  order?: string[];
+  /** Fixação escolhida pela pessoa: "left" fixa, "none" solta uma coluna fixa por padrão. */
+  pins?: Record<string, "left" | "none">;
+};
 
 function usePrefs(storageKey?: string) {
   const [prefs, setPrefs] = useState<Prefs>(() => {
@@ -283,7 +299,21 @@ function useSize<T extends HTMLElement>() {
 /* Editor de célula                                                    */
 /* ------------------------------------------------------------------ */
 
-function CellEditor({ editor, initial, label, onCommit, onCancel }: { editor: GridEditor; initial: GridValue; label: string; onCommit: (v: GridValue) => void; onCancel: () => void }) {
+function CellEditor({
+  editor,
+  initial,
+  label,
+  validate,
+  onCommit,
+  onCancel,
+}: {
+  editor: GridEditor;
+  initial: GridValue;
+  label: string;
+  validate?: (v: GridValue) => string | undefined;
+  onCommit: (v: GridValue) => void;
+  onCancel: () => void;
+}) {
   const toText = () => {
     if (initial == null) return "";
     if (editor.type === "currency" && typeof initial === "number") return initial.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -291,6 +321,7 @@ function CellEditor({ editor, initial, label, onCommit, onCancel }: { editor: Gr
     return String(initial);
   };
   const [text, setText] = useState(toText);
+  const [err, setErr] = useState<string | null>(null);
   const done = useRef(false);
   const parse = (): GridValue | undefined => {
     const t = text.trim();
@@ -302,12 +333,20 @@ function CellEditor({ editor, initial, label, onCommit, onCancel }: { editor: Gr
     if (editor.type === "date") return t ? parseDateInput(t) : null;
     return t;
   };
-  const commit = () => {
+  /** Enter: valor inválido mostra o erro e continua editando. Sair do campo com erro desfaz a edição. */
+  const commit = (fromBlur = false) => {
     if (done.current) return;
     const v = parse();
+    const problem = v === undefined ? (editor.type === "date" ? "Data não reconhecida" : "Número inválido") : validate?.(v);
+    if (problem) {
+      if (fromBlur) {
+        done.current = true;
+        onCancel();
+      } else setErr(problem);
+      return;
+    }
     done.current = true;
-    if (v === undefined) onCancel();
-    else onCommit(v);
+    onCommit(v as GridValue);
   };
   if (editor.type === "select") {
     return (
@@ -316,7 +355,11 @@ function CellEditor({ editor, initial, label, onCommit, onCancel }: { editor: Gr
         value={initial == null ? null : String(initial)}
         defaultOpen
         modal={false}
-        onValueChange={(v) => onCommit((v as string | null) ?? null)}
+        onValueChange={(v) => {
+          const next = (v as string | null) ?? null;
+          if (validate?.(next)) return;
+          onCommit(next);
+        }}
         onOpenChange={(open) => !open && setTimeout(() => !done.current && onCancel(), 0)}
       >
         <BaseSelect.Trigger aria-label={label} className="flex h-8 w-full items-center justify-between gap-2 rounded-md border border-muted bg-surface px-2 text-left text-[13px] outline-none">
@@ -347,34 +390,128 @@ function CellEditor({ editor, initial, label, onCommit, onCancel }: { editor: Gr
       <input
         autoFocus
         aria-label={label}
+        aria-invalid={err ? true : undefined}
         value={text}
         inputMode={editor.type === "number" || editor.type === "currency" ? "decimal" : undefined}
         placeholder={editor.type === "date" ? "dd/mm/aaaa ou “sexta”" : undefined}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => {
+          setText(e.target.value);
+          if (err) setErr(null);
+        }}
         onFocus={(e) => e.currentTarget.select()}
         onKeyDown={(e) => {
           e.stopPropagation();
           if (e.key === "Enter") {
             e.preventDefault();
-            commit();
+            commit(false);
           } else if (e.key === "Escape") {
             e.preventDefault();
             done.current = true;
             onCancel();
           }
         }}
-        onBlur={commit}
+        onBlur={() => commit(true)}
         className={cn(
-          "h-8 w-full rounded-md border border-muted bg-surface px-2 text-[13px] text-ink shadow-[0_0_0_3px_color-mix(in_oklab,var(--ds-ink)_6%,transparent)] outline-none",
+          "h-8 w-full rounded-md border bg-surface px-2 text-[13px] text-ink shadow-[0_0_0_3px_color-mix(in_oklab,var(--ds-ink)_6%,transparent)] outline-none",
+          err ? "border-rose" : "border-muted",
           (editor.type === "number" || editor.type === "currency") && "text-right tabular-nums",
         )}
       />
-      {editor.type === "date" && text.trim() && (
+      {err ? (
+        <span role="alert" className="absolute left-0 top-full z-10 mt-1 whitespace-nowrap rounded-md border border-line bg-popover px-2 py-1 text-[11.5px] text-rose shadow-popup">
+          {err}
+        </span>
+      ) : editor.type === "date" && text.trim() && (
         <span className={cn("absolute left-0 top-full z-10 mt-1 whitespace-nowrap rounded-md border border-line bg-popover px-2 py-1 text-[11.5px] shadow-popup", preview ? "text-ink-soft" : "text-rose")}>
           {preview ? formatDate(preview) : "Data não reconhecida"}
         </span>
       )}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Menu do cabeçalho                                                   */
+/* ------------------------------------------------------------------ */
+
+const headItem =
+  "flex w-full cursor-default select-none items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-ink outline-none data-highlighted:bg-soft data-disabled:text-muted/60 [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:text-muted";
+
+/** Ordenar, mover, fixar e ocultar a coluna — como no Airtable/Notion. Aparece no hover e no foco. */
+function ColumnHeaderMenu({
+  header,
+  sortable,
+  sortDir,
+  onSort,
+  pinned,
+  canPin,
+  onPin,
+  canMoveLeft,
+  canMoveRight,
+  onMove,
+  canHide,
+  onHide,
+}: {
+  header: string;
+  sortable: boolean;
+  sortDir?: "asc" | "desc";
+  onSort: (dir: "asc" | "desc" | null) => void;
+  pinned: boolean;
+  canPin: boolean;
+  onPin: (on: boolean) => void;
+  canMoveLeft: boolean;
+  canMoveRight: boolean;
+  onMove: (delta: -1 | 1) => void;
+  canHide: boolean;
+  onHide: () => void;
+}) {
+  return (
+    <BaseMenu.Root modal={false}>
+      <BaseMenu.Trigger
+        aria-label={`Opções da coluna ${header}`}
+        className="dg-colmenu ml-auto inline-grid h-6 w-6 shrink-0 place-items-center rounded-md text-muted outline-none hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/40 data-popup-open:bg-soft data-popup-open:text-ink"
+      >
+        <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+      </BaseMenu.Trigger>
+      <BaseMenu.Portal>
+        <BaseMenu.Positioner sideOffset={4} align="end" collisionPadding={12} className="z-[100] outline-none">
+          <BaseMenu.Popup className={cn(popupClass, "min-w-[200px] p-1.5")}>
+            {sortable && (
+              <>
+                <BaseMenu.Item className={headItem} onClick={() => onSort(sortDir === "asc" ? null : "asc")}>
+                  <ArrowUp /> <span className="flex-1">Ordenar crescente</span>
+                  {sortDir === "asc" && <Check className="!text-ink" aria-hidden />}
+                </BaseMenu.Item>
+                <BaseMenu.Item className={headItem} onClick={() => onSort(sortDir === "desc" ? null : "desc")}>
+                  <ArrowDown /> <span className="flex-1">Ordenar decrescente</span>
+                  {sortDir === "desc" && <Check className="!text-ink" aria-hidden />}
+                </BaseMenu.Item>
+                <BaseMenu.Separator className="my-1 h-px bg-line" />
+              </>
+            )}
+            <BaseMenu.Item className={headItem} disabled={!canMoveLeft} onClick={() => onMove(-1)}>
+              <ArrowLeft /> Mover para a esquerda
+            </BaseMenu.Item>
+            <BaseMenu.Item className={headItem} disabled={!canMoveRight} onClick={() => onMove(1)}>
+              <ArrowRight /> Mover para a direita
+            </BaseMenu.Item>
+            {canPin && (
+              <BaseMenu.Item className={headItem} onClick={() => onPin(!pinned)}>
+                {pinned ? <PinOff /> : <Pin />} {pinned ? "Desafixar coluna" : "Fixar à esquerda"}
+              </BaseMenu.Item>
+            )}
+            {canHide && (
+              <>
+                <BaseMenu.Separator className="my-1 h-px bg-line" />
+                <BaseMenu.Item className={headItem} onClick={onHide}>
+                  <EyeOff /> Ocultar coluna
+                </BaseMenu.Item>
+              </>
+            )}
+          </BaseMenu.Popup>
+        </BaseMenu.Positioner>
+      </BaseMenu.Portal>
+    </BaseMenu.Root>
   );
 }
 
@@ -432,10 +569,46 @@ export function DataGrid<T>(props: DataGridProps<T>) {
     className,
   } = props;
 
+  /** Primeiro carregamento (sem linhas): esqueleto. Recarregando com linhas: mantém as linhas e mostra a barra. */
+  const firstLoad = !!loading && rows.length === 0;
+  const refreshing = !!loading && rows.length > 0;
+
   /* preferências ----------------------------------------------------- */
   const [prefs, setPrefs] = usePrefs(storageKey);
   const hidden = prefs.hidden ?? columns.filter((c) => c.defaultHidden).map((c) => c.key);
-  const visibleCols = columns.filter((c) => !hidden.includes(c.key));
+  const orderedCols = useMemo(() => {
+    const order = prefs.order;
+    const withPin = columns.map((c) => {
+      const pin = prefs.pins?.[c.key];
+      return pin ? { ...c, pinned: pin === "left" ? ("left" as const) : undefined } : c;
+    });
+    if (!order?.length) return withPin;
+    const pos = new Map(order.map((k, i) => [k, i]));
+    return withPin
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => (pos.get(a.c.key) ?? 1000 + a.i) - (pos.get(b.c.key) ?? 1000 + b.i))
+      .map((x) => x.c);
+  }, [columns, prefs.order, prefs.pins]);
+  const visibleCols = orderedCols.filter((c) => !hidden.includes(c.key));
+  const moveColumn = (key: string, delta: -1 | 1) =>
+    setPrefs((p) => {
+      const keys = orderedCols.map((c) => c.key);
+      const vis = keys.filter((k) => !hidden.includes(k));
+      const i = vis.indexOf(key);
+      const target = vis[i + delta];
+      if (i < 0 || !target) return p;
+      const from = keys.indexOf(key);
+      const to = keys.indexOf(target);
+      [keys[from], keys[to]] = [keys[to], keys[from]];
+      return { ...p, order: keys };
+    });
+  const pinColumn = (key: string, pin: boolean) => setPrefs((p) => ({ ...p, pins: { ...p.pins, [key]: pin ? "left" : "none" } }));
+  const hideColumn = (key: string) =>
+    setPrefs((p) => {
+      const h = new Set(p.hidden ?? columns.filter((x) => x.defaultHidden).map((x) => x.key));
+      if (columns.length - h.size > 1) h.add(key);
+      return { ...p, hidden: [...h] };
+    });
   const widthOf = (c: GridColumn<T>) => prefs.widths[c.key] ?? c.width ?? 160;
 
   /* densidade -------------------------------------------------------- */
@@ -610,7 +783,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
   const measured = useRef<Record<string, number>>({});
   const [, force] = useState(0);
   const heightOf = (it: Item<T>) => (it.kind === "row" ? rowH : it.kind === "group" ? GROUP_H : measured.current[it.key] ?? EXPANDED_ESTIMATE);
-  const virtual = (props.virtualize ?? items.length > 200) && !loading;
+  const virtual = (props.virtualize ?? items.length > 200) && !firstLoad;
   const HEADER_H = 40;
   const tops = useMemo(() => {
     const t: number[] = [];
@@ -819,7 +992,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
         {...pinAttrs(s)}
         data-col={col.key}
         style={cellStyle(s)}
-        className={cn("dg-cell", col.align === "right" && "text-right", col.align === "center" && "text-center", col.editable && onEdit && "dg-editable", col.className)}
+        className={cn("dg-cell", col.align === "right" && "text-right", col.align === "center" && "text-center", col.editable && onEdit && "dg-editable", isEditing && "dg-editing", col.className)}
         onClick={
           col.editable && onEdit && !isEditing
             ? (e) => {
@@ -834,6 +1007,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
             editor={col.editable!}
             initial={col.value?.(row)}
             label={`${col.header}: ${rowLabel(row)}`}
+            validate={col.validate ? (v) => col.validate!(v, row) : undefined}
             onCommit={(v) => {
               setEditing(null);
               if (v !== col.value?.(row)) onEdit?.(row, col.key, v);
@@ -932,14 +1106,14 @@ export function DataGrid<T>(props: DataGridProps<T>) {
         }),
       ),
     { type: "separator" },
-    { label: "Restaurar colunas e larguras", icon: <RotateCcw />, onSelect: () => setPrefs(() => ({ widths: {}, hidden: null })) },
+    { label: "Restaurar colunas e larguras", icon: <RotateCcw />, onSelect: () => setPrefs(() => ({ widths: {}, hidden: null, order: undefined, pins: undefined })) },
   ];
 
   const exportRows = () => downloadCsv(exportFileName ?? "exportacao", gridToCsv(selected.size ? selectedRows : sortedRows, visibleCols));
 
   /* estados de corpo -------------------------------------------------- */
   const colCount = slots.length;
-  const bodyState = loading ? (
+  const bodyState = firstLoad ? (
     Array.from({ length: 6 }, (_, i) => (
       <tr key={`sk${i}`} className="dg-row" style={{ height: rowH }}>
         {slots.map((s) => (
@@ -967,14 +1141,24 @@ export function DataGrid<T>(props: DataGridProps<T>) {
     <tr>
       <td colSpan={colCount} className="p-0">
         <div className="sticky left-0 p-4" style={{ width: size.w || undefined }}>
-          {empty ?? <Empty framed={false} title={`Nenhum ${noun} por aqui`} hint="Ajuste a busca ou os filtros." />}
+          {empty ??
+            (props.filtered ? (
+              <Empty
+                framed={false}
+                title={`${gender === "f" ? "Nenhuma" : "Nenhum"} ${noun} com estes filtros`}
+                hint="Remova um filtro ou limpe a busca."
+                action={props.onClearFilters ? <Button size="sm" variant="ghost" onClick={props.onClearFilters}>Limpar filtros</Button> : undefined}
+              />
+            ) : (
+              <Empty framed={false} title={`${gender === "f" ? "Nenhuma" : "Nenhum"} ${noun} por aqui`} />
+            ))}
         </div>
       </td>
     </tr>
   ) : null;
 
   /* cards no celular -------------------------------------------------- */
-  const cardView = cards && !loading && !error && rows.length > 0 && (
+  const cardView = cards && !firstLoad && !error && rows.length > 0 && (
     <ul className="m-0 flex list-none flex-col gap-2 p-2">
       {sortedRows.map((row, index) => {
         const key = rowKey(row);
@@ -1117,8 +1301,14 @@ export function DataGrid<T>(props: DataGridProps<T>) {
             }
             setCtx({ row: it.row, col: columns.find((c) => c.key === td?.dataset.col) });
           }}
+          aria-busy={loading || undefined}
           className="dg-scroll relative min-h-0 flex-1 overflow-auto overscroll-contain"
         >
+          {refreshing && (
+            <div role="status" aria-label="Atualizando" className="pointer-events-none sticky left-0 top-0 z-[6] -mb-0.5 h-0.5 w-full overflow-hidden">
+              <span className="ds-progress-indeterminate block h-full w-1/3 bg-primary" />
+            </div>
+          )}
           {cards ? (
             cardView || <table className="w-full"><tbody>{bodyState}</tbody></table>
           ) : (
@@ -1177,6 +1367,22 @@ export function DataGrid<T>(props: DataGridProps<T>) {
                               ?
                             </span>
                           )}
+                          {columnMenu && col.menu !== false && !cards && (
+                            <ColumnHeaderMenu
+                              header={col.header}
+                              sortable={sortable}
+                              sortDir={active ? sort!.dir : undefined}
+                              onSort={(dir) => setSort(dir ? { key: col.key, dir } : null)}
+                              pinned={col.pinned === "left"}
+                              canPin={col.pinned !== "right"}
+                              onPin={(on) => pinColumn(col.key, on)}
+                              canMoveLeft={visibleCols[0]?.key !== col.key}
+                              canMoveRight={visibleCols[visibleCols.length - 1]?.key !== col.key}
+                              onMove={(d) => moveColumn(col.key, d)}
+                              canHide={col.hideable !== false && visibleCols.length > 1}
+                              onHide={() => hideColumn(col.key)}
+                            />
+                          )}
                         </div>
                         {col.resizable !== false && (
                           <span
@@ -1194,7 +1400,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
                   })}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={cn(refreshing && "opacity-60 transition-opacity")}>
                 {bodyState ??
                   (() => {
                     const out: ReactNode[] = [];
@@ -1293,7 +1499,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
                     return out;
                   })()}
               </tbody>
-              {hasFooter && !loading && !error && rows.length > 0 && (
+              {hasFooter && !firstLoad && !error && rows.length > 0 && (
                 <tfoot>
                   <tr>
                     {slots.map((s) => (
@@ -1306,7 +1512,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
               )}
             </table>
           )}
-          {hasMore && onLoadMore && !loading && (
+          {hasMore && onLoadMore && !firstLoad && (
             <div className="sticky left-0 flex justify-center py-3" style={{ width: size.w || undefined }}>
               {loadMode === "infinite" ? (
                 <div ref={sentinel} className="flex h-8 items-center gap-2 text-[12.5px] text-muted">

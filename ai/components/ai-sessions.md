@@ -95,7 +95,7 @@ Ações de uma resposta: Copiar, Markdown, (refazer, avaliar) e ramificar.
 | `onFeedback` | `((value: "up" \| "down") => void) \| undefined` |  |  |
 | `onRetry` | `(() => void) \| undefined` |  |  |
 | `onShare` | `(() => void) \| undefined` |  | Compartilhar a resposta (link ou exportar). |
-| `size` | `"md" \| "xs" \| undefined` | `"md"` | "xs": ícones mínimos (estilo Codex), implica `compact`. |
+| `size` | `"xs" \| "md" \| undefined` | `"md"` | "xs": ícones mínimos (estilo Codex), implica `compact`. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

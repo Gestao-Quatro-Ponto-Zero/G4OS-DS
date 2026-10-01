@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 397 componentes, gráficos SVG e 85 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 435 componentes, gráficos SVG e 85 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -61,6 +61,10 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [navigation-extra](components/navigation-extra.md): NavigationMenu: navegação de site/portal com painéis de links.
 - [sortable](components/sortable.md): SortableList: reordenar por arraste e teclado, com anúncios pt-BR.
 - [questionnaire](components/questionnaire.md): Questionnaire: perguntas uma por vez (escolha, múltipla, livre, condicionais).
+- [data-view](components/data-view.md): useDataView: busca + filtros + ordenação + paginação + seleção de uma coleção num hook só, na ordem certa (filtra → ordena → pagina) e com o estado na URL.
+- [attachment](components/attachment.md): Attachment (equivalente ao Attachment do shadcn/ui): anexo componível para composer de IA, mensagens, formulários e listas de documentos.
+- [command](components/command.md): Command componível (equivalente ao Command do shadcn/ui, sem cmdk): busca + lista com grupos, ↑ ↓ Home End Enter, vazio, carregando e atalhos.
+- [conversation](components/conversation.md): Conversa (equivalentes a Bubble, Marker e Message Scroller do shadcn/ui).
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)

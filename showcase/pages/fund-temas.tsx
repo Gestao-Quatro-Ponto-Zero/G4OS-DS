@@ -83,7 +83,7 @@ function Preview({ tokens, theme, radius, font }: { tokens: BrandTokens; theme: 
       <StagePath stages={[{ id: "a", label: "Lead" }, { id: "b", label: "Proposta" }, { id: "c", label: "Fechado" }]} current="b" />
       <TextField label="E-mail do cliente" placeholder="nome@empresa.com.br" value={email} onChange={setEmail} />
       <p className="m-0 text-[13px] text-ink-soft">
-        Texto com <a className="font-medium text-blue underline-offset-2 hover:underline">link de ação</a> e <span className="font-medium text-accent-deep">destaque de marca</span>.
+        Texto com <a className="font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">link de ação</a> e <span className="font-medium text-accent-deep">destaque de marca</span>.
       </p>
     </div>
   );
@@ -240,7 +240,7 @@ const { mode, setMode, brand, setBrand, resolved } = useTheme();
       </DocSection>
 
       <DocSection title="O que pode mudar por cliente (e o que não)">
-        <div className="overflow-x-auto rounded-xl border border-line">
+        <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
           <table className="w-full text-left text-[13px]">
             <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
               <tr>

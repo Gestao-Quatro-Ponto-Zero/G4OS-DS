@@ -160,6 +160,106 @@ const tools = {
     },
   },
 
+  plan_screen: {
+    title: "Planejar uma tela",
+    description:
+      "Transforma um pedido de tela ('lista de vagas com filtros e ações em massa', 'configurações de automação com dias e cargos') num plano: anatomia de página com esqueleto, blocos de referência para copiar, componentes certos para cada necessidade (com o erro comum a evitar) e checklist de verificação. Use ANTES de escrever a tela.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        description: { type: "string", description: "A tela pedida, em linguagem natural (pt-BR ou inglês)." },
+        category: { type: "string", description: `Opcional. Tipo de app para priorizar blocos: ${categories.join(", ")}.` },
+      },
+      required: ["description"],
+    },
+    run({ description, category }) {
+      const q = norm(description);
+      const has = (re) => re.test(q);
+      const anatomy =
+        [
+          ["G", /\b(chat|conversa|assistente de ia|agente|arquivos|gerenciador de arquivos|apresentacao)\b/],
+          ["H", /\b(login|entrar|cadastro|criar conta|senha|otp|codigo de verificacao|onboarding|assistente|wizard|passo a passo)\b/],
+          ["I", /\b(landing|pagina publica|precos|planos|carreiras|site)\b/],
+          ["E", /\b(kanban|quadro|pipeline|funil de vendas|etapas)\b/],
+          ["D", /\b(configurac|preferenc|automac|settings|notificacoes|permissoes|integracoes)\w*/],
+          ["C", /\b(registro|detalhe|ficha|perfil d|pagina d[oa] (cliente|pedido|vaga|candidato|negocio|fornecedor))/],
+          ["F", /\b(aprovac|caixa de entrada|inbox|solicitac|chamados|conciliac)\w*/],
+          ["B", /\b(dashboard|painel|kpi|indicadores|visao geral|resumo|metricas)\b/],
+          ["A", /\b(lista|listagem|tabela|cadastro de|clientes|pedidos|faturas|vagas|contatos|produtos|estoque)\b/],
+        ].find(([, re]) => has(re))?.[0] ?? "A";
+      const ANAT = {
+        A: ["Lista", "Page › PageHeading (1 primário em actions) › PageToolbar (TableToolbar/FilterBar) › DataTable|DataGrid (loading, error, empty) › Pagination · BulkBar quando há seleção"],
+        B: ["Painel", "Page › PageHeading (período em actions) › KpiGrid de KpiCard (delta em fração, goodWhen='down' p/ custo) › ChartCard (título = pergunta) + gráfico com label › filas de ação"],
+        C: ["Registro", "Page › PageHeading crumbs (ações do estado) › Tabs › SplitLayout main=… aside={<PropertyList items />} · editar em Drawer"],
+        D: ["Configurações", "SettingsLayout (subnavegação) ou Page width='narrow' › PageHeading › SettingsSection por assunto (título + descrição) › salvar com OperationButton; Switch salva na hora"],
+        E: ["Quadro", "Page › PageHeading › KanbanBoard › KanbanColumn (total no cabeçalho) › RecordCard"],
+        F: ["Mestre-detalhe", "Page › PageHeading › lista à esquerda + detalhe à direita (seleção em ?id=); no celular o detalhe abre em Sheet"],
+        G: ["App de altura total", "AppShell sem Page › cabeçalho da área › conteúdo que rola (thread/lista) › composer fixo"],
+        H: ["Fluxo focado", "coluna única centralizada sem casca do app (ou split com BrandPanel) › formulário curto › ação primária única"],
+        I: ["Público", "sem AppShell › cabeçalho do site › Hero › seções largas › CTA"],
+      };
+      const needs = [
+        [/filtr|busca|pesquis/, "TableToolbar (busca + contagem) · FilterBar (filtros estruturados)", "busca só com ≥ 12 itens, filtros com ≥ 8; dentro de PageToolbar"],
+        [/selec|em massa|em lote|varios itens/, "selectionColumn + useSelection + BulkBar", "filhos do BulkBar são <button type='button'> simples"],
+        [/pagina[cç]|paginad/, "usePagination + Pagination", ""],
+        [/tabela|lista|listagem/, "DataTable (ou DataGrid para planilha/totais/colunas fixas)", "nunca <table> cru; passe loading, error e empty"],
+        [/varios|varias|multi|cargos|perfis|tags|categorias/, "MultiSelect (dropdown com busca) · CheckboxGroup (todas visíveis, ≤ 12)", "não monte lista de Checkbox solta"],
+        [/dias da semana|semana/, "ToggleGroup multiple (Seg…Dom)", ""],
+        [/\bdata\b|datas|prazo|vencimento|inicio|periodo/, "DatePicker · DateRangePicker (período) · DueDatePicker (prazo)", "nunca <input type='date'>"],
+        [/horario|\bhora\b|hora de/, "TimePicker", "nunca <input type='time'>"],
+        [/liga|desliga|ativar|desativar|ativo/, "Switch (efeito imediato)", ""],
+        [/criar|editar|novo|nova|cadastrar/, "Drawer com footer (criar/editar sem sair da lista) + useOperation/OperationButton", "Drawer nunca abre Drawer"],
+        [/excluir|arquivar|cancelar|remover|irreversivel|rodar agora|enviar/, "ConfirmDialog (tone='danger' só se destrutivo) + notify depois", "nunca window.confirm/alert"],
+        [/salvar|gravar/, "useOperation + OperationButton + OperationFeedback; notify('Alterações salvas')", "sem 'com sucesso' e sem '!'"],
+        [/grafico|evolucao|fluxo de caixa|tendencia|historico/, "ChartCard title='Pergunta?' + AreaChart/BarChart/LineChart label=…", "série 1 = ink, comparação tracejada"],
+        [/kpi|receita|despesa|saldo|indicador|meta|inadimpl/, "KpiGrid + KpiCard delta={fração} goodWhen='down' (custo, churn, prazo, inadimplência)", "valores por formatCurrency/formatPercent"],
+        [/abas|aba\b|pedidos e notas|visao geral/, "Tabs (seções da entidade) · SegmentedControl (só trocar visualização)", ""],
+        [/status|situacao|etapa/, "StatusLabel/Badge; trocar por Menu (selo que abre menu)", "nunca Select por linha de tabela"],
+        [/propriedades|cnpj|responsavel|limite/, "PropertyList dentro de SplitLayout aside", ""],
+        [/anexo|upload|arquivo/, "FileDropzone · FileCard", ""],
+        [/demonstra|somente leitura|bloquead|desabilit|sem permiss/, "Button disabled disabledReason='…' (legível e explica o motivo)", "nunca span com opacity-50/pointer-events-none em volta"],
+        [/assincron|carreg|api|fetch|atraso|erro/, "loading/error/empty no DataTable · Skeleton com a forma final · StateView/Empty com 'Tentar de novo'", ""],
+        [/dinheiro|valor|r\$|preco|limite de credito|moeda/, "CurrencyField (entrada) · formatCurrency (exibição)", "nada de toFixed ou 'R$ ' +"],
+        [/migr|legad|shadcn|mui/, "rode audit no legado antes e depois; traduza por shadcn-map.json (get_guide guias/shadcn-equivalencias)", ""],
+      ].filter(([re]) => re.test(q));
+      const blocks = manifest.blocks
+        .map((b) => {
+          let sc = score(description, [[b.title, 3], [b.description, 1.5], [b.concept?.goal, 1], [(b.concept?.patterns ?? []).join(" "), 0.6], [b.category, 1]]);
+          // termos soltos também contam (o pedido é uma frase, não uma busca)
+          for (const t of q.split(/\s+/).filter((w) => w.length > 3)) {
+            if (norm(b.title).includes(t)) sc += 6;
+            else if (norm(`${b.description} ${b.concept?.goal ?? ""}`).includes(t)) sc += 2;
+          }
+          if (norm((b.concept?.patterns ?? [])[0] ?? "").includes(norm(ANAT[anatomy][0]))) sc += 6;
+          if (category && norm(b.category) === norm(category)) sc += 8;
+          return { b, sc };
+        })
+        .filter((x) => x.sc > 0)
+        .sort((a, z) => z.sc - a.sc)
+        .slice(0, 3);
+      const lines = [
+        `# Plano: ${description}`,
+        "",
+        `## Anatomia ${anatomy} · ${ANAT[anatomy][0]}`,
+        ANAT[anatomy][1],
+        "Cabeçalho e corpo no mesmo eixo: para coluna estreita use <Page width=\"narrow|medium|reading\">, nunca um wrapper mx-auto max-w-*.",
+        "",
+        "## Blocos para partir (copie o mais próximo e troque dados/textos)",
+        ...(blocks.length ? blocks.map(({ b }) => `- ${b.slug} · ${b.title} (${b.category}): ${b.concept?.goal ?? b.description} → get_block {"slug":"${b.slug}","include_source":true}`) : ["- nenhum bloco próximo: componha a partir do esqueleto acima"]),
+        "",
+        "## Componentes por necessidade",
+        ...(needs.length ? needs.map(([, use, avoid]) => `- ${use}${avoid ? ` — ${avoid}` : ""}`) : ["- veja a tabela 'Qual componente' no core (get_guide core)"]),
+        "",
+        "## Antes de concluir",
+        "- npx g4os-ds audit <pasta> --fix, depois 0 erros e 0 avisos (ou use a tool audit)",
+        "- npx tsc --noEmit verde; confira props em get_component antes de usar (não invente props)",
+        "- cinco estados (carregando, vazio, vazio por filtro, erro, ideal); textos pt-BR; formatadores para dinheiro e data",
+        "- 1440 e 390 px, claro e escuro",
+      ];
+      return lines.join("\n");
+    },
+  },
+
   get_component: {
     title: "Documentação de componente",
     chunk: true,
@@ -503,7 +603,7 @@ function complete(ref = {}, argument = {}) {
 /* JSON-RPC                                                            */
 /* ------------------------------------------------------------------ */
 
-const instructions = `G4OS-DS ${pkg.version} (@g4ai/ds): design system para apps G4 OS (CRM, ATS, ERP, financeiro, IA). Antes de escrever UI: get_guide "core" (regras), depois search → get_component/get_block. Prefira bloco pronto > composição de componentes > tokens. Use só tokens semânticos (bg-surface, text-muted, bg-primary text-on-primary), pt-BR, e siga uma anatomia de página (get_guide "anatomia-de-pagina"). Valide com audit. Respostas longas vêm em partes: continue com offset.`;
+const instructions = `G4OS-DS ${pkg.version} (@g4ai/ds): design system para apps G4 OS (CRM, ATS, ERP, financeiro, IA). Antes de escrever UI: get_guide "core" (regras e erros comuns), plan_screen com o pedido (anatomia, blocos, componentes), depois get_block/get_component. Prefira bloco pronto > composição de componentes > tokens. Use só tokens semânticos (bg-surface, text-muted, bg-primary text-on-primary), pt-BR, e siga uma anatomia de página (get_guide "anatomia-de-pagina"). Valide com audit até 0 erros e 0 avisos. Respostas longas vêm em partes: continue com offset.`;
 
 const LEVELS = ["debug", "info", "notice", "warning", "error", "critical", "alert", "emergency"];
 const newer = (v, than) => PROTOCOLS.indexOf(v) <= PROTOCOLS.indexOf(than); // lista vai do mais novo ao mais antigo

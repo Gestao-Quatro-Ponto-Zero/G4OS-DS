@@ -38,6 +38,14 @@ Painel lateral direito (500px).
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ Criar/editar sem sair da lista: `<Drawer open={o} onClose={fechar} title="Editar cliente" footer={<OperationButton operation={op} onClick={salvar}>Salvar alterações</OperationButton>}>`.
+
+**Evite**
+
+- ✗ `Drawer` dentro de `Drawer` (regra `nested-drawer`); formulário de uma linha em `Drawer` (edite inline).
+
 ## Modal
 
 | Prop | Tipo | Padrão | Descrição |
@@ -70,6 +78,13 @@ Popover genérico: gatilho + painel com título e conteúdo.
 | `width` | `number \| undefined` | `300` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-conversa`):
+
+```tsx
+<Bubble tooltip="Enviada às 09:41 · editada">Ajustei o valor.</Bubble>
+<Popover trigger={<SmilePlus />} triggerLabel="Reagir">…</Popover>
+```
 
 ## popupClass (const)
 

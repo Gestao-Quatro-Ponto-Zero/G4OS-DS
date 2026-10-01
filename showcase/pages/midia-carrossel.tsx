@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { AspectFrame, Badge, Carousel } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
+import { CarouselShadcnExamples } from "./_shadcn-extras";
 import { art } from "./_media-data";
 
 export const meta: PageMeta = {
@@ -73,6 +74,8 @@ export default function Page() {
           ]}
         />
       </DocSection>
+
+      <CarouselShadcnExamples />
 
       <DocSection title="Regras">
         <Rules

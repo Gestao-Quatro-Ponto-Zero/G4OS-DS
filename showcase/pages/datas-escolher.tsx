@@ -28,7 +28,7 @@ export default function Page() {
   return (
     <DocPage title={meta.title} kicker="Formulários · Datas" description={meta.description}>
       <DocSection title="Da pergunta ao componente">
-        <div className="overflow-x-auto rounded-xl border border-line">
+        <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
           <table className="w-full min-w-[640px] text-left text-[13px]">
             <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
               <tr>

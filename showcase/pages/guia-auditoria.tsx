@@ -15,7 +15,7 @@ const DOCS = "https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/blob/main/docs
 export default function Page() {
   return (
     <DocPage title={meta.title} kicker={meta.group} description={meta.description}>
-      <DocSection title="Onde roda" rule="As mesmas 31 regras em todo lugar: o que o CI reprova, o editor já sublinhou e o agente já corrigiu.">
+      <DocSection title="Onde roda" rule="As mesmas 47 regras em todo lugar: o que o CI reprova, o editor já sublinhou e o agente já corrigiu.">
         <GuideTable
           head={["Onde", "Como", "Para quê"]}
           mono={[1]}
@@ -177,11 +177,27 @@ pre-commit:
             ["target-blank", "Segurança", "target=\"_blank\" sem rel=\"noopener\"", "aviso", "sim"],
             ["dangerous-html", "Segurança", "dangerouslySetInnerHTML", "aviso", ""],
             ["icon-star-import", "Performance", "import * de \"lucide-react\"", "aviso", ""],
+            ["page-width-wrapper", "Anatomia de página", "Largura da página num wrapper (mx-auto max-w-*)", "aviso", ""],
+            ["page-heading", "Anatomia de página", "<h1> solto numa tela com Page", "info", ""],
+            ["disabled-wrapper", "Componentes", "Wrapper com opacity/pointer-events em volta de controle desabilitado", "aviso", ""],
+            ["redundant-children", "Componentes", "Texto repetido em label e children", "info", "sim"],
+            ["field-double-label", "Componentes", "FieldBlock em volta de campo que já tem rótulo", "aviso", ""],
+            ["nested-drawer", "Componentes", "Drawer dentro de Drawer", "aviso", ""],
+            ["multiple-primary", "Componentes", "Mais de um botão primário na mesma área", "aviso", ""],
+            ["select-per-row", "Componentes", "Select/Combobox dentro de célula de tabela", "aviso", ""],
+            ["cell-control-label", "Acessibilidade", "Checkbox/Switch em célula sem hideLabel", "aviso", "sim"],
+            ["raw-input", "Componentes", "<input>/<textarea> cru", "aviso", ""],
+            ["raw-table", "Componentes", "<table> cru", "info", ""],
+            ["data-states", "Componentes", "Tabela com dados assíncronos sem estado de carregamento", "info", ""],
+            ["manual-format", "Formatação pt-BR", "Formatação pt-BR feita à mão", "info", ""],
+            ["copy-tone", "Escrita", "Texto com \"com sucesso\" ou exclamação", "aviso", ""],
+            ["english-copy", "Escrita", "Texto de interface em inglês", "aviso", ""],
+            ["title-case", "Escrita", "Botão em Title Case", "info", ""],
           ]}
         />
         <p className="m-0 text-[13px] text-muted">
           Guia completo com exemplos por regra:{" "}
-          <a className="text-blue hover:underline" href={DOCS} target="_blank" rel="noopener noreferrer">
+          <a className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue" href={DOCS} target="_blank" rel="noopener noreferrer">
             docs/guias/auditoria.md
           </a>
           .

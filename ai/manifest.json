@@ -11,14 +11,28 @@
         {
           "name": "Avatar",
           "kind": "component",
-          "summary": "Pessoa. Iniciais brancas sobre tinta escura (#3f3f46 padrão, #202124 para o responsável).",
+          "summary": "Pessoa. Iniciais brancas sobre a tinta da pessoa (#3f3f46 padrão, #202124 para o responsável); com `src`, a foto (as iniciais ficam de reserva se a imagem falhar).",
           "props": [
             {
-              "name": "initials",
-              "type": "string",
-              "required": true,
+              "name": "badge",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Selo no canto (ícone 10–12 px): verificado, admin, bot."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "initials",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Padrão: calculadas a partir de `name`."
             },
             {
               "name": "name",
@@ -28,11 +42,32 @@
               "description": null
             },
             {
+              "name": "shape",
+              "type": "\"circle\" | \"square\" | undefined",
+              "required": false,
+              "default": "\"circle\"",
+              "description": null
+            },
+            {
               "name": "size",
-              "type": "\"sm\" | \"md\" | \"lg\" | undefined",
+              "type": "AvatarSize | undefined",
               "required": false,
               "default": "\"md\"",
               "description": null
+            },
+            {
+              "name": "src",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Foto. Sem ela (ou se falhar), as iniciais."
+            },
+            {
+              "name": "status",
+              "type": "AvatarStatus | undefined",
+              "required": false,
+              "default": null,
+              "description": "Ponto de presença no canto."
             },
             {
               "name": "tint",
@@ -42,7 +77,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "base-avatar-e-teclas"
         },
         {
           "name": "AvatarGroup",
@@ -51,8 +86,22 @@
           "props": [
             {
               "name": "people",
-              "type": "{ name: string; initials: string; tint?: string; }[]",
+              "type": "{ name: string; initials?: string; tint?: string; src?: string; }[]",
               "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
               "default": null,
               "description": null
             },
@@ -62,9 +111,42 @@
               "required": false,
               "default": "4",
               "description": null
+            },
+            {
+              "name": "size",
+              "type": "AvatarSize | undefined",
+              "required": false,
+              "default": "\"sm\"",
+              "description": null
+            },
+            {
+              "name": "stacked",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "total",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Total real (quando `people` é só uma amostra)."
             }
           ],
-          "examplePage": null
+          "examplePage": "base-avatar-e-teclas"
+        },
+        {
+          "name": "AvatarSize",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\""
+        },
+        {
+          "name": "AvatarStatus",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"online\" | \"away\" | \"busy\" | \"offline\""
         },
         {
           "name": "Badge",
@@ -272,6 +354,13 @@
               "description": null
             },
             {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `hint`, com o nome usado em StateView."
+            },
+            {
               "name": "framed",
               "type": "boolean | undefined",
               "required": false,
@@ -280,10 +369,10 @@
             },
             {
               "name": "hint",
-              "type": "string | undefined",
+              "type": "ReactNode",
               "required": false,
               "default": null,
-              "description": null
+              "description": "Uma frase sobre o que falta ou o que fazer."
             },
             {
               "name": "icon",
@@ -293,7 +382,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "data-tabela-estado"
         },
         {
           "name": "EntityMark",
@@ -424,12 +513,12 @@
               "description": null
             }
           ],
-          "examplePage": "ov-tooltip"
+          "examplePage": "_shadcn-extras"
         },
         {
           "name": "Kbd",
           "kind": "component",
-          "summary": "Tecla de atalho.",
+          "summary": "Tecla de atalho. `size=\"sm\"` dentro de itens densos; `md` ao lado de texto corrido.",
           "props": [
             {
               "name": "children",
@@ -437,9 +526,72 @@
               "required": true,
               "default": null,
               "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"sm\"",
+              "description": null
             }
           ],
-          "examplePage": "form-grupos-e-complementos"
+          "examplePage": "base-avatar-e-teclas"
+        },
+        {
+          "name": "KbdGroup",
+          "kind": "component",
+          "summary": "Combinação de teclas.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "keys",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "base-avatar-e-teclas"
+        },
+        {
+          "name": "keyLabel",
+          "kind": "function",
+          "summary": "Converte nomes de tecla (\"mod\", \"shift\", \"enter\") no símbolo da plataforma.",
+          "signature": "keyLabel(key, mac): string"
         },
         {
           "name": "LinkedCard",
@@ -728,6 +880,12 @@
           "name": "toneText",
           "kind": "const",
           "summary": null
+        },
+        {
+          "name": "useIsMac",
+          "kind": "hook",
+          "summary": "true no macOS/iOS (para escolher ⌘ ou Ctrl).",
+          "signature": "useIsMac(): boolean"
         }
       ],
       "doc": "components/primitives.md"
@@ -998,7 +1156,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "ia-conversa"
         },
         {
           "name": "popupClass",
@@ -2412,7 +2570,7 @@
           "name": "Column",
           "kind": "type",
           "summary": null,
-          "definition": "{ key: string; header: ReactNode; cell: (row: T) => ReactNode; primary?: boolean; wide?: boolean; action?: boolean; mobileHidden?: boolean; nowrap?: boolean; align?: \"left\" | \"right\"; className?: string; }"
+          "definition": "{ key: string; header: ReactNode; cell: (row: T) => ReactNode; primary?: boolean; wide?: boolean; action?: boolean; selection?: boolean; mobileHidden?: boolean; nowrap?: boolean; align?: \"left\" | \"right\" | \"center\"; sortKey?: string; footer?: ReactNode; width?: number | string; className?: string; }"
         },
         {
           "name": "DataTable",
@@ -2462,6 +2620,48 @@
               "description": null
             },
             {
+              "name": "error",
+              "type": "{ message: string; onRetry?: () => void; } | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "footerLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo da primeira célula do rodapé quando ela não tem `footer`."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome da tabela para leitores de tela (\"Contas a receber\")."
+            },
+            {
+              "name": "loading",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "loadingRows",
+              "type": "number | undefined",
+              "required": false,
+              "default": "5",
+              "description": "Linhas de esqueleto no primeiro carregamento."
+            },
+            {
+              "name": "maxHeight",
+              "type": "string | number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Altura máxima: rola por dentro com o cabeçalho fixo."
+            },
+            {
               "name": "onRowClick",
               "type": "((row: T) => void) | undefined",
               "required": false,
@@ -2474,6 +2674,27 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "rowSelected",
+              "type": "((row: T) => boolean) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Linha selecionada (seleção em massa ou registro aberto ao lado)."
+            },
+            {
+              "name": "rowTone",
+              "type": "((row: T) => \"warn\" | \"bad\" | undefined) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Linha que pede atenção (atrasado, bloqueado): faixa à esquerda."
+            },
+            {
+              "name": "sort",
+              "type": "TableSort | undefined",
+              "required": false,
+              "default": null,
+              "description": "Retorno do useSort; colunas com `sortKey` ganham cabeçalho ordenável."
             },
             {
               "name": "view",
@@ -2577,7 +2798,7 @@
             },
             {
               "name": "options",
-              "type": "{ id: string; label: string; }[]",
+              "type": "FacetOption[]",
               "required": true,
               "default": null,
               "description": null
@@ -2598,6 +2819,12 @@
             }
           ],
           "examplePage": null
+        },
+        {
+          "name": "FacetOption",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id?: string; value?: string; label: string; count?: number; icon?: ReactNode; }"
         },
         {
           "name": "KanbanBoard",
@@ -2871,6 +3098,12 @@
           "examplePage": null
         },
         {
+          "name": "TableSort",
+          "kind": "type",
+          "summary": "O que a tabela precisa de um `useSort` (passe o retorno inteiro).",
+          "definition": "{ sort: SortState; toggle: (key: string) => void }"
+        },
+        {
           "name": "TableToolbar",
           "kind": "component",
           "summary": "Busca + filtros + \"Limpar\" + contagem \"X de Y\" (aria-live).",
@@ -3035,6 +3268,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "disabledReason",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Por que está desabilitado (tooltip + leitor de tela), igual a Button."
             },
             {
               "name": "size",
@@ -5769,11 +6009,39 @@
               "description": null
             },
             {
+              "name": "noun",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"1–20 de 312 contatos\"."
+            },
+            {
+              "name": "nounPlural",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onPageSizeChange",
+              "type": "((size: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
               "name": "pageSize",
               "type": "number | undefined",
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "pageSizeOptions",
+              "type": "number[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Mostra \"Por página\" com estas opções (ex.: [20, 50, 100])."
             },
             {
               "name": "total",
@@ -5867,7 +6135,7 @@
               "description": null
             }
           ],
-          "examplePage": "data-tabela-estado"
+          "examplePage": null
         },
         {
           "name": "SortState",
@@ -5879,7 +6147,7 @@
           "name": "usePagination",
           "kind": "hook",
           "summary": "Pagina uma lista no cliente.",
-          "signature": "usePagination(rows, pageSize?): { page: number; pageCount: number; pageSize: number; total: number; rows: T[]; setPage: Dispatch<SetStateAc…"
+          "signature": "usePagination(rows, pageSize?, options?): { page: number; pageCount: number; pageSize: number; total: number; rows: T[]; setPage: Dispatch<SetStateAc…"
         },
         {
           "name": "useSelection",
@@ -6260,6 +6528,12 @@
           "kind": "function",
           "summary": null,
           "signature": "rgbToHex([r, g, b]): string"
+        },
+        {
+          "name": "tintFill",
+          "kind": "function",
+          "summary": "Preenchimento de identidade (avatar, agente, app) com iniciais brancas: tints claros escurecem até 4,6:1.",
+          "signature": "tintFill(tint, fallback?): string"
         }
       ],
       "doc": "components/lib-color.md"
@@ -6374,6 +6648,13 @@
               "description": null
             },
             {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
+            },
+            {
               "name": "hint",
               "type": "ReactNode",
               "required": false,
@@ -6458,6 +6739,13 @@
               "description": null
             },
             {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
+            },
+            {
               "name": "hint",
               "type": "ReactNode",
               "required": false,
@@ -6534,6 +6822,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
             },
             {
               "name": "hint",
@@ -6705,6 +7000,13 @@
               "description": null
             },
             {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
+            },
+            {
               "name": "hint",
               "type": "ReactNode",
               "required": false,
@@ -6793,6 +7095,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
             },
             {
               "name": "hint",
@@ -6972,6 +7281,13 @@
               "description": null
             },
             {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
+            },
+            {
               "name": "hint",
               "type": "ReactNode",
               "required": false,
@@ -7054,6 +7370,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
             },
             {
               "name": "hint",
@@ -7304,6 +7627,13 @@
               "description": null
             },
             {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
+            },
+            {
               "name": "hint",
               "type": "ReactNode",
               "required": false,
@@ -7417,6 +7747,13 @@
               "description": null
             },
             {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
+            },
+            {
               "name": "hint",
               "type": "ReactNode",
               "required": false,
@@ -7507,6 +7844,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hideLabel",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas)."
             },
             {
               "name": "hint",
@@ -8063,7 +8407,7 @@
             },
             {
               "name": "grid",
-              "type": "\"none\" | \"polygon\" | \"circle\" | undefined",
+              "type": "\"circle\" | \"none\" | \"polygon\" | undefined",
               "required": false,
               "default": "\"polygon\"",
               "description": null
@@ -8591,6 +8935,13 @@
               "description": null
             },
             {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
+            },
+            {
               "name": "illustration",
               "type": "ReactNode",
               "required": false,
@@ -8674,6 +9025,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
             },
             {
               "name": "illustration",
@@ -8834,6 +9192,13 @@
               "description": null
             },
             {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
+            },
+            {
               "name": "illustration",
               "type": "ReactNode",
               "required": false,
@@ -8910,6 +9275,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
             },
             {
               "name": "illustration",
@@ -9018,6 +9390,13 @@
               "description": null
             },
             {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
+            },
+            {
               "name": "illustration",
               "type": "ReactNode",
               "required": false,
@@ -9069,7 +9448,7 @@
             },
             {
               "name": "size",
-              "type": "\"sm\" | \"md\" | \"lg\" | \"xs\" | undefined",
+              "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
               "required": false,
               "default": "\"md\"",
               "description": null
@@ -9123,6 +9502,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
             },
             {
               "name": "icon",
@@ -9201,6 +9587,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Alias de `description`, com o nome usado em Empty."
             },
             {
               "name": "illustration",
@@ -9407,7 +9800,7 @@
         {
           "name": "Menu",
           "kind": "component",
-          "summary": "Menu completo: itens com ícone e atalho, rótulos de grupo, separadores, marcações (checkbox), escolha única (radio) e submenus.",
+          "summary": null,
           "props": [
             {
               "name": "items",
@@ -9438,6 +9831,20 @@
               "description": null
             },
             {
+              "name": "onOpenChange",
+              "type": "((open: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
               "name": "side",
               "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | undefined",
               "required": false,
@@ -9450,9 +9857,23 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "triggerVariant",
+              "type": "\"ghost\" | \"icon\" | \"button\" | \"bare\" | undefined",
+              "required": false,
+              "default": "\"button\"",
+              "description": "`button` (contorno, padrão) · `ghost` · `icon` (só ícone, 32 px) · `bare` (sem estilo: avatar como gatilho)."
+            },
+            {
+              "name": "width",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Largura do menu em px (padrão: conteúdo, mínimo 200)."
             }
           ],
-          "examplePage": "ov-menus"
+          "examplePage": "_shadcn-extras"
         },
         {
           "name": "Menubar",
@@ -9487,7 +9908,7 @@
           "name": "MenuEntry",
           "kind": "type",
           "summary": null,
-          "definition": "| { type?: \"item\"; label: string; icon?: ReactNode; shortcut?: string; onSelect?: () => void; href?: string; disabled?: boolean; tone?: \"neutral\" | \"danger\" } | { type: \"separator\" } | { type: \"label\"; label: string } | { type: \"checkbox\"; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; icon?: ReactNode } | { type: \"radio\"; value: string; onValueChange: (value: str…"
+          "definition": "| { type?: \"item\"; label: string; icon?: ReactNode; description?: string; shortcut?: string | string[]; onSelect?: () => void; href?: string; disabled?: boolean; tone?: \"neutral\" | \"danger\"; } | { type: \"separator\" } | { type: \"label\"; label: string } | { type: \"header\"; content: ReactNode } | { type: \"checkbox\"; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; icon…"
         },
         {
           "name": "Sheet",
@@ -9715,6 +10136,13 @@
               "description": null
             },
             {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações à direita do gatilho (fora do botão)."
+            },
+            {
               "name": "className",
               "type": "string | undefined",
               "required": false,
@@ -9726,6 +10154,113 @@
               "type": "boolean | undefined",
               "required": false,
               "default": "false",
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Linha de apoio sob o rótulo (row/card)."
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "meta",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto à direita do rótulo: \"3 regras\", \"Opcional\"."
+            },
+            {
+              "name": "onOpenChange",
+              "type": "((open: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"card\" | \"inline\" | \"row\" | undefined",
+              "required": false,
+              "default": "\"inline\"",
+              "description": null
+            }
+          ],
+          "examplePage": "nav-revelacao"
+        },
+        {
+          "name": "CollapsibleContent",
+          "kind": "component",
+          "summary": "Conteúdo componível com altura animada (respeita \"reduzir movimento\").",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "_shadcn-extras"
+        },
+        {
+          "name": "CollapsibleRoot",
+          "kind": "component",
+          "summary": "Raiz componível (controlada com `open`/`onOpenChange`).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
               "description": null
             },
             {
@@ -9743,7 +10278,36 @@
               "description": null
             }
           ],
-          "examplePage": "nav-revelacao"
+          "examplePage": "_shadcn-extras"
+        },
+        {
+          "name": "CollapsibleTrigger",
+          "kind": "component",
+          "summary": "Gatilho componível. Sem `className`, vem com o visual de linha (chevron gira ao abrir via `group-data-panel-open:`).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "chevron",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "_shadcn-extras"
         },
         {
           "name": "DescriptionToggle",
@@ -9870,7 +10434,7 @@
         {
           "name": "Carousel",
           "kind": "component",
-          "summary": "Carrossel com rolagem nativa (arrasta no toque, trackpad funciona), encaixe por item, setas, pontos e ←/→ quando focado.",
+          "summary": "Carrossel com rolagem nativa (arrasta no toque, trackpad funciona), encaixe por item, setas, pontos ou miniaturas, ←/→ (↑/↓ na vertical) quando focado.",
           "props": [
             {
               "name": "children",
@@ -9908,6 +10472,13 @@
               "description": null
             },
             {
+              "name": "counter",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Mostra \"2 de 8\" sobre o canto."
+            },
+            {
               "name": "dots",
               "type": "boolean | undefined",
               "required": false,
@@ -9919,6 +10490,41 @@
               "type": "number | undefined",
               "required": false,
               "default": "12",
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Altura em px (obrigatória na vertical)."
+            },
+            {
+              "name": "index",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Página atual (controlado)."
+            },
+            {
+              "name": "loop",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "onIndexChange",
+              "type": "((index: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\" | undefined",
+              "required": false,
+              "default": "\"horizontal\"",
               "description": null
             },
             {
@@ -9934,9 +10540,29 @@
               "required": false,
               "default": "1",
               "description": null
+            },
+            {
+              "name": "setApi",
+              "type": "((api: CarouselApi) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Recebe o controle (index, count, goTo, next, prev) a cada mudança."
+            },
+            {
+              "name": "thumbnails",
+              "type": "ReactNode[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Miniaturas no lugar dos pontos (uma por item; use com perView 1)."
             }
           ],
-          "examplePage": "midia-carrossel"
+          "examplePage": "_shadcn-extras"
+        },
+        {
+          "name": "CarouselApi",
+          "kind": "type",
+          "summary": "Controle do carrossel por fora (botões próprios, \"3 de 8\", sincronizar com outra lista).",
+          "definition": "{ index: number; count: number; canPrev: boolean; canNext: boolean; goTo: (index: number) => void; next: () => void; prev: () => void; }"
         },
         {
           "name": "DeckSlide",
@@ -12205,7 +12831,7 @@
         {
           "name": "applyFilters",
           "kind": "function",
-          "summary": "Aplica busca + filtros (tudo em E).",
+          "summary": "Aplica busca + filtros.",
           "signature": "applyFilters(rows, fields, state, options?): T[]"
         },
         {
@@ -12348,6 +12974,13 @@
               "required": false,
               "default": "false",
               "description": null
+            },
+            {
+              "name": "gender",
+              "type": "\"m\" | \"f\" | undefined",
+              "required": false,
+              "default": "\"m\"",
+              "description": "Concordância: \"f\" → \"Nenhuma fatura com esse recorte\"."
             },
             {
               "name": "noun",
@@ -12517,7 +13150,7 @@
           "name": "FilterState",
           "kind": "type",
           "summary": null,
-          "definition": "{ query: string; conditions: FilterCondition[] }"
+          "definition": "{ query: string; conditions: FilterCondition[]; match?: \"and\" | \"or\"; }"
         },
         {
           "name": "FilterType",
@@ -12565,6 +13198,28 @@
           "kind": "function",
           "summary": "Busca textual: todas as palavras precisam aparecer em algum dos textos (E).",
           "signature": "matchesQuery(query, texts): boolean"
+        },
+        {
+          "name": "MatchToggle",
+          "kind": "component",
+          "summary": "Alterna como os filtros se combinam.",
+          "props": [
+            {
+              "name": "filters",
+              "type": "{ fields: FilterField<T>[]; state: FilterState; setState: Dispatch<SetStateAction<FilterState>>; rows: T[];…",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "filtros-construtor"
         },
         {
           "name": "parseFilters",
@@ -15140,7 +15795,7 @@
               "type": "boolean | undefined",
               "required": false,
               "default": null,
-              "description": "Mostra o menu \"Colunas\"."
+              "description": "Mostra o menu \"Colunas\" e o menu de cada cabeçalho (mover, fixar, ocultar)."
             },
             {
               "name": "defaultCollapsedGroups",
@@ -15183,6 +15838,13 @@
               "required": false,
               "default": null,
               "description": "Habilita \"Exportar CSV\" com este nome de arquivo (sem extensão)."
+            },
+            {
+              "name": "filtered",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "O vazio vem de busca/filtro: o padrão vira \"Nenhum X com estes filtros\" + \"Limpar filtros\"."
             },
             {
               "name": "footerLabel",
@@ -15245,7 +15907,7 @@
               "type": "boolean | undefined",
               "required": false,
               "default": null,
-              "description": null
+              "description": "Sem linhas: esqueleto."
             },
             {
               "name": "loadingMore",
@@ -15292,6 +15954,13 @@
             {
               "name": "nounPlural",
               "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onClearFilters",
+              "type": "(() => void) | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -15462,7 +16131,7 @@
           "name": "GridColumn",
           "kind": "type",
           "summary": null,
-          "definition": "{ key: string; header: string; tooltip?: string; width?: number; minWidth?: number; maxWidth?: number; pinned?: \"left\" | \"right\"; align?: \"left\" | \"right\" | \"center\"; value?: (row: T) => GridValue; cell?: (row: T, ctx: { query: string }) => ReactNode; sortable?: boolean; hideable?: boolean; defaultHidden?: boolean; resizable?: boolean; editable?: GridEditor; footer?: (rows: T[]) => ReactNode; a…"
+          "definition": "{ key: string; header: string; tooltip?: string; width?: number; minWidth?: number; maxWidth?: number; pinned?: \"left\" | \"right\"; align?: \"left\" | \"right\" | \"center\"; value?: (row: T) => GridValue; cell?: (row: T, ctx: { query: string }) => ReactNode; sortable?: boolean; hideable?: boolean; defaultHidden?: boolean; resizable?: boolean; menu?: boolean; editable?: GridEditor; validate?: (value: G…"
         },
         {
           "name": "GridEditor",
@@ -16829,7 +17498,7 @@
             },
             {
               "name": "size",
-              "type": "\"md\" | \"xs\" | undefined",
+              "type": "\"xs\" | \"md\" | undefined",
               "required": false,
               "default": "\"md\"",
               "description": "\"xs\": ícones mínimos (estilo Codex), implica `compact`."
@@ -18371,7 +19040,7 @@
             },
             {
               "name": "size",
-              "type": "\"sm\" | \"md\" | \"lg\" | \"xs\" | \"xl\" | undefined",
+              "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | undefined",
               "required": false,
               "default": "\"md\"",
               "description": null
@@ -22227,7 +22896,7 @@
         {
           "name": "NavigationMenu",
           "kind": "component",
-          "summary": "Menu de navegação de site público, portal do cliente ou central de ajuda: links diretos e painéis com links descritos (título + descrição + ícone).",
+          "summary": null,
           "props": [
             {
               "name": "items",
@@ -22241,7 +22910,7 @@
               "type": "string",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Nome acessível (\"Navegação principal\")."
             },
             {
               "name": "className",
@@ -22249,21 +22918,40 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "indicator",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Seta apontando do painel para o item aberto."
+            },
+            {
+              "name": "mobile",
+              "type": "\"none\" | \"menu\" | undefined",
+              "required": false,
+              "default": "\"menu\"",
+              "description": "Abaixo de 768px: `menu` troca a barra por um botão \"Menu\" com todos os links; `none` não muda nada (você cuida)."
             }
           ],
-          "examplePage": "nav-menus-de-site"
+          "examplePage": "_shadcn-extras"
         },
         {
           "name": "NavigationMenuEntry",
           "kind": "type",
           "summary": null,
-          "definition": "| { label: string; href: string; active?: boolean } | { label: string; links: NavigationMenuLinkItem[]; feature?: ReactNode; active?: boolean; }"
+          "definition": "| { label: string; href: string; active?: boolean; icon?: ReactNode } | { label: string; icon?: ReactNode; links: NavigationMenuLinkItem[]; feature?: ReactNode; active?: boolean; }"
         },
         {
           "name": "NavigationMenuLinkItem",
           "kind": "type",
           "summary": null,
           "definition": "{ title: string; href: string; description?: string; icon?: ReactNode; }"
+        },
+        {
+          "name": "navigationMenuTriggerClass",
+          "kind": "const",
+          "summary": "Visual do gatilho do NavigationMenu, para links soltos ao lado dele (equivale a navigationMenuTriggerStyle)."
         }
       ],
       "doc": "components/navigation-extra.md"
@@ -22449,6 +23137,1292 @@
         }
       ],
       "doc": "components/questionnaire.md"
+    },
+    {
+      "name": "data-view",
+      "file": "src/components/data-view.tsx",
+      "summary": "useDataView: busca + filtros + ordenação + paginação + seleção de uma coleção num hook só, na ordem certa (filtra → ordena → pagina) e com o estado na URL.",
+      "exports": [
+        {
+          "name": "DataViewApi",
+          "kind": "type",
+          "summary": null,
+          "definition": "ReturnType<typeof useDataView<T>>"
+        },
+        {
+          "name": "useDataView",
+          "kind": "hook",
+          "summary": null,
+          "signature": "useDataView(rows, options): { filters: { fields: FilterField<T>[]; state: FilterState; setState: Dispatch<SetStateAction<FilterState>>;…"
+        },
+        {
+          "name": "useUrlState",
+          "kind": "hook",
+          "summary": "Um valor espelhado num parâmetro da URL (location.search), sem recarregar e sem mexer no hash nem nos outros parâmetros.",
+          "signature": "useUrlState(key, initial, options?): readonly [V, (next: V) => void]"
+        }
+      ],
+      "doc": "components/data-view.md"
+    },
+    {
+      "name": "attachment",
+      "file": "src/components/attachment.tsx",
+      "summary": "Attachment (equivalente ao Attachment do shadcn/ui): anexo componível para composer de IA, mensagens, formulários e listas de documentos.",
+      "exports": [
+        {
+          "name": "Attachment",
+          "kind": "component",
+          "summary": "Raiz do anexo. `orientation=\"vertical\"` para miniatura em cima (grade de imagens).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\" | undefined",
+              "required": false,
+              "default": "\"horizontal\"",
+              "description": null
+            },
+            {
+              "name": "progress",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "0–100 durante `uploading`."
+            },
+            {
+              "name": "size",
+              "type": "AttachmentSize | undefined",
+              "required": false,
+              "default": "\"default\"",
+              "description": null
+            },
+            {
+              "name": "state",
+              "type": "AttachmentState | undefined",
+              "required": false,
+              "default": "\"done\"",
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentAction",
+          "kind": "component",
+          "summary": "Ação de ícone do anexo (remover, baixar, tentar de novo).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentActions",
+          "kind": "component",
+          "summary": "Grupo de ações à direita (ou embaixo, na vertical).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentContent",
+          "kind": "component",
+          "summary": "Texto do anexo (título + descrição).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentDescription",
+          "kind": "component",
+          "summary": "Linha de apoio: tipo e tamanho.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentGroup",
+          "kind": "component",
+          "summary": "Conjunto de anexos. `layout=\"row\"` rola na horizontal (composer), `grid` em grade (galeria, mensagens), `list` empilhado (formulário).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Anexos\"",
+              "description": null
+            },
+            {
+              "name": "layout",
+              "type": "\"list\" | \"row\" | \"grid\" | undefined",
+              "required": false,
+              "default": "\"row\"",
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentMedia",
+          "kind": "component",
+          "summary": "Mídia do anexo: ícone do tipo (pela extensão em `name`), miniatura (`variant=\"image\"` com `src`) ou um ícone próprio em `children` (link, pasta).",
+          "props": [
+            {
+              "name": "alt",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"\"",
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "name",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do arquivo para escolher o ícone do tipo."
+            },
+            {
+              "name": "src",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"icon\" | \"image\" | undefined",
+              "required": false,
+              "default": "\"icon\"",
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentState",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"idle\" | \"uploading\" | \"processing\" | \"error\" | \"done\""
+        },
+        {
+          "name": "AttachmentTitle",
+          "kind": "component",
+          "summary": "Nome do arquivo (truncado).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "midia-anexos"
+        },
+        {
+          "name": "AttachmentTrigger",
+          "kind": "component",
+          "summary": "Torna o anexo inteiro clicável (abrir prévia, baixar) sem aninhar botões: cobre o card e deixa as ações por cima.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "render",
+              "type": "ReactElement<{ className?: string; \"aria-label\"?: string; }, string | JSXElementConstructor<any>> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        }
+      ],
+      "doc": "components/attachment.md"
+    },
+    {
+      "name": "command",
+      "file": "src/components/command.tsx",
+      "summary": "Command componível (equivalente ao Command do shadcn/ui, sem cmdk): busca + lista com grupos, ↑ ↓ Home End Enter, vazio, carregando e atalhos.",
+      "exports": [
+        {
+          "name": "CommandDialog",
+          "kind": "component",
+          "summary": "Command dentro de um diálogo (a paleta montada à mão).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "filter",
+              "type": "boolean | ((text: string, query: string) => boolean) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onValueChange",
+              "type": "((value: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandEmpty",
+          "kind": "component",
+          "summary": "Aparece quando nenhum item combina com a busca.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Nada encontrado\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Tente outro termo, sem acento ou abrevi",
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandGroup",
+          "kind": "component",
+          "summary": "Grupo com título. Some sozinho quando a busca esvazia todos os itens dele.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "heading",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandInput",
+          "kind": "component",
+          "summary": "Campo de busca. Setas mudam o item ativo; Enter executa.",
+          "props": [
+            {
+              "name": "autoFocus",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Buscar…\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandItem",
+          "kind": "component",
+          "summary": "Um item. `value` é o texto usado na busca (padrão: children, se for texto); `keywords` acrescenta sinônimos e siglas.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "disabled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "keywords",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "meta",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto à direita (contexto: empresa, módulo)."
+            },
+            {
+              "name": "onSelect",
+              "type": "((value: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "shortcut",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandList",
+          "kind": "component",
+          "summary": "Lista que rola (até `maxHeight`).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "maxHeight",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandLoading",
+          "kind": "component",
+          "summary": "Enquanto a busca no servidor responde.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Buscando…\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "commandMatch",
+          "kind": "function",
+          "summary": "Combina sem acento e sem caixa: cada palavra da busca aparece no texto; ou, para erro de digitação (\"confg\"), as letras da busca em ordem dentro de UMA palavra que começa com a mesma letra.",
+          "signature": "commandMatch(text, query): boolean"
+        },
+        {
+          "name": "CommandMenu",
+          "kind": "component",
+          "summary": "Raiz: guarda a busca e o item ativo.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível: \"Ações\", \"Trocar de workspace\"."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "filter",
+              "type": "boolean | ((text: string, query: string) => boolean) | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "loop",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "↓ no último volta ao primeiro."
+            },
+            {
+              "name": "onValueChange",
+              "type": "((value: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Texto da busca (controlado)."
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandSeparator",
+          "kind": "component",
+          "summary": "Linha entre grupos (escondida durante a busca).",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ov-comando-componivel"
+        },
+        {
+          "name": "CommandShortcut",
+          "kind": "component",
+          "summary": "Atalho à direita do item: [\"⌘\", \"N\"] ou [\"mod\", \"N\"] (⌘ no Mac, Ctrl nos outros).",
+          "props": [
+            {
+              "name": "keys",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        }
+      ],
+      "doc": "components/command.md"
+    },
+    {
+      "name": "conversation",
+      "file": "src/components/conversation.tsx",
+      "summary": "Conversa (equivalentes a Bubble, Marker e Message Scroller do shadcn/ui).",
+      "exports": [
+        {
+          "name": "Bubble",
+          "kind": "component",
+          "summary": "Uma fala em balão. Use `align=\"end\"` para quem está usando o app e `start` para as outras pessoas.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "align",
+              "type": "\"start\" | \"end\" | undefined",
+              "required": false,
+              "default": "\"start\"",
+              "description": null
+            },
+            {
+              "name": "clamp",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Limita a N linhas com \"Ver mais\"."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRetry",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "position",
+              "type": "BubblePosition | undefined",
+              "required": false,
+              "default": "\"single\"",
+              "description": "Definido pelo BubbleGroup; ajusta os cantos de falas seguidas."
+            },
+            {
+              "name": "status",
+              "type": "BubbleStatus | undefined",
+              "required": false,
+              "default": null,
+              "description": "Estado de envio (só faz sentido em `align=\"end\"`)."
+            },
+            {
+              "name": "time",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Hora curta exibida embaixo (\"09:41\")."
+            },
+            {
+              "name": "tooltip",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Dica ao passar o mouse ou focar o balão (hora completa, \"Editada\")."
+            },
+            {
+              "name": "variant",
+              "type": "BubbleVariant | undefined",
+              "required": false,
+              "default": "\"secondary\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "BubbleContent",
+          "kind": "component",
+          "summary": "O balão em si. Use quando precisar de controle: `render` troca o elemento (um link ou botão que abre a mensagem) mantendo o visual.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "render",
+              "type": "ReactElement<{ className?: string; children?: ReactNode; }, string | JSXElementConstructor<any>> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "BubbleGroup",
+          "kind": "component",
+          "summary": "Falas seguidas da mesma pessoa: espaço menor entre balões, cantos encaixados, avatar e nome uma vez só.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "align",
+              "type": "\"start\" | \"end\" | undefined",
+              "required": false,
+              "default": "\"start\"",
+              "description": null
+            },
+            {
+              "name": "author",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Nome exibido acima do primeiro balão (grupo com várias pessoas)."
+            },
+            {
+              "name": "avatar",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Avatar ao lado do último balão."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "BubbleVariant | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "BubbleReaction",
+          "kind": "component",
+          "summary": "Uma reação: emoji + contagem.",
+          "props": [
+            {
+              "name": "emoji",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "active",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "count",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onToggle",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "BubbleReactions",
+          "kind": "component",
+          "summary": "Linha de reações sobreposta à borda do balão.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "align",
+              "type": "\"start\" | \"end\" | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "side",
+              "type": "\"top\" | \"bottom\" | undefined",
+              "required": false,
+              "default": "\"bottom\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "BubbleStatus",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"sending\" | \"sent\" | \"read\" | \"error\""
+        },
+        {
+          "name": "BubbleVariant",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"default\" | \"secondary\" | \"muted\" | \"tinted\" | \"outline\" | \"ghost\" | \"destructive\""
+        },
+        {
+          "name": "Marker",
+          "kind": "component",
+          "summary": "Nota inline numa conversa: \"Ana entrou na conversa\", \"Contexto trocado\", \"Pensando…\" (`shimmer`), separador rotulado (\"Hoje\", \"Novas mensagens\") ou linha com borda.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "align",
+              "type": "\"start\" | \"center\" | undefined",
+              "required": false,
+              "default": "\"center\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "render",
+              "type": "ReactElement<{ className?: string; children?: ReactNode; }, string | JSXElementConstructor<any>> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "shimmer",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Brilho correndo no texto: algo está acontecendo agora (\"Pensando…\")."
+            },
+            {
+              "name": "tone",
+              "type": "MarkerTone | undefined",
+              "required": false,
+              "default": "\"neutral\"",
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"default\" | \"border\" | \"separator\" | undefined",
+              "required": false,
+              "default": "\"default\"",
+              "description": "`default` linha discreta · `border` linha com borda e fundo · `separator` texto entre traços."
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MarkerContent",
+          "kind": "component",
+          "summary": "Texto do Marker.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MarkerIcon",
+          "kind": "component",
+          "summary": "Ícone decorativo do Marker (escondido do leitor de tela).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MarkerTone",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"neutral\" | \"ok\" | \"warn\" | \"bad\" | \"info\""
+        },
+        {
+          "name": "MessageScroller",
+          "kind": "component",
+          "summary": "Moldura da conversa: posiciona o botão \"Ir para o fim\" sobre a rolagem.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MessageScrollerButton",
+          "kind": "component",
+          "summary": "Botão flutuante \"Ir para o fim\": aparece quando a pessoa sobe para ler e mostra quantas mensagens chegaram enquanto isso.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "direction",
+              "type": "\"start\" | \"end\" | undefined",
+              "required": false,
+              "default": "\"end\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MessageScrollerContent",
+          "kind": "component",
+          "summary": "Lista das mensagens. Acompanha o fim, ancora turnos novos e compensa a rolagem quando itens entram no topo.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MessageScrollerItem",
+          "kind": "component",
+          "summary": "Uma linha da conversa.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "messageId",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "scrollAnchor",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MessageScrollerProvider",
+          "kind": "component",
+          "summary": "Estado compartilhado da rolagem de uma conversa.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "anchorNewTurns",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Turno novo marcado com `scrollAnchor` sobe para o topo e a resposta cresce embaixo dele."
+            },
+            {
+              "name": "autoScroll",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Acompanha o fim enquanto a pessoa está nele (resposta em streaming)."
+            },
+            {
+              "name": "defaultScrollPosition",
+              "type": "\"start\" | \"end\" | \"last-anchor\" | undefined",
+              "required": false,
+              "default": "\"end\"",
+              "description": "Onde abre: no fim (padrão), no começo ou no último turno marcado."
+            },
+            {
+              "name": "scrollPreviousItemPeek",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": "Ao ancorar um turno no topo, deixa N px do item anterior à vista (contexto)."
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "MessageScrollerViewport",
+          "kind": "component",
+          "summary": "Área que rola. `preserveScrollOnPrepend` mantém a mensagem que a pessoa está lendo no lugar quando mensagens antigas entram no topo.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onReachStart",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Chegou ao topo: carregue o histórico anterior."
+            },
+            {
+              "name": "preserveScrollOnPrepend",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-conversa"
+        },
+        {
+          "name": "useMessageScroller",
+          "kind": "hook",
+          "summary": "Ações de rolagem: `scrollToMessage(id)`, `scrollToEnd()`, `scrollToStart()` e o estado (`atEnd`, `unread`).",
+          "signature": "useMessageScroller(): { scrollToMessage: (id: string, opts?: { align?: ScrollAlign; behavior?: ScrollBehavior; }) => void; scroll…"
+        },
+        {
+          "name": "useMessageScrollerScrollable",
+          "kind": "hook",
+          "summary": "Se ainda dá para rolar para o começo (`start`) ou para o fim (`end`).",
+          "signature": "useMessageScrollerScrollable(): { start: boolean; end: boolean; }"
+        },
+        {
+          "name": "useMessageScrollerVisibility",
+          "kind": "hook",
+          "summary": "O que está à vista: ids visíveis e o turno atual (último `scrollAnchor` que passou do topo).",
+          "signature": "useMessageScrollerVisibility(): { currentAnchorId: string | null; visibleMessageIds: string[]; }"
+        }
+      ],
+      "doc": "components/conversation.md"
     }
   ],
   "blocks": [
@@ -25918,7 +27892,6 @@
         "DataTable",
         "Meter",
         "Modal",
-        "Select",
         "TableToolbar",
         "TagInput",
         "normalize",
@@ -25980,7 +27953,7 @@
       {
         "token": "--ds-muted",
         "utility": "muted",
-        "light": "#6b6e76",
+        "light": "#63666e",
         "dark": "#8f929a",
         "note": "metadado, rótulo, placeholder (AA)"
       },
@@ -26092,7 +28065,7 @@
       {
         "token": "--ds-accent-deep",
         "utility": "accent-deep",
-        "light": "#8c6a3a",
+        "light": "#7d5e33",
         "dark": "#dcbd8e",
         "note": "texto na cor de destaque"
       },
@@ -26120,7 +28093,7 @@
       {
         "token": "--ds-amber",
         "utility": "amber",
-        "light": "#e65100",
+        "light": "#b54500",
         "dark": "#ffb163",
         "note": null
       },
@@ -26365,7 +28338,7 @@
       {
         "token": "--ds-focus",
         "utility": null,
-        "light": "#6b6e76",
+        "light": "#63666e",
         "dark": "#8f929a",
         "note": null
       },

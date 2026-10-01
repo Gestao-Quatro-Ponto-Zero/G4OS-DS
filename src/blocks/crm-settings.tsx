@@ -6,10 +6,10 @@ import {
   NumberField,
   Page,
   PageHeading,
+  SaveBar,
   Switch,
   TagInput,
   TextField,
-  cn,
   notify,
 } from "@g4ai/ds";
 import { lostReasons, stages as baseStages } from "./data/crm";
@@ -140,25 +140,18 @@ export default function CrmSettings() {
             </div>
           </Section>
         </div>
-        {/* Barra de alterações não salvas */}
-        <div className={cn("sticky bottom-4 z-10 mx-auto mt-6 flex w-fit max-w-full items-center gap-3 rounded-xl border border-line bg-popover py-2 pl-4 pr-2 shadow-toast transition-opacity", dirty ? "opacity-100" : "pointer-events-none opacity-0")} aria-hidden={!dirty}>
-          <span className="text-[13px]">Alterações não salvas</span>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              setStages(initialStages);
-              setReasons(lostReasons.map((r) => r.label));
-              setRules(initialRules);
-              setStaleDays(30);
-            }}
-          >
-            Descartar
-          </Button>
-          <Button size="sm" disabled={invalid} onClick={() => notify("Configurações salvas para o time")}>
-            Salvar
-          </Button>
-        </div>
+        <SaveBar
+          dirty={dirty}
+          warnOnLeave={false}
+          saveDisabledReason={invalid ? "Corrija a probabilidade das etapas" : undefined}
+          onSave={() => notify("Configurações salvas para o time")}
+          onDiscard={() => {
+            setStages(initialStages);
+            setReasons(lostReasons.map((r) => r.label));
+            setRules(initialRules);
+            setStaleDays(30);
+          }}
+        />
       </Page>
     </CrmShell>
   );

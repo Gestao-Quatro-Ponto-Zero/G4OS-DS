@@ -83,7 +83,8 @@
     "CHANGELOG.md",
     "LICENSE",
     "!scripts/lint/__fixtures__",
-    "!scripts/lint/test-lint.mjs"
+    "!scripts/lint/test-lint.mjs",
+    "!scripts/eval"
   ],
   "bin": {
     "g4os-ds": "scripts/cli.mjs"
@@ -105,15 +106,16 @@
     "version-packages": "changeset version && npm install --package-lock-only --silent && npm run ai:build",
     "test:mcp": "node scripts/test-mcp.mjs",
     "lint": "eslint .",
-    "test:lint": "node scripts/lint/test-lint.mjs"
+    "test:lint": "node scripts/lint/test-lint.mjs",
+    "qa:sweep": "node scripts/qa/sweep.mjs"
   },
   "peerDependencies": {
     "@base-ui/react": "^1.8.0",
+    "eslint": ">=9.0.0",
     "lucide-react": ">=1.45.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwindcss": "^4.3.0",
-    "eslint": ">=9.0.0"
+    "tailwindcss": "^4.3.0"
   },
   "peerDependenciesMeta": {
     "eslint": {
@@ -128,6 +130,7 @@
     "@tailwindcss/cli": "4.3.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "axe-core": "^4.13.0",
     "esbuild": "^0.25.0",
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",

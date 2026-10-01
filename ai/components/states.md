@@ -93,6 +93,7 @@ Falha ao carregar. Mostra o código e, recolhidos, os detalhes técnicos (para c
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
 | `details` | `string \| undefined` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `onRetry` | `(() => void) \| undefined` |  |  |
 | `retryLabel` | `string \| undefined` | `"Tentar novamente"` |  |
@@ -124,6 +125,7 @@ Sem permissão. Diga quem pode dar acesso.
 | `className` | `string \| undefined` |  |  |
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `secondaryAction` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "page" \| undefined` |  | `page` centraliza na altura toda; `md` para painel; `sm` para card. |
@@ -212,6 +214,7 @@ Manutenção programada.
 | `className` | `string \| undefined` |  |  |
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `secondaryAction` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "page" \| undefined` |  | `page` centraliza na altura toda; `md` para painel; `sm` para card. |
@@ -242,6 +245,7 @@ Página ou registro que não existe (link quebrado, registro excluído).
 | `className` | `string \| undefined` |  |  |
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `secondaryAction` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "page" \| undefined` |  | `page` centraliza na altura toda; `md` para painel; `sm` para card. |
@@ -309,6 +313,7 @@ Sem conexão. O app tenta de novo sozinho; diga isso.
 | `className` | `string \| undefined` |  |  |
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `secondaryAction` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "page" \| undefined` |  | `page` centraliza na altura toda; `md` para painel; `sm` para card. |
@@ -335,7 +340,7 @@ Indicador de espera indeterminada.
 | --- | --- | --- | --- |
 | `className` | `string \| undefined` |  |  |
 | `label` | `string \| undefined` | `"Carregando"` |  |
-| `size` | `"sm" \| "md" \| "lg" \| "xs" \| undefined` | `"md"` |  |
+| `size` | `"xs" \| "sm" \| "md" \| "lg" \| undefined` | `"md"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -358,6 +363,7 @@ Estado que ocupa uma área inteira (página, painel, card grande).
 | `className` | `string \| undefined` |  |  |
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `icon` | `ReactNode` |  |  |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `secondaryAction` | `ReactNode` |  |  |
@@ -383,6 +389,7 @@ Conclusão de um fluxo longo (importação, onboarding, pagamento).
 | `className` | `string \| undefined` |  |  |
 | `code` | `string \| undefined` |  | Código curto acima do título: "404", "500". |
 | `description` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  | Alias de `description`, com o nome usado em Empty. |
 | `illustration` | `ReactNode` |  | Substitui o ícone por uma ilustração/imagem própria. |
 | `secondaryAction` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "page" \| undefined` |  | `page` centraliza na altura toda; `md` para painel; `sm` para card. |

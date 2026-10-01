@@ -99,6 +99,51 @@
       "status": "equivalente",
       "ours": [
         {
+          "name": "Attachment",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentMedia",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentContent",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentTitle",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentDescription",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentActions",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentAction",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentTrigger",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
+          "name": "AttachmentGroup",
+          "module": "attachment",
+          "doc": "components/attachment.md"
+        },
+        {
           "name": "FileCard",
           "module": "media",
           "doc": "components/media.md"
@@ -107,14 +152,10 @@
           "name": "FileDropzone",
           "module": "inputs",
           "doc": "components/inputs.md"
-        },
-        {
-          "name": "ComposerChip",
-          "module": "ai",
-          "doc": "components/ai.md"
         }
       ],
       "pages": [
+        "midia-anexos",
         "midia-arquivos",
         "form-upload"
       ],
@@ -122,7 +163,7 @@
         "anexo",
         "file"
       ],
-      "notes": "FileCard tem `progress`, `error`, `preview` e variantes row/tile; FileDropzone faz o envio com progresso."
+      "notes": "Mesmas partes e estados (idle, uploading com `progress`, processing, error, done), tamanhos default/sm/xs e orientação vertical. Diferenças: `AttachmentMedia name` escolhe o ícone pela extensão; `AttachmentGroup layout` (row/grid/list). FileCard continua como cartão pronto."
     },
     {
       "shadcn": "avatar",
@@ -147,10 +188,11 @@
         }
       ],
       "pages": [
+        "base-avatar-e-teclas",
         "base-exibicao"
       ],
       "aliases": [],
-      "notes": "EntityMark para empresas e registros (não pessoas)."
+      "notes": "Avatar com `src` (iniciais de reserva se a foto falhar), tamanhos xs–xl, `status` (presença) e `badge` (AvatarBadge), `shape`. AvatarGroup com `stacked`, `total` (AvatarGroupCount) e `action`. API por props, não partes. EntityMark para empresas e registros."
     },
     {
       "shadcn": "badge",
@@ -216,6 +258,31 @@
       "status": "equivalente",
       "ours": [
         {
+          "name": "Bubble",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "BubbleContent",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "BubbleGroup",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "BubbleReactions",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "BubbleReaction",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
           "name": "UserBubble",
           "module": "ai-sessions",
           "doc": "components/ai-sessions.md"
@@ -227,11 +294,12 @@
         }
       ],
       "pages": [
+        "ia-conversa",
         "ia-sessoes",
         "ia-assistente"
       ],
       "aliases": [],
-      "notes": "Balão só para a fala da pessoa; a resposta do agente é texto corrido (AgentMessage)."
+      "notes": "Mesmas 7 variantes, `align`, BubbleGroup (cantos encaixados, autor e avatar), reações, `render` em BubbleContent. Extras: `status` de envio com “Tentar de novo”, `clamp` (Ver mais) e `tooltip`. Resposta longa do assistente: `ghost` ou ChatMessage."
     },
     {
       "shadcn": "button",
@@ -357,7 +425,7 @@
         "midia-carrossel"
       ],
       "aliases": [],
-      "notes": "Rolagem nativa com encaixe (sem Embla)."
+      "notes": "Rolagem nativa com encaixe (sem Embla). `perView`/`gap` (tamanhos e espaço), `orientation`, `loop`, `setApi` (index, count, next, prev), `onIndexChange` (evento select), `autoplay` (pausa no hover/foco e com movimento reduzido), `thumbnails` e `counter`. Sem plugins do Embla."
     },
     {
       "shadcn": "chart",
@@ -447,13 +515,33 @@
           "name": "Collapsible",
           "module": "disclosure",
           "doc": "components/disclosure.md"
+        },
+        {
+          "name": "CollapsibleRoot",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
+        },
+        {
+          "name": "CollapsibleTrigger",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
+        },
+        {
+          "name": "CollapsibleContent",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
+        },
+        {
+          "name": "TreeView",
+          "module": "disclosure",
+          "doc": "components/disclosure.md"
         }
       ],
       "pages": [
         "nav-revelacao"
       ],
       "aliases": [],
-      "notes": "Uma seção opcional (\"Opções avançadas\")."
+      "notes": "Collapsible pronto (variant inline/row/card, `description`, `meta`, `actions`, controlado) e as partes componíveis (Root/Trigger/Content) com altura animada. Árvore com teclado completo: TreeView."
     },
     {
       "shadcn": "combobox",
@@ -486,6 +574,56 @@
       "status": "equivalente",
       "ours": [
         {
+          "name": "CommandMenu",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandInput",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandList",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandEmpty",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandGroup",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandItem",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandSeparator",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandShortcut",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandLoading",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
+          "name": "CommandDialog",
+          "module": "command",
+          "doc": "components/command.md"
+        },
+        {
           "name": "CommandPalette",
           "module": "overlays-extra",
           "doc": "components/overlays-extra.md"
@@ -497,6 +635,7 @@
         }
       ],
       "pages": [
+        "ov-comando-componivel",
         "ov-comandos",
         "busca-cmdk"
       ],
@@ -504,7 +643,7 @@
         "cmdk",
         "command palette"
       ],
-      "notes": "⌘K com busca tolerante a acento e erro de digitação, grupos e atalhos."
+      "notes": "Partes equivalentes ao cmdk (a raiz chama CommandMenu porque `Command` já é o tipo da CommandPalette). Busca sem acento, `keywords`, `filter={false}` para servidor, CommandLoading, atalhos por plataforma. CommandPalette é a ⌘K pronta a partir de uma lista."
     },
     {
       "shadcn": "context-menu",
@@ -552,11 +691,13 @@
         }
       ],
       "pages": [
+        "data-visao-de-dados",
+        "data-tabela-estado",
         "busca-tabelas",
         "grade-visao-geral"
       ],
       "aliases": [],
-      "notes": "DataTable para listas comuns; DataGrid para muitas linhas, rolagem interna, edição e teclado (sem TanStack)."
+      "notes": "DataTable para listas comuns (useDataView junta filtros, ordenação, paginação, seleção e URL, como o useReactTable); DataGrid para muitas linhas, rolagem interna, edição e teclado (sem TanStack)."
     },
     {
       "shadcn": "date-picker",
@@ -669,7 +810,7 @@
       "aliases": [
         "dropdown"
       ],
-      "notes": "ActionMenu para o ⋯ de linha/card; Menu para submenus, marcações e escolha única."
+      "notes": "Todos os exemplos do shadcn (básico, submenu, atalhos, ícones, marcações com e sem ícone, escolha única com e sem ícone, destrutivo, avatar, completo) por uma lista de entradas: `checkbox`, `radio`, `submenu`, `label`, `header`, `separator`; `shortcut` aceita teclas por plataforma; `triggerVariant` button/ghost/icon/bare. ActionMenu para o ⋯ de linha/card."
     },
     {
       "shadcn": "empty",
@@ -927,16 +1068,22 @@
           "doc": "components/primitives.md"
         },
         {
+          "name": "KbdGroup",
+          "module": "primitives",
+          "doc": "components/primitives.md"
+        },
+        {
           "name": "KeyCombo",
           "module": "interactive",
           "doc": "components/interactive.md"
         }
       ],
       "pages": [
+        "base-avatar-e-teclas",
         "base-acoes"
       ],
       "aliases": [],
-      "notes": "KeyCombo monta atalhos (⌘ K) por plataforma."
+      "notes": "KbdGroup com `keys` converte \"mod\", \"shift\", \"alt\", \"enter\" para ⌘/⇧/⌥/↵ no Mac e Ctrl/Shift/Alt/Enter nos outros. KeyCombo é o mesmo (nome antigo)."
     },
     {
       "shadcn": "label",
@@ -968,6 +1115,21 @@
       "status": "equivalente",
       "ours": [
         {
+          "name": "Marker",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MarkerIcon",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MarkerContent",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
           "name": "SystemMessage",
           "module": "ai",
           "doc": "components/ai.md"
@@ -978,27 +1140,17 @@
           "doc": "components/collab.md"
         },
         {
-          "name": "ThreadDaySeparator",
-          "module": "ai-layout",
-          "doc": "components/ai-layout.md"
-        },
-        {
           "name": "ThinkingIndicator",
           "module": "ai",
           "doc": "components/ai.md"
-        },
-        {
-          "name": "Separator",
-          "module": "structure",
-          "doc": "components/structure.md"
         }
       ],
       "pages": [
-        "ia-avisos",
-        "colaboracao-e-documento"
+        "ia-conversa",
+        "ia-avisos"
       ],
       "aliases": [],
-      "notes": "Status, nota do sistema e separador rotulado dentro de conversas."
+      "notes": "Marker com variantes default/border/separator, `shimmer`, `render` (link, botão) e partes MarkerIcon/MarkerContent. Extra: `tone`. Aviso com ação e fechar: SystemMessage."
     },
     {
       "shadcn": "menubar",
@@ -1055,26 +1207,62 @@
       "status": "equivalente",
       "ours": [
         {
+          "name": "MessageScrollerProvider",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MessageScroller",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MessageScrollerViewport",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MessageScrollerContent",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MessageScrollerItem",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "MessageScrollerButton",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "useMessageScroller",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "useMessageScrollerVisibility",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
+          "name": "useMessageScrollerScrollable",
+          "module": "conversation",
+          "doc": "components/conversation.md"
+        },
+        {
           "name": "ChatThread",
           "module": "ai",
           "doc": "components/ai.md"
-        },
-        {
-          "name": "ThreadView",
-          "module": "ai-layout",
-          "doc": "components/ai-layout.md"
-        },
-        {
-          "name": "ThreadMinimap",
-          "module": "ai-sessions",
-          "doc": "components/ai-sessions.md"
         }
       ],
       "pages": [
+        "ia-conversa",
         "ia-layout-agente"
       ],
       "aliases": [],
-      "notes": "Acompanha o fim enquanto a pessoa está no fim e para quando ela rola para ler."
+      "notes": "Mesmas partes e ganchos: `autoScroll`, `defaultScrollPosition` (end/start/last-anchor), `scrollPreviousItemPeek`, `scrollAnchor`, `preserveScrollOnPrepend`, `data-pending-scroll`/`data-autoscrolling`. Extras: `anchorNewTurns`, `onReachStart` (carregar histórico) e contagem de novas no botão. ChatThread segue como a versão simples."
     },
     {
       "shadcn": "native-select",
@@ -1109,13 +1297,18 @@
           "name": "NavigationMenu",
           "module": "navigation-extra",
           "doc": "components/navigation-extra.md"
+        },
+        {
+          "name": "navigationMenuTriggerClass",
+          "module": "navigation-extra",
+          "doc": "components/navigation-extra.md"
         }
       ],
       "pages": [
         "nav-menus-de-site"
       ],
       "aliases": [],
-      "notes": "Site público, portal e central de ajuda. App: Sidebar/AppShell."
+      "notes": "Painéis com links descritos e destaque, `icon` nos itens, `indicator` (seta) e `mobile=\"menu\"` (abaixo de 768 px vira botão Menu). `navigationMenuTriggerClass` equivale a navigationMenuTriggerStyle. Para app de gestão: Sidebar/AppShell."
     },
     {
       "shadcn": "pagination",

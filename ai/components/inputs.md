@@ -25,6 +25,7 @@ Cards selecionáveis (plano, tipo de conta, modelo de contratação).
 | `columns` | `1 \| 2 \| 3 \| 4 \| undefined` | `3` |  |
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `label` | `string \| undefined` |  |  |
 | `multiple` | `boolean \| undefined` | `false` |  |
@@ -59,6 +60,7 @@ Valor em reais com máscara "caixa registradora": os dígitos entram pela direit
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `currency` | `string \| undefined` | `"R$"` |  |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `label` | `string \| undefined` |  |  |
 | `optional` | `boolean \| undefined` |  |  |
@@ -85,6 +87,7 @@ Exemplo (showcase `#/p/form-numeros`):
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `disabled` | `boolean \| undefined` |  |  |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `items` | `UploadItem[] \| undefined` | `[]` |  |
 | `label` | `string \| undefined` |  |  |
@@ -144,6 +147,7 @@ Campo com máscara. `value` = texto mascarado; `onChange(masked, digits)`.
 | `className` | `string \| undefined` |  |  |
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `invalidMessage` | `string \| undefined` | `"Confira o número digitado."` |  |
 | `label` | `string \| undefined` |  |  |
@@ -176,6 +180,7 @@ Número com −/+. Setas ↑↓ mudam `step`; Shift multiplica por 10.
 | `digits` | `number \| undefined` | `0` |  |
 | `disabled` | `boolean \| undefined` |  |  |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `id` | `string \| undefined` |  |  |
 | `label` | `string \| undefined` |  |  |
@@ -231,6 +236,7 @@ Senha com mostrar/ocultar.
 | `className` | `string \| undefined` |  |  |
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `label` | `string \| undefined` | `"Senha"` |  |
 | `optional` | `boolean \| undefined` |  |  |
@@ -265,6 +271,7 @@ Escolha única entre 2–6 opções sempre visíveis.
 | `className` | `string \| undefined` |  |  |
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `label` | `string \| undefined` |  |  |
 | `name` | `string \| undefined` |  |  |
@@ -344,6 +351,7 @@ Lista livre de etiquetas (skills, tags de lead, e-mails).
 | `className` | `string \| undefined` |  |  |
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `id` | `string \| undefined` |  |  |
 | `label` | `string \| undefined` |  |  |
@@ -376,6 +384,7 @@ Texto longo. `autosize` cresce até `maxRows`; contador com maxLength.
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `counter` | `boolean \| undefined` |  |  |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `label` | `string \| undefined` |  |  |
 | `maxRows` | `number \| undefined` | `10` |  |
@@ -403,6 +412,7 @@ Campo de texto completo.
 | `corner` | `ReactNode` |  | Canto direito do rótulo (contador, link "Esqueci a senha"). |
 | `counter` | `boolean \| undefined` |  |  |
 | `error` | `ReactNode` |  |  |
+| `hideLabel` | `boolean \| undefined` |  | Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). |
 | `hint` | `ReactNode` |  |  |
 | `icon` | `ReactNode` |  |  |
 | `label` | `string \| undefined` |  |  |
@@ -413,6 +423,14 @@ Campo de texto completo.
 | `suffix` | `ReactNode` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+**Uso certo**
+
+- ✓ `<TextField label="Nome" value={v} onChange={setV} />`: rótulo, dica, erro e foco prontos. Texto longo: `TextareaField`.
+
+**Evite**
+
+- ✗ `<input>` cru (regra `raw-input`); `FieldBlock` com o mesmo rótulo em volta.
 
 Exemplo (showcase `#/p/form-texto`):
 

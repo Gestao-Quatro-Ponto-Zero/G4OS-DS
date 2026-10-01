@@ -407,6 +407,198 @@
             2
           ],
           "description": "import * de \"lucide-react\". Importe só os ícones usados: import { Plus } from \"lucide-react\"."
+        },
+        "page-width-wrapper": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Largura da página num wrapper (mx-auto max-w-*). Use <Page width=\"wide|medium|narrow|reading\">: cabeçalho, filtros e corpo ficam no mesmo eixo. Um wrapper só centraliza o corpo e desalinha o título."
+        },
+        "page-heading": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<h1> solto numa tela com Page. Use <PageHeading title=… description=… actions=…>: título fixo, ações e subnavegação no lugar certo."
+        },
+        "disabled-wrapper": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Wrapper com opacity/pointer-events em volta de controle desabilitado. Use disabled + disabledReason=\"…\" no Button (fica legível, focável e explica o motivo). Opacidade extra deixa o botão invisível."
+        },
+        "redundant-children": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Texto repetido em label e children. Checkbox/Switch já mostram o label. Remova os children (ou use children só para texto rico)."
+        },
+        "field-double-label": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "FieldBlock em volta de campo que já tem rótulo. TextField, NumberField, CurrencyField, TextareaField… já desenham o label. Remova o FieldBlock (ou o label do campo)."
+        },
+        "nested-drawer": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Drawer dentro de Drawer. Drawer nunca abre drawer: troque o conteúdo do mesmo Drawer (passos) ou use Modal para a decisão curta."
+        },
+        "multiple-primary": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Mais de um botão primário na mesma área. Um primário por área; o resto variant=\"ghost\" ou no ActionMenu (⋯)."
+        },
+        "select-per-row": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Select/Combobox dentro de célula de tabela. Status é controle inline: selo (StatusLabel/Badge) que abre Menu. Select por linha pesa e confunde."
+        },
+        "cell-control-label": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Checkbox/Switch em célula sem hideLabel. Na tabela o rótulo vira só nome acessível: <Checkbox label=\"Selecionar …\" hideLabel />. Sem hideLabel o texto aparece na célula."
+        },
+        "raw-input": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<input>/<textarea> cru. TextField, TextareaField, NumberField, CurrencyField, SearchInput, Checkbox, RadioGroup: rótulo, erro, foco e tema já resolvidos."
+        },
+        "raw-table": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "<table> cru. DataTable (dados com ordenação, seleção, celular) ou Table (estática)."
+        },
+        "data-states": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Tabela com dados assíncronos sem estado de carregamento. Cinco estados: Skeleton/LoadingState enquanto carrega, Empty (vazio e vazio por filtro), erro com saída."
+        },
+        "manual-format": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Formatação pt-BR feita à mão. formatCurrency / formatPercent / formatNumber de @g4ai/ds: mesmo arredondamento e abreviação em todo o app."
+        },
+        "copy-tone": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Texto com \"com sucesso\" ou exclamação. Particípio + objeto: \"Vaga criada\", \"Convite enviado\". Sem \"com sucesso\" e sem \"!\"."
+        },
+        "english-copy": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Texto de interface em inglês. pt-BR em tudo: Salvar, Cancelar, Carregando…, Buscar, Excluir, Voltar."
+        },
+        "title-case": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "Botão em Title Case. Só a primeira letra maiúscula: \"Criar nova vaga\", não \"Criar Nova Vaga\"."
         }
       }
     },

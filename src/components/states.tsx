@@ -56,7 +56,8 @@ export function StateView({
   tone = "neutral",
   code,
   title,
-  description,
+  description: descriptionProp,
+  hint,
   action,
   secondaryAction,
   children,
@@ -71,6 +72,8 @@ export function StateView({
   code?: string;
   title: string;
   description?: ReactNode;
+  /** Alias de `description`, com o nome usado em Empty. */
+  hint?: ReactNode;
   action?: ReactNode;
   secondaryAction?: ReactNode;
   /** Conteúdo extra abaixo das ações (detalhes técnicos, links). */
@@ -79,6 +82,7 @@ export function StateView({
   size?: "sm" | "md" | "page";
   className?: string;
 }) {
+  const description = descriptionProp ?? hint;
   return (
     <div
       role={tone === "bad" ? "alert" : "status"}
@@ -284,7 +288,7 @@ const bannerTone: Record<BannerTone, { cls: string; icon: ReactNode }> = {
   warn: { cls: "border-amber/20 bg-amber-soft/60 text-ink", icon: <AlertTriangle className="text-amber" /> },
   bad: { cls: "border-rose/20 bg-rose-soft/60 text-ink", icon: <XCircle className="text-rose" /> },
   ok: { cls: "border-ok/15 bg-ok-soft/70 text-ink", icon: <CheckCircle2 className="text-ok" /> },
-  accent: { cls: "border-navy bg-navy text-white", icon: <Megaphone className="text-accent" /> },
+  accent: { cls: "border-navy bg-navy text-white", icon: <Megaphone className="text-brand-accent" /> },
 };
 
 /**
@@ -327,7 +331,7 @@ export function Banner({
         <div
           className={cn(
             "shrink-0 [&_a]:font-medium [&_a]:underline-offset-2 hover:[&_a]:underline [&_button]:font-medium",
-            tone === "accent" ? "[&_a]:text-accent [&_button]:text-accent" : "[&_a]:text-blue [&_button]:text-blue",
+            tone === "accent" ? "[&_a]:text-brand-accent [&_button]:text-brand-accent" : "[&_a]:text-blue [&_button]:text-blue",
           )}
         >
           {action}

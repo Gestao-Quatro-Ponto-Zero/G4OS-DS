@@ -105,10 +105,10 @@ export default function Page() {
             title="4 linhas não foram importadas"
             description="Corrija e reenvie só estas linhas; as outras 1.200 já estão no CRM."
             items={[
-              { id: "12", label: "Linha 12 · Rafael Moura", hint: "E-mail inválido: rafael@@acme.com", action: <button type="button" className="font-medium text-blue hover:underline">Corrigir</button> },
-              { id: "88", label: "Linha 88 · Júlia Prado", hint: "CNPJ com 13 dígitos", action: <button type="button" className="font-medium text-blue hover:underline">Corrigir</button> },
-              { id: "301", label: "Linha 301 · Pedro Sá", hint: "Estágio “Negociaçao” não existe", action: <button type="button" className="font-medium text-blue hover:underline">Mapear</button> },
-              { id: "940", label: "Linha 940 · Ana Lima", hint: "Duplicado da linha 12", action: <button type="button" className="font-medium text-blue hover:underline">Ignorar</button> },
+              { id: "12", label: "Linha 12 · Rafael Moura", hint: "E-mail inválido: rafael@@acme.com", action: <button type="button" className="font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">Corrigir</button> },
+              { id: "88", label: "Linha 88 · Júlia Prado", hint: "CNPJ com 13 dígitos", action: <button type="button" className="font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">Corrigir</button> },
+              { id: "301", label: "Linha 301 · Pedro Sá", hint: "Estágio “Negociaçao” não existe", action: <button type="button" className="font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">Mapear</button> },
+              { id: "940", label: "Linha 940 · Ana Lima", hint: "Duplicado da linha 12", action: <button type="button" className="font-medium text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">Ignorar</button> },
             ]}
             actions={
               <>

@@ -59,7 +59,7 @@ export default function Page() {
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
       <DocSection title="Qual usar" rule="Escolha pela quantidade de valores, pelo tamanho da lista e por onde a pessoa está (celular).">
-        <div className="overflow-x-auto rounded-xl border border-line">
+        <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
           <table className="w-full min-w-[640px] border-collapse text-left text-[13px]">
             <thead className="bg-soft text-[12px] text-muted">
               <tr>

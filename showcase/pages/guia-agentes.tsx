@@ -56,7 +56,7 @@ startup_timeout_sec = 60`}
         />
         <Callout tone="info" title="Outros clientes, Windows e modo HTTP">
           Continue, Goose, opencode, Amp, pi, a variante <code className="font-mono">cmd /c npx</code> para Windows, o modo HTTP (<code className="font-mono">npx -y @g4ai/ds mcp --http</code> → <code className="font-mono">http://127.0.0.1:3845/mcp</code>) e problemas comuns:{" "}
-          <a className="text-blue underline-offset-2 hover:underline" href={`${SITE}docs/guias/mcp.md`}>
+          <a className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue" href={`${SITE}docs/guias/mcp.md`}>
             docs/guias/mcp.md
           </a>
           . Compatível com os protocolos MCP 2024-11-05 a 2025-11-25; os schemas das ferramentas funcionam com Claude, GPT e Gemini.

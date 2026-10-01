@@ -19,7 +19,7 @@ Pré-requisito: aplique a skill **g4os-ds** (localizar o DS e ler `DS/ai/core.md
 
 0. **Anatomia primeiro.** Leia `DS/docs/padroes/anatomia-de-pagina.md` e escolha uma das nove (Lista, Painel, Registro, Configurações, Quadro, Mestre-detalhe, App de altura total, Fluxo focado, Público). Ela define o que fica fixo e o que rola: cabeçalho fixo (`PageHeading`), filtros colados em `PageToolbar`, propriedades em `SplitLayout`, uma rolagem por eixo. Diga ao usuário qual anatomia escolheu. Resumo e checklist: `references/anatomias.md`.
 
-1. Procure o bloco mais próximo em `DS/ai/core.md` (seção Blocos) e leia `DS/ai/blocks/<slug>.md`. O `concept` de cada bloco (objetivo, padrões, adaptar, evitar) diz se ele serve para o seu caso. Receitas por tipo de app: `DS/docs/receitas/<crm|ats|erp|financeiro|portal-do-cliente>.md`.
+1. Com o MCP ligado, comece por `plan_screen` com o pedido: devolve anatomia, esqueleto, blocos próximos e o componente certo para cada necessidade. Sem MCP, procure o bloco mais próximo em `DS/ai/core.md` (seção Blocos) e leia `DS/ai/blocks/<slug>.md`. O `concept` de cada bloco (objetivo, padrões, adaptar, evitar) diz se ele serve para o seu caso. Receitas por tipo de app: `DS/docs/receitas/<crm|ats|erp|financeiro|portal-do-cliente>.md`.
 2. Se servir ≥ 60 %: copie `DS/src/blocks/<slug>.tsx` para o projeto, renomeie, troque os dados do topo pelos tipos/fetch reais e remova o que não se aplica.
 3. Se não houver bloco: componha. Leia só os `DS/ai/components/<módulo>.md` necessários. Padrões: `DS/docs/padroes/` (layout, formulários, tabelas, filtros, dashboards, superfícies).
 
@@ -31,6 +31,9 @@ Decisões de superfície: entidade = página; criar/editar sem perder a lista = 
 - Rótulos e textos em pt-BR (`DS/docs/fundamentos/escrita.md`); números/datas com `format*`.
 - Controles só quando há o que controlar (busca ≥ 12, filtros ≥ 8).
 - Um primário por área; secundárias no `ActionMenu`.
+- Coluna estreita = `<Page width="narrow|medium|reading">`; nunca centralize só o corpo com `mx-auto max-w-*`.
+- `label` dos campos é visível: sem `FieldBlock` duplicado, sem children repetindo o label do `Checkbox`. Bloqueado = `disabled disabledReason="…"`.
+- Confira as props de cada componente em `DS/ai/components/<módulo>.md` (ou `get_component`) antes de usar.
 
 ## 4. Cinco estados (obrigatório)
 
@@ -47,7 +50,8 @@ Para cada coleção ou dado assíncrono, entregue:
 ## 5. Verifique
 
 ```bash
-npx g4os-ds audit <arquivos novos> --fix   # aplica as trocas seguras; depois 0 erros
+npx g4os-ds audit <arquivos novos> --fix            # aplica as trocas seguras
+npx g4os-ds audit <arquivos novos> --format json    # corrija o que sobrou; repita até 0 erros e 0 avisos
 npx tsc --noEmit
 ```
 

@@ -18,7 +18,7 @@ export default function Page() {
           code={`<PasswordField value={pw} onChange={setPw} corner={<a href="/esqueci">Esqueci a senha</a>} />
 <PasswordField label="Nova senha" value={pw} onChange={setPw} strength autoComplete="new-password" />`}
         >
-          <PasswordField value={pw2} onChange={setPw2} corner={<a href="#" className="text-blue hover:underline">Esqueci a senha</a>} />
+          <PasswordField value={pw2} onChange={setPw2} corner={<a href="#" className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">Esqueci a senha</a>} />
           <PasswordField label="Nova senha" value={pw} onChange={setPw} strength autoComplete="new-password" placeholder="Crie uma senha" />
         </Demo>
       </DocSection>

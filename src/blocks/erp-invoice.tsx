@@ -165,7 +165,7 @@ function InvoiceDoc({ invoice }: { invoice: Invoice }) {
             </Box>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Itens da nota">
             <table className="w-full min-w-[640px] text-[12.5px]">
               <thead className="border-b border-line bg-soft/60 text-[11.5px] text-muted">
                 <tr>

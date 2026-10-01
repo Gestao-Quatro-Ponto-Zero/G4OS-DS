@@ -18,6 +18,7 @@ import {
 import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
 import { normalize } from "../lib/text";
+import { useFieldContext } from "./forms";
 
 /*
  * Entradas de dados. Mesmas regras de forms.tsx:
@@ -35,6 +36,8 @@ import { normalize } from "../lib/text";
 
 type FrameProps = {
   label?: string;
+  /** Rótulo só para leitores de tela (filtros, tabelas, barras de ferramentas). Prefira o rótulo visível. */
+  hideLabel?: boolean;
   hint?: ReactNode;
   error?: ReactNode;
   optional?: boolean;
@@ -45,12 +48,15 @@ type FrameProps = {
 
 function useFieldIds(id?: string) {
   const auto = useId();
-  const base = id ?? auto;
-  return { id: base, desc: `${base}-desc` };
+  // Dentro de FieldBlock o campo usa o id e a descrição do bloco (sem rótulo duplicado).
+  const ctx = useFieldContext();
+  const base = id ?? ctx?.id ?? auto;
+  return { id: base, desc: ctx?.describedBy ?? `${base}-desc` };
 }
 
 function Frame({
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -61,23 +67,26 @@ function Frame({
   group,
   children,
 }: FrameProps & { htmlFor?: string; descId: string; group?: boolean; children: ReactNode }) {
+  const ctx = useFieldContext();
+  // FieldBlock já desenha rótulo, ajuda e erro: o campo entra só com o controle.
+  if (ctx) return <div className={cn("min-w-0", className)}>{children}</div>;
   const labelText = label && (
     <>
       {label}
-      {optional && <span className="ml-1 text-muted/80">(opcional)</span>}
+      {optional && <span className="ml-1 text-muted">(opcional)</span>}
     </>
   );
   return (
     <div className={cn("mb-5 min-w-0", className)} role={group ? "group" : undefined} aria-labelledby={group && label ? `${descId}-lbl` : undefined}>
       {(label || corner) && (
-        <div className="mb-1.5 flex items-baseline justify-between gap-3">
+        <div className={cn("mb-1.5 flex items-baseline justify-between gap-3", hideLabel && !corner && "sr-only")}>
           {label &&
             (group ? (
-              <span id={`${descId}-lbl`} className="text-[12.5px] text-muted">
+              <span id={`${descId}-lbl`} className={cn("text-[12.5px] text-muted", hideLabel && "sr-only")}>
                 {labelText}
               </span>
             ) : (
-              <label htmlFor={htmlFor} className="text-[12.5px] text-muted">
+              <label htmlFor={htmlFor} className={cn("text-[12.5px] text-muted", hideLabel && "sr-only")}>
                 {labelText}
               </label>
             ))}
@@ -114,6 +123,7 @@ type NativeInput = Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "prefix"
  */
 export function TextField({
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -149,7 +159,7 @@ export function TextField({
   const ref = useRef<HTMLInputElement>(null);
   const showCounter = counter && maxLength != null;
   return (
-    <Frame
+    <Frame hideLabel={hideLabel}
       label={label}
       hint={hint}
       error={error}
@@ -215,6 +225,7 @@ function Spinner() {
 /** Texto longo. `autosize` cresce até `maxRows`; contador com maxLength. */
 export function TextareaField({
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -248,7 +259,7 @@ export function TextareaField({
     el.style.height = `${Math.min(Math.max(el.scrollHeight, minRows * line + pad), maxRows * line + pad)}px`;
   }, [value, autosize, minRows, maxRows]);
   return (
-    <Frame
+    <Frame hideLabel={hideLabel}
       label={label}
       hint={hint}
       error={error}
@@ -303,6 +314,7 @@ const strengthLabel = ["", "Fraca", "Razoável", "Boa", "Forte"];
 /** Senha com mostrar/ocultar. `strength` mostra régua de força e requisitos. */
 export function PasswordField({
   label = "Senha",
+  hideLabel,
   hint,
   error,
   value,
@@ -329,7 +341,7 @@ export function PasswordField({
     ["Símbolo", /[^A-Za-z0-9]/.test(value)],
   ] as const;
   return (
-    <Frame label={label} hint={strength ? undefined : hint} error={error} className={className} htmlFor={ids.id} descId={ids.desc} corner={corner}>
+    <Frame hideLabel={hideLabel} label={label} hint={strength ? undefined : hint} error={error} className={className} htmlFor={ids.id} descId={ids.desc} corner={corner}>
       <div className={cn(shellBase, shellSizes.md, shellTone(error))}>
         <input
           id={ids.id}
@@ -391,6 +403,7 @@ export function PasswordField({
 /** Número com −/+. Setas ↑↓ mudam `step`; Shift multiplica por 10. Vazio = null. */
 export function NumberField({
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -428,7 +441,7 @@ export function NumberField({
   };
   const btn = "inline-flex h-full w-9 shrink-0 items-center justify-center text-muted hover:bg-soft hover:text-ink disabled:opacity-40 disabled:hover:bg-transparent";
   return (
-    <Frame label={label} hint={hint} error={error} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
+    <Frame hideLabel={hideLabel} label={label} hint={hint} error={error} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
       <div className={cn(shellBase, shellSizes.md, shellTone(error), "overflow-hidden")}>
         <button type="button" tabIndex={-1} aria-label="Diminuir" className={cn(btn, "border-r border-line")} disabled={disabled || (min != null && (value ?? 0) <= min)} onClick={() => bump(-1)}>
           <Minus className="h-3.5 w-3.5" />
@@ -473,6 +486,7 @@ export function NumberField({
  */
 export function CurrencyField({
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -497,7 +511,7 @@ export function CurrencyField({
     onChange(digits ? Number(digits) / 100 : null);
   };
   return (
-    <Frame label={label} hint={hint} error={error} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
+    <Frame hideLabel={hideLabel} label={label} hint={hint} error={error} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
       <div className={cn(shellBase, shellSizes.md, shellTone(error))}>
         <span className="shrink-0 pl-3 text-[13px] text-muted">{currency}</span>
         <input
@@ -589,6 +603,7 @@ export function MaskedField({
   value,
   onChange,
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -609,7 +624,7 @@ export function MaskedField({
   const invalid = touched && digits.length > 0 && mask.validate && !mask.validate(digits);
   const shown = error ?? (invalid ? invalidMessage : undefined);
   return (
-    <Frame label={label} hint={hint} error={shown} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
+    <Frame hideLabel={hideLabel} label={label} hint={hint} error={shown} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
       <div className={cn(shellBase, shellSizes.md, shellTone(shown))}>
         <input
           id={ids.id}
@@ -754,6 +769,7 @@ export function OtpInput({
  */
 export function TagInput({
   label,
+  hideLabel,
   hint,
   error,
   optional,
@@ -796,7 +812,7 @@ export function TagInput({
   };
   const shown = error ?? localError ?? undefined;
   return (
-    <Frame label={label} hint={hint} error={shown} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
+    <Frame hideLabel={hideLabel} label={label} hint={hint} error={shown} optional={optional} className={className} htmlFor={ids.id} descId={ids.desc}>
       <div className="relative">
         <div
           className={cn("focus-field flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-surface px-2 py-1.5", shellTone(shown))}
@@ -812,7 +828,7 @@ export function TagInput({
                   e.stopPropagation();
                   onChange(value.filter((v) => v !== t));
                 }}
-                className="inline-flex h-4 w-4 items-center justify-center rounded text-muted hover:bg-line hover:text-ink"
+                className="ds-hit inline-flex h-4 w-4 items-center justify-center rounded text-muted hover:bg-line hover:text-ink"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -1021,6 +1037,7 @@ export type ChoiceOption<T extends string = string> = {
 /** Escolha única entre 2–6 opções sempre visíveis. Setas movem a seleção (nativo). */
 export function RadioGroup<T extends string>({
   label,
+  hideLabel,
   hint,
   error,
   options,
@@ -1039,7 +1056,7 @@ export function RadioGroup<T extends string>({
   const ids = useFieldIds();
   const groupName = name ?? ids.id;
   return (
-    <Frame label={label} hint={hint} error={error} className={className} descId={ids.desc} group>
+    <Frame hideLabel={hideLabel} label={label} hint={hint} error={error} className={className} descId={ids.desc} group>
       <div role="radiogroup" aria-labelledby={label ? `${ids.desc}-lbl` : undefined} className={cn("flex gap-x-5 gap-y-2.5", orientation === "vertical" ? "flex-col" : "flex-wrap")}>
         {options.map((o) => (
           <label key={o.value} className={cn("flex cursor-pointer items-start gap-2.5", o.disabled && "cursor-not-allowed opacity-50")}>
@@ -1078,6 +1095,7 @@ export function RadioGroup<T extends string>({
  */
 export function ChoiceCards<T extends string>({
   label,
+  hideLabel,
   hint,
   error,
   options,
@@ -1103,7 +1121,7 @@ export function ChoiceCards<T extends string>({
   };
   const cols = { 1: "", 2: "sm:grid-cols-2", 3: "sm:grid-cols-2 lg:grid-cols-3", 4: "sm:grid-cols-2 lg:grid-cols-4" }[columns];
   return (
-    <Frame label={label} hint={hint} error={error} className={className} descId={ids.desc} group>
+    <Frame hideLabel={hideLabel} label={label} hint={hint} error={error} className={className} descId={ids.desc} group>
       <div role={multiple ? "group" : "radiogroup"} className={cn("grid gap-2.5", cols)}>
         {options.map((o) => {
           const on = isOn(o.value);
@@ -1225,6 +1243,7 @@ const fmtSize = (b: number) => (b < 1024 ? `${b} B` : b < 1024 ** 2 ? `${formatN
  */
 export function FileDropzone({
   label,
+  hideLabel,
   hint,
   error,
   accept,
@@ -1282,7 +1301,7 @@ export function FileDropzone({
     hint ??
     [accept && accept.replace(/\./g, "").toUpperCase().split(",").join(", "), maxSize && `até ${fmtSize(maxSize)}`, maxFiles && `máx. ${maxFiles} arquivos`].filter(Boolean).join(" · ");
   return (
-    <Frame label={label} error={shown} className={className} descId={ids.desc} group>
+    <Frame hideLabel={hideLabel} label={label} error={shown} className={className} descId={ids.desc} group>
       <div
         role="button"
         tabIndex={disabled ? -1 : 0}

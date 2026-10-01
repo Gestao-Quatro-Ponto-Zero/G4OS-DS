@@ -250,6 +250,7 @@ export function OperationButton({
   operation,
   busyLabel,
   disabled,
+  disabledReason,
   children,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -258,9 +259,12 @@ export function OperationButton({
   children: ReactNode;
   variant?: ButtonVariant;
   size?: "sm" | "md";
+  /** Por que está desabilitado (tooltip + leitor de tela), igual a Button. Não vale enquanto a operação roda. */
+  disabledReason?: ReactNode;
 }) {
+  const running = operation.busy || operation.pending;
   return (
-    <Button {...rest} disabled={disabled || operation.busy || operation.pending} aria-busy={operation.busy || undefined}>
+    <Button {...rest} disabled={disabled || running} disabledReason={disabled && !running ? disabledReason : undefined} aria-busy={operation.busy || undefined}>
       {operation.busy ? (busyLabel ?? operation.busyLabel) : children}
     </Button>
   );

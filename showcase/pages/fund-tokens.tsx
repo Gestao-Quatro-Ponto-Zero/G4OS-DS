@@ -131,7 +131,7 @@ export default function Page() {
       </DocSection>
       {groupsOfTokens.map((g) => (
         <DocSection key={g.title} title={g.title} rule={g.rule}>
-          <div className="overflow-x-auto rounded-xl border border-line">
+          <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
             <table className="w-full min-w-[720px] text-left text-[12.5px]">
               <thead className="border-b border-line bg-soft/60 text-[11.5px] text-muted">
                 <tr>

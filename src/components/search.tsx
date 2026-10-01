@@ -460,8 +460,8 @@ export function SearchPalette({
                 >
                   {s.icon}
                   {s.label}
-                  {q && n != null && <span className={cn("text-[11px] tabular-nums", on ? "text-on-primary/70" : "text-muted/80")}>{n}</span>}
-                  {!q && s.prefix && <span className={cn("font-mono text-[11px]", on ? "text-on-primary/70" : "text-muted/70")}>{s.prefix}</span>}
+                  {q && n != null && <span className={cn("text-[11px] tabular-nums", on ? "text-on-primary/70" : "text-muted")}>{n}</span>}
+                  {!q && s.prefix && <span className={cn("font-mono text-[11px]", on ? "text-on-primary/70" : "text-muted")}>{s.prefix}</span>}
                 </button>
               );
             })}

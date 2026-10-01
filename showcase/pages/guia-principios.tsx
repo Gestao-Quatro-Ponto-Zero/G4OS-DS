@@ -12,7 +12,7 @@ export const meta: PageMeta = {
 function Frame({ children, tone }: { children: React.ReactNode; tone: "do" | "dont" }) {
   return (
     <div className={tone === "do" ? "rounded-xl border border-ok/20 p-1" : "rounded-xl border border-rose/20 p-1"}>
-      <div className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-lg bg-surface p-4">{children}</div>
+      <div data-qa-ignore={tone === "dont" ? "" : undefined} className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-lg bg-surface p-4">{children}</div>
       <p className={tone === "do" ? "m-0 px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ok" : "m-0 px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-rose"}>
         {tone === "do" ? "Faça" : "Evite"}
       </p>

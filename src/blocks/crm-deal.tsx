@@ -233,7 +233,7 @@ export default function CrmDeal() {
                     </ul>
                   ) : (
                     <>
-                      <div className="rounded-xl border border-line bg-surface p-3">
+                      <div className="focus-field rounded-xl border border-line bg-surface p-3">
                         <label htmlFor="deal-note" className="sr-only">
                           Nova nota
                         </label>

@@ -90,7 +90,7 @@ export function ActionRequiredBanner({
         <p id={id} className="m-0 text-[14px] font-medium text-rose">
           {title}
         </p>
-        {description && <p className="m-0 mt-0.5 text-[12.5px] text-rose/80">{description}</p>}
+        {description && <p className="m-0 mt-0.5 text-[12.5px] text-rose">{description}</p>}
       </div>
       <button
         type="button"

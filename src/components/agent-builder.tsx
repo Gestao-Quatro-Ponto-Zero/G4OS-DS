@@ -65,7 +65,7 @@ export function PublishBar({
       </span>
       {onShare && (
         <button type="button" onClick={onShare} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-ink-soft hover:bg-soft hover:text-ink">
-          <Lock className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Compartilhar</span>
+          <Lock className="h-3.5 w-3.5" /> <span className="max-sm:sr-only">Compartilhar</span>
         </button>
       )}
       {onTest && (
@@ -121,7 +121,7 @@ export function AgentHeader({
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           aria-label="Nome do agente"
-          className="ds-bare mt-4 w-full bg-transparent text-[24px] font-semibold tracking-[-0.02em] text-ink outline-none"
+          className="ds-bare -mx-1.5 mt-4 w-[calc(100%+12px)] rounded-md bg-transparent px-1.5 text-[24px] font-semibold tracking-[-0.02em] text-ink outline-none hover:bg-soft focus-visible:bg-soft focus-visible:ring-2 focus-visible:ring-muted/40"
           style={{ fontFamily: "var(--ds-font-display)" }}
         />
       ) : (
@@ -135,7 +135,7 @@ export function AgentHeader({
           onChange={(e) => onDescriptionChange(e.target.value)}
           aria-label="Descrição do agente"
           placeholder="O que este agente faz, em uma frase"
-          className="ds-bare mt-1 w-full bg-transparent text-[14px] text-muted outline-none placeholder:text-muted/70"
+          className="ds-bare -mx-1.5 mt-1 w-[calc(100%+12px)] rounded-md bg-transparent px-1.5 text-[14px] text-muted outline-none placeholder:text-muted hover:bg-soft focus-visible:bg-soft focus-visible:ring-2 focus-visible:ring-muted/40"
         />
       ) : (
         description && <p className="m-0 mt-1 text-[14px] text-muted">{description}</p>
@@ -229,7 +229,7 @@ export function ChipPicker({ chips, onRemove, addItems, addLabel = "Adicionar", 
               type="button"
               onClick={() => onRemove(c.id)}
               aria-label={`Remover ${c.label}`}
-              className="grid h-5 w-5 place-items-center rounded text-muted opacity-60 hover:bg-soft hover:text-ink group-hover:opacity-100"
+              className="ds-hit grid h-5 w-5 place-items-center rounded text-muted opacity-60 hover:bg-soft hover:text-ink group-hover:opacity-100"
             >
               ×
             </button>

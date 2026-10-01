@@ -72,6 +72,7 @@ async function withStdioClient(version, fn) {
 
 const SAMPLE_ARGS = {
   search: { query: "tabela" },
+  plan_screen: { description: "lista de vagas com filtros, seleção e ações em massa" },
   get_component: { name: "DataGrid" },
   list_blocks: { category: "CRM" },
   get_block: { slug: "crm-pipeline" },
@@ -129,6 +130,21 @@ for (const v of VERSIONS) {
     }),
   );
 }
+
+await test("plan_screen: anatomia, blocos e componentes a partir do pedido", () =>
+  withStdioClient("2025-06-18", async (c) => {
+    const plan = async (description) => text(await c.callTool({ name: "plan_screen", arguments: { description } }));
+    const lista = await plan("lista de vagas com filtros, seleção e ações em massa");
+    assert.match(lista, /Anatomia A · Lista/);
+    assert.match(lista, /BulkBar/);
+    assert.match(lista, /get_block/);
+    const cfg = await plan("configurações de automação com dias da semana, cargos (vários) e modo demonstração");
+    assert.match(cfg, /Anatomia D · Configurações/);
+    assert.match(cfg, /MultiSelect|CheckboxGroup/);
+    assert.match(cfg, /disabledReason/);
+    assert.match(await plan("página de registro de cliente com abas e propriedades"), /Anatomia C · Registro/);
+  }),
+);
 
 await test("audit: mesmo motor do CLI (json com fixable, markdown, filtros)", () =>
   withStdioClient("2025-06-18", async (c) => {
@@ -323,7 +339,7 @@ await test("SDK StreamableHTTPClientTransport: initialize, tools, call, resource
     await client.connect(transport);
     assert.ok(transport.sessionId, "Mcp-Session-Id devolvido no initialize");
     const { tools } = await client.listTools();
-    assert.equal(tools.length, 9);
+    assert.equal(tools.length, 10);
     const r = await client.callTool({ name: "search", arguments: { query: "login" } });
     assert.match(text(r), /auth-login/);
     const res = await client.readResource({ uri: "g4os-ds://tokens" });
@@ -364,7 +380,7 @@ if (process.argv.includes("--inspector")) {
       spawnSync("npx", ["-y", "@modelcontextprotocol/inspector", "--cli", process.execPath, cli, "mcp", ...extra], { cwd: root, encoding: "utf8", timeout: 180000 });
     const list = run("--method", "tools/list");
     assert.equal(list.status, 0, list.stderr);
-    assert.equal(JSON.parse(list.stdout).tools.length, 9);
+    assert.equal(JSON.parse(list.stdout).tools.length, 10);
     const call = run("--method", "tools/call", "--tool-name", "search", "--tool-arg", "query=funil");
     assert.equal(call.status, 0, call.stderr);
     assert.match(JSON.parse(call.stdout).content[0].text, /funil/i);

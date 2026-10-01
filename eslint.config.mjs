@@ -9,7 +9,7 @@ import tseslint from "typescript-eslint";
 import g4osDs from "./scripts/lint/eslint-plugin.mjs";
 
 export default tseslint.config(
-  { ignores: ["node_modules/**", "dist/**", "showcase/dist/**", "showcase/.generated/**", "ai/**", "templates/**/node_modules/**", "templates/**/.next/**", "scripts/lint/__fixtures__/**"] },
+  { ignores: ["node_modules/**", "dist/**", "showcase/dist/**", "showcase/.generated/**", "ai/**", "templates/**/node_modules/**", "templates/**/.next/**", "scripts/lint/__fixtures__/**", "scripts/eval/fixtures/**", ".eval/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -48,6 +48,16 @@ export default tseslint.config(
     files: ["**/*.{mjs,cjs,js}"],
     languageOptions: { globals: { ...globals.node } },
   },
+  // Varredura QA: funções passadas ao page.evaluate rodam no navegador (document, window, axe).
+  {
+    files: ["scripts/qa/**/*.mjs"],
+    languageOptions: { globals: { ...globals.node, ...globals.browser, axe: "readonly" } },
+  },
   // Regras do próprio DS (dogfooding do plugin publicado). CSS e HTML ficam com `npm run audit:self`.
   { ...g4osDs.configs.recommended, files: ["src/**/*.{ts,tsx}", "showcase/**/*.{ts,tsx}", "templates/**/*.{ts,tsx}"] },
+  // Os componentes implementam os controles crus que as regras pedem para usar; a documentação mostra tabelas de referência.
+  {
+    files: ["src/components/**/*.{ts,tsx}", "showcase/**/*.{ts,tsx}"],
+    rules: { "g4os-ds/raw-input": "off", "g4os-ds/raw-table": "off" },
+  },
 );

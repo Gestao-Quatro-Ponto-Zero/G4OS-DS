@@ -393,7 +393,7 @@ export default function RecordTracker() {
               ]}
             />
             <button type="button" onClick={add} className="ui-button ui-button-primary ml-1 inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-[12.5px] font-medium text-on-primary hover:bg-primary/90">
-              <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Novo caso</span>
+              <Plus className="h-3.5 w-3.5" /> <span className="max-sm:sr-only">Novo caso</span>
             </button>
           </div>
         </header>

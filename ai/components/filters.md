@@ -20,6 +20,7 @@ Exemplo (showcase `#/p/filtros-construtor`):
 ```tsx
 <QuickFilter filters={filters} field={fields[0]} />     // Etapa ▾
 <AddFilterMenu filters={filters} />                       // + Filtro: campo → operador → valor
+{filters.active.length > 1 && <MatchToggle filters={filters} />}  // "Atende a todos ▾" ⇄ "qualquer um" (E / OU)
 {filters.active.map((c) => <ActiveFilterChip key={c.id} filters={filters} condition={c} />)}
 <FilterSheet filters={filters} open={open} onClose={…} /> // todos os campos, “Aplicar (N)”
 ```
@@ -41,13 +42,14 @@ Exemplo (showcase `#/p/filtros-construtor`):
 ```tsx
 <QuickFilter filters={filters} field={fields[0]} />     // Etapa ▾
 <AddFilterMenu filters={filters} />                       // + Filtro: campo → operador → valor
+{filters.active.length > 1 && <MatchToggle filters={filters} />}  // "Atende a todos ▾" ⇄ "qualquer um" (E / OU)
 {filters.active.map((c) => <ActiveFilterChip key={c.id} filters={filters} condition={c} />)}
 <FilterSheet filters={filters} open={open} onClose={…} /> // todos os campos, “Aplicar (N)”
 ```
 
 ## applyFilters (function)
 
-Aplica busca + filtros (tudo em E).
+Aplica busca + filtros.
 
 ```ts
 applyFilters(rows, fields, state, options?): T[]
@@ -134,6 +136,7 @@ Nenhum resultado com o recorte atual.
 | --- | --- | --- | --- |
 | `filters` * | `{ fields: FilterField<T>[]; state: FilterState; setState: Dispatch<SetStateAction<FilterState>>; rows: T[];…` |  |  |
 | `framed` | `boolean \| undefined` | `false` |  |
+| `gender` | `"m" \| "f" \| undefined` | `"m"` | Concordância: "f" → "Nenhuma fatura com esse recorte". |
 | `noun` | `string \| undefined` | `"resultado"` |  |
 | `nounPlural` | `string \| undefined` |  |  |
 
@@ -252,6 +255,7 @@ Exemplo (showcase `#/p/filtros-construtor`):
 ```tsx
 <QuickFilter filters={filters} field={fields[0]} />     // Etapa ▾
 <AddFilterMenu filters={filters} />                       // + Filtro: campo → operador → valor
+{filters.active.length > 1 && <MatchToggle filters={filters} />}  // "Atende a todos ▾" ⇄ "qualquer um" (E / OU)
 {filters.active.map((c) => <ActiveFilterChip key={c.id} filters={filters} condition={c} />)}
 <FilterSheet filters={filters} open={open} onClose={…} /> // todos os campos, “Aplicar (N)”
 ```
@@ -259,7 +263,7 @@ Exemplo (showcase `#/p/filtros-construtor`):
 ## FilterState (type)
 
 ```ts
-type FilterState = { query: string; conditions: FilterCondition[] }
+type FilterState = { query: string; conditions: FilterCondition[]; match?: "and" | "or"; }
 ```
 
 ## FilterType (type)
@@ -300,6 +304,27 @@ Busca textual: todas as palavras precisam aparecer em algum dos textos (E).
 matchesQuery(query, texts): boolean
 ```
 
+## MatchToggle
+
+Alterna como os filtros se combinam.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `filters` * | `{ fields: FilterField<T>[]; state: FilterState; setState: Dispatch<SetStateAction<FilterState>>; rows: T[];…` |  |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/filtros-construtor`):
+
+```tsx
+<QuickFilter filters={filters} field={fields[0]} />     // Etapa ▾
+<AddFilterMenu filters={filters} />                       // + Filtro: campo → operador → valor
+{filters.active.length > 1 && <MatchToggle filters={filters} />}  // "Atende a todos ▾" ⇄ "qualquer um" (E / OU)
+{filters.active.map((c) => <ActiveFilterChip key={c.id} filters={filters} condition={c} />)}
+<FilterSheet filters={filters} open={open} onClose={…} /> // todos os campos, “Aplicar (N)”
+```
+
 ## parseFilters (function)
 
 ```ts
@@ -332,6 +357,7 @@ Exemplo (showcase `#/p/filtros-construtor`):
 ```tsx
 <QuickFilter filters={filters} field={fields[0]} />     // Etapa ▾
 <AddFilterMenu filters={filters} />                       // + Filtro: campo → operador → valor
+{filters.active.length > 1 && <MatchToggle filters={filters} />}  // "Atende a todos ▾" ⇄ "qualquer um" (E / OU)
 {filters.active.map((c) => <ActiveFilterChip key={c.id} filters={filters} condition={c} />)}
 <FilterSheet filters={filters} open={open} onClose={…} /> // todos os campos, “Aplicar (N)”
 ```

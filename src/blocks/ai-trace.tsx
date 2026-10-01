@@ -133,7 +133,7 @@ export default function AiTrace() {
                 variant="ghost"
                 onClick={() => {
                   setRetried((r) => new Set(r).add(step.id));
-                  notify("Passo executado de novo com sucesso", undefined, "ok");
+                  notify("Passo executado de novo", undefined, "ok");
                 }}
               >
                 <RotateCcw /> Tentar só este passo

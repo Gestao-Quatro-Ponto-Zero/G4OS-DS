@@ -3,5 +3,11 @@
   "extends": "recommended",
   "include": ["src", "templates", "showcase"],
   "exclude": [],
-  "rules": {}
+  "rules": {},
+  "overrides": [
+    {
+      "files": ["src/components/**", "showcase/kit.tsx", "showcase/main.tsx", "showcase/pages/**"],
+      "rules": { "raw-input": "off", "raw-table": "off" }
+    }
+  ]
 }

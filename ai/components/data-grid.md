@@ -14,13 +14,14 @@ DataGrid: a tabela "de trabalho" do DS.
 | `rows` * | `T[]` |  |  |
 | `bulkActions` | `((rows: T[], ctx: { allMatching: boolean; count: number; clear: () => void; }) => ReactNode) \| undefined` |  |  |
 | `className` | `string \| undefined` |  |  |
-| `columnMenu` | `boolean \| undefined` |  | Mostra o menu "Colunas". |
+| `columnMenu` | `boolean \| undefined` |  | Mostra o menu "Colunas" e o menu de cada cabeçalho (mover, fixar, ocultar). |
 | `defaultCollapsedGroups` | `string[] \| undefined` |  |  |
 | `defaultSort` | `SortState \| undefined` |  |  |
 | `density` | `Density \| undefined` |  |  |
 | `empty` | `ReactNode` |  |  |
 | `error` | `{ message: string; onRetry?: () => void; } \| undefined` |  |  |
 | `exportFileName` | `string \| undefined` |  | Habilita "Exportar CSV" com este nome de arquivo (sem extensão). |
+| `filtered` | `boolean \| undefined` |  | O vazio vem de busca/filtro: o padrão vira "Nenhum X com estes filtros" + "Limpar filtros". |
 | `footerLabel` | `string \| undefined` |  |  |
 | `footerSlot` | `ReactNode` |  | Abaixo do rodapé (Pagination, contagem). |
 | `gender` | `"m" \| "f" \| undefined` |  | Concordância do substantivo ("f": "Todas as 312 contas selecionadas"). |
@@ -29,7 +30,7 @@ DataGrid: a tabela "de trabalho" do DS.
 | `groupOrder` | `string[] \| undefined` |  |  |
 | `hasMore` | `boolean \| undefined` |  |  |
 | `height` | `string \| number \| undefined` |  | Altura fixa: a grade rola por dentro. |
-| `loading` | `boolean \| undefined` |  |  |
+| `loading` | `boolean \| undefined` |  | Sem linhas: esqueleto. |
 | `loadingMore` | `boolean \| undefined` |  |  |
 | `loadMode` | `"button" \| "infinite" \| undefined` |  |  |
 | `manualSort` | `boolean \| undefined` |  | true = as linhas já chegam ordenadas (servidor); a grade só mostra o estado. |
@@ -37,6 +38,7 @@ DataGrid: a tabela "de trabalho" do DS.
 | `mobile` | `"cards" \| "scroll" \| undefined` |  |  |
 | `noun` | `string \| undefined` |  |  |
 | `nounPlural` | `string \| undefined` |  |  |
+| `onClearFilters` | `(() => void) \| undefined` |  |  |
 | `onDensityChange` | `((d: Density) => void) \| undefined` |  |  |
 | `onEdit` | `((row: T, key: string, value: GridValue) => void) \| undefined` |  |  |
 | `onLoadMore` | `(() => void) \| undefined` |  |  |
@@ -82,7 +84,7 @@ downloadCsv(fileName, csv): void
 ## GridColumn (type)
 
 ```ts
-type GridColumn = { key: string; header: string; tooltip?: string; width?: number; minWidth?: number; maxWidth?: number; pinned?: "left" | "right"; align?: "left" | "right" | "center"; value?: (row: T) => GridValue; cell?: (row: T, ctx: { query: string }) => ReactNode; sortable?: boolean; hideable?: boolean; defaultHidden?: boolean; resizable?: boolean; editable?: GridEditor; footer?: (rows: T[]) => ReactNode; a…
+type GridColumn = { key: string; header: string; tooltip?: string; width?: number; minWidth?: number; maxWidth?: number; pinned?: "left" | "right"; align?: "left" | "right" | "center"; value?: (row: T) => GridValue; cell?: (row: T, ctx: { query: string }) => ReactNode; sortable?: boolean; hideable?: boolean; defaultHidden?: boolean; resizable?: boolean; menu?: boolean; editable?: GridEditor; validate?: (value: G…
 ```
 
 ## GridEditor (type)

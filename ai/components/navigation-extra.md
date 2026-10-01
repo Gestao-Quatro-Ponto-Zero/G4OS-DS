@@ -6,36 +6,31 @@ NavigationMenu: navegação de site/portal com painéis de links.
 
 ## NavigationMenu
 
-Menu de navegação de site público, portal do cliente ou central de ajuda: links diretos e painéis com links descritos (título + descrição + ícone).
-
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `items` * | `NavigationMenuEntry[]` |  |  |
-| `label` * | `string` |  |  |
+| `label` * | `string` |  | Nome acessível ("Navegação principal"). |
 | `className` | `string \| undefined` |  |  |
+| `indicator` | `boolean \| undefined` | `false` | Seta apontando do painel para o item aberto. |
+| `mobile` | `"none" \| "menu" \| undefined` | `"menu"` | Abaixo de 768px: `menu` troca a barra por um botão "Menu" com todos os links; `none` não muda nada (você cuida). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/nav-menus-de-site`):
+Exemplo (showcase `#/p/_shadcn-extras`):
 
 ```tsx
-<NavigationMenu
-  label="Navegação principal"
-  items={[
-    { label: "Produto", links: [
-      { title: "Pipeline", description: "Negócios por etapa, com previsão.", href: "/produto/pipeline", icon: <Workflow /> },
-      { title: "Relatórios", description: "Painéis prontos e exportação.", href: "/produto/relatorios", icon: <BarChart3 /> },
-    ] },
-    { label: "Recursos", links: [...] },
-    { label: "Preços", href: "/precos" },
-  ]}
-/>
+<NavigationMenu label="Navegação do portal" indicator items={[
+  { label: "Produto", icon: <BarChart3 />, links: […] },
+  { label: "Recursos", icon: <BookOpen />, links: […] },
+  { label: "Preços", href: "/precos", icon: <CreditCard /> },
+]} />
+<a className={navigationMenuTriggerClass} href="/contato">Contato</a>
 ```
 
 ## NavigationMenuEntry (type)
 
 ```ts
-type NavigationMenuEntry = | { label: string; href: string; active?: boolean } | { label: string; links: NavigationMenuLinkItem[]; feature?: ReactNode; active?: boolean; }
+type NavigationMenuEntry = | { label: string; href: string; active?: boolean; icon?: ReactNode } | { label: string; icon?: ReactNode; links: NavigationMenuLinkItem[]; feature?: ReactNode; active?: boolean; }
 ```
 
 ## NavigationMenuLinkItem (type)
@@ -43,3 +38,7 @@ type NavigationMenuEntry = | { label: string; href: string; active?: boolean } |
 ```ts
 type NavigationMenuLinkItem = { title: string; href: string; description?: string; icon?: ReactNode; }
 ```
+
+## navigationMenuTriggerClass (const)
+
+Visual do gatilho do NavigationMenu, para links soltos ao lado dele (equivale a navigationMenuTriggerStyle).

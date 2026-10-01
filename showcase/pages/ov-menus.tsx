@@ -2,6 +2,7 @@ import { Archive, ArrowUpDown, Columns3, Copy, Download, FileSpreadsheet, FileTe
 import { useState } from "react";
 import { ActionMenu, ContextMenu, Menu, notify, type MenuEntry } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
+import { MenuShadcnExamples } from "./_shadcn-extras";
 
 export const meta: PageMeta = {
   title: "Menus",
@@ -77,6 +78,8 @@ export default function Page() {
           <span className="text-[12px] text-muted"><ArrowUpDown className="mr-1 inline h-3 w-3" />Ordenação: {sort}</span>
         </Demo>
       </DocSection>
+
+      <MenuShadcnExamples />
 
       <DocSection title="ContextMenu: clique direito" rule="Atalho para quem já conhece o produto. As mesmas ações precisam existir num menu visível (⋯) — clique direito não é descobrível, e no toque vira toque longo.">
         <Demo code={`<ContextMenu items={recordItems}>

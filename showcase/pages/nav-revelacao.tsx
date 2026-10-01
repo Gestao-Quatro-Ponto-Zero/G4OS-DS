@@ -2,6 +2,7 @@ import { Building, Folder, FolderOpen, Landmark, Users, Wallet } from "lucide-re
 import { useState } from "react";
 import { Accordion, Collapsible, DescriptionToggle, FieldBlock, Switch, TreeView, fieldClass, type TreeNode } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
+import { CollapsibleShadcnExamples } from "./_shadcn-extras";
 
 export const meta: PageMeta = {
   title: "Accordion, árvore e recolhíveis",
@@ -82,6 +83,8 @@ export default function Page() {
           </Collapsible>
         </Demo>
       </DocSection>
+
+      <CollapsibleShadcnExamples />
 
       <DocSection title="TreeView" rule="Hierarquia navegável: pastas, plano de contas, centros de custo, estrutura de times. Teclado de árvore completo (↑↓ →← Home End Enter).">
         <Demo className="grid gap-6 md:grid-cols-[320px_1fr]" code={`<TreeView label="Plano de contas" nodes={contas} selected={sel} onSelect={(n) => setSel(n.id)} defaultExpanded={["1", "1.2"]} />`}>

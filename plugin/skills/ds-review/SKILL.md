@@ -22,7 +22,9 @@ Toda ocorrência `erro` vira item "Alta" do relatório; `aviso` vira "Média"; `
 
 Leia o código (e a tela renderizada, se houver dev server ou screenshot). Use `references/checklist.md`; cada item que falhar entra no relatório com arquivo:linha.
 
-Pontos que o audit não pega e mais importam:
+Pontos que o audit não pega (ou só sinaliza) e mais importam:
+- **Eixo**: título (`PageHeading`) e corpo alinhados à mesma borda esquerda; nada de corpo centralizado com `mx-auto max-w-*` (use `Page width`).
+- **Rótulos visíveis**: todo checkbox fora de tabela tem texto ao lado; nenhum rótulo duplicado; desabilitado legível e com motivo (`disabledReason`).
 - **Hierarquia**: um primário por área; título = o que é a tela; ações secundárias no `ActionMenu`.
 - **Densidade**: busca só com ≥ 12 itens, filtros ≥ 8; sem card dentro de card; espaçamento dos tokens.
 - **Estados**: carregando, vazio (com próxima ação), vazio por filtro, erro (com saída), ideal.

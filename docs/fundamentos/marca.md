@@ -6,7 +6,7 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 | --- | --- | --- |
 | 1 · Toque (padrão) | Todos os produtos | Marcador Royal Gold no item ativo da navegação (`--ds-nav-marker`), progresso dourado, selos (`BrandBadge`). |
 | 2 · Momento | Login, fim de onboarding, capa de relatório, saudação da IA, conquista | `BrandPanel` (navy `--ds-brand`, texto Royal Silver `--ds-on-brand`, brilho Royal Gold `--ds-brand-accent`), `BrandButton`, `AchievementCard`. **No máximo um por tela.** |
-| 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4-institucional">`: neutros quentes (Warm White, Royal Silver, Light Gray, Charcoal), Navy na ação, Gold no destaque, escuro neutro com Silver na ação e semânticas do manual. |
+| 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4-institucional">`: fundo e superfícies iguais ao G4 clássico (sem bege), Navy na ação, Gold no destaque, escuro neutro com Silver na ação e semânticas do manual. |
 
 ## Paleta → tokens
 
@@ -19,7 +19,7 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 | Scaling Blue | `#184560` | `--g4-scaling-blue` | `--ds-blue` (links) |
 | Founders Red | `#441B1B` | `--g4-founders-red` | `--ds-founders` (só Founders) |
 | Ground Clay | `#842E20` | `--g4-ground-clay` | `--ds-clay`, série 4 |
-| Warm White · Light Gray · Mid Gray · Dark Gray · Charcoal | `#FAFAF9` `#E8E6E3` `#9A9895` `#4A4845` `#2A2826` | `--g4-warm-white` … `--g4-charcoal` | neutros do Institucional |
+| Warm White · Light Gray · Mid Gray · Dark Gray · Charcoal | `#FAFAF9` `#E8E6E3` `#9A9895` `#4A4845` `#2A2826` | `--g4-warm-white` … `--g4-charcoal` | materiais impressos e slides (a interface usa os neutros do clássico) |
 
 ## Regras
 

@@ -245,7 +245,7 @@ export function Actions() {
             <Button variant="split-left" size="sm">
               Registrar
             </Button>
-            <Button variant="split-right" size="sm">
+            <Button variant="split-right" size="sm" aria-label="Outras formas de registrar">
               <Plus />
             </Button>
           </span>
@@ -644,8 +644,8 @@ export function Collections() {
           dirty={Boolean(q || owners.length || st.length)}
           onClear={() => { setQ(""); setOwners([]); setSt([]); }}
         >
-          <FacetFilter label="Responsável" options={rows.map((r) => ({ id: r.initials, label: r.owner }))} value={owners} onChange={setOwners} align="left" />
-          <FacetFilter label="Status" options={statusOptions.map((o) => ({ id: o.value, label: o.label }))} value={st} onChange={setSt} align="left" />
+          <FacetFilter label="Responsável" options={rows.map((r) => ({ id: r.initials, label: r.owner, count: many.filter((m) => m.initials === r.initials && (!st.length || st.includes(m.status))).length }))} value={owners} onChange={setOwners} align="left" />
+          <FacetFilter label="Status" options={statusOptions.map((o) => ({ value: o.value, label: o.label, icon: o.icon, count: many.filter((m) => m.status === o.value && (!owners.length || owners.includes(m.initials))).length }))} value={st} onChange={setSt} align="left" />
           <DisplayControls view={view} onView={setView} density={density} onDensity={setDensity} />
         </TableToolbar>
         <DataTable

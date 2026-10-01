@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@import "@g4ai/ds/styles.css"; /* tokens, marcas, tema escuro e componentes; já traz os @source do DS */
+/* Opcional: componentes do shadcn/ui e 21st.dev com a cara do DS. */
+/* @import "@g4ai/ds/shadcn.css"; */

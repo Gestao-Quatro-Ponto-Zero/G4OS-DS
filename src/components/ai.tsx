@@ -136,7 +136,7 @@ export function ThinkingIndicator({ label = "Pensando", startedAt, className }: 
         ))}
       </span>
       {label}…
-      {elapsed > 3000 && <span className="tabular-nums text-muted/80">{formatDuration(elapsed)}</span>}
+      {elapsed > 3000 && <span className="tabular-nums text-muted">{formatDuration(elapsed)}</span>}
     </span>
   );
 }
@@ -152,7 +152,7 @@ const sourceIcon: Record<NonNullable<AiSource["kind"]>, LucideIcon> = { web: Glo
 /** Número de citação dentro do texto: “… 18 % [2]”. Hover mostra a fonte. */
 export function CitationChip({ index, source, onClick }: { index: number; source?: AiSource; onClick?: () => void }) {
   const cls =
-    "mx-0.5 inline-flex h-4 min-w-4 -translate-y-px items-center justify-center rounded bg-soft px-1 align-middle text-[10.5px] font-medium tabular-nums text-ink-soft ring-1 ring-line hover:bg-line hover:text-ink";
+    "ds-hit mx-0.5 inline-flex h-4 min-w-4 -translate-y-px items-center justify-center rounded bg-soft px-1 align-middle text-[10.5px] font-medium tabular-nums text-ink-soft ring-1 ring-line hover:bg-line hover:text-ink";
   const label = source ? `Fonte ${index}: ${source.title}` : `Fonte ${index}`;
   if (source?.href)
     return (
@@ -635,7 +635,7 @@ export function ToolCallCard({ call, defaultOpen = false }: { call: ToolCall; de
         </span>
         <span className={cn("inline-flex shrink-0 items-center gap-1 text-[11.5px]", st.cls)}>
           {st.icon}
-          <span className="hidden sm:inline">{st.label}</span>
+          <span className="max-sm:sr-only">{st.label}</span>
         </span>
         {call.durationMs != null && <span className="w-14 shrink-0 text-right text-[11.5px] tabular-nums text-muted">{formatDuration(call.durationMs)}</span>}
         <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-150", open && "rotate-90")} aria-hidden />
@@ -895,7 +895,7 @@ export function AgentTrace({
                             return n;
                           })
                         }
-                        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted hover:bg-line hover:text-ink"
+                        className="ds-hit inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted hover:bg-line hover:text-ink"
                       >
                         <ChevronRight className={cn("h-3.5 w-3.5 transition-transform duration-150", isOpen && "rotate-90")} />
                       </button>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber, formatPercent } from "../lib/format";
+import { useReadableFills } from "../lib/readable";
 import { ChartLegend, ChartTooltip, chartColor, niceDomain, SrTable, useElementWidth, type ChartDatum, type ChartSeries } from "./charts";
 
 /*
@@ -95,8 +96,13 @@ export function Treemap({
   const sorted = useMemo(() => [...items].filter((i) => i.value > 0).sort((a, b) => b.value - a.value), [items]);
   const total = sorted.reduce((s, i) => s + i.value, 0) || 1;
   const rects = useMemo(() => (width ? squarify(sorted.map((i) => i.value), { x: 0, y: 0, w: width, h: height }) : []), [sorted, width, height]);
-  const fill = (it: TreemapItem, i: number) => it.color ?? (colorful ? chartColor(i) : `color-mix(in oklab, var(--ds-ink) ${Math.round(Math.max(0.1, 0.92 - i * (0.8 / Math.max(1, sorted.length - 1))) * 100)}%, transparent)`);
-  const dark = (i: number) => (colorful ? i !== 5 : 0.92 - i * (0.8 / Math.max(1, sorted.length - 1)) > 0.45);
+  // Rampa monocromática sem a faixa do meio (35–70 %), onde nem texto claro nem escuro chega a 4,5:1.
+  const shade = (i: number) => {
+    const t = sorted.length > 1 ? i / (sorted.length - 1) : 0;
+    return t < 0.5 ? 0.92 - t * 0.4 : 0.34 - (t - 0.5) * 0.44;
+  };
+  const fill = (it: TreemapItem, i: number) => it.color ?? (colorful ? chartColor(i) : `color-mix(in oklab, var(--ds-ink) ${Math.round(shade(i) * 100)}%, transparent)`);
+  useReadableFills(ref, [rects.length, colorful, items]);
   return (
     <div ref={ref} className={cn("relative min-w-0", className)} style={{ height }} role="img" aria-label={`${label}: ${sorted.map((i) => `${i.label} ${format(i.value)}`).join(", ")}`}>
       {rects.map((r, i) => {
@@ -107,13 +113,14 @@ export function Treemap({
             key={it.label}
             onPointerEnter={() => setActive(i)}
             onPointerLeave={() => setActive(null)}
-            className={cn("absolute overflow-hidden rounded-md p-2 transition-opacity duration-150", dark(i) ? "text-on-ink" : "text-ink")}
+            data-fill=""
+            className="absolute overflow-hidden rounded-md p-2 transition-opacity duration-150"
             style={{ left: r.x + 1, top: r.y + 1, width: Math.max(0, r.w - 2), height: Math.max(0, r.h - 2), background: fill(it, i), opacity: active == null || active === i ? 1 : 0.6 }}
           >
             {fits && (
               <>
                 <div className="truncate text-[12px] font-medium leading-tight">{it.label}</div>
-                <div className={cn("truncate text-[11.5px] tabular-nums", dark(i) ? "text-on-ink/75" : "text-muted")}>{format(it.value)}</div>
+                <div className="truncate text-[11.5px] tabular-nums">{format(it.value)}</div>
               </>
             )}
           </div>
@@ -756,6 +763,14 @@ export function SankeyChart({
 /* ------------------------------------------------------------------ */
 
 /**
+ * Intensidade → opacidade da cor. Monotônica, mas salta a faixa do meio
+ * (40–72 %), onde nenhuma cor de texto atinge 4,5:1 sobre o preenchimento.
+ */
+function heatShade(a: number) {
+  return a <= 0.5 ? a * 0.8 : 0.72 + (a - 0.5) * 0.56;
+}
+
+/**
  * Intensidade em duas dimensões: coorte × mês (retenção), dia × hora
  * (picos de atendimento), vendedor × etapa. Uma cor, 5+ níveis contínuos,
  * valor escrito na célula quando cabe.
@@ -786,8 +801,10 @@ export function HeatmapMatrix({
 }) {
   const top = max ?? Math.max(1, ...values.flat().map((v) => v ?? 0));
   const base = { ink: "var(--ds-ink)", accent: "var(--ds-accent)", ok: "var(--ds-ok)", info: "var(--ds-blue)" }[tone];
+  const box = useRef<HTMLDivElement>(null);
+  useReadableFills(box, [values, tone, top]);
   return (
-    <div className={cn("min-w-0 overflow-x-auto", className)}>
+    <div ref={box} className={cn("min-w-0 overflow-x-auto", className)} tabIndex={0} role="region" aria-label={label}>
       <table className="border-separate text-[11.5px]" style={{ borderSpacing: 2 }} aria-label={label}>
         <thead>
           <tr>
@@ -812,8 +829,9 @@ export function HeatmapMatrix({
                   <td
                     key={c}
                     title={v == null ? `${r} · ${c}: sem dado` : `${r} · ${c}: ${format(v)}`}
-                    className={cn("rounded-[4px] text-center tabular-nums", a > 0.55 ? "text-on-ink" : "text-ink-soft")}
-                    style={{ height: cell * 0.8, minWidth: cell, background: v == null ? "transparent" : `color-mix(in oklab, ${base} ${Math.round(a * 100)}%, transparent)` }}
+                    data-fill=""
+                    className="rounded-[4px] text-center tabular-nums"
+                    style={{ height: cell * 0.8, minWidth: cell, background: v == null ? "transparent" : `color-mix(in oklab, ${base} ${Math.round(heatShade(a) * 100)}%, transparent)` }}
                   >
                     {showValues && v != null ? format(v) : ""}
                   </td>

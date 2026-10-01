@@ -24,7 +24,7 @@ Exemplo (showcase `#/p/midia-galeria`):
 
 ## Carousel
 
-Carrossel com rolagem nativa (arrasta no toque, trackpad funciona), encaixe por item, setas, pontos e ←/→ quando focado.
+Carrossel com rolagem nativa (arrasta no toque, trackpad funciona), encaixe por item, setas, pontos ou miniaturas, ←/→ (↑/↓ na vertical) quando focado.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
@@ -33,19 +33,33 @@ Carrossel com rolagem nativa (arrasta no toque, trackpad funciona), encaixe por 
 | `arrows` | `boolean \| undefined` | `true` |  |
 | `autoplay` | `number \| undefined` |  | Intervalo em ms. Pausa no hover/foco e com movimento reduzido. |
 | `className` | `string \| undefined` |  |  |
+| `counter` | `boolean \| undefined` | `false` | Mostra "2 de 8" sobre o canto. |
 | `dots` | `boolean \| undefined` | `true` |  |
 | `gap` | `number \| undefined` | `12` |  |
+| `height` | `number \| undefined` |  | Altura em px (obrigatória na vertical). |
+| `index` | `number \| undefined` |  | Página atual (controlado). |
+| `loop` | `boolean \| undefined` | `false` |  |
+| `onIndexChange` | `((index: number) => void) \| undefined` |  |  |
+| `orientation` | `"horizontal" \| "vertical" \| undefined` | `"horizontal"` |  |
 | `perView` | `number \| undefined` | `1` |  |
 | `perViewMobile` | `number \| undefined` | `1` |  |
+| `setApi` | `((api: CarouselApi) => void) \| undefined` |  | Recebe o controle (index, count, goTo, next, prev) a cada mudança. |
+| `thumbnails` | `ReactNode[] \| undefined` |  | Miniaturas no lugar dos pontos (uma por item; use com perView 1). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/midia-carrossel`):
+Exemplo (showcase `#/p/_shadcn-extras`):
 
 ```tsx
-<Carousel label="Modelos" perView={3} perViewMobile={1.15} arrows>
-  {modelos.map((m) => <Card …/>)}
-</Carousel>
+<Carousel label="…" loop counter>…</Carousel>
+```
+
+## CarouselApi (type)
+
+Controle do carrossel por fora (botões próprios, "3 de 8", sincronizar com outra lista).
+
+```ts
+type CarouselApi = { index: number; count: number; canPrev: boolean; canNext: boolean; goTo: (index: number) => void; next: () => void; prev: () => void; }
 ```
 
 ## DeckSlide (type)

@@ -159,7 +159,7 @@ export default function AppFilteredList() {
   const saved = useSavedViews(filters, views, "atendimento-visoes");
   const q = filters.state.query;
   const sort = useSort(filters.rows, { sla: (t) => t.slaHours, criado: (t) => t.created }, { key: "sla", dir: "asc" });
-  const pages = usePagination(sort.rows, 12);
+  const pages = usePagination(sort.rows, 12, { resetKey: [filters.state, sort.sort, range] });
 
   const columns: Column<Ticket>[] = [
     {

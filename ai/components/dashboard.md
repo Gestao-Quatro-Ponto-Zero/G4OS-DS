@@ -170,6 +170,14 @@ Indicador de topo de dashboard: rótulo, número grande, delta com período, e o
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+**Uso certo**
+
+- ✓ `delta` é fração (`0.12` = +12 %); custo, churn, prazo, inadimplência com `goodWhen="down"`; `value` já formatado (`formatCurrency(v, { compact: true })`).
+
+**Evite**
+
+- ✗ Montar KPI com `Card` + textos; delta em pontos (`12`).
+
 Exemplo (showcase `#/p/dash-kpis`):
 
 ```tsx

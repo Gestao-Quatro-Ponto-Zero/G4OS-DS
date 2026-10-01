@@ -98,7 +98,7 @@ export default function SaasCustomers() {
   const saved = useSavedViews(filters, views, "saas-clientes-visoes");
   const q = filters.state.query;
   const sort = useSort(filters.rows, { nome: (c) => c.name, mrr: (c) => c.mrr, uso: (c) => c.usage, usuarios: (c) => c.seats }, { key: "mrr", dir: "desc" });
-  const pages = usePagination(sort.rows, 10);
+  const pages = usePagination(sort.rows, 10, { resetKey: [filters.state, sort.sort] });
   const sel = useSelection(pages.rows.map((c) => c.id));
 
   const columns: Column<Customer>[] = [

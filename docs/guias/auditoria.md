@@ -227,6 +227,22 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 | [`target-blank`](#target-blank) | Segurança | aviso | aviso | aviso | sim |
 | [`dangerous-html`](#dangerous-html) | Segurança | aviso | aviso | aviso |  |
 | [`icon-star-import`](#icon-star-import) | Performance | aviso | aviso | aviso |  |
+| [`page-width-wrapper`](#page-width-wrapper) | Anatomia de página | aviso | aviso | aviso |  |
+| [`page-heading`](#page-heading) | Anatomia de página | info | aviso | aviso |  |
+| [`disabled-wrapper`](#disabled-wrapper) | Componentes | aviso | aviso | aviso |  |
+| [`redundant-children`](#redundant-children) | Componentes | info | info | aviso | sim |
+| [`field-double-label`](#field-double-label) | Componentes | aviso | aviso | aviso |  |
+| [`nested-drawer`](#nested-drawer) | Componentes | aviso | aviso | aviso |  |
+| [`multiple-primary`](#multiple-primary) | Componentes | aviso | aviso | aviso |  |
+| [`select-per-row`](#select-per-row) | Componentes | aviso | aviso | aviso |  |
+| [`cell-control-label`](#cell-control-label) | Acessibilidade | aviso | aviso | aviso | sim |
+| [`raw-input`](#raw-input) | Componentes | aviso | aviso | aviso |  |
+| [`raw-table`](#raw-table) | Componentes | info | aviso | aviso |  |
+| [`data-states`](#data-states) | Componentes | info | aviso | aviso |  |
+| [`manual-format`](#manual-format) | Formatação pt-BR | info | aviso | aviso |  |
+| [`copy-tone`](#copy-tone) | Escrita | aviso | aviso | aviso |  |
+| [`english-copy`](#english-copy) | Escrita | aviso | aviso | aviso |  |
+| [`title-case`](#title-case) | Escrita | info | aviso | aviso |  |
 ### Tokens e cor
 
 #### `hex-color`
@@ -500,6 +516,144 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 - Gravidade: aviso (strict: aviso)
 - Evite: `import * as Icons from "lucide-react"`
 - Use: `import { Plus, Search } from "lucide-react"`
+
+### Anatomia de página
+
+#### `page-width-wrapper`
+
+**Largura da página num wrapper (mx-auto max-w-*).** Use <Page width="wide|medium|narrow|reading">: cabeçalho, filtros e corpo ficam no mesmo eixo. Um wrapper só centraliza o corpo e desalinha o título.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<Page><PageHeading …/><div className="mx-auto max-w-4xl">…</div></Page>`
+- Use: `<Page width="narrow"><PageHeading …/><div>…</div></Page>`
+
+#### `page-heading`
+
+**<h1> solto numa tela com Page.** Use <PageHeading title=… description=… actions=…>: título fixo, ações e subnavegação no lugar certo.
+
+- Gravidade: info (strict: aviso)
+- Evite: `<Page><h1 className="text-title">Histórico</h1>…`
+- Use: `<Page><PageHeading title="Histórico" description="…" />…`
+
+### Composição
+
+#### `disabled-wrapper`
+
+**Wrapper com opacity/pointer-events em volta de controle desabilitado.** Use disabled + disabledReason="…" no Button (fica legível, focável e explica o motivo). Opacidade extra deixa o botão invisível.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<span className="opacity-50" aria-disabled><span className="pointer-events-none"><Button disabled>…`
+- Use: `<Button disabled={demo} disabledReason="Demonstração: nada é gravado">Salvar</Button>`
+
+#### `redundant-children`
+
+**Texto repetido em label e children.** Checkbox/Switch já mostram o label. Remova os children (ou use children só para texto rico).
+
+- Gravidade: info (strict: info) · corrigível com `--fix`
+- Evite: `<Checkbox label={cargo} …>{cargo}</Checkbox>`
+- Use: `<Checkbox label={cargo} … />`
+
+#### `field-double-label`
+
+**FieldBlock em volta de campo que já tem rótulo.** TextField, NumberField, CurrencyField, TextareaField… já desenham o label. Remova o FieldBlock (ou o label do campo).
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<FieldBlock label="Valor"><CurrencyField label="Valor" … /></FieldBlock>`
+- Use: `<CurrencyField label="Valor" … />`
+
+#### `nested-drawer`
+
+**Drawer dentro de Drawer.** Drawer nunca abre drawer: troque o conteúdo do mesmo Drawer (passos) ou use Modal para a decisão curta.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<Drawer …><Drawer …>…</Drawer></Drawer>`
+- Use: `passos no mesmo Drawer · <Modal> para a decisão curta`
+
+#### `multiple-primary`
+
+**Mais de um botão primário na mesma área.** Um primário por área; o resto variant="ghost" ou no ActionMenu (⋯).
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `actions={<><Button>Exportar</Button><Button>Criar vaga</Button></>}`
+- Use: `actions={<><Button variant="ghost">Exportar</Button><Button>Criar vaga</Button></>}`
+
+#### `select-per-row`
+
+**Select/Combobox dentro de célula de tabela.** Status é controle inline: selo (StatusLabel/Badge) que abre Menu. Select por linha pesa e confunde.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `cell: (r) => <Select value={r.etapa} … />`
+- Use: `cell: (r) => <Menu trigger={<StatusLabel …/>}>…</Menu>`
+
+#### `raw-input`
+
+**<input>/<textarea> cru.** TextField, TextareaField, NumberField, CurrencyField, SearchInput, Checkbox, RadioGroup: rótulo, erro, foco e tema já resolvidos.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<textarea className="…" /> · <input value={v} … />`
+- Use: `<TextareaField label="Justificativa" … /> · <TextField label="Nome" … />`
+
+#### `raw-table`
+
+**<table> cru.** DataTable (dados com ordenação, seleção, celular) ou Table (estática).
+
+- Gravidade: info (strict: aviso)
+- Evite: `<table>…</table>`
+- Use: `<DataTable rows={…} columns={…} rowKey={…} />` · `<Table><TableHeader>…<TableBody><TableRow><TableCell>…</Table>`
+
+#### `data-states`
+
+**Tabela com dados assíncronos sem estado de carregamento.** Cinco estados: Skeleton/LoadingState enquanto carrega, Empty (vazio e vazio por filtro), erro com saída.
+
+- Gravidade: info (strict: aviso)
+- Evite: `fetch(…).then(setRows); <DataTable rows={rows} … />`
+- Use: `if (!rows) return <Skeleton …/>; …<DataTable empty={<Empty …/>} … />`
+
+### Acessibilidade em tabelas
+
+#### `cell-control-label`
+
+**Checkbox/Switch em célula sem hideLabel.** Na tabela o rótulo vira só nome acessível: <Checkbox label="Selecionar …" hideLabel />. Sem hideLabel o texto aparece na célula.
+
+- Gravidade: aviso (strict: aviso) · corrigível com `--fix`
+- Evite: `cell: (r) => <Checkbox label={`Selecionar ${r.nome}`} … />`
+- Use: `cell: (r) => <Checkbox label={`Selecionar ${r.nome}`} hideLabel … /> (ou selectionColumn)`
+
+### Formatação à mão
+
+#### `manual-format`
+
+**Formatação pt-BR feita à mão.** formatCurrency / formatPercent / formatNumber de @g4ai/ds: mesmo arredondamento e abreviação em todo o app.
+
+- Gravidade: info (strict: aviso)
+- Evite: `n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })`
+- Use: `formatCurrency(n)`
+
+### Escrita
+
+#### `copy-tone`
+
+**Texto com "com sucesso" ou exclamação.** Particípio + objeto: "Vaga criada", "Convite enviado". Sem "com sucesso" e sem "!".
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `notify("Vaga criada com sucesso!")`
+- Use: `notify("Vaga criada")`
+
+#### `english-copy`
+
+**Texto de interface em inglês.** pt-BR em tudo: Salvar, Cancelar, Carregando…, Buscar, Excluir, Voltar.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<Button>Save</Button> · label="Name"`
+- Use: `<Button>Salvar</Button> · label="Nome"`
+
+#### `title-case`
+
+**Botão em Title Case.** Só a primeira letra maiúscula: "Criar nova vaga", não "Criar Nova Vaga".
+
+- Gravidade: info (strict: aviso)
+- Evite: `<Button>Criar Nova Vaga</Button>`
+- Use: `<Button>Criar nova vaga</Button>`
 
 ## Contribuir com uma regra
 

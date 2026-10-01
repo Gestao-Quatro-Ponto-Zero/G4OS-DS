@@ -166,7 +166,11 @@ export function doctor(target = ".") {
     add(/lang=["'{]?["']?pt-BR/.test(tag) ? "ok" : "warn", 'lang="pt-BR"', r, 'Use <html lang="pt-BR">.', r);
     add(/ds-app/.test(tag) ? "ok" : "info", "className ds-app", /ds-app/.test(tag) ? r : "ausente", "Em apps (não sites) use ds-app: só a área de trabalho rola.", r);
     add(/data-theme/.test(tag) ? "ok" : "warn", "Tema (data-theme)", /data-theme/.test(tag) ? "definido" : "ausente no <html>", 'Adicione data-theme="system" (ou light/dark) ao <html>.', r);
-    add(/themeScript/.test(s) ? "ok" : "warn", "themeScript no <head>", /themeScript/.test(s) ? r : "ausente", "<script dangerouslySetInnerHTML={{ __html: themeScript }} /> no <head>: evita piscar o tema errado.", r);
+    // Vite: o themeScript costuma ser injetado por um plugin (transformIndexHtml) no vite.config
+    const viteCfg = ["vite.config.ts", "vite.config.mts", "vite.config.js", "vite.config.mjs"].map((n) => join(root, n)).find((p) => existsSync(p));
+    const injected = viteCfg && /themeScript/.test(readFileSync(viteCfg, "utf8")) ? rel(viteCfg) : null;
+    const hasTheme = /themeScript/.test(s) || injected;
+    add(hasTheme ? "ok" : "warn", "themeScript no <head>", hasTheme ? (injected && !/themeScript/.test(s) ? `${injected} (transformIndexHtml)` : r) : "ausente", "<script dangerouslySetInnerHTML={{ __html: themeScript }} /> no <head> (Next) ou um plugin transformIndexHtml no vite.config (Vite): evita piscar o tema errado.", r);
     if (deps.next && /<html\b/.test(s) && !/suppressHydrationWarning/.test(tag)) add("info", "suppressHydrationWarning", r, "Em Next, o themeScript altera data-theme antes da hidratação: use <html … suppressHydrationWarning>.", r);
   }
   const fontOk = /Figtree/i.test(cssText) || all.some(([, x]) => /Figtree/i.test(x)) || /--ds-font-sans/.test(cssText);

@@ -11,7 +11,7 @@ O servidor MCP vem dentro do pacote (`npx -y @g4ai/ds mcp`). Roda local, sem red
 
 | Tipo | Itens |
 | --- | --- |
-| Ferramentas (9, todas só leitura) | `search`, `get_component`, `list_blocks`, `get_block`, `get_guide`, `get_tokens`, `theme_from_colors`, `audit`, `doctor` |
+| Ferramentas (10, todas só leitura) | `plan_screen` (pedido → anatomia, blocos e componentes), `search`, `get_component`, `list_blocks`, `get_block`, `get_guide`, `get_tokens`, `theme_from_colors`, `audit`, `doctor` |
 | Prompts | `adaptar-projeto`, `criar-tela`, `revisar-tela`. Aparecem como comandos `/` no Claude Code, VS Code e Zed |
 | Recursos | `g4os-ds://core`, `g4os-ds://tokens`, `g4os-ds://llms`, `g4os-ds://components/{module}`, `g4os-ds://blocks/{slug}`, `g4os-ds://guides/{slug}`, com autocompletar |
 | Outros | `ping`, `logging/setLevel`, `completion/complete`, paginação por `cursor` |

@@ -86,7 +86,7 @@ export default function SaasBilling() {
   });
   const q = filters.state.query;
   const sort = useSort(filters.rows, { valor: (i) => i.amount, venc: (i) => i.due }, { key: "venc", dir: "asc" });
-  const pages = usePagination(sort.rows, 10);
+  const pages = usePagination(sort.rows, 10, { resetKey: [filters.state, sort.sort] });
   const sel = useSelection(pages.rows.map((i) => i.id));
 
   const sum = (s: InvoiceStatus[]) => invoices.filter((i) => s.includes(i.status)).reduce((t, i) => t + i.amount, 0);

@@ -88,7 +88,7 @@ const fields: FilterField<Event>[] = [
 export default function SettingsAuditLogBlock() {
   const query = useFrameQuery();
   const filters = useFilters(events, { fields, search: (e) => [nameOf(e.who), e.action, e.target, e.ip], me: me.id, now: today });
-  const pages = usePagination(filters.rows, 10);
+  const pages = usePagination(filters.rows, 10, { resetKey: filters.state });
   const q = filters.state.query;
   const open = events.find((e) => e.id === query.get("id")) ?? null;
 

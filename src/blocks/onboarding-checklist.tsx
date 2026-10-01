@@ -124,7 +124,7 @@ export default function OnboardingChecklistBlock() {
                           aria-checked={isDone}
                           aria-label={`Marcar “${t.title}” como ${isDone ? "pendente" : "concluído"}`}
                           onClick={() => toggle(t.id)}
-                          className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors", isDone ? "border-ok bg-ok text-on-ink" : "border-line-strong bg-surface hover:border-ink")}
+                          className={cn("ds-hit grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors", isDone ? "border-ok bg-ok text-on-ink" : "border-line-strong bg-surface hover:border-ink")}
                         >
                           {isDone && <Check className="h-3 w-3" strokeWidth={3} />}
                         </button>

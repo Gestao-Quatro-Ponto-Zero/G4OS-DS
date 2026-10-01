@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode, type RefObject } from "react";
 import { cn } from "../lib/cn";
+import { tintFill } from "../lib/color";
 import { AgentComposer, Waveform, type SlashCommand } from "./ai-workspace";
 import { notify } from "./feedback";
 import { FileCard } from "./media";
@@ -705,7 +706,7 @@ export function StepGroup({
         )}
         <span className={cn("truncate", running && "ds-shimmer")}>{title}</span>
         {steps.length > 0 && (
-          <span className="shrink-0 text-[11.5px] tabular-nums text-muted/80">
+          <span className="shrink-0 text-[11.5px] tabular-nums text-muted">
             {running ? `${done}/${steps.length}` : `${steps.length} passo${steps.length === 1 ? "" : "s"}`}
           </span>
         )}
@@ -1046,7 +1047,7 @@ export function ToolsBar({ tools, max = 5, onManage, className }: { tools: Conne
         {errors > 0 && <span className="ml-1.5 font-medium text-rose">· {errors} com erro</span>}
       </span>
       <span className="flex-1" />
-      <span className="flex items-center gap-1.5" aria-label={tools.map((t) => t.name).join(", ")}>
+      <span className="flex items-center gap-1.5" role="group" aria-label={tools.map((t) => t.name).join(", ")}>
         {shown.map((t) => (
           <Tooltip key={t.id} content={`${t.name}${t.status === "error" ? " · reconectar" : ""}`}>
             <span className="relative grid h-5 w-5 place-items-center rounded-[5px] text-[10px] font-semibold text-on-ink [&_svg]:h-3 [&_svg]:w-3" style={{ background: t.tint ?? "var(--ds-ink-soft)" }}>
@@ -1142,8 +1143,9 @@ export function AgentPicker({ agents, value, onChange }: { agents: AgentOption[]
               aria-checked={on}
               aria-label={a.name}
               onClick={() => onChange(a.id)}
-              className={cn("grid h-7 w-7 place-items-center rounded-full text-[10px] font-bold transition-[box-shadow,opacity]", on ? "ring-2 ring-ink ring-offset-2 ring-offset-surface" : "opacity-60 hover:opacity-100")}
-              style={{ background: a.tint ?? "var(--ds-ink)", color: "var(--ds-on-ink)" }}
+              // ds-audit-ignore white-black: iniciais brancas sobre o tint do agente (identidade), escurecido até AA por tintFill
+              className={cn("grid h-7 w-7 place-items-center rounded-full text-[10px] font-bold text-white transition-[box-shadow,filter]", on ? "ring-2 ring-ink ring-offset-2 ring-offset-surface" : "saturate-50 hover:saturate-100")}
+              style={{ background: tintFill(a.tint, "var(--ds-ink-soft)") }}
             >
               {a.initials}
             </button>
@@ -1302,7 +1304,7 @@ export function SessionHeader({
           )}
         >
           {recording ? <span aria-hidden className="h-2 w-2 rounded-full bg-rose motion-safe:animate-pulse" /> : <Mic />}
-          <span className="hidden lg:inline">{recording ? "Gravando reunião" : "Gravar reunião"}</span>
+          <span className="max-lg:sr-only">{recording ? "Gravando reunião" : "Gravar reunião"}</span>
         </button>
       )}
       {onSearch && (
@@ -1847,7 +1849,8 @@ export function ModelPicker({
   const groups = Array.from(new Set(models.map((m) => m.group ?? "Modelos")));
   const curAgent = agents?.find((a) => a.id === agent) ?? agents?.[0];
   const avatar = (a: AgentOption, size = "h-5 w-5 text-[10px] tracking-tight") => (
-    <span aria-hidden className={cn("grid shrink-0 place-items-center rounded-full font-bold", size)} style={{ background: a.tint ?? "var(--ds-ink)", color: "var(--ds-on-ink)" }}>
+    // ds-audit-ignore white-black: iniciais brancas sobre o tint do agente (identidade), escurecido até AA por tintFill
+    <span aria-hidden className={cn("grid shrink-0 place-items-center rounded-full font-bold text-white", size)} style={{ background: tintFill(a.tint, "var(--ds-ink-soft)") }}>
       {a.initials}
     </span>
   );

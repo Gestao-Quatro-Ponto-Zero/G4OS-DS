@@ -7,7 +7,7 @@ export const meta: PageMeta = { title: "DataGrid · teclado, estados e desempenh
 const big = makeContas(10000);
 
 export default function Page() {
-  const [state, setState] = useState<"ok" | "loading" | "error" | "empty">("ok");
+  const [state, setState] = useState<"ok" | "loading" | "refreshing" | "error" | "empty" | "filtered">("ok");
   const [loaded, setLoaded] = useState(() => makeContas(40));
   const [loadingMore, setLoadingMore] = useState(false);
   const more = () => {
@@ -25,7 +25,7 @@ export default function Page() {
         </Demo>
       </DocSection>
       <DocSection title="Teclado">
-        <div className="overflow-x-auto rounded-xl border border-line">
+        <div tabIndex={0} role="region" aria-label="Tabela" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
           <table className="w-full text-left text-[13px]">
             <tbody className="divide-y divide-line">
               {[
@@ -47,15 +47,33 @@ export default function Page() {
           </table>
         </div>
       </DocSection>
-      <DocSection title="Estados" rule="Carregando usa esqueleto com a forma das colunas; erro oferece tentar de novo; vazio explica e oferece saída.">
-        <SegmentedControl label="Estado" value={state} onChange={setState} options={[{ value: "ok", label: "Com dados" }, { value: "loading", label: "Carregando" }, { value: "error", label: "Erro" }, { value: "empty", label: "Vazio" }]} />
+      <DocSection title="Estados" rule="Carregando (sem linhas) usa esqueleto com a forma das colunas; recarregando (com linhas) mantém as linhas com uma barra no topo; erro oferece tentar de novo; vazio explica; vazio por filtro oferece “Limpar filtros”.">
+        <div className="max-w-full overflow-x-auto pb-1">
+          <SegmentedControl
+            label="Estado"
+            value={state}
+            onChange={setState}
+            options={[
+              { value: "ok", label: "Com dados" },
+              { value: "loading", label: "Carregando" },
+              { value: "refreshing", label: "Recarregando" },
+              { value: "error", label: "Erro" },
+              { value: "empty", label: "Vazio" },
+              { value: "filtered", label: "Vazio por filtro" },
+            ]}
+          />
+        </div>
         <DataGrid
           label="Estados"
-          rows={state === "empty" ? [] : loaded}
+          rows={state === "empty" || state === "filtered" || state === "loading" ? [] : loaded}
+          filtered={state === "filtered"}
+          onClearFilters={() => setState("ok")}
+          noun="conta"
+          gender="f"
           columns={contaColumns.slice(0, 6)}
           rowKey={(r) => r.id}
           height={360}
-          loading={state === "loading"}
+          loading={state === "loading" || state === "refreshing"}
           error={state === "error" ? { message: "O servidor demorou para responder. Suas alterações estão salvas.", onRetry: () => setState("ok") } : undefined}
           hasMore={state === "ok" && loaded.length < 160}
           loadingMore={loadingMore}
@@ -67,7 +85,9 @@ export default function Page() {
         <PropsTable
           rows={[
             ["virtualize", "boolean", "auto (> 200)", "Renderiza só as linhas visíveis. Altura por densidade: 44 / 36px."],
-            ["loading · error · empty", "boolean · { message, onRetry } · ReactNode", "—", "Estados do corpo."],
+            ["loading", "boolean", "false", "Sem linhas: esqueleto. Com linhas (servidor recarregando): mantém as linhas, esmaecidas, com barra de progresso."],
+            ["error · empty", "{ message, onRetry } · ReactNode", "—", "Estados do corpo."],
+            ["filtered · onClearFilters", "boolean · () => void", "—", "O vazio vem do filtro: “Nenhuma conta com estes filtros” + “Limpar filtros”."],
             ["hasMore · onLoadMore · loadingMore · loadMode", '… · "button" | "infinite"', '"button"', "Carregar mais por botão ou ao chegar no fim."],
             ["mobile", '"scroll" | "cards"', '"scroll"', "No celular: rolagem lateral com a 1ª coluna fixa, ou um card por linha."],
             ["exportFileName", "string", "—", "Botão Exportar: CSV pt-BR (;) do que está na tela ou dos selecionados."],

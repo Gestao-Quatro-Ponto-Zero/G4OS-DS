@@ -4,6 +4,8 @@
 
 - **Rótulo sempre visível, acima do campo.** Placeholder é exemplo ("Ex.: Diretor comercial"), nunca rótulo.
 - **Regra do `label` (igual em todos os campos do DS):** `label` vira o rótulo visível acima do campo e o nome acessível (`TextField`, `Select`, `Combobox`, `MultiSelect`, `NativeSelect`, `CheckboxGroup`, `DatePicker`, `DateInput`, `Checkbox` ao lado da caixa). Dentro de `<FieldBlock label=…>` o rótulo é do FieldBlock e o campo não repete. `hideLabel` deixa só o nome acessível: use em toolbar, célula de tabela e filtro. Controles de barra (`Select size="compact"`, `ToggleGroup`, `SegmentedControl`) já escondem por padrão. Nunca faça um `<p>` de rótulo à mão acima de um campo.
+- **Props com o mesmo nome em todos os campos:** `label`, `hideLabel`, `hint`, `error`, `optional`, `disabled`. O retorno de valor segue a família: **seleção em popup** (`Select`, `Combobox`, `MultiSelect`, `CheckboxGroup`, `DatePicker`, `NativeSelect`) usa `value` + `onValueChange(valor)`; **campos de digitação e pickers clássicos** (`TextField`, `TextareaField`, `NumberField`, `CurrencyField`, `MaskedField`, `PasswordField`, `TagInput`, `RadioGroup`, `ToggleGroup`, `DateInput`, `TimePicker`…) usam `value` + `onChange(valor)`, sempre com o valor (nunca o evento); liga/desliga (`Checkbox`, `Switch`) usa `checked` + `onCheckedChange`. O TypeScript acusa a troca.
+- `FieldBlock` vale para qualquer campo do DS: dentro dele, o campo não desenha rótulo nem ajuda e herda id, `aria-describedby` e estado de erro.
 - Uma coluna por padrão. `FieldGrid` põe pares curtos lado a lado (cidade + UF, início + fim) a partir de 640 px; no celular volta a uma coluna.
 - Agrupe em seções com título quando passar de ~8 campos. Formulário longo mora em página ou drawer, em `ReadingColumn` (620 px).
 - Ajuda abaixo do campo em uma frase; erro substitui a ajuda, em `text-rose`, específico e com exemplo.
@@ -65,10 +67,13 @@ Edição inline de um campo: `InlineEdit`. Grupo de alternância com ícones: `T
 | Um campo (título, status, dono) | inline no próprio registro (selo que abre menu, clique para editar) |
 | Formulário curto sem sair da lista | `Drawer` (500 px) |
 | Decisão curta com 1–3 campos | `Modal` |
-| Formulário longo ou com etapas | página própria; com etapas, `Stepper` no topo |
+| Formulário longo ou com etapas | página própria; com etapas, `FormWizard` (Stepper no topo, validação por etapa) |
+| Configurações e registro editados no lugar | campos na página + `SaveBar` (aparece com alteração, ⌘S salva, aviso ao sair) |
 
-- Status é **controle inline** (selo que abre menu), nunca um `Select` por linha de tabela.
+- Status é **controle inline** (selo que abre menu: `InlineSelect`), nunca um `Select` por linha de tabela. `disabledReason` explica quando não dá para trocar ("Único administrador").
 - Fechar um drawer com alterações não salvas pede confirmação.
+- **`SaveBar`**: uma por tela, no fim da área que rola; fica inerte sem alteração; `saveDisabledReason` explica por que não dá para salvar (validação pendente); `error` mantém a barra aberta com o motivo. Toast só depois que salvou.
+- **`FormWizard`**: 3–5 etapas com nome de conteúdo; cada etapa valida ao avançar (`validate` pode ser assíncrona) e o erro aparece no topo da etapa; Voltar nunca valida; a última ação tem o verbo do resultado ("Criar vaga"). Os dados ficam no estado do app: ir e voltar não apaga nada.
 
 ## Máscaras e formatos brasileiros
 
