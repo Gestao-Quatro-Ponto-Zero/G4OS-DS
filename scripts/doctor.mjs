@@ -94,8 +94,9 @@ export function doctor(target = ".") {
 
   // React
   const react = ver("react");
-  if (!react) add("block", "React", "não encontrado", "O DS é React 19.");
-  else if (major(react) < 19) add("block", "React", `versão ${react}`, "Atualize para React 19 antes de migrar (npm i react@19 react-dom@19; em Next, Next 15+).");
+  if (!react) add("block", "React", "não encontrado", "O DS funciona com React 18.2+ e 19.");
+  else if (major(react) < 18 || (major(react) === 18 && parse(react)[1] < 2)) add("block", "React", `versão ${react}`, "O DS precisa de React 18.2+ (ou 19): npm i react@18.3 react-dom@18.3, ou react@19 react-dom@19 (Next 15+).");
+  else if (major(react) === 18) add("ok", "React", `${react} (suportado; o DS também roda no 19)`);
   else add("ok", "React", react);
   const rd = ver("react-dom");
   if (react && rd && installed("react") && installed("react-dom") && installed("react") !== installed("react-dom")) add("warn", "react-dom", `${rd} ≠ react ${react}`, "Instale react e react-dom na mesma versão.");

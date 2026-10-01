@@ -16,6 +16,7 @@ export * from "./components/dashboard";
 export * from "./components/data";
 export * from "./components/pipeline";
 export { cn } from "./lib/cn";
+export { inertProps } from "./lib/inert";
 export { usePortalContainer } from "./lib/portal";
 export * from "./lib/text";
 export * from "./lib/format";

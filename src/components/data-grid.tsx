@@ -6,7 +6,6 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, ChevronDown, ChevronR
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -27,6 +26,7 @@ import { ContextMenu, Menu, type MenuEntry } from "./overlays-extra";
 import { popupClass } from "./overlays";
 import { Button, Empty } from "./primitives";
 import { Spinner } from "./states";
+import { useIsomorphicLayoutEffect as useLayoutEffect } from "../lib/layout-effect";
 
 /*
  * DataGrid: a tabela "de trabalho" do DS. Use quando a lista É a tela

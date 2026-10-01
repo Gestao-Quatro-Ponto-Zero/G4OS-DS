@@ -13,7 +13,7 @@ Trabalho longo: faça em fases, registre o progresso em `MIGRATION.md` na raiz d
 npx g4os-ds doctor            # ou: node <DS>/scripts/cli.mjs doctor .
 ```
 
-- React < 19, Tailwind < 4 (ou `@tailwind base`), sem Base UI → **não migre ainda**. Proponha ao usuário um plano de atualização (React 19 / Next 15+, `npx @tailwindcss/upgrade`) e só continue com o de acordo dele.
+- React < 18.2, Tailwind < 4 (ou `@tailwind base`), sem Base UI → **não migre ainda**. Proponha ao usuário um plano de atualização (React 18.3 ou 19, `npx @tailwindcss/upgrade`) e só continue com o de acordo dele. React 18.2+ (Next 14) serve: use `inertProps` em vez de `inert={…}` e `forwardRef` nos seus componentes usados como gatilho.
 - MUI/Chakra/Ant/styled-components: convivem durante a migração, mas **não há mapeamento 1:1**; a estratégia é reescrever por página e remover a lib no fim. Avise o custo.
 - shadcn/ui: importe `@g4ai/ds/shadcn.css` na fase 1 para tudo herdar os tokens já; depois troque por componentes do DS página a página.
 

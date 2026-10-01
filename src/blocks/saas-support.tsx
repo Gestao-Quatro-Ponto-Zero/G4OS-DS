@@ -64,7 +64,7 @@ export default function SaasSupport() {
   const [tickets, setTickets] = useState(baseTickets);
   const id = useFrameParam("id");
   // Desktop abre o primeiro da fila; no celular a fila vem primeiro.
-  const [selected, setSelected] = useState<string | null>(() => id ?? (window.matchMedia("(min-width: 1024px)").matches ? baseTickets.find((t) => t.priority === "urgente" && t.status !== "resolvido")?.id ?? null : null));
+  const [selected, setSelected] = useState<string | null>(() => id ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches ? baseTickets.find((t) => t.priority === "urgente" && t.status !== "resolvido")?.id ?? null : null));
   const [reply, setReply] = useState("");
   useEffect(() => {
     if (id) setSelected(id);

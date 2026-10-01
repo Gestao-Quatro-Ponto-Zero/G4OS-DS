@@ -9,13 +9,13 @@
 Design system para construir **qualquer aplicação G4 OS** — CRM, ATS, ERP, financeiro, IA, portal do cliente, produto SaaS — com a mesma linguagem visual:
 
 - **Tokens** em três camadas (primitivos → semânticos → utilitários), com **tema escuro** e **marcas de cliente** trocando só variáveis.
-- **Componentes**: React 19 + Base UI + Tailwind v4, em português, acessíveis, responsivos. Gráficos em SVG sem dependência.
+- **Componentes**: React 19 (compatível com 18.2+) + Base UI + Tailwind v4, em português, acessíveis, responsivos. Gráficos em SVG sem dependência.
 - **Blocos**: 85+ telas completas (dashboards, pipelines, registros, listas, IA, login, configurações) para copiar e trocar os dados.
 - **Feito para agentes**: servidor MCP, `llms.txt`, guia `ai/` gerado do código e skills para Claude Code.
 
 ## Instalar
 
-Requisitos: React 19, Tailwind CSS 4, Node 20+.
+Requisitos: React 18.2+ ou 19, Tailwind CSS 4, Node 20+ ([React 18](docs/guias/instalacao.md#react-18)).
 
 ```bash
 pnpm add @g4ai/ds @base-ui/react lucide-react        # ou npm i / yarn add
@@ -142,7 +142,7 @@ As regras do DS (tokens, tipografia, anatomia de página, composição de compon
 
 ```bash
 npx g4os-ds init                      # g4os-ds.config.json + scripts ds:* + workflow de CI (--eslint, --hook lefthook, --baseline)
-npx g4os-ds doctor                    # pré-requisitos: React 19, Tailwind v4, ordem do CSS, tema, fonte, React duplicado
+npx g4os-ds doctor                    # pré-requisitos: React 18.2+/19, Tailwind v4, ordem do CSS, tema, fonte, React duplicado
 npx g4os-ds audit                     # o que foge do DS, com a troca sugerida
 npx g4os-ds audit --fix               # aplica as trocas seguras (bg-white→bg-surface, rounded-[12px]→rounded-card…)
 npx g4os-ds audit --changed           # só o que mudou (--staged no pre-commit, --since origin/main no PR)

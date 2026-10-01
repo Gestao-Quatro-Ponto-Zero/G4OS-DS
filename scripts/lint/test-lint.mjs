@@ -412,6 +412,16 @@ await test("doctor: bloqueia sem pré-requisitos, aponta ordem do CSS e formatos
   rmSync(dir, { recursive: true, force: true });
 });
 
+await test("doctor: React 18.2+ é suportado, abaixo disso bloqueia", () => {
+  const deps = (react) => ({ dependencies: { react, "react-dom": react, "@g4ai/ds": "0.5.2", "@base-ui/react": "1.8.0", "lucide-react": "1.45.0" }, devDependencies: { tailwindcss: "4.3.0" } });
+  for (const [react, level] of [["18.3.1", "ok"], ["19.2.0", "ok"], ["18.1.0", "block"], ["17.0.2", "block"]]) {
+    const dir = project({ "src/a.tsx": "export const A = () => null;\n" }, deps(react));
+    const j = JSON.parse(run(["doctor", "--format", "json"], dir).stdout);
+    assert.equal(j.checks.find((c) => c.label === "React").level, level, `react ${react}`);
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 await test("rules: lista em markdown e json", () => {
   const md = run(["rules"], root).stdout;
   for (const id of Object.keys(RULES)) assert.ok(md.includes(`\`${id}\``), id);

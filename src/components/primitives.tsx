@@ -2,12 +2,14 @@
 
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { ArrowUpRight, Inbox } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { forwardRef, useEffect, useId, useState } from "react";
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
-  ComponentType,
+  ForwardedRef,
+  JSXElementConstructor,
   ReactNode,
+  RefAttributes,
 } from "react";
 import { cn } from "../lib/cn";
 import { tintFill } from "../lib/color";
@@ -26,20 +28,26 @@ import { initials as initialsOf } from "../lib/text";
  *   import { setLinkComponent } from "@g4ai/ds";
  *   setLinkComponent(Link);
  */
-type LinkLike = ComponentType<
-  AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+// JSXElementConstructor (e não ComponentType): com @types/react@18 o
+// ComponentType compara propTypes, e o Link do Next (href: string | UrlObject)
+// deixaria de ser aceito.
+type LinkLike = JSXElementConstructor<
+  AnchorHTMLAttributes<HTMLAnchorElement> & { href: string } & RefAttributes<HTMLAnchorElement>
 >;
 // eslint-disable-next-line jsx-a11y/anchor-has-content -- o conteúdo chega por props.children
-let LinkComponent: LinkLike = (props) => <a {...props} />;
+let LinkComponent: LinkLike = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }>((props, ref) => <a ref={ref} {...props} />);
 export function setLinkComponent(component: LinkLike) {
   LinkComponent = component;
 }
-export function DsLink(
+// forwardRef (e não ref como prop do React 19): no React 18 o Base UI precisa
+// da ref para ancorar tooltip/menu quando o link é o gatilho.
+export const DsLink = forwardRef(function DsLink(
   props: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string },
+  ref: ForwardedRef<HTMLAnchorElement>,
 ) {
   const C = LinkComponent;
-  return <C {...props} />;
-}
+  return <C {...props} ref={ref} />;
+});
 
 /* ------------------------------------------------------------------ */
 /* Tons                                                                */
@@ -368,7 +376,7 @@ export function buttonClass({
  * `disabled` + `disabledReason`: continua focável (aria-disabled), não
  * dispara e explica o motivo num tooltip ("Indisponível na demonstração").
  */
-export function Button({
+export const Button = forwardRef(function Button({
   children,
   variant = "primary",
   size = "md",
@@ -384,12 +392,12 @@ export function Button({
   href?: string;
   /** Por que está desabilitado. Mostra tooltip no hover/foco e é lido pelo leitor de tela. */
   disabledReason?: ReactNode;
-}) {
+}, ref: ForwardedRef<HTMLButtonElement>) {
   const reasonId = useId();
   const cls = buttonClass({ variant, size, className });
   if (href && !disabled)
     return (
-      <DsLink href={href} className={cls}>
+      <DsLink ref={ref as unknown as ForwardedRef<HTMLAnchorElement>} href={href} className={cls}>
         {children}
       </DsLink>
     );
@@ -400,6 +408,7 @@ export function Button({
           delay={150}
           render={
             <button
+              ref={ref}
               type={type}
               className={cls}
               {...rest}
@@ -425,22 +434,23 @@ export function Button({
     );
   }
   return (
-    <button type={type} className={cls} disabled={disabled} {...rest}>
+    <button ref={ref} type={type} className={cls} disabled={disabled} {...rest}>
       {children}
     </button>
   );
-}
+});
 
 /** Botão quadrado só com ícone. `label` é obrigatório (aria-label + title). */
-export function IconButton({
+export const IconButton = forwardRef(function IconButton({
   label,
   children,
   size = "md",
   className,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; size?: "sm" | "md" }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; size?: "sm" | "md" }, ref: ForwardedRef<HTMLButtonElement>) {
   return (
     <button
+      ref={ref}
       type="button"
       aria-label={label}
       title={label}
@@ -454,7 +464,7 @@ export function IconButton({
       {children}
     </button>
   );
-}
+});
 
 /** Chip de filtro binário. Ligado = tinta escura, desligado = contorno. */
 export function FilterChip({

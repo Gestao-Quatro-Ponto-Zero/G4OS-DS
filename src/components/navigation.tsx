@@ -421,7 +421,7 @@ export function ActionMenu({
 export type NavItem = {
   href: string;
   label: string;
-  icon: ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon: ComponentType<{ className?: string; strokeWidth?: number | string }>;
   /** Prefixo que marca o item como ativo; padrão = href. */
   match?: string;
   /** Contador de atenção (alertas). */

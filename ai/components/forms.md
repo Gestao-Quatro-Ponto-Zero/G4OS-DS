@@ -417,7 +417,7 @@ Exemplo (showcase `#/p/estrutura-item-e-tabela`):
 Liga um controle ao rótulo: dentro de FieldBlock usa o contexto; fora, desenha rótulo/ajuda/erro (a menos que `hideLabel`).
 
 ```ts
-useControlLabel(props): { id: string; describedBy: string | undefined; invalid: boolean; wrap: (control: ReactNode) => string | num…
+useControlLabel(props): { id: string; describedBy: string | undefined; invalid: boolean; wrap: (control: ReactNode) => JSX.Element; }
 ```
 
 ## useFieldContext (hook)

@@ -5,14 +5,15 @@ import {
   Children,
   cloneElement,
   createContext,
+  forwardRef,
   isValidElement,
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type ForwardedRef,
   type HTMLAttributes,
   type MutableRefObject,
   type RefObject,
@@ -21,6 +22,7 @@ import {
 } from "react";
 import { cn } from "../lib/cn";
 import { Tooltip } from "./overlays-extra";
+import { useIsomorphicLayoutEffect as useLayoutEffect } from "../lib/layout-effect";
 
 /*
  * Conversa (equivalentes a Bubble, Marker e Message Scroller do shadcn/ui).
@@ -163,12 +165,12 @@ function BubbleMeta({ align, status, time, onRetry }: { align: "start" | "end"; 
  * O balão em si. Use quando precisar de controle: `render` troca o elemento
  * (um link ou botão que abre a mensagem) mantendo o visual.
  */
-export function BubbleContent({
+export const BubbleContent = forwardRef(function BubbleContent({
   children,
   render,
   className,
   ...rest
-}: { children?: ReactNode; render?: ReactElement<{ className?: string; children?: ReactNode }>; className?: string } & Omit<HTMLAttributes<HTMLElement>, "children" | "className">) {
+}: { children?: ReactNode; render?: ReactElement<{ className?: string; children?: ReactNode }>; className?: string } & Omit<HTMLAttributes<HTMLElement>, "children" | "className">, ref: ForwardedRef<HTMLElement>) {
   const { variant, align, position, clamp } = useContext(BubbleCtx);
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
@@ -205,13 +207,14 @@ export function BubbleContent({
   ) : (
     children
   );
-  if (render) return cloneElement(render, { ...rest, className: cn(cls, render.props.className), children: body });
+  // ref encaminhada: no React 18 o Tooltip (Base UI) precisa dela para ancorar.
+  if (render) return cloneElement(render, { ...rest, ref, className: cn(cls, render.props.className), children: body } as Record<string, unknown>);
   return (
-    <div {...rest} className={cls}>
+    <div {...rest} ref={ref as ForwardedRef<HTMLDivElement>} className={cls}>
       {body}
     </div>
   );
-}
+});
 
 /** Linha de reações sobreposta à borda do balão. Use com BubbleReaction. */
 export function BubbleReactions({ children, side = "bottom", align, className }: { children: ReactNode; side?: "top" | "bottom"; align?: "start" | "end"; className?: string }) {

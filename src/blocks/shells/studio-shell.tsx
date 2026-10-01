@@ -108,7 +108,7 @@ const tabs: NavItem[] = [
 
 const isActive = (current: string, item: { href: string; match?: string }) => current === item.href || (item.match ? current.startsWith(item.match) : current.startsWith(`${item.href}?`));
 
-function SideLink({ href, label, icon: Icon, active, leading, trailing }: { href: string; label: string; icon?: ComponentType<{ className?: string; strokeWidth?: number }>; active?: boolean; leading?: ReactNode; trailing?: ReactNode }) {
+function SideLink({ href, label, icon: Icon, active, leading, trailing }: { href: string; label: string; icon?: ComponentType<{ className?: string; strokeWidth?: number | string }>; active?: boolean; leading?: ReactNode; trailing?: ReactNode }) {
   return (
     <a
       href={href}

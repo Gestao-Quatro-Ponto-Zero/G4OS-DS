@@ -15,7 +15,7 @@ export const daysFromToday = (isoDate: string) => Math.round((new Date(`${isoDat
 
 /** Parâmetro da rota do frame: #/frame/saas-customer?id=3 → "3". */
 export function useFrameParam(name: string) {
-  const read = () => new URLSearchParams(location.hash.split("?")[1] ?? "").get(name);
+  const read = () => (typeof window === "undefined" ? null : new URLSearchParams(window.location.hash.split("?")[1] ?? "").get(name));
   const [value, setValue] = useState(read);
   useEffect(() => {
     const on = () => setValue(read());

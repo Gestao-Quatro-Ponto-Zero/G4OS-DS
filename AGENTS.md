@@ -13,7 +13,7 @@ npx g4os-ds init                                # auditoria contínua: config, s
 claude mcp add g4os-ds -- npx -y @g4ai/ds mcp   # MCP: plan_screen, search, get_component, get_block, get_guide, audit…
 ```
 
-Guia da versão instalada: `node_modules/@g4ai/ds/ai/core.md`. Na web: https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt. Detalhes: [usar com IA](docs/guias/usar-com-ia.md).
+Funciona com React 18.2+ e 19 (no 18: `{...inertProps(flag)}` em vez de `inert={…}`; ver [instalação › React 18](docs/guias/instalacao.md#react-18)). Guia da versão instalada: `node_modules/@g4ai/ds/ai/core.md`. Na web: https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt. Detalhes: [usar com IA](docs/guias/usar-com-ia.md).
 
 ## Comandos (neste repositório)
 
@@ -23,6 +23,7 @@ npm run ai:build         # regenera ai/ (guia para agentes) a partir do código
 npm run lint             # ESLint: typescript-eslint, react-hooks, jsx-a11y e o plugin @g4ai/ds/eslint
 npm run audit:self       # g4os-ds audit em src/, templates/ e showcase/ (--fix aplica as trocas seguras)
 npm run test:lint        # regras de auditoria (fixtures), plugin ESLint, init, doctor
+npm run test:react       # React 18 e 19: tipos, render no servidor e no cliente de blocos e páginas (também no CI)
 npm run showcase:build   # compila o site de documentação em showcase/dist
 npm run showcase:watch   # recompila a cada mudança
 npm run showcase         # build + servidor em localhost:4173

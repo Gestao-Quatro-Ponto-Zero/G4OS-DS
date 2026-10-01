@@ -151,7 +151,7 @@ export function useControlLabel({ id, label, hideLabel, hint, error, optional }:
   const invalid = Boolean(error) || Boolean(ctx?.invalid);
   const showLabel = !ctx && !hideLabel;
   const wrap = (control: ReactNode) => {
-    if (ctx || (!showLabel && !ownDesc)) return control;
+    if (ctx || (!showLabel && !ownDesc)) return <>{control}</>;
     return (
       <div className="min-w-0">
         {showLabel && (

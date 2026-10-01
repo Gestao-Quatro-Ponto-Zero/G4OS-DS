@@ -10,8 +10,8 @@ npx g4os-ds doctor
 
 | Situação | Caminho |
 | --- | --- |
-| React 19 + Tailwind v4 | migre direto |
-| React 18 / Next 14 | atualize antes (React 19, Next 15+) num PR separado |
+| React 18.2+ ou 19 + Tailwind v4 | migre direto (Next 14 e 15+ funcionam; ver [React 18](instalacao.md#react-18)) |
+| React 17 ou 18.0–18.1 | atualize para 18.3 ou 19 antes, num PR separado |
 | Tailwind v3 (`tailwind.config.js`, `@tailwind base`) | `npx @tailwindcss/upgrade` antes |
 | shadcn/ui | importe `@g4ai/ds/shadcn.css` já na fase 1 (tudo herda os tokens); troque por componentes do DS por página |
 | MUI, Chakra, Ant, styled-components | convivem; **reescreva por página** (não há mapeamento 1:1) e remova a lib no fim |

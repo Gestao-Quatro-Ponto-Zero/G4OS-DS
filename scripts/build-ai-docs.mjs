@@ -131,6 +131,11 @@ function describeExport(sym) {
   if (ts.isClassDeclaration(decl)) return { name, kind: "class", summary };
   let fn = ts.isFunctionDeclaration(decl) ? decl : null;
   if (!fn && ts.isVariableDeclaration(decl) && decl.initializer && (ts.isArrowFunction(decl.initializer) || ts.isFunctionExpression(decl.initializer))) fn = decl.initializer;
+  // forwardRef(function X(props, ref) {…}) / memo(…): documenta a função interna.
+  if (!fn && ts.isVariableDeclaration(decl) && decl.initializer && ts.isCallExpression(decl.initializer) && /^(forwardRef|memo)$/.test(decl.initializer.expression.getText().replace(/^React\./, ""))) {
+    const inner = decl.initializer.arguments[0];
+    if (inner && (ts.isArrowFunction(inner) || ts.isFunctionExpression(inner))) fn = inner;
+  }
   if (fn) {
     const isComponent = /^[A-Z]/.test(name);
     const isHook = /^use[A-Z]/.test(name);
@@ -397,6 +402,8 @@ function renderCore() {
 
 Leia isto inteiro antes de escrever ou mudar UI num projeto com \`@g4ai/ds\`. Detalhes ao lado (mesma pasta): \`components/<módulo>.md\` (props + exemplos), \`blocks/<bloco>.md\`, \`tokens.md\`, \`manifest.json\`. Com o MCP \`g4os-ds\` ligado, use \`plan_screen\` (pedido → anatomia, bloco e componentes), \`get_component\`, \`get_block\` e \`audit\`.
 
+Requisitos: React 18.2+ ou 19, Tailwind v4, \`@base-ui/react\`, \`lucide-react\` (\`npx g4os-ds doctor\` confere). No React 18: \`{...inertProps(flag)}\` em vez de \`inert={flag}\`, e \`forwardRef\` nos seus componentes usados como gatilho de Tooltip/Menu; não use \`use\`, \`useActionState\`, \`useOptimistic\` nem \`<form action={fn}>\` se o app estiver no 18.
+
 ## Fluxo de trabalho (sempre nesta ordem)
 1. **Anatomia**: decida qual das 9 anatomias a tela é (tabela abaixo). Ela define o que fica fixo e onde vai cada coisa.
 2. **Bloco**: procure um bloco parecido (\`blocks/<slug>.md\`, MCP \`plan_screen\`/\`search\`). Achou? Copie \`src/blocks/<slug>.tsx\` inteiro e troque dados e textos. Só comece do zero se nenhum servir.
@@ -510,7 +517,7 @@ ${categories.map((c) => `- **${c}**: ${blocks.filter((b) => b.category === c).ma
 function renderLlms() {
   return `# @g4ai/ds
 
-> Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, ${componentCount} componentes, gráficos SVG e ${blocks.length} blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, ${componentCount} componentes, gráficos SVG e ${blocks.length} blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 

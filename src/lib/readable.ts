@@ -1,6 +1,7 @@
 "use client";
 
-import { useLayoutEffect, type RefObject } from "react";
+import { type RefObject } from "react";
+import { useIsomorphicLayoutEffect as useLayoutEffect } from "./layout-effect";
 
 /*
  * Texto legível sobre preenchimentos calculados (heatmap, treemap, barras

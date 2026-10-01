@@ -9,6 +9,7 @@ import { SessionStatusGlyph, ThreadMinimap, type MinimapItem, type SessionStatus
 import { ResizableSplit } from "./ai-workspace";
 import { popupClass } from "./overlays";
 import { Menu, Tooltip, type MenuEntry } from "./overlays-extra";
+import { inertProps } from "../lib/inert";
 
 /*
  * Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
@@ -210,7 +211,7 @@ export function AgentAppLayout({
         <div
           className={cn("relative flex min-h-0 shrink-0 overflow-hidden", listOpen && "border-r border-line", !dragging && "transition-[width] duration-200 ease-out motion-reduce:transition-none")}
           style={{ width: listOpen ? width : 0 }}
-          inert={!listOpen}
+          {...inertProps(!listOpen)}
           aria-hidden={!listOpen || undefined}
         >
           <div className="flex min-h-0 shrink-0" style={{ width }}>{list}</div>

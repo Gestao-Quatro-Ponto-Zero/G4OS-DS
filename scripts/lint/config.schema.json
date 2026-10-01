@@ -599,6 +599,18 @@
             2
           ],
           "description": "Botão em Title Case. Só a primeira letra maiúscula: \"Criar nova vaga\", não \"Criar Nova Vaga\"."
+        },
+        "raw-inert": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "inert direto no JSX. Use {...inertProps(flag)} de @g4ai/ds: o React 18 descarta inert={true} e o 19 lê inert=\"\" como falso."
         }
       }
     },
@@ -993,6 +1005,18 @@
                   2
                 ],
                 "description": "import * de \"lucide-react\". Importe só os ícones usados: import { Plus } from \"lucide-react\"."
+              },
+              "raw-inert": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "inert direto no JSX. Use {...inertProps(flag)} de @g4ai/ds: o React 18 descarta inert={true} e o 19 lê inert=\"\" como falso."
               }
             }
           }

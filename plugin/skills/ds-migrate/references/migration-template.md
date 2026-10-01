@@ -8,7 +8,7 @@
 - Decisões: marca do cliente <sim/não, data-brand="…">; tema escuro no lançamento <sim/não>; libs a remover: <mui, chakra, shadcn…>
 
 ## Pré-requisitos (g4os-ds doctor)
-- [ ] React 19  - [ ] Tailwind v4  - [ ] Base UI  - [ ] CSS do DS  - [ ] tema (data-theme + themeScript)  - [ ] fonte  - [ ] setLinkComponent
+- [ ] React 18.2+ ou 19  - [ ] Tailwind v4  - [ ] Base UI  - [ ] CSS do DS  - [ ] tema (data-theme + themeScript)  - [ ] fonte  - [ ] setLinkComponent
 
 ## Linha de base
 - `npx g4os-ds audit --no-baseline --format json --out ds-audit.json` → <E> erros / <W> avisos em <N> arquivos (baseline em `.g4os-ds-baseline.json`)

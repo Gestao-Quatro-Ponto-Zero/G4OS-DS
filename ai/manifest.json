@@ -2043,7 +2043,7 @@
           "name": "useControlLabel",
           "kind": "hook",
           "summary": "Liga um controle ao rótulo: dentro de FieldBlock usa o contexto; fora, desenha rótulo/ajuda/erro (a menos que `hideLabel`).",
-          "signature": "useControlLabel(props): { id: string; describedBy: string | undefined; invalid: boolean; wrap: (control: ReactNode) => string | num…"
+          "signature": "useControlLabel(props): { id: string; describedBy: string | undefined; invalid: boolean; wrap: (control: ReactNode) => JSX.Element; }"
         },
         {
           "name": "useFieldContext",
@@ -2202,7 +2202,7 @@
           "name": "NavItem",
           "kind": "type",
           "summary": null,
-          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number }>; match?: string; badge?: number; }"
+          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; match?: string; badge?: number; }"
         },
         {
           "name": "PageHeading",
@@ -4016,7 +4016,7 @@
           "name": "SettingsNavItem",
           "kind": "type",
           "summary": null,
-          "definition": "{ href: string; label: string; icon?: ComponentType<{ className?: string; strokeWidth?: number }>; badge?: ReactNode; }"
+          "definition": "{ href: string; label: string; icon?: ComponentType<{ className?: string; strokeWidth?: number | string }>; badge?: ReactNode; }"
         },
         {
           "name": "SettingsSection",
@@ -16937,7 +16937,7 @@
           "name": "RailItem",
           "kind": "type",
           "summary": null,
-          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number }>; dot?: boolean; badge?: number; match?: string; }"
+          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; dot?: boolean; badge?: number; match?: string; }"
         },
         {
           "name": "RankedList",

@@ -7,6 +7,7 @@ import { Toaster } from "./feedback";
 import { Breadcrumb, PageHeading, StickyHeader, Tabs, type Crumb, type NavItem, type TabItem } from "./navigation";
 import { DsLink } from "./primitives";
 import { EntityMark } from "./primitives";
+import { inertProps } from "../lib/inert";
 
 /**
  * Casca do app: sidebar à esquerda (ou topo+drawer no celular), conteúdo que
@@ -86,7 +87,7 @@ export function AppShell({
       {mobileOpen && <button type="button" aria-label="Fechar menu" onClick={close} className="fixed inset-x-0 bottom-0 top-12 z-30 bg-black/15 md:hidden" />}
       {sidebar({ mobileOpen, close })}
       <main
-        inert={mobileOpen}
+        {...inertProps(mobileOpen)}
         id="main-content"
         tabIndex={-1}
         className={cn("flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-page outline-none", hasTabbar && "max-md:pb-[calc(76px+env(safe-area-inset-bottom))]")}
@@ -260,7 +261,7 @@ export function SplitLayout({ main, aside, asideWidth = 320, stickyAside = true 
 export type SettingsNavItem = {
   href: string;
   label: string;
-  icon?: ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon?: ComponentType<{ className?: string; strokeWidth?: number | string }>;
   /** Marcador à direita (contagem, "Novo"). */
   badge?: ReactNode;
 };

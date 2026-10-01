@@ -7,7 +7,6 @@ import {
   useCallback,
   useContext,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -18,6 +17,7 @@ import {
 import { cn } from "../lib/cn";
 import { normalize } from "../lib/text";
 import { KbdGroup } from "./primitives";
+import { useIsomorphicLayoutEffect as useLayoutEffect } from "../lib/layout-effect";
 
 /*
  * Command componível (equivalente ao Command do shadcn/ui, sem cmdk):

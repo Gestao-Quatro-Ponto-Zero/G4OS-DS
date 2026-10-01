@@ -19,6 +19,7 @@ import { popupClass } from "./overlays";
 import { Button, Dot, DsLink, Meter, type Tone } from "./primitives";
 import { Tooltip } from "./overlays-extra";
 import { Stepper, type Step } from "./status";
+import { inertProps } from "../lib/inert";
 
 /*
  * Fluxos de trabalho que todo app de gestão repete:
@@ -97,7 +98,7 @@ export function SaveBar({
     <div
       role="region"
       aria-label="Alterações não salvas"
-      inert={!open}
+      {...inertProps(!open)}
       className={cn(
         "pointer-events-none sticky bottom-4 z-30 mt-6 flex justify-center px-0 transition-[opacity,transform] duration-150 motion-reduce:transition-none",
         open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",

@@ -4,7 +4,6 @@ import { Check, Eye, EyeOff, FileText, Minus, Pencil, Plus, Star, UploadCloud, X
 import {
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   type ChangeEvent,
@@ -19,6 +18,7 @@ import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
 import { normalize } from "../lib/text";
 import { useFieldContext } from "./forms";
+import { useIsomorphicLayoutEffect as useLayoutEffect } from "../lib/layout-effect";
 
 /*
  * Entradas de dados. Mesmas regras de forms.tsx:

@@ -1,7 +1,7 @@
 {
   "name": "g4os-ds",
   "version": "0.2.0",
-  "description": "Use o G4OS-DS (React 19 + Base UI + Tailwind v4) em qualquer repositório: regras, criação de telas a partir de blocos, migração de projetos existentes, revisão com auditoria automática e temas de cliente com modo escuro.",
+  "description": "Use o G4OS-DS (React 18.2+/19 + Base UI + Tailwind v4) em qualquer repositório: regras, criação de telas a partir de blocos, migração de projetos existentes, revisão com auditoria automática e temas de cliente com modo escuro.",
   "author": { "name": "G4 Educação" },
   "keywords": ["design-system", "react", "tailwind", "g4os", "pt-BR"]
 }

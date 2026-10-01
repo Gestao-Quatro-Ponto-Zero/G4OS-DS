@@ -4,7 +4,7 @@ O pacote [`@g4ai/ds`](https://www.npmjs.com/package/@g4ai/ds) publica JavaScript
 
 ## Requisitos
 
-- React 19, Tailwind CSS 4.3+, TypeScript 5, Node 20+.
+- React 18.2+ ou 19, Tailwind CSS 4.3+, TypeScript 5, Node 20+ (detalhes do React 18 [abaixo](#react-18)).
 - Peer deps: `@base-ui/react`, `lucide-react`, `react`, `react-dom`, `tailwindcss`. Datas não precisam de dependência extra (Calendar próprio).
 
 ## 1. Instalar
@@ -78,7 +78,7 @@ Imports por módulo também funcionam: `@g4ai/ds/components/charts`, `@g4ai/ds/l
 
 ## Conferir
 
-- [ ] `npx g4os-ds doctor` sem itens ✗ (React 19, Tailwind v4, Base UI, CSS e ordem dos imports, tema, fonte).
+- [ ] `npx g4os-ds doctor` sem itens ✗ (React 18.2+/19, Tailwind v4, Base UI, CSS e ordem dos imports, tema, fonte).
 - [ ] `npx g4os-ds init`: config da auditoria, scripts `ds:*` e workflow de CI (opcional: `--eslint`, `--hook lefthook`). Ver [auditoria](auditoria.md).
 - [ ] Um `Button` aparece em tinta escura com cantos de 8 px → CSS carregou.
 - [ ] `data-theme="dark"` no `<html>` deixa tudo escuro sem mexer em componente → tokens OK.
@@ -89,3 +89,15 @@ Imports por módulo também funcionam: `@g4ai/ds/components/charts`, `@g4ai/ds/l
 Starter pronto: [`templates/next-app`](../../templates/next-app/README.md). Detalhes de Next: [next.md](next.md).
 
 Agentes de IA: [usar com IA](usar-com-ia.md) (MCP, `llms.txt`, plugin). Atualizar de versão: [migração › Atualizar de versão](migracao.md#atualizar-de-versão).
+
+## React 18
+
+O DS é desenvolvido em React 19 e testado também em **React 18.2+** a cada mudança (CI: tipos com `@types/react@18`, render no servidor e no cliente de todos os blocos e páginas do showcase). Não há nada a configurar:
+
+- **Next 14 (App Router) ou Vite com React 18**: instale como acima. `react` e `react-dom` 18.2+ satisfazem as peer deps; `npx g4os-ds doctor` aceita 18.2+.
+- **`inert`**: o React 18 não conhece o atributo e descartaria `inert={true}`. Os componentes usam `inertProps(flag)`, que escolhe o formato certo para a versão instalada. No seu código, faça o mesmo: `<div {...inertProps(!open)}>` (a auditoria acusa `inert=` direto, regra `raw-inert`).
+- **Refs**: `Button`, `IconButton` e os links do DS usam `forwardRef`, então funcionam como gatilho de `Tooltip`, `Menu` e do Base UI (`render={<Button />}`) nas duas versões. Seus próprios componentes usados como gatilho também precisam de `forwardRef` no React 18 (no 19 a `ref` chega como prop).
+- **Tipos**: com `@types/react@18`, use TypeScript 5.1+ (componentes que devolvem `ReactNode`).
+- **Recursos do React 19** (`use`, `useActionState`, `useOptimistic`, `<form action={fn}>`, metadados no corpo) não são usados pelo DS; no seu app, só se você estiver no 19.
+
+Quando puder, prefira o React 19 (Next 15+): é a versão em que o DS é desenvolvido.

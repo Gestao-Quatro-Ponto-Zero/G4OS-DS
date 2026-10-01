@@ -2,6 +2,8 @@
 
 Leia isto inteiro antes de escrever ou mudar UI num projeto com `@g4ai/ds`. Detalhes ao lado (mesma pasta): `components/<módulo>.md` (props + exemplos), `blocks/<bloco>.md`, `tokens.md`, `manifest.json`. Com o MCP `g4os-ds` ligado, use `plan_screen` (pedido → anatomia, bloco e componentes), `get_component`, `get_block` e `audit`.
 
+Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`npx g4os-ds doctor` confere). No React 18: `{...inertProps(flag)}` em vez de `inert={flag}`, e `forwardRef` nos seus componentes usados como gatilho de Tooltip/Menu; não use `use`, `useActionState`, `useOptimistic` nem `<form action={fn}>` se o app estiver no 18.
+
 ## Fluxo de trabalho (sempre nesta ordem)
 1. **Anatomia**: decida qual das 9 anatomias a tela é (tabela abaixo). Ela define o que fica fixo e onde vai cada coisa.
 2. **Bloco**: procure um bloco parecido (`blocks/<slug>.md`, MCP `plan_screen`/`search`). Achou? Copie `src/blocks/<slug>.tsx` inteiro e troque dados e textos. Só comece do zero se nenhum servir.

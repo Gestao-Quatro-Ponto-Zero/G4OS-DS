@@ -144,7 +144,7 @@ Exemplo (showcase `#/p/padroes-anatomia-de-pagina`):
 ## SettingsNavItem (type)
 
 ```ts
-type SettingsNavItem = { href: string; label: string; icon?: ComponentType<{ className?: string; strokeWidth?: number }>; badge?: ReactNode; }
+type SettingsNavItem = { href: string; label: string; icon?: ComponentType<{ className?: string; strokeWidth?: number | string }>; badge?: ReactNode; }
 ```
 
 ## SettingsSection

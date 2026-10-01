@@ -329,7 +329,7 @@ type PlanStep = { id: string; label: string; status: "pending" | "active" | "don
 ## RailItem (type)
 
 ```ts
-type RailItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number }>; dot?: boolean; badge?: number; match?: string; }
+type RailItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; dot?: boolean; badge?: number; match?: string; }
 ```
 
 ## RankedList

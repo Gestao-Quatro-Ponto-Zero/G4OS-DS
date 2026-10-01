@@ -47,7 +47,7 @@ Com o DS instalado no projeto, `npx` usa a versão de `node_modules`. Fora de um
 | `get_tokens` | tokens semânticos, presets de marca e de tipografia |
 | `theme_from_colors` | CSS `[data-brand]` claro e escuro a partir das cores do cliente, com contraste WCAG |
 | `audit` | violações numa pasta do projeto (mesmas regras do CLI e do ESLint), com a troca sugerida e a troca segura quando existe; `format`, `preset`, `severity`, `rule`, `changed`, `since` |
-| `doctor` | pré-requisitos do projeto (React 19, Tailwind 4, CSS, tema, fonte) |
+| `doctor` | pré-requisitos do projeto (React 18.2+/19, Tailwind 4, CSS, tema, fonte) |
 
 Prompts: `criar-tela`, `revisar-tela`, `adaptar-projeto`. Respostas longas vêm em partes, com o `offset` para continuar. Recursos: `g4os-ds://core`, `g4os-ds://tokens`, `g4os-ds://llms`, `g4os-ds://components/<módulo>`, `g4os-ds://blocks/<slug>`, `g4os-ds://guides/<slug>`.
 

@@ -18,7 +18,7 @@ import { Badge, DsLink, Kbd } from "./primitives";
  *   · tudo reversível: desconectar e revogar têm desfazer
  */
 
-type IconLike = ComponentType<{ className?: string; strokeWidth?: number }>;
+type IconLike = ComponentType<{ className?: string; strokeWidth?: number | string }>;
 
 /* ------------------------------------------------------------------ */
 /* AppIcon                                                             */

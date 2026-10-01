@@ -5,7 +5,7 @@ description: Regras e mapa do design system G4OS-DS (@g4ai/ds). Use SEMPRE que f
 
 # G4OS-DS · base para qualquer trabalho de interface
 
-Você está num projeto que usa (ou vai usar) o **G4OS-DS**: tokens semânticos com tema escuro e marcas, componentes React 19 + Base UI + Tailwind v4, gráficos SVG e blocos de tela prontos, tudo em pt-BR. Esta skill não contém o índice: ela manda você ler a versão **instalada**, que é a verdade.
+Você está num projeto que usa (ou vai usar) o **G4OS-DS**: tokens semânticos com tema escuro e marcas, componentes React 18.2+/19 + Base UI + Tailwind v4, gráficos SVG e blocos de tela prontos, tudo em pt-BR. Esta skill não contém o índice: ela manda você ler a versão **instalada**, que é a verdade.
 
 ## 1. Localize o DS (uma vez por sessão)
 

@@ -68,6 +68,7 @@ export const RULES = {
   "locale-missing": { category: "formatacao", severity: "warn", fixable: false, title: "toLocaleString/Intl sem locale", hint: "Sem locale, o formato muda com o navegador. Use os formatadores de @g4ai/ds (pt-BR)." },
   "date-format": { category: "formatacao", severity: "warn", fixable: false, title: "Formato de data fixo", hint: "formatDate / formatRelative de @g4ai/ds (dd/mm/aaaa, '12 mar', 'há 2 dias')." },
   // react
+  "raw-inert": { category: "react", severity: "warn", fixable: false, title: "inert direto no JSX", hint: "Use {...inertProps(flag)} de @g4ai/ds: o React 18 descarta inert={true} (o trecho continua focável) e o 19 lê inert=\"\" como falso." },
   "effect-return": { category: "react", severity: "warn", fixable: false, title: "Efeito devolve algo que não é limpeza", hint: "useEffect(() => { x(); }, …): um efeito só pode devolver uma função de limpeza (Promise ou valor quebra o React)." },
   // imports
   "deep-import": { category: "imports", severity: "error", fixable: true, title: "Import interno do pacote", hint: 'Importe de "@g4ai/ds" (e CSS de "@g4ai/ds/styles.css"): caminhos internos mudam entre versões.' },
@@ -367,6 +368,9 @@ export function checkTag(tag, { code, raw = code, report, ext }) {
     const keyboard = tag.has("tabIndex", "contentEditable") && tag.has("onKeyDown", "onKeyUp", "onKeyPress");
     if (!passive && !decorative && !composite && !keyboard) report("clickable-div", ...at);
   }
+
+  const inertAttr = a("inert");
+  if (inertAttr) report("raw-inert", inertAttr.start, inertAttr.end);
 
   const ti = a("tabIndex") ?? a("tabindex");
   if (ti && /^\s*[1-9]\d*\s*$/.test(ti.value)) report("positive-tabindex", ti.start, ti.end);

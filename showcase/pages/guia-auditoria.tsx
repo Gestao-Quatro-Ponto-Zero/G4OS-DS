@@ -173,6 +173,7 @@ pre-commit:
             ["locale-missing", "Formatação pt-BR", "toLocaleString/Intl sem locale", "aviso", ""],
             ["date-format", "Formatação pt-BR", "Formato de data fixo", "aviso", ""],
             ["effect-return", "React", "Efeito devolve algo que não é limpeza", "aviso", ""],
+            ["raw-inert", "React", "inert direto no JSX (use inertProps: funciona no React 18 e 19)", "aviso", ""],
             ["deep-import", "Imports", "Import interno do pacote", "erro", "sim"],
             ["target-blank", "Segurança", "target=\"_blank\" sem rel=\"noopener\"", "aviso", "sim"],
             ["dangerous-html", "Segurança", "dangerouslySetInnerHTML", "aviso", ""],

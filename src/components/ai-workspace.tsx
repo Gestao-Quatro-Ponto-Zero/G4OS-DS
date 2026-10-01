@@ -226,7 +226,7 @@ export function ResizableSplit({
 export type RailItem = {
   href: string;
   label: string;
-  icon: ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon: ComponentType<{ className?: string; strokeWidth?: number | string }>;
   /** Ponto de atenção (novidade, execução terminou). */
   dot?: boolean;
   badge?: number;

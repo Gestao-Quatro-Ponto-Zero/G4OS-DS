@@ -5,7 +5,7 @@ O G4OS-DS vem com um verificador próprio: as regras do [AGENTS.md](../../AGENTS
 | Onde | Comando | Para quê |
 | --- | --- | --- |
 | Terminal | `npx g4os-ds audit` | relatório do projeto, `--fix` para as trocas seguras |
-| Pré-requisitos | `npx g4os-ds doctor` | React 19, Tailwind v4, ordem do CSS, tema, fonte, layout raiz |
+| Pré-requisitos | `npx g4os-ds doctor` | React 18.2+/19, Tailwind v4, ordem do CSS, tema, fonte, layout raiz |
 | Começar | `npx g4os-ds init` | config, scripts `ds:*`, workflow de CI, ESLint e pre-commit opcionais |
 | Editor e `eslint .` | `@g4ai/ds/eslint` | mesmas regras, sublinhadas no código, com correção rápida |
 | CI | `audit --format github` / `--format sarif` | anotações no PR e code scanning |
@@ -223,6 +223,7 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 | [`locale-missing`](#locale-missing) | Formatação pt-BR | aviso | aviso | aviso |  |
 | [`date-format`](#date-format) | Formatação pt-BR | aviso | aviso | aviso |  |
 | [`effect-return`](#effect-return) | React | aviso | aviso | aviso |  |
+| [`raw-inert`](#raw-inert) | React | aviso | aviso | aviso |  |
 | [`deep-import`](#deep-import) | Imports | erro | erro | erro | sim |
 | [`target-blank`](#target-blank) | Segurança | aviso | aviso | aviso | sim |
 | [`dangerous-html`](#dangerous-html) | Segurança | aviso | aviso | aviso |  |
@@ -475,6 +476,14 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 - Gravidade: aviso (strict: aviso)
 - Evite: `useEffect(async () => { … })` · `useEffect(() => fetch(url), [])`
 - Use: `useEffect(() => { void carregar(); }, [])`
+
+#### `raw-inert`
+
+**inert direto no JSX.** O React 18 não conhece `inert`: descarta `inert={true}` com aviso e o trecho (drawer fechado, lista recolhida) continua no Tab. O React 19 faz o contrário com `inert=""`. `inertProps` escolhe o formato pela versão.
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<div inert={!open}>`
+- Use: `<div {...inertProps(!open)}>` (de `@g4ai/ds`)
 
 
 ### Imports

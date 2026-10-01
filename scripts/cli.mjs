@@ -65,7 +65,7 @@ const HELP = `g4os-ds ${pkg.version} · ferramentas do G4OS-DS
       --max-errors <n>       tolera até n erros (padrão 0)
       --max-warnings <n>     falha se houver mais de n avisos
       --out <arquivo>        grava a saída num arquivo
-  doctor [pasta]    confere pré-requisitos (React 19, Tailwind v4, CSS e ordem dos imports, tema, fonte,
+  doctor [pasta]    confere pré-requisitos (React 18.2+/19, Tailwind v4, CSS e ordem dos imports, tema, fonte,
                     layout raiz, link do Next, React duplicado)   --format pretty|json|markdown|github|sarif
   init              prepara o projeto: g4os-ds.config.json, scripts ds:*, workflow de CI
       --dry-run  --force  --eslint  --hook lefthook|husky|simple-git-hooks  --baseline  --no-ci

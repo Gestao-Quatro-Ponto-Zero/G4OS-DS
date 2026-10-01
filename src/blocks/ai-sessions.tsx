@@ -23,6 +23,7 @@ import {
   type MenuEntry,
   type MinimapItem,
   type SlashCommand,
+  inertProps,
 } from "@g4ai/ds";
 import { agents, cannedReply, markdown, osProjects, osUser, osWorkspace, plain, sessions as seed, tagSuggestions, tools, type OsSession, type Rich, type ThreadEntry } from "./data/os-sessions";
 import { useFrameParam } from "./shells/frame-route";
@@ -510,7 +511,7 @@ export default function AiSessions() {
           // Recolher anima a largura; o conteúdo mantém a largura e é recortado.
           <div
             className={cn("flex min-h-0 shrink-0 overflow-hidden transition-[width] duration-200 ease-out motion-reduce:transition-none", listOpen ? "w-[300px] border-r border-line lg:w-[320px]" : "w-0")}
-            inert={!listOpen}
+            {...inertProps(!listOpen)}
             aria-hidden={!listOpen || undefined}
           >
             <div className="flex min-h-0 w-[300px] shrink-0 lg:w-[320px]">{sidebar}</div>

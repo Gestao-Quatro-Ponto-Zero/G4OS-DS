@@ -30,7 +30,7 @@ Requisitos: Node 20+ (o CI usa Node 24). Para testar uma mudança num app antes 
    npm run check     # tokens + typecheck + ESLint + referências de IA + auditoria do próprio DS + testes (lint e MCP)
    npm run build     # compila dist/
    ```
-   Partes isoladas: `npm run lint` (ESLint; `npx eslint --fix .` corrige o que der), `npm run audit:self` (`g4os-ds audit` em `src/`, `templates/`, `showcase/`; `node scripts/cli.mjs audit src --fix` aplica as trocas seguras), `npm run test:lint` (regras, plugin ESLint, init, doctor), `npm run test:mcp`.
+   Partes isoladas: `npm run lint` (ESLint; `npx eslint --fix .` corrige o que der), `npm run audit:self` (`g4os-ds audit` em `src/`, `templates/`, `showcase/`; `node scripts/cli.mjs audit src --fix` aplica as trocas seguras), `npm run test:lint` (regras, plugin ESLint, init, doctor), `npm run test:mcp`, `npm run test:react` (instala o pacote com React 18 e 19 num projeto temporário: tipos, render no servidor e no cliente; o CI roda os dois).
 5. Registre a mudança para o changelog:
    ```bash
    npx changeset     # escolha patch (correção), minor (novo componente/prop) ou major (quebra)
@@ -74,7 +74,7 @@ Procura rolagem horizontal, elemento cortado, contraste e nomes (axe-core), erro
 
 ## Padrões de código
 
-- TypeScript estrito, React 19, Base UI para comportamento, Tailwind v4 para estilo.
+- TypeScript estrito, React 19 (e compatível com 18.2+: nada de `use`, `useActionState`, ref como prop em componente que vira gatilho, `inert={…}` direto; `npm run test:react` confere), Base UI para comportamento, Tailwind v4 para estilo.
 - Nada de cor crua: use os tokens (`bg-surface`, `text-muted`, `bg-primary text-on-primary`…). `npm run audit:self` e `npm run lint` apontam violações.
 - Exceção a uma regra só com motivo escrito: `// g4os-ds-disable-next-line <regra> -- motivo` ou `// eslint-disable-next-line <regra> -- motivo`. Regra desligada no `eslint.config.mjs` também leva o motivo ao lado.
 - Regra nova de auditoria: `scripts/lint/rules.mjs` + fixtures `bad`/`good`(/`fixed`) em `scripts/lint/__fixtures__/` + seção em [docs/guias/auditoria.md](docs/guias/auditoria.md#contribuir-com-uma-regra).

@@ -16,3 +16,19 @@ jobs:
       - run: npm run check
       - run: npm run build
       - run: npm run showcase:build
+  react-compat:
+    # O DS suporta React 18.2+ e 19: tipos (@types/react da versão), render no
+    # servidor e no cliente de todos os blocos e páginas do showcase.
+    name: React ${{ matrix.react }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        react: [18, 19]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/test-react18.mjs --react ${{ matrix.react }} --skip-build

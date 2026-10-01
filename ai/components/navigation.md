@@ -77,7 +77,7 @@ type NavGroup = { label: string; items: NavItem[] }
 ## NavItem (type)
 
 ```ts
-type NavItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number }>; match?: string; badge?: number; }
+type NavItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; match?: string; badge?: number; }
 ```
 
 ## PageHeading
