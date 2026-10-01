@@ -4,6 +4,7 @@
 //   npx g4os-ds doctor [pasta] [--json]
 //   npx g4os-ds guide          imprime o caminho de ai/core.md (para agentes lerem)
 //   npx -y @g4ai/ds mcp        servidor MCP (stdio) para agentes: claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+//   npx -y @g4ai/ds mcp --http [--port 3845] [--host 127.0.0.1]   mesmo servidor via Streamable HTTP
 import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,8 +50,8 @@ if (cmd === "audit") {
   emit(flag("--json") ? JSON.stringify(r, null, 2) : doctorMarkdown(r));
   process.exit(r.ok ? 0 : 1);
 } else if (cmd === "mcp") {
-  const { startMcp } = await import("./mcp.mjs");
-  startMcp();
+  const { runFromArgs } = await import("./mcp.mjs");
+  runFromArgs(rest);
 } else if (cmd === "guide") {
   console.log(join(dirname(fileURLToPath(import.meta.url)), "..", "ai", "core.md"));
 } else {
@@ -61,7 +62,8 @@ if (cmd === "audit") {
                    --json  --fix-hints  --max-errors N  --out arquivo
   doctor [pasta]   confere pré-requisitos (React 19, Tailwind v4, Base UI, CSS, tema, fonte)
   guide            caminho do guia para agentes (ai/core.md)
-  mcp              servidor MCP (stdio) para Claude Code, Cursor, VS Code…
-                   claude mcp add g4os-ds -- npx -y @g4ai/ds mcp`);
+  mcp              servidor MCP (stdio) para Claude Code, Codex, Cursor, VS Code, Gemini CLI…
+                   claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+                   --http [--port 3845] [--host 127.0.0.1]  Streamable HTTP em /mcp`);
   process.exit(cmd ? 1 : 0);
 }

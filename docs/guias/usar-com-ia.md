@@ -1,10 +1,10 @@
 # Usar o G4OS-DS com agentes de IA
 
-O DS foi feito para ser aplicado por agentes (Claude Code, Cursor, Codex, Copilot) em **qualquer** repositório: criar telas, adaptar um projeto existente, revisar e tematizar.
+O DS foi feito para ser aplicado por agentes (Claude Code, Codex, Cursor, Copilot, Gemini CLI, pi…) em **qualquer** repositório: criar telas, adaptar um projeto existente, revisar e tematizar.
 
 | Peça | O que é | Onde |
 | --- | --- | --- |
-| **Servidor MCP** | Busca, componentes, blocos, guias, tokens, tema de marca, audit e doctor como ferramentas | `npx -y @g4ai/ds mcp` |
+| **Servidor MCP** | Busca, componentes, blocos, guias, tokens, tema de marca, audit e doctor como ferramentas, mais prompts prontos | `npx -y @g4ai/ds mcp` (stdio) · `--http` |
 | **Web** | `llms.txt`, `llms-full.txt`, `ai/` e `docs/` publicados com o site | https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt |
 | **Guia gerado** | Regras, tokens, props de cada componente e catálogo de blocos (com o conceito de cada um), em Markdown e JSON | `node_modules/@g4ai/ds/ai/` (`core.md` é a porta de entrada) |
 | **CLI** | `g4os-ds doctor` (pré-requisitos), `g4os-ds audit` (o que foge do DS), `g4os-ds mcp` | `npx g4os-ds` |
@@ -17,12 +17,13 @@ Tudo sai da mesma fonte (o código do DS) e vem dentro do pacote: o MCP e as ski
 ### Opção A · servidor MCP (qualquer cliente MCP)
 
 ```bash
-# Claude Code
-claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp          # Claude Code
+codex mcp add g4os-ds -- npx -y @g4ai/ds mcp           # Codex
+gemini mcp add -s user g4os-ds npx -y @g4ai/ds mcp     # Gemini CLI
 ```
 
 ```json
-// Cursor: .cursor/mcp.json
+// Cursor (.cursor/mcp.json), Claude Desktop, Windsurf, Cline, Kiro, JetBrains, pi (pi-mcp-adapter)
 { "mcpServers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
 ```
 
@@ -30,6 +31,8 @@ claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
 // VS Code: .vscode/mcp.json
 { "servers": { "g4os-ds": { "type": "stdio", "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
 ```
+
+Os demais clientes (Zed, Continue, Goose, opencode, Amp, pi), a variante de Windows (`cmd /c npx`), o modo HTTP (`--http`) e os problemas comuns estão em **[Servidor MCP em qualquer cliente](mcp.md)**.
 
 Com o DS instalado no projeto, `npx` usa a versão de `node_modules`. Fora de um projeto, baixa a última do npm.
 
@@ -45,7 +48,7 @@ Com o DS instalado no projeto, `npx` usa a versão de `node_modules`. Fora de um
 | `audit` | violações numa pasta do projeto, com a troca sugerida |
 | `doctor` | pré-requisitos do projeto (React 19, Tailwind 4, CSS, tema, fonte) |
 
-Recursos: `g4os-ds://core`, `g4os-ds://tokens`, `g4os-ds://llms`, `g4os-ds://components/<módulo>`, `g4os-ds://blocks/<slug>`, `g4os-ds://guides/<slug>`.
+Prompts: `criar-tela`, `revisar-tela`, `adaptar-projeto`. Respostas longas vêm em partes, com o `offset` para continuar. Recursos: `g4os-ds://core`, `g4os-ds://tokens`, `g4os-ds://llms`, `g4os-ds://components/<módulo>`, `g4os-ds://blocks/<slug>`, `g4os-ds://guides/<slug>`.
 
 ### Opção B · web (agentes que leem URLs)
 

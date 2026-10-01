@@ -18,7 +18,7 @@ export default function Page() {
         <GuideTable
           head={["Caminho", "Para", "Como"]}
           rows={[
-            ["MCP", "Claude Code, Cursor, VS Code, Windsurf, qualquer cliente MCP", "npx -y @g4ai/ds mcp (stdio, sem rede)"],
+            ["MCP", "Claude Code, Codex, Cursor, VS Code, Gemini CLI, Zed, Windsurf, qualquer cliente MCP", "npx -y @g4ai/ds mcp (stdio, sem rede) · --http para URL"],
             ["llms.txt", "agentes que leem URLs, chats com busca na web", `${SITE}llms.txt`],
             ["ai/ no pacote", "qualquer agente com acesso ao repositório", "node_modules/@g4ai/ds/ai/core.md"],
             ["Plugin", "Claude Code: skills que disparam pelos pedidos", "/plugin install g4os-ds@g4os"],
@@ -29,23 +29,38 @@ export default function Page() {
       <DocSection title="1. Servidor MCP" rule="Roda local a partir do pacote: responde com a mesma versão de componentes e blocos que o projeto usa.">
         <CodeBlock
           code={`# Claude Code
-claude mcp add g4os-ds -- npx -y @g4ai/ds mcp`}
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+
+# Codex
+codex mcp add g4os-ds -- npx -y @g4ai/ds mcp
+
+# Gemini CLI
+gemini mcp add -s user g4os-ds npx -y @g4ai/ds mcp`}
         />
         <CodeBlock
-          code={`// Cursor: .cursor/mcp.json
-{
-  "mcpServers": {
-    "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] }
-  }
-}
+          code={`// Cursor (.cursor/mcp.json), Claude Desktop, Windsurf, Cline, Kiro, JetBrains, pi (pi-mcp-adapter)
+{ "mcpServers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
 
-// VS Code: .vscode/mcp.json
-{
-  "servers": {
-    "g4os-ds": { "type": "stdio", "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] }
-  }
-}`}
+// VS Code (.vscode/mcp.json): chave "servers"
+{ "servers": { "g4os-ds": { "type": "stdio", "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
+
+// Zed (settings.json): chave "context_servers"
+{ "context_servers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }`}
         />
+        <CodeBlock
+          code={`# ~/.codex/config.toml
+[mcp_servers.g4os-ds]
+command = "npx"
+args = ["-y", "@g4ai/ds", "mcp"]
+startup_timeout_sec = 60`}
+        />
+        <Callout tone="info" title="Outros clientes, Windows e modo HTTP">
+          Continue, Goose, opencode, Amp, pi, a variante <code className="font-mono">cmd /c npx</code> para Windows, o modo HTTP (<code className="font-mono">npx -y @g4ai/ds mcp --http</code> → <code className="font-mono">http://127.0.0.1:3845/mcp</code>) e problemas comuns:{" "}
+          <a className="text-blue underline-offset-2 hover:underline" href={`${SITE}docs/guias/mcp.md`}>
+            docs/guias/mcp.md
+          </a>
+          . Compatível com os protocolos MCP 2024-11-05 a 2025-11-25; os schemas das ferramentas funcionam com Claude, GPT e Gemini.
+        </Callout>
         <GuideTable
           head={["Ferramenta", "O que devolve"]}
           rows={[
@@ -61,7 +76,7 @@ claude mcp add g4os-ds -- npx -y @g4ai/ds mcp`}
           ]}
         />
         <p className="m-0 text-[12.5px] text-muted">
-          Também expõe recursos <code className="font-mono">g4os-ds://core</code>, <code className="font-mono">g4os-ds://components/&lt;módulo&gt;</code>, <code className="font-mono">g4os-ds://blocks/&lt;slug&gt;</code> e <code className="font-mono">g4os-ds://guides/&lt;slug&gt;</code>.
+          Prompts prontos: <code className="font-mono">criar-tela</code>, <code className="font-mono">revisar-tela</code> e <code className="font-mono">adaptar-projeto</code> (viram comandos / no Claude Code, VS Code e Zed). Respostas longas vêm em partes, com o <code className="font-mono">offset</code> para continuar. Também expõe recursos <code className="font-mono">g4os-ds://core</code>, <code className="font-mono">g4os-ds://components/&lt;módulo&gt;</code>, <code className="font-mono">g4os-ds://blocks/&lt;slug&gt;</code> e <code className="font-mono">g4os-ds://guides/&lt;slug&gt;</code>.
         </p>
       </DocSection>
 

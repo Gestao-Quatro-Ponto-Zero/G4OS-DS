@@ -88,14 +88,15 @@
     "ai:check": "node scripts/build-ai-docs.mjs --check",
     "audit": "node scripts/cli.mjs audit",
     "audit:self": "node scripts/cli.mjs audit src templates",
-    "check": "npm run check:tokens && npm run typecheck && npm run ai:check && npm run audit:self",
+    "check": "npm run check:tokens && npm run typecheck && npm run ai:check && npm run audit:self && npm run test:mcp",
     "showcase:build": "node showcase/build.mjs",
     "showcase": "npm run showcase:build && npx --yes serve showcase/dist -l 4173",
     "showcase:watch": "node showcase/build.mjs --watch",
     "build": "node scripts/build-lib.mjs",
     "prepublishOnly": "npm run check && npm run build",
     "release": "changeset publish",
-    "version-packages": "changeset version && npm install --package-lock-only --silent && npm run ai:build"
+    "version-packages": "changeset version && npm install --package-lock-only --silent && npm run ai:build",
+    "test:mcp": "node scripts/test-mcp.mjs"
   },
   "peerDependencies": {
     "@base-ui/react": "^1.8.0",
@@ -107,6 +108,7 @@
   "devDependencies": {
     "@base-ui/react": "1.8.0",
     "@changesets/cli": "^2.31.1",
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "@tailwindcss/cli": "4.3.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

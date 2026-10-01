@@ -102,18 +102,21 @@ Marca de cliente com contraste AA (claro e escuro): skill `ds-theme`, ferramenta
 
 ## Usar com IA
 
-**MCP** (Claude Code, Cursor, VS Code, qualquer cliente MCP). Roda local, lê a versão instalada do DS, sem rede:
+**MCP** (Claude Code, Codex, Cursor, VS Code, Gemini CLI, Zed, Windsurf, pi, qualquer cliente MCP). Roda local, lê a versão instalada do DS, sem rede:
 
 ```bash
-claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp     # Claude Code
+codex mcp add g4os-ds -- npx -y @g4ai/ds mcp      # Codex
 ```
 
 ```json
-// Cursor (.cursor/mcp.json) · VS Code (.vscode/mcp.json usa "servers" no lugar de "mcpServers")
+// Cursor, Claude Desktop, Windsurf, Gemini CLI… · VS Code (.vscode/mcp.json) usa "servers" no lugar de "mcpServers"
 { "mcpServers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
 ```
 
-Ferramentas: `search`, `get_component`, `list_blocks`, `get_block`, `get_guide`, `get_tokens`, `theme_from_colors`, `audit`, `doctor`.
+Config de cada cliente, Windows, modo HTTP (`npx -y @g4ai/ds mcp --http`) e problemas comuns: [docs/guias/mcp.md](docs/guias/mcp.md).
+
+Ferramentas: `search`, `get_component`, `list_blocks`, `get_block`, `get_guide`, `get_tokens`, `theme_from_colors`, `audit`, `doctor`. Prompts: `criar-tela`, `revisar-tela`, `adaptar-projeto`.
 
 **Web** (para agentes que só leem URLs):
 
@@ -138,7 +141,7 @@ Depois peça: *"Adapte este projeto ao G4OS-DS"*, *"Crie a tela de pedidos com o
 npx g4os-ds doctor                    # o projeto pode usar o DS?
 npx g4os-ds audit src --fix-hints     # o que foge do DS, com a troca sugerida (--json para acompanhar)
 npx g4os-ds guide                     # imprime o caminho do guia ai/core.md
-npx g4os-ds mcp                       # servidor MCP (stdio)
+npx g4os-ds mcp                       # servidor MCP (stdio; --http para Streamable HTTP)
 ```
 
 ## Atualizar de versão
