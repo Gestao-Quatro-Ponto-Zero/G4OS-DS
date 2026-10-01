@@ -1,8 +1,8 @@
 # G4OS-DS
 
-[![npm](https://img.shields.io/npm/v/@g4ai/ds?color=202124&label=%40g4ai%2Fds)](https://www.npmjs.com/package/@g4ai/ds)
+[![npm](https://img.shields.io/npm/v/%40g4ai%2Fds.svg?color=202124)](https://www.npmjs.com/package/@g4ai/ds)
 [![CI](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/actions/workflows/ci.yml/badge.svg)](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/actions/workflows/ci.yml)
-[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-b9915b)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-b9915b.svg)](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/blob/main/LICENSE)
 
 **Site e documentação:** https://gestao-quatro-ponto-zero.github.io/G4OS-DS/
 
