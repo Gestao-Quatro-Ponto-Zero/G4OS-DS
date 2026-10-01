@@ -1,4 +1,4 @@
-# G4OS-DS · guia essencial para agentes (v0.4.0)
+# G4OS-DS · guia essencial para agentes (v0.5.0)
 
 Leia isto antes de escrever ou mudar qualquer UI num projeto que usa `@g4ai/ds`. Os detalhes estão ao lado, em `ai/` (mesma pasta deste arquivo): `tokens.md`, `components/<módulo>.md` (props e exemplos), `blocks/<bloco>.md`, `manifest.json` (tudo em JSON). Leia só o módulo de que precisar.
 

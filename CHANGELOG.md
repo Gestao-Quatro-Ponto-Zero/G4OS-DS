@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- a805df6: Auditoria e lint de boas práticas, do terminal ao editor e ao CI.
+
+  - **31 regras em 9 categorias** (tokens, tipografia, acessibilidade, formatação pt-BR, componentes, React, imports, segurança, performance), num motor só (`scripts/lint/`) usado pelo CLI, pelo plugin ESLint e pela tool `audit` do MCP. Novas: `arbitrary-radius`, `arbitrary-shadow`, `z-index`, `img-alt`, `field-label`, `clickable-div`, `outline-none`, `positive-tabindex`, `locale-missing`, `date-format`, `effect-return`, `deep-import`, `deprecated-export`, `target-blank`, `dangerous-html`, `icon-star-import`, `as-any-props` e, no preset `strict`, `tailwind-text-scale` e `z-index-token`. Menos falso positivo: texto em `<code>`, exemplos em template literal e `var(--token, fallback)` não contam mais.
+  - **`g4os-ds audit`**: `--fix` (trocas seguras: `bg-white`→`bg-surface`, `text-gray-500`→`text-muted`, shadcn→DS, `rounded-[12px]`→`rounded-card`, `rel="noopener"`, imports internos e nomes renomeados), `--changed`/`--staged`/`--since`, `--baseline`/`--update-baseline` (só achado novo falha), `--format pretty|json|markdown|sarif|github`, `--preset`, `--rule`, `--max-warnings`, config `g4os-ds.config.json` (com JSON Schema) ou `package.json#"g4os-ds"`, `overrides` por pasta. Exit code 2 para erro de uso/config.
+  - **`g4os-ds init`**: cria config, scripts `ds:*` e o workflow de CI (anotações no PR + SARIF); `--eslint`, `--hook lefthook|husky|simple-git-hooks`, `--baseline`, `--dry-run`. Nunca sobrescreve sem `--force`.
+  - **`g4os-ds doctor`**: ordem dos imports CSS, integração do Tailwind v4 (PostCSS/Vite), React duplicado, versões dos peers, `themeScript`, `suppressHydrationWarning`, `transpilePackages` desnecessário; `--format github|sarif|json|markdown`.
+  - **Plugin ESLint 9** em `@g4ai/ds/eslint` (`configs.recommended|strict|migration`, `config({ standalone: true })` para projetos sem parser de TS), com tipos. ESLint é dependência opcional.
+  - Ignorar com motivo: `// g4os-ds-disable-next-line <regra> -- motivo`, `-line`, `disable`/`enable`, `-file` (a sintaxe `ds-audit-ignore` continua valendo).
+  - Tool `audit` do MCP: `format`, `preset`, `severity`, `rule`, `changed`, `since`; achados com `fixable` e `replacement`.
+  - Starter `templates/next-app` com `g4os-ds.config.json`, `eslint.config.mjs` e scripts `lint`/`ds:*`.
+
+  Como migrar: nada obrigatório. O `audit` agora pega mais coisas (e `icon-button-label` virou erro); para não travar o CI de um projeto em andamento, rode `npx g4os-ds init --baseline` (ou `npx g4os-ds audit --baseline`) e `npx g4os-ds audit --fix`.
+
+- 4ed1fce: Formulários a partir do uso num app real (Radar de Forecast):
+
+  - **Mudança de comportamento:** `Checkbox` mostra o `label` ao lado da caixa por padrão (como o `Switch`). Para só a caixa (seleção de linha de tabela, tarefa com título ao lado), passe `hideLabel`. Novo `description`. Marcado + desabilitado continua lendo como marcado e o texto fica legível.
+  - **Regra única de rótulo:** `Select`, `Combobox`, `DatePicker` (e os novos `MultiSelect`, `NativeSelect`, `CheckboxGroup`) desenham o `label` visível acima do campo, com `hint`, `error` e `optional`, como o `TextField`. Dentro de `FieldBlock` o rótulo continua sendo do FieldBlock (sem duplicar); `hideLabel` para toolbar, tabela e filtro; `Select size="compact"` esconde por padrão. Se você desenhava um `<p>` de rótulo acima de um Select, remova-o.
+  - Novos: `MultiSelect` (busca, grupos, "Selecionar todos"/"Limpar", `max`, `disabledReason`, resumo ou chips), `CheckboxGroup` (tudo visível, tri-estado, colunas) e `NativeSelect` (o `<select>` do sistema estilizado, com grupos; a regra `native-select` da auditoria só acusa `<select>` cru).
+  - `DatePicker`: rodapé "Hoje"/"Limpar", `clearable`, `now`, `hint`/`error`; nome acessível inclui a data escolhida.
+  - Celular: `Select` e `DatePicker` abrem como folha inferior (< 640px, por cima da barra inferior); `Combobox`/`MultiSelect` com a largura da tela. `presentation="popover"` mantém o comportamento antigo.
+  - `Button`: desabilitado legível (ghost/quiet com texto muted e borda visível; preenchidos esmaecem) e `disabledReason` (continua focável com `aria-disabled` e explica o motivo em tooltip). `ToggleGroup` e `Switch` ganharam `disabled`.
+  - `Sidebar`: o `footer` tem respiro próprio; um `Button` ali não vaza mais do trilho.
+  - `Page width="wide|medium|narrow|reading"`: cabeçalho, barra e corpo no mesmo eixo (antes era comum centralizar só o corpo com `mx-auto max-w-*` e o título ficava desalinhado).
+
+- 4ed1fce: Paridade com o shadcn/ui.
+
+  - Novos componentes: `Separator` (com rótulo), `ScrollArea` (barra fina, esmaecimento nas bordas), `Label`, `FieldSet`/`FieldGroup`/`FieldSeparator`, família `Item` (`Item`, `ItemGroup`, `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, `ItemActions`), `Table` estática (`TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`), `Prose` (texto longo), `Toggle`, `ButtonGroup`/`ButtonGroupText`, família `InputGroup` (complementos, botões e faixa de ações dentro do campo), `ColorPicker` (amostras, hex, seletor livre e contraste), `Menubar`, `NavigationMenu`, `SortableList` (arraste e teclado, com anúncios) e `Questionnaire` (uma pergunta por vez, condicionais, atalhos).
+  - De/para shadcn/ui → DS em `scripts/data/shadcn-map.json`, publicado como `ai/shadcn-map.json` e `docs/guias/shadcn-equivalencias.md`. Página "shadcn/ui ↔ G4OS-DS" no site e selo "Equivalente no shadcn" em cada página de componente.
+  - MCP: `search` entende nomes do shadcn ("alert-dialog", "sheet", "dropdown menu") e devolve o equivalente do DS.
+
 ## 0.4.0
 
 ### Minor Changes
