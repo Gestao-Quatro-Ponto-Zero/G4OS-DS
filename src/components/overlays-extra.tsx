@@ -326,7 +326,8 @@ export function Menu({
         ref={ref}
         aria-label={label}
         className={cn(
-          "inline-flex shrink-0 items-center outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+          // `!` para vencer `!ring-0`/`!ring-1` passados em triggerClassName: o foco sempre aparece.
+          "inline-flex shrink-0 items-center outline-none focus-visible:!ring-2 focus-visible:!ring-accent/40",
           triggerVariant !== "bare" && "[&_svg]:h-4 [&_svg]:w-4",
           menuTrigger[triggerVariant],
           triggerClassName,

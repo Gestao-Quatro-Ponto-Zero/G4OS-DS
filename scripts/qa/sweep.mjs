@@ -139,9 +139,11 @@ function layoutProbe({ doTap, mobile }) {
     const r = el.getBoundingClientRect();
     if (!visible(el, r)) continue;
     // clipped: um ancestral que corta (overflow hidden/clip, ou auto/scroll sem rolagem nesse eixo)
-    let a = el.parentElement;
+    // Elemento (ou ancestral) fixo escapa do overflow dos ancestrais: para a subida ali.
+    let a = getComputedStyle(el).position === "fixed" ? null : el.parentElement;
     while (a && a !== document.body) {
       const cs = getComputedStyle(a);
+      if (cs.position === "fixed") break;
       // Ancestral que rola na horizontal: o conteúdo é alcançável pela rolagem.
       if (/auto|scroll/.test(cs.overflowX) && a.scrollWidth > a.clientWidth + 1) break;
       const clipsX = /hidden|clip/.test(cs.overflowX) || (/auto|scroll/.test(cs.overflowX) && a.scrollWidth <= a.clientWidth + 1);
@@ -159,7 +161,15 @@ function layoutProbe({ doTap, mobile }) {
       a = a.parentElement;
     }
     if (doTap && mobile && el.matches(interactive) && el.tagName !== "LABEL") {
-      const inlineText = el.tagName === "A" && getComputedStyle(el).display === "inline" && el.parentElement && textLeaf(el.parentElement);
+      // Exceção de link em texto corrido (WCAG 2.5.8): <a> inline cujo bloco tem outro texto além dele.
+      const inlineText = el.tagName === "A" && getComputedStyle(el).display === "inline" && (() => {
+        let blk = el.parentElement;
+        while (blk && getComputedStyle(blk).display === "inline") blk = blk.parentElement;
+        if (!blk) return false;
+        const own = (el.textContent ?? "").trim().length;
+        const all = (blk.textContent ?? "").trim().length;
+        return all - own > 3;
+      })();
       const inLabel = el.closest("label");
       let target = inLabel ? inLabel.getBoundingClientRect() : r;
       // Área de toque ampliada por pseudo-elemento (.ds-hit, link esticado do card).

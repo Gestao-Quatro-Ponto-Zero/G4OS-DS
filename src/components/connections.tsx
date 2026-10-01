@@ -122,11 +122,11 @@ export function AppTile({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           {href ? (
-            <DsLink href={href} className="truncate text-[14px] font-medium text-ink outline-none focus-visible:underline">
+            <DsLink href={href} className="truncate py-0.5 text-[14px] font-medium text-ink outline-none focus-visible:underline">
               {title}
             </DsLink>
           ) : onOpen ? (
-            <button type="button" onClick={onOpen} className="truncate text-left text-[14px] font-medium text-ink outline-none focus-visible:underline">
+            <button type="button" onClick={onOpen} className="truncate py-0.5 text-left text-[14px] font-medium text-ink outline-none focus-visible:underline">
               {title}
             </button>
           ) : (

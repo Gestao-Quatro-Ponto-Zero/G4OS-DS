@@ -201,7 +201,7 @@ export default function MarketingLanding() {
             ))}
           </div>
           <p className="m-0 mt-6 text-center text-[13px] text-muted">
-            <a href={authRoutes.pricing} className="font-medium text-blue hover:underline">
+            <a href={authRoutes.pricing} className="inline-flex min-h-6 items-center font-medium text-blue hover:underline">
               Comparar todos os recursos dos planos →
             </a>
           </p>

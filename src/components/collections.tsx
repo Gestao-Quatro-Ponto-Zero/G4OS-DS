@@ -380,7 +380,7 @@ export function ListPanel({
           {title}
           {count !== undefined && <span className="text-[11px] font-normal tabular-nums text-muted">{count}</span>}
         </h2>
-        {action && <div className="ml-auto shrink-0 text-[12px] text-muted [&_a:hover]:text-ink">{action}</div>}
+        {action && <div className="ml-auto shrink-0 text-[12px] text-muted [&_a]:inline-flex [&_a]:min-h-6 [&_a]:items-center [&_a:hover]:text-ink">{action}</div>}
       </div>
       <div className="overflow-hidden rounded-card border border-line bg-surface">{children}</div>
     </section>
@@ -804,7 +804,11 @@ export function KanbanCard({
   );
 }
 
-/** Contêiner horizontal do quadro, com rolagem própria. */
-export function KanbanBoard({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("flex min-h-0 gap-3 overflow-x-auto pb-2 [&>section]:min-h-[240px]", className)}>{children}</div>;
+/** Contêiner horizontal do quadro, com rolagem própria. Focável para rolar pelo teclado. */
+export function KanbanBoard({ children, className, label = "Quadro" }: { children: ReactNode; className?: string; /** Nome da região (leitor de tela). */ label?: string }) {
+  return (
+    <div tabIndex={0} role="region" aria-label={label} className={cn("flex min-h-0 gap-3 overflow-x-auto pb-2 outline-none focus-visible:ring-2 focus-visible:ring-accent/40 [&>section]:min-h-[240px]", className)}>
+      {children}
+    </div>
+  );
 }

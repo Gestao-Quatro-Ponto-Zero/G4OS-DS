@@ -451,7 +451,15 @@ export function SearchPalette({
                   type="button"
                   role="tab"
                   aria-selected={on}
-                  tabIndex={-1}
+                  // Aba ativa entra no Tab (roving tabindex); setas trocam o escopo.
+                  tabIndex={on ? 0 : -1}
+                  onKeyDown={(e) => {
+                    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+                    e.preventDefault();
+                    const list = e.currentTarget.parentElement;
+                    cycle(e.key === "ArrowRight" ? 1 : -1);
+                    requestAnimationFrame(() => list?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus());
+                  }}
                   onClick={() => {
                     setScope(s.id);
                     inputRef.current?.focus();

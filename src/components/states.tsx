@@ -330,7 +330,7 @@ export function Banner({
       {action && (
         <div
           className={cn(
-            "shrink-0 [&_a]:font-medium [&_a]:underline-offset-2 hover:[&_a]:underline [&_button]:font-medium",
+            "shrink-0 [&_a]:inline-flex [&_a]:min-h-6 [&_a]:items-center [&_a]:font-medium [&_a]:underline-offset-2 hover:[&_a]:underline [&_button]:font-medium",
             tone === "accent" ? "[&_a]:text-brand-accent [&_button]:text-brand-accent" : "[&_a]:text-blue [&_button]:text-blue",
           )}
         >

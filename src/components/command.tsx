@@ -155,7 +155,7 @@ export function CommandInput({ placeholder = "Buscar…", autoFocus, className }
     e.preventDefault();
   };
   return (
-    <div className={cn("flex h-11 shrink-0 items-center gap-2.5 border-b border-line px-3.5", className)}>
+    <div className={cn("flex h-11 shrink-0 items-center gap-2.5 border-b border-line px-3.5 focus-within:ring-2 focus-within:ring-inset focus-within:ring-accent/40", className)}>
       <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden />
       <input
         autoFocus={autoFocus}
@@ -180,7 +180,7 @@ export function CommandInput({ placeholder = "Buscar…", autoFocus, className }
 export function CommandList({ children, maxHeight, className }: { children: ReactNode; /** Altura máxima em px (padrão 320). */ maxHeight?: number; className?: string }) {
   const c = useCommand("CommandList");
   return (
-    <div ref={c.listRef} id={c.listId} role="listbox" aria-label="Resultados" className={cn("max-h-80 min-h-0 overflow-y-auto overscroll-contain p-1.5", className)} style={maxHeight ? { maxHeight } : undefined}>
+    <div ref={c.listRef} id={c.listId} role={c.visibleCount > 0 ? "listbox" : undefined} aria-label={c.visibleCount > 0 ? "Resultados" : undefined} className={cn("max-h-80 min-h-0 overflow-y-auto overscroll-contain p-1.5", className)} style={maxHeight ? { maxHeight } : undefined}>
       {children}
     </div>
   );
@@ -237,7 +237,8 @@ export function CommandGroup({ heading, children, className }: { heading?: React
 export function CommandSeparator({ className }: { className?: string }) {
   const c = useCommand("CommandSeparator");
   if (c.query.trim()) return null;
-  return <div role="separator" className={cn("-mx-1.5 my-1 h-px bg-line", className)} />;
+  // Decorativo (aria-hidden): role=separator não é filho permitido de listbox.
+  return <div aria-hidden className={cn("-mx-1.5 my-1 h-px bg-line", className)} />;
 }
 
 /** Atalho à direita do item: ["⌘", "N"] ou ["mod", "N"] (⌘ no Mac, Ctrl nos outros). */

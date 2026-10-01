@@ -171,7 +171,7 @@ export function AttachmentDescription({ children, className }: { children?: Reac
 export function AttachmentActions({ children, className }: { children: ReactNode; className?: string }) {
   const { orientation } = useContext(AttachmentCtx);
   return (
-    <div className={cn("relative z-[1] flex shrink-0 items-center gap-0.5", orientation === "vertical" && "absolute right-1.5 top-1.5 rounded-lg bg-popover/90 p-0.5 shadow-surface backdrop-blur", className)}>
+    <div className={cn("z-[1] flex shrink-0 items-center gap-0.5", orientation === "vertical" ? "absolute right-1.5 top-1.5 rounded-lg bg-popover/90 p-0.5 shadow-surface backdrop-blur" : "relative", className)}>
       {children}
     </div>
   );

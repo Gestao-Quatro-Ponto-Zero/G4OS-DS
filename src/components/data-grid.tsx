@@ -1424,7 +1424,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
                                     return n;
                                   })
                                 }
-                                className="inline-flex max-w-full items-center gap-1.5 rounded-md py-0.5 pr-2 text-left text-[12.5px] font-semibold text-ink hover:text-ink-soft"
+                                className="ds-hit inline-flex max-w-full items-center gap-1.5 rounded-md py-0.5 pr-2 text-left text-[12.5px] font-semibold text-ink hover:text-ink-soft"
                               >
                                 <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 text-muted transition-transform", open && "rotate-90")} />
                                 <span className="truncate">{groupLabel ? groupLabel(g, it.rows) : g}</span>

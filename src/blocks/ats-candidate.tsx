@@ -294,7 +294,7 @@ function Profile({ candidate: c }: { candidate: Candidate }) {
                   </div>
                   <PropertyList
                     items={[
-                      { label: "Vaga", value: <a className="text-blue hover:underline" href={`#/frame/ats-job?id=${job.id}`}>{job.short}</a> },
+                      { label: "Vaga", value: <a className="inline-flex min-h-6 items-center text-blue hover:underline" href={`#/frame/ats-job?id=${job.id}`}>{job.short}</a> },
                       { label: "Origem", value: c.referral ? `Indicação de ${c.referral}` : c.source },
                       { label: "Pretensão", value: formatCurrency(c.salaryExpectation, { cents: false }), hint: c.salaryExpectation > job.salary[1] ? "acima da faixa da vaga" : "CLT · mensal" },
                       { label: "Disponibilidade", value: c.notice },

@@ -116,13 +116,13 @@ export default function CrmActivities() {
         <div className="min-w-0 flex-1">
           <Highlight text={a.title} query={q} className={cn("block text-[13.5px]", a.done ? "text-muted line-through" : "font-medium")} />
           <div className="mt-0.5 flex flex-wrap gap-x-2 text-[12px] text-muted">
-            <a href={`#/frame/crm-company?id=${company.id}`} className="hover:text-ink hover:underline">
+            <a href={`#/frame/crm-company?id=${company.id}`} className="inline-flex min-h-6 items-center hover:text-ink hover:underline">
               {company.name}
             </a>
             {deal && (
               <>
                 <span aria-hidden>·</span>
-                <a href={`#/frame/crm-deal?id=${deal.id}`} className="hover:text-ink hover:underline">
+                <a href={`#/frame/crm-deal?id=${deal.id}`} className="inline-flex min-h-6 items-center hover:text-ink hover:underline">
                   {deal.title}
                 </a>
               </>

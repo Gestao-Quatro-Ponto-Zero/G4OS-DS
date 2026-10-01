@@ -400,6 +400,7 @@ Dois painéis lado a lado com divisor arrastável (mouse, toque ou teclado: ←/
 | `label` | `string \| undefined` | `"Redimensionar painéis"` |  |
 | `max` | `number \| undefined` | `0.72` |  |
 | `min` | `number \| undefined` | `0.28` |  |
+| `mobileLayout` | `"overlay" \| "stack" \| undefined` | `"overlay"` | Abaixo de 768 px: "overlay" (padrão) abre o painel direito em tela cheia — o conteúdo dele precisa ter um botão de fechar que zere `rightOpen`; "stack" empilha os dois painéis dentro do próprio contêiner. |
 | `rightOpen` | `boolean \| undefined` | `true` |  |
 | `storageKey` | `string \| undefined` |  |  |
 

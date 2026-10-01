@@ -905,7 +905,7 @@ export function AgentTrace({
                     <span className={cn("inline-grid h-5 w-5 shrink-0 place-items-center rounded", st === "error" ? "text-rose" : "text-muted")}>
                       {st === "running" ? <Loader2 className="h-3.5 w-3.5 text-blue motion-safe:animate-spin" aria-label="Executando" /> : st === "error" ? <XCircle className="h-3.5 w-3.5" aria-label="Falhou" /> : <Icon className="h-3.5 w-3.5" aria-hidden />}
                     </span>
-                    <button type="button" onClick={() => onSelect?.(s)} className={cn("min-w-0 truncate text-left text-[12.5px]", depth === 0 ? "font-medium text-ink" : "text-ink-soft", onSelect && "hover:underline")}>
+                    <button type="button" onClick={() => onSelect?.(s)} className={cn("min-w-0 truncate py-1 text-left text-[12.5px]", depth === 0 ? "font-medium text-ink" : "text-ink-soft", onSelect && "hover:underline")}>
                       {s.title}
                     </button>
                     {s.tokens != null && <span className="ml-auto shrink-0 pl-2 text-[11px] tabular-nums text-muted">{formatNumber(tokensAt(s))} tk</span>}

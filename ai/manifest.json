@@ -2844,6 +2844,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Quadro\"",
+              "description": null
             }
           ],
           "examplePage": "dash-pipelines"
@@ -17079,6 +17086,13 @@
               "required": false,
               "default": "0.28",
               "description": null
+            },
+            {
+              "name": "mobileLayout",
+              "type": "\"overlay\" | \"stack\" | undefined",
+              "required": false,
+              "default": "\"overlay\"",
+              "description": "Abaixo de 768 px: \"overlay\" (padrão) abre o painel direito em tela cheia — o conteúdo dele precisa ter um botão de fechar que zere `rightOpen`; \"stack\" empilha os dois painéis dentro do próprio contêiner."
             },
             {
               "name": "rightOpen",

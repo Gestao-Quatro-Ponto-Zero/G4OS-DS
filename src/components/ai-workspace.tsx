@@ -97,11 +97,18 @@ export function ResizableSplit({
   max = 0.72,
   storageKey,
   label = "Redimensionar painéis",
+  mobileLayout = "overlay",
   className,
 }: {
   left: ReactNode;
   right: ReactNode;
   rightOpen?: boolean;
+  /**
+   * Abaixo de 768 px: "overlay" (padrão) abre o painel direito em tela cheia —
+   * o conteúdo dele precisa ter um botão de fechar que zere `rightOpen`;
+   * "stack" empilha os dois painéis dentro do próprio contêiner.
+   */
+  mobileLayout?: "overlay" | "stack";
   defaultSize?: number;
   min?: number;
   max?: number;
@@ -157,6 +164,14 @@ export function ResizableSplit({
     e.preventDefault();
   };
 
+  if (mobile && mobileLayout === "stack") {
+    return (
+      <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", className)}>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{left}</div>
+        {rightOpen && <div className="flex min-h-0 min-w-0 flex-1 flex-col border-t border-line">{right}</div>}
+      </div>
+    );
+  }
   if (mobile) {
     return (
       <div className={cn("relative flex min-h-0 min-w-0 flex-1", className)}>

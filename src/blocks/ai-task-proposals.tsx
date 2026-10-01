@@ -128,7 +128,6 @@ export default function TaskProposals() {
             people={team}
             projects={projects}
             defaultOpen={isNext}
-            className={cn(st === "pendente" && !isNext && "opacity-75 transition-opacity hover:opacity-100 focus-within:opacity-100")}
             onChange={(patch) => setItems((xs) => xs.map((x) => (x.id === t.id ? { ...x, ...patch } : x)))}
             onAccept={() => decide(t.id, "aceita")}
             onDecline={() => decide(t.id, "recusada")}

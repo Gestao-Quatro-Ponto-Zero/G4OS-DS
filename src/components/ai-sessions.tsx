@@ -1060,7 +1060,7 @@ export function ToolsBar({ tools, max = 5, onManage, className }: { tools: Conne
       </span>
       {onManage && (
         <Tooltip content="Gerenciar ferramentas">
-          <button type="button" onClick={onManage} aria-label="Gerenciar ferramentas" className="grid h-6 w-6 place-items-center rounded-md hover:bg-ink/[0.06] hover:text-ink">
+          <button type="button" onClick={onManage} aria-label="Gerenciar ferramentas" className="ds-hit grid h-6 w-6 shrink-0 place-items-center rounded-md hover:bg-ink/[0.06] hover:text-ink">
             <Settings2 className="h-3.5 w-3.5" />
           </button>
         </Tooltip>

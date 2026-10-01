@@ -90,7 +90,7 @@ function Frame({
                 {labelText}
               </label>
             ))}
-          {corner && <span className="shrink-0 text-[12px] text-muted">{corner}</span>}
+          {corner && <span className="shrink-0 text-[12px] text-muted [&_a]:inline-flex [&_a]:min-h-6 [&_a]:items-center">{corner}</span>}
         </div>
       )}
       {children}

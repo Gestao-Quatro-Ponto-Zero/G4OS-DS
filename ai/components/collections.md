@@ -139,6 +139,7 @@ Contêiner horizontal do quadro, com rolagem própria.
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
+| `label` | `string \| undefined` | `"Quadro"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

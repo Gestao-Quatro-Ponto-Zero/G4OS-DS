@@ -60,7 +60,7 @@ export function SortHeader({ label, active, dir, onToggle, align = "left" }: { l
       type="button"
       onClick={onToggle}
       aria-label={`Ordenar por ${label}${active ? (dir === "asc" ? ", crescente" : ", decrescente") : ""}`}
-      className={cn("-mx-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-soft hover:text-ink", active && "text-ink", align === "right" && "flex-row-reverse")}
+      className={cn("ds-hit -mx-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-soft hover:text-ink", active && "text-ink", align === "right" && "flex-row-reverse")}
     >
       {label}
       <Icon className={cn("h-3 w-3", !active && "opacity-50")} aria-hidden />

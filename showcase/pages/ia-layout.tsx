@@ -35,6 +35,7 @@ export default function Page() {
             />
             <ResizableSplit
               storageKey="doc-demo"
+              mobileLayout="stack"
               left={<div className="p-4 text-[13px] text-muted">Painel esquerdo (conversa)</div>}
               right={<div className="h-full bg-soft/60 p-4 text-[13px] text-muted">Painel direito (artefatos)</div>}
             />

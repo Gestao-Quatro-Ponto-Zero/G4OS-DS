@@ -746,7 +746,7 @@ export function AddFilterMenu<T>({ filters, label = "Filtro", compact }: { filte
           }}
         >
           <div className="mb-2.5 flex items-center gap-1.5">
-            <button type="button" onClick={reset} aria-label="Voltar para os campos" className="-ml-1 grid h-6 w-6 place-items-center rounded-md text-muted hover:bg-soft hover:text-ink">
+            <button type="button" onClick={reset} aria-label="Voltar para os campos" className="ds-hit -ml-1 grid h-6 w-6 shrink-0 place-items-center rounded-md text-muted hover:bg-soft hover:text-ink">
               <ArrowLeft className="h-3.5 w-3.5" />
             </button>
             <span className="text-[13px] font-medium">{field.label}</span>

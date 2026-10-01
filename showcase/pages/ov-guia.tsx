@@ -25,7 +25,7 @@ export default function Page() {
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
       <DocSection title="Tabela de decisão">
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+        <div tabIndex={0} role="region" aria-label="Tabela de decisão" className="overflow-x-auto rounded-xl border border-line bg-surface outline-none focus-visible:ring-2 focus-visible:ring-accent/40">
           <table className="w-full min-w-[720px] text-left text-[13px]">
             <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
               <tr>
