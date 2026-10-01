@@ -6,6 +6,24 @@
 
 Conta de cliente (?id=): saúde, uso diário, adoção por recurso, faturas, chamados, ajuste de plano com prévia de MRR e cancelamento com confirmação.
 
+## Conceito
+
+**Objetivo:** Decidir o que fazer com uma conta: saúde, uso, cobrança e suporte em um lugar.
+
+**Padrões aplicados**
+
+- Anatomia C · Registro: KPIs da conta no topo; propriedades fixas à direita
+- Saúde e adoção por recurso
+- Ajuste de plano com prévia de MRR; cancelamento com confirmação
+
+**Quando usar e o que adaptar**
+
+- Empresa (CRM), cliente B2B (ERP)
+
+**Evite**
+
+- Cancelar sem mostrar o impacto
+
 ## Componentes usados
 
-—
+`ActionMenu`, `AreaChart`, `Badge`, `Button`, `ChartCard`, `Column`, `ConfirmDialog`, `DataTable`, `EntityMark`, `FieldBlock`, `KpiCard`, `KpiGrid`, `Modal`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `RadialBars`, `Select`, `SplitLayout`, `Tabs`, `formatCurrency`, `formatDate`, `formatNumber`, `notify`

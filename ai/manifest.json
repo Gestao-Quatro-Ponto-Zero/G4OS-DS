@@ -20694,7 +20694,43 @@
       "title": "Construtor de agentes",
       "description": "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Definir o que um agente faz sem sair da conversa com ele: quem configura automações monta gatilhos, ferramentas e instruções e testa na hora.",
+        "patterns": [
+          "Anatomia G · App de altura total: conversa à esquerda, ficha à direita (ResizableSplit)",
+          "Ficha em seções: Gatilhos → Propriedades → Instruções, cada uma com '+ Adicionar'",
+          "Uma ação primária no topo: Publicar (estado rascunho/publicado/alterado)",
+          "Testar roda dentro da conversa com RunSummary, sem trocar de tela",
+          "Instruções em editor rico com 'Melhorar com IA'"
+        ],
+        "adapt": [
+          "Construtor de automações, regras de CRM, playbooks de atendimento: troque os tipos de gatilho e propriedade",
+          "No celular, alterne Ficha/Conversa em vez de dividir a tela"
+        ],
+        "avoid": [
+          "Publicar sem estado visível (rascunho × publicado)",
+          "Instruções em textarea sem estrutura para agentes complexos"
+        ]
+      },
+      "uses": [
+        "AddPropertyMenu",
+        "AgentComposer",
+        "AgentHeader",
+        "AgentInstructions",
+        "AgentMessage",
+        "AgentStatus",
+        "BuilderSection",
+        "ChipPicker",
+        "MenuEntry",
+        "PropertyRow",
+        "PublishBar",
+        "ResizableSplit",
+        "RunStatus",
+        "RunSummary",
+        "ToolGlyph",
+        "TriggerList",
+        "notify"
+      ]
     },
     {
       "slug": "ai-agent-connections",
@@ -20702,7 +20738,33 @@
       "title": "Agente e conexões",
       "description": "Página do agente: o que ele acessa (conexões), quem ele aciona (subagentes com estado), o que entrega (resultados), gatilhos e instruções.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar de uma vez o que um agente acessa, quem ele aciona e o que entrega, para o dono do agente confiar e ajustar permissões.",
+        "patterns": [
+          "Anatomia C · Registro: cabeçalho fixo com Testar/Pausar, conteúdo à esquerda e cartão de conexões fixo à direita",
+          "ConnectionsCard em três blocos: conexões (✓/Conectar), subagentes com estado, resultados",
+          "Conectar acontece no lugar, com desfazer",
+          "Gatilhos com switch: liga/desliga sem formulário"
+        ],
+        "adapt": [
+          "Página de integração de um usuário, bot de atendimento, robô de cobrança",
+          "Troque 'subagentes' por 'etapas' quando o agente for uma automação linear"
+        ],
+        "avoid": [
+          "Esconder permissões de escrita no meio da lista de leitura"
+        ]
+      },
+      "uses": [
+        "AgentConnection",
+        "AppIcon",
+        "Button",
+        "ConnectionsCard",
+        "Page",
+        "PageHeading",
+        "Subagent",
+        "Switch",
+        "notify"
+      ]
     },
     {
       "slug": "ai-agent-run",
@@ -20710,7 +20772,44 @@
       "title": "Execução de agente",
       "description": "Detalhe de uma execução: trace em cascata com replay, passo selecionado com entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar e tentar de novo.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Explicar uma execução do agente passo a passo para quem precisa auditar ou aprovar o resultado antes de usar.",
+        "patterns": [
+          "Anatomia C · Registro: trilha + título fixos, trace em cascata no conteúdo",
+          "Passo selecionado mostra entrada e saída lado a lado",
+          "Custo, tokens e tempo sempre visíveis",
+          "Saída que pede aprovação humana antes de agir; tentar de novo por passo"
+        ],
+        "adapt": [
+          "Logs de automação, jobs de integração, pipelines de dados",
+          "Troque 'tokens' por 'registros processados' fora de IA"
+        ],
+        "avoid": [
+          "Mostrar só o resultado final sem como chegou nele"
+        ]
+      },
+      "uses": [
+        "AgentTrace",
+        "AiBadge",
+        "Badge",
+        "Button",
+        "JsonView",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "StatCell",
+        "StatGrid",
+        "SystemMessage",
+        "Tabs",
+        "TokenUsageMeter",
+        "ToolCall",
+        "ToolCallsSection",
+        "TraceStep",
+        "formatCurrency",
+        "formatDuration",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "ai-assistant",
@@ -20718,7 +20817,47 @@
       "title": "Assistente sobre a tela",
       "description": "Painel Ask AI ao lado de uma tela de CRM: sugestões, resposta com ferramentas usadas e fontes citadas, streaming e parar. A tela continua usável.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Pedir ajuda à IA sobre a tela que já está aberta (aqui, o CRM) sem perder o contexto nem a tela.",
+        "patterns": [
+          "Painel lateral de IA ao lado da tela: a tela continua usável",
+          "Respostas com ferramentas usadas e fontes citadas",
+          "Streaming com Parar; sugestões de pergunta no início",
+          "No celular o painel abre fechado e ocupa a tela quando aberto"
+        ],
+        "adapt": [
+          "Qualquer tela de lista ou registro (ERP, ATS, financeiro): troque as sugestões pelo contexto da tela"
+        ],
+        "avoid": [
+          "Modal de IA que cobre a tela que a pessoa quer analisar"
+        ]
+      },
+      "uses": [
+        "AiBadge",
+        "AiSource",
+        "AskAILauncher",
+        "AskAIPanel",
+        "Badge",
+        "ChatComposer",
+        "ChatMessage",
+        "CitationChip",
+        "Column",
+        "ComposerChip",
+        "DataTable",
+        "EntityMark",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "PromptSuggestion",
+        "PromptSuggestions",
+        "SourceList",
+        "SystemMessage",
+        "ThinkingIndicator",
+        "ToolCall",
+        "ToolCallsSection",
+        "formatCurrency"
+      ]
     },
     {
       "slug": "ai-chat",
@@ -20726,7 +20865,43 @@
       "title": "Chat com histórico",
       "description": "Conversa em página inteira: histórico por data com busca, estado vazio com sugestões, respostas com ferramentas e fontes, avisos do sistema e limite de uso com contagem.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Conversar com o assistente em página inteira, com histórico pesquisável, para quem usa a IA como ferramenta de trabalho diária.",
+        "patterns": [
+          "Anatomia G · App de altura total: histórico à esquerda, thread rola, composer fixo",
+          "Histórico agrupado por data com busca",
+          "Estado vazio com sugestões; avisos do sistema e limite de uso com contagem",
+          "Respostas com ferramentas e fontes"
+        ],
+        "adapt": [
+          "Suporte interno, base de conhecimento, copiloto de vendas"
+        ],
+        "avoid": [
+          "Rolar a página inteira junto com a conversa (perde o composer)"
+        ]
+      },
+      "uses": [
+        "AiMark",
+        "AiSource",
+        "Button",
+        "ChatComposer",
+        "ChatMessage",
+        "ChatThread",
+        "CitationChip",
+        "ComposerAttachment",
+        "ComposerChip",
+        "LimitDialog",
+        "PromptSuggestion",
+        "PromptSuggestions",
+        "RateLimitNotice",
+        "SourceList",
+        "SystemMessage",
+        "ThinkingIndicator",
+        "TokenUsageMeter",
+        "ToolCall",
+        "ToolCallsSection",
+        "normalize"
+      ]
     },
     {
       "slug": "ai-codex",
@@ -20734,7 +20909,59 @@
       "title": "Agente de código (tarefas longas)",
       "description": "Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Acompanhar um agente que trabalha por minutos em um repositório (corrige, testa, publica): ver o que ele fez, o resultado verificável e decidir o próximo passo sem se perder em conversas longas.",
+        "patterns": [
+          "Anatomia Conversa (AgentAppLayout): trilho + lista por projeto recolhível (⌘\\) + conversa; troca rápida de sessão quando a lista está fechada",
+          "Lista “Por projeto”: pastas = repositórios, sessões aninhadas, “Mostrar mais”, ⋯ por projeto",
+          "Execução como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos",
+          "Histórico longo recolhido no topo (ThreadView collapseBefore): só o final importa",
+          "Resultados verificáveis em lista (commit, deploy, testes) com links, não só texto",
+          "Permissão sempre visível no campo; “Acesso total” em âmbar e com confirmação"
+        ],
+        "adapt": [
+          "Agentes de dados (consultas, notebooks): projetos viram bases; resultados viram tabelas e gráficos",
+          "Operações (deploys, incidentes): resultados com status ok/falhou e link do painel",
+          "Use “Sessões com artefatos” quando a entrega principal for um documento e não uma ação"
+        ],
+        "avoid": [
+          "Esconder que o agente tem acesso total",
+          "Mostrar o histórico inteiro sempre aberto",
+          "Resultado sem evidência (hash, link, contagem de testes)"
+        ]
+      },
+      "uses": [
+        "AgentAppLayout",
+        "AgentComposer",
+        "AnswerCard",
+        "BottomNav",
+        "Disclaimer",
+        "IconRail",
+        "InputModal",
+        "ListToggle",
+        "MenuEntry",
+        "MessageActions",
+        "ModelEffort",
+        "ModelPicker",
+        "NavItem",
+        "PermissionMode",
+        "PermissionModeChip",
+        "ProductMark",
+        "RailItem",
+        "RunSummary",
+        "SessionQuickSwitcher",
+        "SessionSidebar",
+        "StepGroup",
+        "StepItem",
+        "ThreadHeader",
+        "ThreadView",
+        "Tooltip",
+        "UserBubble",
+        "VoiceModeButton",
+        "VoiceOverlay",
+        "WorkspaceSwitcher",
+        "notify"
+      ]
     },
     {
       "slug": "ai-compose-email",
@@ -20742,7 +20969,32 @@
       "title": "E-mail com IA",
       "description": "Rascunhos preparados pelo agente: destinatários com busca e sugestões, modelo, estado RASCUNHO e envio com agendamento.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Revisar e enviar e-mails que o agente rascunhou, com controle humano sobre destinatários, texto e horário.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: rascunhos à esquerda, composer à direita (dialog no celular)",
+          "Estado do rascunho sempre visível (Rascunho, Agendado, Enviado)",
+          "Destinatários com busca e sugestões; enviar com desfazer; agendar no botão dividido"
+        ],
+        "adapt": [
+          "Respostas de atendimento, follow-up de vendas, convites de entrevista no ATS"
+        ],
+        "avoid": [
+          "Enviar automaticamente sem passar por revisão"
+        ]
+      },
+      "uses": [
+        "AiBadge",
+        "Button",
+        "ComposeEmail",
+        "ComposeEmailDialog",
+        "ComposeStatus",
+        "MenuEntry",
+        "Page",
+        "PageHeading",
+        "Person",
+        "notify"
+      ]
     },
     {
       "slug": "ai-conversation",
@@ -20750,7 +21002,39 @@
       "title": "Conversa com aprovação",
       "description": "Conversa longa com raciocínio recolhível, plano, ferramentas, fontes citadas, artefato e um pedido de aprovação antes de enviar e-mails (humano no controle).",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar uma conversa longa em que o agente pensa, planeja, usa ferramentas e pede aprovação antes de uma ação irreversível.",
+        "patterns": [
+          "Anatomia G · App de altura total: só a thread rola, composer fixo",
+          "Raciocínio e plano recolhíveis: visíveis, mas sem poluir",
+          "Pedido de aprovação humana antes de agir (enviar e-mails)",
+          "Fontes citadas e artefato inline"
+        ],
+        "adapt": [
+          "Qualquer agente que mexe em dados de clientes (cobrança, CRM, RH)"
+        ],
+        "avoid": [
+          "Esconder o que o agente fez; executar ação externa sem aprovação"
+        ]
+      },
+      "uses": [
+        "AgentComposer",
+        "AgentMessage",
+        "AgentPlan",
+        "AiSource",
+        "ApprovalRequest",
+        "ApprovalState",
+        "ArtifactCard",
+        "CitationChip",
+        "ReasoningBlock",
+        "RunSummary",
+        "SourceList",
+        "SystemMessage",
+        "ToolCall",
+        "ToolCallsSection",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "ai-projects",
@@ -20758,7 +21042,44 @@
       "title": "Projetos do agente",
       "description": "Lista de análises feitas pelo agente com status, dono, tempo, artefatos e custo; filtros, busca e nova análise que abre o workspace.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Achar e reabrir análises feitas pelo agente, com status, dono e custo, para o time acompanhar o que a IA produziu.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (filtros e busca local)",
+          "KPIs curtos no topo (em andamento, concluídas, custo)",
+          "Uma ação primária: Nova análise (InputModal) que abre o workspace",
+          "Linha abre o projeto (?id=)"
+        ],
+        "adapt": [
+          "Relatórios gerados, execuções de automação, campanhas: troque colunas e status"
+        ],
+        "avoid": [
+          "Filtros fora da PageToolbar (somem ao rolar)"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "InputModal",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "TableSearch",
+        "formatCurrency",
+        "formatDuration",
+        "formatNumber",
+        "notify",
+        "useFilters"
+      ]
     },
     {
       "slug": "ai-sessions-artifacts",
@@ -20766,7 +21087,80 @@
       "title": "Sessões com artefatos",
       "description": "Lista de sessões enxuta + conversa em fluxo (status da execução, passos recolhíveis, artefatos que abrem em abas) + painel de artefatos e detalhes. Montada com AgentAppLayout, ThreadHeader e ThreadView.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Versão calma das sessões do G4 OS: mantém a lista de sessões, mas a leitura é em fluxo e as entregas viram artefatos no painel lateral.",
+        "patterns": [
+          "AgentAppLayout: trilho + lista recolhível (botão no cabeçalho da conversa, ⌘\\) + conversa + painel (⌘.); lista recolhida = troca rápida de sessão",
+          "Lista clean: uma linha por sessão (título + glifo de status + horário), agrupada por data ou por projeto pelo ícone do cabeçalho",
+          "Respostas em fluxo com “Trabalhou por …” (RunSummary divider): os passos abrem sob demanda",
+          "Histórico longo recolhido no topo (ThreadView collapseBefore)",
+          "Campo enxuto: + (anexos e ferramentas) · permissão … agente/modelo · ditar · enviar; voz no botão redondo fora do campo",
+          "Permissão sempre visível; “Acesso total” em âmbar e com confirmação",
+          "Painel com abas que viram ícones quando falta espaço; a aba ativa fica sempre inteira",
+          "Celular: lista → conversa em tela cheia → painel como folha"
+        ],
+        "adapt": [
+          "Qualquer app de agente com histórico + entregáveis",
+          "Use a lista rica (Sessões do G4 OS) quando etiquetas e status detalhados importam mais que a leitura",
+          "Para agentes de código (commit, deploy), veja “Agente de código (tarefas longas)”"
+        ],
+        "avoid": [
+          "Misturar respostas em cartão e em fluxo na mesma tela",
+          "Abrir o painel sem um artefato para mostrar",
+          "Mais de ~5 controles na linha do campo ou chips quebrando texto",
+          "Segunda linha de etiquetas em cada sessão da lista clean"
+        ]
+      },
+      "uses": [
+        "AgentAppLayout",
+        "AgentComposer",
+        "AnswerCard",
+        "ArtifactCard",
+        "ArtifactPanel",
+        "ArtifactTab",
+        "BarChart",
+        "BarList",
+        "BottomNav",
+        "ComposerChip",
+        "ContextItem",
+        "ContextView",
+        "Disclaimer",
+        "IconRail",
+        "InputModal",
+        "InsightCard",
+        "ListToggle",
+        "MenuEntry",
+        "MessageActions",
+        "MinimapItem",
+        "ModelEffort",
+        "ModelPicker",
+        "NavItem",
+        "PermissionMode",
+        "PermissionModeChip",
+        "ProductMark",
+        "PromptSuggestions",
+        "RailItem",
+        "ReportSection",
+        "RunStatus",
+        "RunSummary",
+        "SessionDetails",
+        "SessionQuickSwitcher",
+        "SessionSidebar",
+        "SheetArtifact",
+        "SlashCommand",
+        "StepGroup",
+        "StepItem",
+        "ThreadHeader",
+        "ThreadView",
+        "Tooltip",
+        "UserBubble",
+        "VoiceModeButton",
+        "VoiceOverlay",
+        "WorkspaceSwitcher",
+        "formatCurrency",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "ai-sessions-empty",
@@ -20774,7 +21168,34 @@
       "title": "Nova sessão do G4 OS",
       "description": "Início de uma sessão: saudação, campo com agentes e ferramentas, tarefas sugeridas, sessões em andamento e arquivos recentes. Enviar abre a sessão já trabalhando.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Primeira tela de uma sessão: ajudar a pessoa a começar rápido, com sugestões do que o agente sabe fazer e o que já está em andamento.",
+        "patterns": [
+          "Estado vazio produtivo: saudação + composer + tarefas sugeridas (nunca uma tela em branco)",
+          "Momento de marca possível: a saudação pode usar BrandPanel",
+          "Atalhos para retomar: sessões em andamento e arquivos recentes",
+          "Ferramentas conectadas com aviso de reconexão quando algo falha"
+        ],
+        "adapt": [
+          "Home de qualquer copiloto (CRM, ATS, ERP): troque as sugestões pelas tarefas mais comuns do time",
+          "Onboarding de agente novo: sugestões viram um tour guiado"
+        ],
+        "avoid": [
+          "Mais de 4 sugestões",
+          "Sugestões genéricas que não usam os dados do cliente"
+        ]
+      },
+      "uses": [
+        "Disclaimer",
+        "FileCard",
+        "Page",
+        "SessionComposer",
+        "SessionStatusChip",
+        "SlashCommand",
+        "ToolsBar",
+        "VoiceModeButton",
+        "notify"
+      ]
     },
     {
       "slug": "ai-sessions",
@@ -20782,7 +21203,52 @@
       "title": "Sessões do G4 OS (app agêntico)",
       "description": "App desktop de sessões com agente: lista com status ao vivo, conversa com passos recolhíveis, respostas copiáveis e ramificáveis, ferramentas conectadas, painel de informações e modo voz.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Central de trabalho com o agente para quem delega várias tarefas por dia: ver o que está rodando, retomar conversas e auditar o que o agente fez.",
+        "patterns": [
+          "Anatomia Conversa: app em altura total, sem rolagem de página; só o histórico rola e o composer fica fixo",
+          "Lista rica: status ao vivo (Trabalhando, Resposta pronta, Falhou) e etiquetas sempre visíveis",
+          "Respostas em cartão com Copiar · Markdown · ramificar: toda saída é reaproveitável",
+          "Passos recolhíveis (StepGroup): o agente mostra o que fez sem poluir a leitura",
+          "Painel de informações separado (modo da sessão, nome, etiquetas, notas)",
+          "Lista recolhível (ListToggle no cabeçalho da conversa, ⌘\\, lembrada entre visitas); recolhida, a troca rápida de sessão fica no cabeçalho",
+          "Agrupar por data ou por projeto (ícone no cabeçalho da lista): pastas recolhíveis, “Mostrar mais” e ⋯ por projeto"
+        ],
+        "adapt": [
+          "Assistentes internos (G4 OS, copiloto de CRM/ERP): troque agentes e ferramentas conectadas",
+          "Suporte com IA: a lista vira fila de atendimentos, o status vira SLA",
+          "Para leitura mais calma, use a variação Sessões com artefatos (lista clean + respostas em fluxo)"
+        ],
+        "avoid": [
+          "Esconder o status da sessão na lista",
+          "Respostas sem ação de copiar ou ramificar",
+          "Painel de informações aberto por padrão no celular",
+          "Recolher a lista sem deixar um jeito visível de trocar de sessão"
+        ]
+      },
+      "uses": [
+        "AnswerCard",
+        "Disclaimer",
+        "InputModal",
+        "ListToggle",
+        "MenuEntry",
+        "MessageActions",
+        "MinimapItem",
+        "ResizableSplit",
+        "SessionComposer",
+        "SessionHeader",
+        "SessionInfoPanel",
+        "SessionQuickSwitcher",
+        "SessionSidebar",
+        "SlashCommand",
+        "StepGroup",
+        "ThreadMinimap",
+        "UserBubble",
+        "VoiceModeButton",
+        "VoiceOverlay",
+        "WorkspaceSwitcher",
+        "notify"
+      ]
     },
     {
       "slug": "ai-task-proposals",
@@ -20790,7 +21256,32 @@
       "title": "Tarefas propostas pela IA",
       "description": "Resumo de reunião à esquerda e as tarefas que a IA sugere à direita: destino (Linear, Jira, Asana), sub-tarefas, propriedades editáveis, aceitar/recusar por tarefa ou todas, com desfazer.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Transformar o resumo de uma reunião em tarefas reais com revisão humana: aceitar, editar ou recusar cada uma.",
+        "patterns": [
+          "Anatomia G · App de altura total: documento à esquerda, propostas à direita",
+          "Aceitar todas / Recusar todas no topo, com desfazer",
+          "Card editável: destino (Linear, Jira…), sub-tarefas com progresso, propriedades em chips",
+          "Card aceito vira uma linha com 'Desfazer'"
+        ],
+        "adapt": [
+          "Ações de ata de reunião, pendências de auditoria, itens de onboarding de cliente"
+        ],
+        "avoid": [
+          "Criar tarefas automaticamente sem revisão"
+        ]
+      },
+      "uses": [
+        "AvatarGroup",
+        "ProposalState",
+        "SegmentedControl",
+        "TaskDestination",
+        "TaskProposal",
+        "TaskProposalCard",
+        "TaskProposalList",
+        "ToolGlyph",
+        "notify"
+      ]
     },
     {
       "slug": "ai-trace",
@@ -20798,7 +21289,41 @@
       "title": "Inspetor de execução",
       "description": "Trace completo de uma execução em cascata com o passo selecionado ao lado: entrada e saída em JSON, latência, tokens, custo, erro com nova tentativa só daquele passo.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Investigar uma execução que falhou ou demorou: onde, por quê e quanto custou, para quem mantém agentes.",
+        "patterns": [
+          "Anatomia C · Registro: cabeçalho fixo com trilha; trace + detalhe lado a lado (ResizableSplit)",
+          "Cascata com latência por passo; passo com erro em destaque",
+          "Entrada/saída em JSON, tokens e custo do passo",
+          "Tentar de novo só o passo que falhou"
+        ],
+        "adapt": [
+          "Monitor de integrações, filas de processamento, ETL"
+        ],
+        "avoid": [
+          "Logs em texto corrido sem estrutura por passo"
+        ]
+      },
+      "uses": [
+        "AgentPlan",
+        "AgentTrace",
+        "Badge",
+        "Button",
+        "JsonView",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "ReportSection",
+        "ResizableSplit",
+        "StatCell",
+        "StatGrid",
+        "SystemMessage",
+        "TraceStep",
+        "formatCurrency",
+        "formatDuration",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "ai-workspace",
@@ -20806,7 +21331,50 @@
       "title": "Workspace de agente",
       "description": "Conversa com o agente à esquerda e artefatos à direita (relatório, contexto, saída, planilha) em painel redimensionável; resposta com tempo e trace, cartões que abrem abas, composer com comandos e voz.",
       "category": "IA",
-      "uses": []
+      "concept": {
+        "goal": "Análise feita pelo agente que gera entregáveis: a conversa explica, os artefatos (relatório, planilha, contexto) ficam ao lado para revisar e exportar.",
+        "patterns": [
+          "Anatomia Conversa + painel: ResizableSplit com conversa à esquerda e ArtifactPanel à direita",
+          "Resposta em fluxo com RunSummary (tempo, passos, ferramentas, custo) que abre o trace",
+          "Artefatos são cidadãos de primeira classe: cartões na conversa abrem abas no painel",
+          "Contexto explícito: o que o agente usou, com relevância e citações",
+          "Composer com comandos (/relatório) e voz"
+        ],
+        "adapt": [
+          "Análises de receita, funil, churn, inadimplência",
+          "Pesquisa de mercado e due diligence",
+          "Relatórios para cliente: o relatório vira entregável exportável"
+        ],
+        "avoid": [
+          "Esconder quanto tempo e quanto custou a execução",
+          "Artefato que só existe dentro da conversa (sem aba e sem exportar)"
+        ]
+      },
+      "uses": [
+        "AgentComposer",
+        "AgentMessage",
+        "AgentTrace",
+        "ArtifactCard",
+        "ArtifactKind",
+        "ArtifactPanel",
+        "ArtifactTab",
+        "ComposerChip",
+        "ContextItem",
+        "ContextView",
+        "InsightCard",
+        "JsonView",
+        "KpiPair",
+        "LineChart",
+        "Menu",
+        "MetricBar",
+        "RankedList",
+        "ReportSection",
+        "ResizableSplit",
+        "RunSummary",
+        "SheetArtifact",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "app-collab-doc",
@@ -20814,7 +21382,32 @@
       "title": "Conversa do time + documento",
       "description": "Conversa entre pessoas ao lado de um documento em tipografia de leitura: mensagens com nome e hora, separador de data, “digitando”, faixa de ação obrigatória com envio de arquivo e índice do documento.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Discutir um documento com o time ao lado do próprio texto, com pendências claras (ex.: documento obrigatório que falta).",
+        "patterns": [
+          "Anatomia G · App de altura total: conversa à esquerda, documento à direita",
+          "Mensagens com nome e hora, separador de data e 'digitando'",
+          "Faixa de ação obrigatória com envio de arquivo que se resolve sozinha",
+          "Documento em tipografia de leitura com índice que acompanha"
+        ],
+        "adapt": [
+          "Due diligence, contratos, compliance (LGPD), revisão de propostas"
+        ],
+        "avoid": [
+          "Comentários soltos sem vínculo com o documento"
+        ]
+      },
+      "uses": [
+        "ActionRequiredBanner",
+        "AvatarGroup",
+        "DateSeparator",
+        "ReadingDocument",
+        "SegmentedControl",
+        "TeamComposer",
+        "TeamMessage",
+        "TypingIndicator",
+        "notify"
+      ]
     },
     {
       "slug": "app-command-palette",
@@ -20822,7 +21415,32 @@
       "title": "Paleta de comandos (⌘K)",
       "description": "App com a paleta aberta: navegar, criar e achar registros pelo teclado. Busca sem acento, recentes, grupos e atalhos.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Navegar, criar e achar registros pelo teclado sem tirar a mão dele, para quem usa o app o dia inteiro.",
+        "patterns": [
+          "⌘K abre uma paleta sobre qualquer tela",
+          "Grupos (navegar, criar, registros), busca sem acento, recentes e atalhos visíveis",
+          "Enter executa, Esc fecha; a tela de fundo não muda"
+        ],
+        "adapt": [
+          "Qualquer produto do DS: registre os comandos do produto e os atalhos de criação"
+        ],
+        "avoid": [
+          "Paleta com ações sem atalho nem grupo (vira lista sem ordem)"
+        ]
+      },
+      "uses": [
+        "Card",
+        "Command",
+        "CommandPalette",
+        "Kbd",
+        "ListPanel",
+        "ListRow",
+        "Page",
+        "PageHeading",
+        "useCommandShortcut",
+        "useTheme"
+      ]
     },
     {
       "slug": "app-connection",
@@ -20830,7 +21448,35 @@
       "title": "Detalhe da conexão",
       "description": "Um app conectado: estado, exemplo de pedido, dados sincronizados, contas e permissões de leitura/escrita por conta, desconectar com confirmação.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Ver e controlar o que um app conectado pode ler e escrever, por conta, antes de deixar o agente usar.",
+        "patterns": [
+          "Anatomia C · Registro: trilha Apps › nome, estado e ações no topo",
+          "Exemplo de pedido no app para mostrar o valor",
+          "Permissões separadas em Leitura e Escrita, por conta, com switch e desfazer",
+          "Desconectar só com confirmação"
+        ],
+        "adapt": [
+          "Integrações de ERP/CRM, contas bancárias, provedores de e-mail"
+        ],
+        "avoid": [
+          "Uma permissão única 'acesso total' sem detalhar escrita"
+        ]
+      },
+      "uses": [
+        "AccountRow",
+        "AppIcon",
+        "Breadcrumb",
+        "Button",
+        "ConfirmDialog",
+        "ConnectionStatus",
+        "DataSyncTable",
+        "MarketplaceHero",
+        "Page",
+        "ToolPermissionList",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "app-error-pages",
@@ -20838,7 +21484,31 @@
       "title": "Páginas de erro",
       "description": "404, 500, 403, sem conexão e manutenção dentro da casca do app, cada uma com saída clara. Troque o estado no topo.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Dar saída clara quando algo dá errado (404, 500, 403, offline, manutenção) sem tirar a pessoa do app.",
+        "patterns": [
+          "Estados de tela dentro da casca: a navegação continua disponível",
+          "Cada estado com causa em linguagem simples e uma ação de saída",
+          "Estado linkável (?estado=) para testar"
+        ],
+        "adapt": [
+          "Use os mesmos estados em qualquer produto; troque textos e destinos das ações"
+        ],
+        "avoid": [
+          "Tela de erro sem caminho de volta"
+        ]
+      },
+      "uses": [
+        "Banner",
+        "Button",
+        "ErrorState",
+        "ForbiddenState",
+        "MaintenanceState",
+        "NotFoundState",
+        "OfflineState",
+        "SegmentedControl",
+        "notify"
+      ]
     },
     {
       "slug": "app-file-manager",
@@ -20846,7 +21516,40 @@
       "title": "Gerenciador de arquivos",
       "description": "Pastas em árvore, arquivos em grade ou lista, busca, envio com progresso e prévia em sheet com detalhes e ações.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Organizar, achar e prever arquivos do time em pastas, com envio e detalhes sem trocar de tela.",
+        "patterns": [
+          "Anatomia G · App de altura total: árvore de pastas à esquerda, conteúdo rola",
+          "Grade ou lista (SegmentedControl), busca, envio com progresso",
+          "Prévia em Sheet com detalhes e ações"
+        ],
+        "adapt": [
+          "Documentos de cliente no CRM, currículos no ATS, notas e XMLs no ERP"
+        ],
+        "avoid": [
+          "Abrir arquivo em nova página para só ver detalhes"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Button",
+        "Column",
+        "DataTable",
+        "Empty",
+        "FileCard",
+        "FileIcon",
+        "Meter",
+        "PropertyList",
+        "SearchInput",
+        "SegmentedControl",
+        "Sheet",
+        "TreeNode",
+        "TreeView",
+        "formatBytes",
+        "normalize",
+        "notify"
+      ]
     },
     {
       "slug": "app-filtered-list",
@@ -20854,7 +21557,58 @@
       "title": "Lista com filtros (desktop e celular)",
       "description": "Central de atendimento: período no topo, visões salvas, busca local, atalhos de faceta, filtros por SLA/canal/data. No celular os filtros vão para uma folha com “Aplicar (N)”.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Atender a fila de chamados com o recorte certo: período, visões salvas e filtros por SLA, canal e data.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo com período à direita + PageToolbar colada",
+          "Visões salvas por pergunta ('Meus', 'SLA estourando')",
+          "No celular os filtros vão para FilterSheet com 'Aplicar (N)'",
+          "Detalhe em gaveta (?id=) sem perder a lista"
+        ],
+        "adapt": [
+          "Qualquer fila operacional: pedidos, títulos, candidatos"
+        ],
+        "avoid": [
+          "Filtros que não aparecem na URL (não dá para compartilhar o recorte)"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "DateRange",
+        "DateRangeFilter",
+        "Drawer",
+        "EmptyFilterResult",
+        "FieldBlock",
+        "FieldGrid",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Pagination",
+        "PropertyList",
+        "SavedView",
+        "SavedViews",
+        "Select",
+        "SortHeader",
+        "TableSearch",
+        "TextField",
+        "TextareaField",
+        "Timeline",
+        "Tone",
+        "notify",
+        "resolveDateRange",
+        "useFilters",
+        "usePagination",
+        "useSavedViews",
+        "useSort"
+      ]
     },
     {
       "slug": "app-global-search",
@@ -20862,7 +21616,36 @@
       "title": "Busca global (⌘K)",
       "description": "Busca em todo o app: escopos (Tab, prefixos > @ #), resultados por tipo com destaque, prévia à direita, recentes, fonte remota com carregamento e “Ver todos” que abre a tabela filtrada.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Achar qualquer coisa no app (registros, pessoas, ações) e ir direto para a tabela filtrada quando há muitos resultados.",
+        "patterns": [
+          "⌘K com escopos (Tab, prefixos > @ #) e resultados por tipo com destaque",
+          "Prévia à direita sem abrir o registro",
+          "'Ver todos' abre a lista já filtrada (?q=)",
+          "Fonte remota com carregamento e erro"
+        ],
+        "adapt": [
+          "Busca de qualquer produto: registre os tipos e a fonte de dados"
+        ],
+        "avoid": [
+          "Busca que só navega e não leva ao recorte da lista"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Card",
+        "Kbd",
+        "Page",
+        "PageHeading",
+        "SearchPalette",
+        "SearchResult",
+        "SearchScope",
+        "formatCurrency",
+        "notify",
+        "useCommandShortcut",
+        "useTheme"
+      ]
     },
     {
       "slug": "app-marketplace",
@@ -20870,7 +21653,32 @@
       "title": "Marketplace de apps",
       "description": "Conecte as ferramentas do time: busca, categorias, faixa de exemplos de pedido e grade de apps com conectar/conectado.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Descobrir e conectar as ferramentas que o time já usa, entendendo o que cada uma permite pedir à IA.",
+        "patterns": [
+          "Catálogo: título central, busca e categorias em abas",
+          "Faixa com exemplos de pedido por app (mostra o valor antes de conectar)",
+          "Grade de apps com '+' ou ✓; conectar no lugar com desfazer",
+          "Estado vazio quando a busca não acha"
+        ],
+        "adapt": [
+          "Loja de integrações, módulos de ERP, templates de relatório"
+        ],
+        "avoid": [
+          "Conectar sem mostrar permissões no detalhe"
+        ]
+      },
+      "uses": [
+        "AppGrid",
+        "AppTile",
+        "Button",
+        "Empty",
+        "HalftoneBand",
+        "MarketplaceHero",
+        "Page",
+        "normalize",
+        "notify"
+      ]
     },
     {
       "slug": "app-notifications",
@@ -20878,7 +21686,32 @@
       "title": "Central de notificações",
       "description": "Caixa de entrada com abas (todas, não lidas, menções), grupos por dia, lida/não lida, arquivar e marcar tudo como lido.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Ver o que pede atenção agora e limpar a caixa rápido, para quem recebe avisos de vários módulos.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo com 'Marcar tudo como lido'",
+          "Abas Todas / Não lidas / Menções; grupos por dia",
+          "Cada aviso abre o registro e marca como lido; arquivar com desfazer"
+        ],
+        "adapt": [
+          "Central de avisos de qualquer produto; no celular, item da pílula com contador"
+        ],
+        "avoid": [
+          "Notificação que não leva a lugar nenhum"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Button",
+        "CountBadge",
+        "Empty",
+        "Page",
+        "PageHeading",
+        "Tabs",
+        "Tooltip",
+        "notify"
+      ]
     },
     {
       "slug": "app-presentation",
@@ -20886,7 +21719,32 @@
       "title": "Apresentação (QBR)",
       "description": "Revisão trimestral de negócio montada com os layouts de slide do DS: capa, números, tendência, riscos, cliente e plano. Miniaturas, teclado, tela cheia e notas.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Apresentar uma revisão de negócio (QBR) direto do app, com slides montados nos layouts do DS.",
+        "patterns": [
+          "Anatomia G · App de altura total: palco 16:9, miniaturas, notas",
+          "Teclado (← →, F para tela cheia) e progresso",
+          "Layouts de slide do DS: capa, números, tendência, citação"
+        ],
+        "adapt": [
+          "Relatório mensal ao cliente, board meeting, onboarding de time"
+        ],
+        "avoid": [
+          "Slides com cores e fontes fora dos tokens"
+        ]
+      },
+      "uses": [
+        "Button",
+        "DeckSlide",
+        "PageHeading",
+        "SlideBullets",
+        "SlideDeck",
+        "SlideQuote",
+        "SlideSplit",
+        "SlideStat",
+        "SlideTitle",
+        "notify"
+      ]
     },
     {
       "slug": "app-record-tracker",
@@ -20894,7 +21752,51 @@
       "title": "Rastreador de registros",
       "description": "Banco de registros estilo Notion: tabela com etiquetas coloridas, status e prioridade editáveis, desfazer/refazer, Tabela ou Quadro, e painel lateral com propriedades, arquivos, notas e atividade.",
       "category": "Aplicação",
-      "uses": []
+      "concept": {
+        "goal": "Gerenciar registros estilo Notion (aqui, casos de QA) com propriedades editáveis e um painel de detalhes ao lado.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid de altura total (rolagem interna, cabeçalho da grade fixo)",
+          "Etiquetas coloridas, status e prioridade editáveis; desfazer/refazer",
+          "Tabela ou Quadro (mesmos dados)",
+          "RecordPanel lateral com ‹ › entre registros (?id=)"
+        ],
+        "adapt": [
+          "Backlog de produto, inventário de ativos, controle de contratos"
+        ],
+        "avoid": [
+          "Abrir o registro em outra página e perder a lista"
+        ]
+      },
+      "uses": [
+        "ActivitySection",
+        "Avatar",
+        "Checkbox",
+        "DataGrid",
+        "FilesList",
+        "GridColumn",
+        "KanbanBoard",
+        "KanbanColumn",
+        "NotesTable",
+        "Priority",
+        "PriorityIcon",
+        "PriorityPill",
+        "PropertyPill",
+        "PropertyPills",
+        "RecordCard",
+        "RecordFile",
+        "RecordPanel",
+        "RecordSection",
+        "SectionAddButton",
+        "SegmentedControl",
+        "StatusPill",
+        "TableSearch",
+        "TagPill",
+        "TaskStatus",
+        "notify",
+        "priorityLabel",
+        "taskStatusLabel",
+        "useTableSearch"
+      ]
     },
     {
       "slug": "ats-candidate",
@@ -20902,7 +21804,42 @@
       "title": "Perfil do candidato",
       "description": "Candidato em uma vaga: etapas clicáveis, avaliações por critério e por entrevistador, radar contra o perfil da vaga, currículo, entrevistas, agendar, reprovar e criar proposta.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Decidir sobre um candidato com tudo à mão: em que etapa está, como foi avaliado por critério e o que vem a seguir.",
+        "patterns": [
+          "Anatomia C · Registro: trilha + nome + ações fixos; propriedades fixas à direita (SplitLayout)",
+          "StagePath clicável mostra o caminho e o próximo passo",
+          "Avaliações por critério e por entrevistador; radar contra o perfil da vaga",
+          "Reprovar pede confirmação; proposta em modal"
+        ],
+        "adapt": [
+          "Registro de cliente no CRM (etapas do negócio), fornecedor em homologação no ERP"
+        ],
+        "avoid": [
+          "Nota única sem critérios (esconde o porquê da decisão)"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "ConfirmDialog",
+        "DatePicker",
+        "Empty",
+        "FieldBlock",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "RadarChart",
+        "Select",
+        "SplitLayout",
+        "StagePath",
+        "Tabs",
+        "Timeline",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "ats-candidates",
@@ -20910,7 +21847,46 @@
       "title": "Banco de talentos",
       "description": "Todos os candidatos em DataGrid: visões salvas, filtros, busca local (/), seleção com mover etapa em massa, ações rápidas (e-mail, agendar), colunas configuráveis, CSV e cadastro manual.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Trabalhar o banco de talentos em escala: filtrar, selecionar muitos e mover de etapa de uma vez.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: rolagem interna, cabeçalho e colunas fixos",
+          "Visões salvas, filtros e busca local (/) na barra da grade",
+          "Seleção em massa com BulkBar (mover etapa, e-mail)",
+          "Ações rápidas na linha; colunas configuráveis; CSV"
+        ],
+        "adapt": [
+          "Base de contatos (CRM), clientes B2B (ERP), leads de marketing"
+        ],
+        "avoid": [
+          "Ação em massa sem confirmação quando altera muitos registros"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "DataGrid",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "Menu",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "SavedView",
+        "SavedViews",
+        "Select",
+        "TableSearch",
+        "TextField",
+        "formatCurrency",
+        "notify",
+        "plural",
+        "useFilters",
+        "useSavedViews"
+      ]
     },
     {
       "slug": "ats-careers",
@@ -20918,7 +21894,34 @@
       "title": "Página de carreiras",
       "description": "Site público de vagas, pensado primeiro para o celular: busca, filtro por área e modelo, detalhe da vaga e candidatura com currículo em uma folha. Sem casca de app.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Atrair candidatos com uma página pública de vagas pensada primeiro para o celular.",
+        "patterns": [
+          "Anatomia I · Público: rolagem do documento, cabeçalho do site fixo, sem casca de app",
+          "Busca e filtros por área e modelo",
+          "Candidatura em folha com currículo; botão fixo no celular"
+        ],
+        "adapt": [
+          "Portal do cliente, página de parceiros, catálogo público de produtos"
+        ],
+        "avoid": [
+          "Usar a navegação do app interno numa página pública"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Checkbox",
+        "FileDropzone",
+        "Highlight",
+        "ProductMark",
+        "Sheet",
+        "TextField",
+        "UploadItem",
+        "formatCurrency",
+        "matchesQuery",
+        "notify"
+      ]
     },
     {
       "slug": "ats-dashboard",
@@ -20926,7 +21929,42 @@
       "title": "Painel de recrutamento",
       "description": "Contratações contra a meta, tempo até contratar por área contra o SLA, funil, aceite de propostas, qualidade por origem e o que pede ação hoje (entrevistas e vagas fora do SLA).",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar ao time de recrutamento se as contratações estão no ritmo e o que pede ação hoje.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com período, KPIs no topo",
+          "Um gráfico por pergunta: meta, tempo × SLA, funil, aceite, origem",
+          "Fila 'o que pede ação hoje' antes dos detalhes"
+        ],
+        "adapt": [
+          "Painel de vendas, operações ou atendimento: troque as perguntas e as filas"
+        ],
+        "avoid": [
+          "Gráficos sem período ou sem meta de referência"
+        ]
+      },
+      "uses": [
+        "AreaChart",
+        "Avatar",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "DonutChart",
+        "DumbbellChart",
+        "FunnelChart",
+        "KpiCard",
+        "KpiGrid",
+        "ListPanel",
+        "ListRow",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "ats-interviews",
@@ -20934,7 +21972,37 @@
       "title": "Entrevistas",
       "description": "Agenda de entrevistas por dia com sala/link, avaliações pendentes em destaque e preenchimento do scorecard em uma folha lateral (critérios da vaga, parecer e comentário).",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Organizar a agenda de entrevistas e não deixar avaliações pendentes.",
+        "patterns": [
+          "Anatomia A · Lista agrupada por dia, cabeçalho fixo",
+          "Pendências de avaliação em destaque no topo",
+          "Scorecard em folha lateral com os critérios da vaga"
+        ],
+        "adapt": [
+          "Agenda de visitas comerciais, reuniões de onboarding, auditorias"
+        ],
+        "avoid": [
+          "Formulário de avaliação em outra página (perde a agenda)"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Button",
+        "ChoiceCards",
+        "Empty",
+        "ListPanel",
+        "Page",
+        "PageHeading",
+        "Rating",
+        "SegmentedControl",
+        "Sheet",
+        "TextareaField",
+        "notify",
+        "plural"
+      ]
     },
     {
       "slug": "ats-job",
@@ -20942,7 +22010,44 @@
       "title": "Vaga",
       "description": "Detalhe da vaga: resumo, funil, melhores candidatos, modelo de avaliação (critérios com peso e nota esperada) e canais de divulgação. Com ?id=nova vira o formulário de abertura.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Ver a saúde de uma vaga (funil, melhores candidatos) e definir como ela será avaliada.",
+        "patterns": [
+          "Anatomia C · Registro com abas; propriedades fixas à direita",
+          "Modelo de avaliação: critérios com peso e nota esperada",
+          "?id=nova transforma o registro no formulário de abertura"
+        ],
+        "adapt": [
+          "Campanha (marketing), produto (ERP), plano (SaaS): registro com abas + configuração"
+        ],
+        "avoid": [
+          "Formulário de criação diferente da página de detalhe"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "ChoiceCards",
+        "CurrencyField",
+        "FunnelChart",
+        "IconButton",
+        "ListPanel",
+        "ListRow",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Rating",
+        "Select",
+        "SplitLayout",
+        "Tabs",
+        "TextField",
+        "TextareaField",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "ats-jobs",
@@ -20950,7 +22055,45 @@
       "title": "Vagas",
       "description": "Vagas com funil por etapa, tempo em aberto contra o SLA, filtros por área e recrutador, busca local (/) e estado na URL. Linha abre a vaga.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Acompanhar todas as vagas abertas e achar rápido as que estão fora do SLA.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada; abas por situação",
+          "Funil por etapa na linha (barra de proporção)",
+          "Tempo em aberto contra o SLA com tom de alerta",
+          "Estado na URL; linha abre a vaga"
+        ],
+        "adapt": [
+          "Projetos, contratos, pedidos com prazo"
+        ],
+        "avoid": [
+          "SLA só em número, sem tom quando estoura"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "SortHeader",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "chartColor",
+        "notify",
+        "useFilters",
+        "useSort"
+      ]
     },
     {
       "slug": "ats-offers",
@@ -20958,7 +22101,35 @@
       "title": "Propostas",
       "description": "Propostas de contratação em lista + detalhe: cadeia de aprovação, alerta de salário fora da faixa, envio, prazo de resposta e desfecho. Ações mudam com a situação.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Conduzir propostas de contratação pela aprovação até o aceite, com o risco de salário visível.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: lista de propostas + detalhe com cadeia de aprovação",
+          "Alerta quando o salário sai da faixa",
+          "Ações mudam com a situação (aprovar, enviar, registrar resposta)"
+        ],
+        "adapt": [
+          "Descontos comerciais, compras acima da alçada, reembolsos"
+        ],
+        "avoid": [
+          "Botões de todas as ações sempre visíveis, independentemente da situação"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "ConfirmDialog",
+        "CurrencyField",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Stepper",
+        "Tabs",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "ats-pipeline",
@@ -20966,7 +22137,39 @@
       "title": "Candidatos da vaga",
       "description": "Quadro (ou lista) de candidatos de uma vaga por etapa: nota média, origem, tempo na etapa, arrastar para avançar e adicionar candidato. Card abre o perfil.",
       "category": "ATS",
-      "uses": []
+      "concept": {
+        "goal": "Mover candidatos de uma vaga entre etapas e ver onde o funil trava.",
+        "patterns": [
+          "Anatomia E · Quadro: colunas por etapa; no desktop a página não rola",
+          "Card com nota média, origem e tempo na etapa; arrastar para avançar",
+          "Alternar Quadro/Lista sem perder filtros",
+          "Card abre o perfil"
+        ],
+        "adapt": [
+          "Pipeline de vendas, esteira de pedidos, kanban de chamados"
+        ],
+        "avoid": [
+          "Mudar status por botões dentro do card"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "KanbanBoard",
+        "KanbanColumn",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "RecordCard",
+        "SegmentedControl",
+        "Select",
+        "TextField",
+        "chartColor",
+        "notify"
+      ]
     },
     {
       "slug": "auth-forgot-password",
@@ -20974,7 +22177,25 @@
       "title": "Redefinir senha",
       "description": "Fluxo completo em uma tela: pedir link → conferir e-mail → nova senha com confirmação → pronto. Mensagem neutra que não revela se o e-mail existe.",
       "category": "Autenticação",
-      "uses": []
+      "concept": {
+        "goal": "Recuperar o acesso sem fricção e sem revelar se um e-mail existe.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: uma coluna, quatro estados na mesma tela",
+          "Mensagem neutra após pedir o link (segurança)",
+          "Nova senha com confirmação e força visível"
+        ],
+        "adapt": [
+          "Qualquer produto com login próprio; troque o painel de marca"
+        ],
+        "avoid": [
+          "Dizer 'e-mail não encontrado' (vaza a base de usuários)"
+        ]
+      },
+      "uses": [
+        "Button",
+        "PasswordField",
+        "TextField"
+      ]
     },
     {
       "slug": "auth-login",
@@ -20982,7 +22203,27 @@
       "title": "Entrar",
       "description": "Login com e-mail e senha, SSO Google/Microsoft, link mágico e painel de marca navy à direita (some no celular).",
       "category": "Autenticação",
-      "uses": []
+      "concept": {
+        "goal": "Entrar rápido pelo caminho que a pessoa já usa: senha, SSO ou link mágico.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: formulário à esquerda, painel de marca navy à direita (some no celular)",
+          "SSO Google/Microsoft e link mágico além da senha",
+          "Erro no lugar do campo, sem limpar o que foi digitado"
+        ],
+        "adapt": [
+          "Portal do cliente, app interno, área de parceiros"
+        ],
+        "avoid": [
+          "Painel de marca ocupando a tela no celular"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Callout",
+        "Checkbox",
+        "PasswordField",
+        "TextField"
+      ]
     },
     {
       "slug": "auth-otp",
@@ -20990,7 +22231,25 @@
       "title": "Verificar código",
       "description": "Confirmação por código de 6 dígitos: colar o código inteiro, verificação automática, erro com tentativas restantes e reenvio com contagem.",
       "category": "Autenticação",
-      "uses": []
+      "concept": {
+        "goal": "Confirmar a identidade com um código de 6 dígitos sem atrito.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: cartão central",
+          "Colar o código inteiro; verificação automática no último dígito",
+          "Erro com tentativas restantes; reenviar com contagem"
+        ],
+        "adapt": [
+          "2FA em configurações de segurança, confirmação de telefone, aprovação de pagamento"
+        ],
+        "avoid": [
+          "Botão 'Verificar' obrigatório quando os 6 dígitos já estão preenchidos"
+        ]
+      },
+      "uses": [
+        "Button",
+        "OtpInput",
+        "Spinner"
+      ]
     },
     {
       "slug": "auth-signup",
@@ -20998,7 +22257,29 @@
       "title": "Criar conta",
       "description": "Cadastro em duas etapas (você → empresa), senha com força visível, aceite de termos e SSO. Coluna única centrada.",
       "category": "Autenticação",
-      "uses": []
+      "concept": {
+        "goal": "Criar a conta com o mínimo de campos e sem dúvida sobre a senha.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: coluna única centrada em duas etapas (você → empresa)",
+          "Stepper discreto; senha com força visível",
+          "Plano vindo da página de preços (?plan=) aparece como selo"
+        ],
+        "adapt": [
+          "Cadastro de parceiro, convite de cliente para portal"
+        ],
+        "avoid": [
+          "Pedir dados de cobrança no cadastro"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Checkbox",
+        "PasswordField",
+        "Select",
+        "Stepper",
+        "TextField"
+      ]
     },
     {
       "slug": "crm-activities",
@@ -21006,7 +22287,45 @@
       "title": "Atividades e agenda",
       "description": "Tarefas, ligações, reuniões e e-mails agrupados por prazo (atrasadas primeiro) ou na semana, com conclusão rápida, filtros e nova atividade.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Não deixar follow-up cair: ver o que está atrasado, o que é hoje e fechar rápido.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+          "Agrupado por prazo (atrasadas primeiro) ou por semana",
+          "Conclusão rápida na linha; nova atividade em modal"
+        ],
+        "adapt": [
+          "Tarefas do ATS (entrevistas, retornos), cobranças do financeiro"
+        ],
+        "avoid": [
+          "Ordenar por criação em vez de prazo"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Checkbox",
+        "Combobox",
+        "DatePicker",
+        "EmptyFilterResult",
+        "FieldBlock",
+        "FieldGrid",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "SegmentedControl",
+        "Select",
+        "TableSearch",
+        "TextField",
+        "formatDate",
+        "notify",
+        "useFilters"
+      ]
     },
     {
       "slug": "crm-company",
@@ -21014,7 +22333,39 @@
       "title": "Página da empresa",
       "description": "Conta (?id=): indicadores, negócios, contatos e atividades da empresa, propriedades na lateral e novo negócio já vinculado.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Ver uma conta inteira (negócios, contatos, atividades) para preparar uma reunião ou decidir o próximo passo.",
+        "patterns": [
+          "Anatomia C · Registro: cabeçalho fixo; propriedades fixas à direita (SplitLayout)",
+          "KPIs da conta no topo; abas para negócios, contatos e atividades",
+          "Novo negócio já vinculado à empresa"
+        ],
+        "adapt": [
+          "Cliente no ERP, conta no SaaS, fornecedor"
+        ],
+        "avoid": [
+          "Repetir na aba o que já está nas propriedades"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "EntityMark",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "SplitLayout",
+        "Tabs",
+        "formatCurrency",
+        "formatDate",
+        "notify"
+      ]
     },
     {
       "slug": "crm-contact",
@@ -21022,7 +22373,39 @@
       "title": "Página do contato",
       "description": "Pessoa (?id=): papel na decisão, dados de contato, negócios em que participa, histórico e e-mail com modelo.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Entender o papel de uma pessoa na decisão e o histórico com ela antes de entrar em contato.",
+        "patterns": [
+          "Anatomia C · Registro: propriedades fixas à direita",
+          "Papel na decisão (decisora, influenciadora) em destaque",
+          "Histórico em feed; e-mail com modelo em modal"
+        ],
+        "adapt": [
+          "Candidato (ATS), contato de fornecedor, usuário de conta SaaS"
+        ],
+        "avoid": [
+          "Ações de contato escondidas em menu"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "ActivityFeed",
+        "ActivityItem",
+        "Avatar",
+        "Badge",
+        "Button",
+        "EntityMark",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "SplitLayout",
+        "TextField",
+        "TextareaField",
+        "formatCurrency",
+        "formatDate",
+        "notify"
+      ]
     },
     {
       "slug": "crm-contacts",
@@ -21030,7 +22413,52 @@
       "title": "Empresas e contatos",
       "description": "Base de contas em DataGrid: rolagem interna com cabeçalho e total fixos, empresa fixa à esquerda, seleção em massa, ações rápidas (ligar, e-mail, ⋯, clique direito), estágio e responsável editáveis na célula, colunas configuráveis e CSV.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Trabalhar a base de contas em escala: filtrar, editar na célula e agir em massa sem abrir cada registro.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: rolagem interna, cabeçalho e total fixos, empresa fixa à esquerda",
+          "Estágio e responsável editáveis na célula com desfazer",
+          "Ações rápidas na linha (ligar, e-mail, ⋯ e clique direito)",
+          "Seleção em massa; colunas configuráveis; CSV; cards no celular"
+        ],
+        "adapt": [
+          "Clientes (ERP), candidatos (ATS), contas (SaaS)"
+        ],
+        "avoid": [
+          "Rolagem interna no celular (a grade já passa a rolar com a página)"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Button",
+        "DataGrid",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FieldBlock",
+        "FieldGrid",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "SavedView",
+        "SavedViews",
+        "Select",
+        "TableSearch",
+        "Tabs",
+        "TextField",
+        "downloadCsv",
+        "formatCurrency",
+        "gridToCsv",
+        "matchesQuery",
+        "notify",
+        "useFilters",
+        "useSavedViews"
+      ]
     },
     {
       "slug": "crm-deal",
@@ -21038,7 +22466,50 @@
       "title": "Página do negócio",
       "description": "Registro de um negócio (?id=): caminho de etapas, ganho/perda com motivo, nota rápida, feed, tarefas, arquivos, edição em gaveta.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Avançar um negócio: ver em que etapa está, registrar o que aconteceu e decidir ganho ou perda.",
+        "patterns": [
+          "Anatomia C · Registro: trilha + título + Perdido/Ganho fixos; propriedades fixas à direita",
+          "StagePath clicável; perda pede motivo",
+          "Nota rápida alimenta o feed de atividade",
+          "Edição longa em gaveta (Drawer)"
+        ],
+        "adapt": [
+          "Proposta (ATS), pedido (ERP), chamado (suporte)"
+        ],
+        "avoid": [
+          "Ganho/perda sem motivo (perde o dado para o painel)"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "ActivityFeed",
+        "ActivityItem",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Checkbox",
+        "ConfirmDialog",
+        "CurrencyField",
+        "DatePicker",
+        "Drawer",
+        "EntityMark",
+        "FieldBlock",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Select",
+        "SplitLayout",
+        "StagePath",
+        "Tabs",
+        "TextField",
+        "areaClass",
+        "formatCurrency",
+        "formatDate",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "crm-pipeline",
@@ -21046,7 +22517,38 @@
       "title": "Pipeline de vendas",
       "description": "Quadro de negócios por etapa com soma de valor, previsão ponderada, filtros, arrastar entre etapas e novo negócio.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Ver o funil comercial inteiro e mover negócios entre etapas sabendo quanto vale cada coluna.",
+        "patterns": [
+          "Anatomia E · Quadro: cabeçalho fixo; colunas crescem em telas largas",
+          "Soma de valor e previsão ponderada no topo e por coluna",
+          "Arrastar muda a etapa (com desfazer); card abre o negócio",
+          "Filtros e busca na barra acima do quadro"
+        ],
+        "adapt": [
+          "Candidatos (ATS), pedidos (ERP), chamados por status"
+        ],
+        "avoid": [
+          "Mudar etapa por botão dentro do card"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "KanbanBoard",
+        "KanbanColumn",
+        "PageHeading",
+        "RecordCard",
+        "SegmentedControl",
+        "TableSearch",
+        "formatCurrency",
+        "formatPercent",
+        "notify",
+        "useFilters"
+      ]
     },
     {
       "slug": "crm-sales-dashboard",
@@ -21054,7 +22556,38 @@
       "title": "Painel comercial",
       "description": "Meta do trimestre com ritmo esperado, receita por mês contra a meta, funil de conversão, ranking de vendedores e motivos de perda.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Responder se o time vai bater a meta do trimestre e onde está perdendo negócios.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com seletor de time",
+          "Meta com ritmo esperado (GoalMeter) antes de tudo",
+          "Receita × meta, funil, ranking e motivos de perda (Pareto)"
+        ],
+        "adapt": [
+          "Painel de recrutamento, de cobrança ou de operações"
+        ],
+        "avoid": [
+          "Mostrar receita sem meta nem ritmo esperado"
+        ]
+      },
+      "uses": [
+        "BarChart",
+        "ChartCard",
+        "CompareStat",
+        "FunnelChart",
+        "GaugeChart",
+        "GoalMeter",
+        "KpiCard",
+        "KpiGrid",
+        "Leaderboard",
+        "Page",
+        "PageHeading",
+        "ParetoChart",
+        "SegmentedControl",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent"
+      ]
     },
     {
       "slug": "crm-settings",
@@ -21062,7 +22595,31 @@
       "title": "Configurações do CRM",
       "description": "Etapas do funil com probabilidade e ordem, motivos de perda, regras de automação e barra de alterações não salvas.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Ajustar o funil e as regras do CRM sem quebrar o que o time usa.",
+        "patterns": [
+          "Anatomia D · Configurações: título fixo",
+          "Etapas com probabilidade e ordem; motivos de perda; regras de automação",
+          "Barra de alterações não salvas no rodapé"
+        ],
+        "adapt": [
+          "Etapas de vaga (ATS), situações de pedido (ERP)"
+        ],
+        "avoid": [
+          "Salvar a cada campo quando a mudança afeta o time inteiro"
+        ]
+      },
+      "uses": [
+        "Button",
+        "IconButton",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "Switch",
+        "TagInput",
+        "TextField",
+        "notify"
+      ]
     },
     {
       "slug": "crm-team",
@@ -21070,7 +22627,42 @@
       "title": "Time e metas",
       "description": "Atingimento de meta por vendedor (bullet), evolução do ranking (bump), trimestre contra o anterior (slope) e edição de meta.",
       "category": "CRM",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar ao gestor quem está acima ou abaixo da meta e como o ranking mudou.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo",
+          "Bullet por vendedor (realizado × meta), bump do ranking, slope do trimestre",
+          "Editar meta em modal"
+        ],
+        "adapt": [
+          "Metas de recrutadores, produtividade de atendentes"
+        ],
+        "avoid": [
+          "Ranking sem mostrar a meta de cada um"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "BulletChart",
+        "BumpChart",
+        "Button",
+        "ChartCard",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "IconButton",
+        "KpiCard",
+        "KpiGrid",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "SlopeChart",
+        "formatCurrency",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "erp-customers",
@@ -21078,7 +22670,44 @@
       "title": "Clientes",
       "description": "Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e títulos vencidos. Detalhe em gaveta com pedidos recentes, bloqueio de crédito e novo pedido.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Ver a carteira de clientes B2B com risco de crédito e agir sem perder a lista.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+          "Uso do limite de crédito e títulos vencidos na linha",
+          "Detalhe em gaveta com bloqueio de crédito e novo pedido"
+        ],
+        "adapt": [
+          "Contas (CRM), clientes (SaaS)"
+        ],
+        "avoid": [
+          "Abrir página nova só para ver o limite de crédito"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "ListRow",
+        "Meter",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "SortHeader",
+        "TableSearch",
+        "formatCurrency",
+        "notify",
+        "useFilters",
+        "useSort"
+      ]
     },
     {
       "slug": "erp-dashboard",
@@ -21086,7 +22715,38 @@
       "title": "Painel de operações",
       "description": "Vendas do dia contra a meta, OTIF por semana, causas de atraso (Pareto), maiores clientes e as filas que pedem ação: faturar, repor estoque e aprovar compras.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar à operação se as vendas estão no ritmo e quais filas pedem ação agora (faturar, repor, aprovar).",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com período",
+          "Vendas × meta diária, OTIF, causas de atraso (Pareto)",
+          "Filas de ação antes dos detalhes"
+        ],
+        "adapt": [
+          "Painel financeiro, de atendimento ou de recrutamento"
+        ],
+        "avoid": [
+          "Gráficos bonitos sem a fila de ação"
+        ]
+      },
+      "uses": [
+        "AreaChart",
+        "Badge",
+        "BarList",
+        "ChartCard",
+        "KpiCard",
+        "KpiGrid",
+        "LineChart",
+        "ListPanel",
+        "ListRow",
+        "Page",
+        "PageHeading",
+        "ParetoChart",
+        "SegmentedControl",
+        "formatCompact",
+        "formatCurrency",
+        "formatNumber"
+      ]
     },
     {
       "slug": "erp-inventory",
@@ -21094,7 +22754,51 @@
       "title": "Estoque",
       "description": "Saldo por item com quebra por depósito, régua contra o mínimo, cobertura em dias, ruptura com requisição de compra, transferência e entrada de mercadoria. Linha abre o produto.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Evitar ruptura: ver o saldo por depósito contra o mínimo e repor a tempo.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+          "Régua de saldo contra o mínimo e cobertura em dias",
+          "Ruptura vira requisição de compra em um clique",
+          "Linha abre o produto"
+        ],
+        "adapt": [
+          "Licenças (SaaS), capacidade de equipes, vagas por área"
+        ],
+        "avoid": [
+          "Mostrar saldo sem o mínimo de referência"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "EmptyFilterResult",
+        "FieldBlock",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "KpiCard",
+        "Meter",
+        "Modal",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Select",
+        "SortHeader",
+        "TableSearch",
+        "TextField",
+        "Treemap",
+        "formatCurrency",
+        "formatNumber",
+        "notify",
+        "useFilters",
+        "useSort"
+      ]
     },
     {
       "slug": "erp-invoice",
@@ -21102,7 +22806,35 @@
       "title": "Nota fiscal (NF-e)",
       "description": "Documento fiscal para tela e impressão: chave de acesso, emitente e destinatário, itens com NCM/CFOP, tributos, totais, transporte, carta de correção e cancelamento.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Conferir, imprimir e corrigir uma NF-e com a mesma leitura do documento fiscal.",
+        "patterns": [
+          "Anatomia C · Registro como documento: cabeçalho fixo (fora da impressão)",
+          "Layout fiel ao documento: chave, emitente, destinatário, itens, tributos",
+          "CSS de impressão só com o documento",
+          "Carta de correção e cancelamento com confirmação"
+        ],
+        "adapt": [
+          "Proposta comercial, contrato, recibo"
+        ],
+        "avoid": [
+          "Embrulhar o cabeçalho num invólucro (o fixo para de funcionar)"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Badge",
+        "Button",
+        "Callout",
+        "ConfirmDialog",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "TextareaField",
+        "formatCurrency",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "erp-invoices",
@@ -21110,7 +22842,45 @@
       "title": "Notas fiscais",
       "description": "NF-e emitidas com situação na SEFAZ, rejeições em destaque com o motivo e reenvio, busca por número, chave ou cliente (/), download de XML em massa. Linha abre a nota.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Achar notas com problema na SEFAZ e resolver rápido.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+          "Rejeições em destaque com o motivo e reenvio",
+          "Busca por número, chave ou cliente (/); XML em massa"
+        ],
+        "adapt": [
+          "Faturas (SaaS), títulos (financeiro)"
+        ],
+        "avoid": [
+          "Rejeição sem o motivo na linha"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BulkBar",
+        "Button",
+        "Callout",
+        "Column",
+        "DataTable",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "SortHeader",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "formatCurrency",
+        "notify",
+        "selectionColumn",
+        "useFilters",
+        "useSelection",
+        "useSort"
+      ]
     },
     {
       "slug": "erp-order",
@@ -21118,7 +22888,40 @@
       "title": "Pedido de venda",
       "description": "Detalhe do pedido: etapas, itens com estoque, cliente, pagamento e ações que mudam com a situação (aprovar, liberar crédito, faturar, despachar, entregar, cancelar). ?id=novo abre o cadastro.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Levar um pedido de venda do cadastro à entrega com as ações certas em cada etapa.",
+        "patterns": [
+          "Anatomia C · Registro: etapas no topo; resumo fixo à direita",
+          "Ações mudam com a situação (aprovar, liberar crédito, faturar…)",
+          "Itens com saldo em estoque",
+          "?id=novo abre o cadastro na mesma tela"
+        ],
+        "adapt": [
+          "Negócio (CRM), proposta (ATS), requisição de compra"
+        ],
+        "avoid": [
+          "Todas as ações visíveis em todas as situações"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Combobox",
+        "ConfirmDialog",
+        "EntityMark",
+        "FieldBlock",
+        "IconButton",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Select",
+        "SplitLayout",
+        "Stepper",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "erp-orders",
@@ -21126,7 +22929,41 @@
       "title": "Pedidos de venda",
       "description": "Pedidos em DataGrid: abas por situação, agrupamento com subtotal, itens expansíveis na linha, total fixo no rodapé, faturamento em massa, ações rápidas e CSV. Linha abre o pedido.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Operar pedidos em volume: agrupar por situação, ver itens sem abrir e faturar em massa.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: rolagem interna, total fixo no rodapé",
+          "Abas por situação + agrupamento com subtotal",
+          "Itens expansíveis na linha; faturamento em massa",
+          "Ações rápidas e CSV"
+        ],
+        "adapt": [
+          "Chamados agrupados por prioridade, títulos por vencimento"
+        ],
+        "avoid": [
+          "Subtotal só no fim da página"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "DataGrid",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "formatCurrency",
+        "notify",
+        "useFilters"
+      ]
     },
     {
       "slug": "erp-product",
@@ -21134,7 +22971,41 @@
       "title": "Produto",
       "description": "Página do SKU: saldo por depósito contra o mínimo, projeção de estoque em 30 dias, preço e margem, fornecedor e histórico de movimentações. Ajuste de preço e pedido de compra.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Entender um SKU: onde está o estoque, quando acaba, margem e quem fornece.",
+        "patterns": [
+          "Anatomia C · Registro: propriedades fixas à direita",
+          "Saldo por depósito contra o mínimo; projeção de 30 dias",
+          "Ajuste de preço e pedido de compra em modal"
+        ],
+        "adapt": [
+          "Plano (SaaS), vaga (ATS), contrato"
+        ],
+        "avoid": [
+          "Projeção sem a linha do mínimo"
+        ]
+      },
+      "uses": [
+        "AreaChart",
+        "Badge",
+        "Button",
+        "ChartCard",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "KpiCard",
+        "KpiGrid",
+        "Meter",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "SplitLayout",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "erp-purchase-requests",
@@ -21142,7 +23013,40 @@
       "title": "Requisições de compra",
       "description": "Fila de aprovação mestre-detalhe: cadeia de aprovadores, itens, comparação de cotações com o menor preço destacado e aprovar/recusar com justificativa.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Aprovar ou recusar requisições de compra com a cotação certa e justificativa.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: fila à esquerda, requisição à direita",
+          "Cadeia de aprovadores com etapa atual",
+          "Comparação de cotações com o menor preço destacado",
+          "Recusar exige justificativa"
+        ],
+        "adapt": [
+          "Aprovação de propostas (ATS), descontos (CRM), reembolsos"
+        ],
+        "avoid": [
+          "Aprovar sem ver as cotações"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Empty",
+        "Modal",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Stepper",
+        "Tabs",
+        "TextField",
+        "Tone",
+        "areaClass",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "erp-suppliers",
@@ -21150,7 +23054,49 @@
       "title": "Fornecedores",
       "description": "Fornecedores com classificação A/B/C, OTIF contra a meta, prazo de entrega, gasto no ano e compras em aberto. Dispersão prazo × pontualidade e detalhe em gaveta.",
       "category": "ERP",
-      "uses": []
+      "concept": {
+        "goal": "Escolher e acompanhar fornecedores por pontualidade, prazo e gasto.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
+          "Classificação A/B/C e OTIF contra a meta",
+          "Dispersão prazo × pontualidade para achar os problemáticos",
+          "Detalhe em gaveta"
+        ],
+        "adapt": [
+          "Parceiros, agências, transportadoras"
+        ],
+        "avoid": [
+          "Nota do fornecedor sem os critérios"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarList",
+        "BulletChart",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "ListRow",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "ScatterChart",
+        "SortHeader",
+        "TableSearch",
+        "formatCurrency",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useSort"
+      ]
     },
     {
       "slug": "fin-budget",
@@ -21158,7 +23104,42 @@
       "title": "Orçamento",
       "description": "Orçado × realizado por centro de custo no mês ou no acumulado: halteres de variação, régua de consumo por responsável, tabela com desvio favorável/desfavorável e pedido de remanejamento.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar onde o realizado está fugindo do orçado e quem responde por isso.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com mês/acumulado",
+          "Halteres orçado × realizado; desvio favorável/desfavorável por cor e palavra",
+          "Pedido de remanejamento em modal"
+        ],
+        "adapt": [
+          "Metas comerciais, headcount por área"
+        ],
+        "avoid": [
+          "Verde/vermelho sem dizer se custo acima é ruim"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "ChartCard",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "DumbbellChart",
+        "FieldBlock",
+        "KpiCard",
+        "KpiGrid",
+        "Meter",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Select",
+        "TextareaField",
+        "formatCurrency",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "fin-cashflow",
@@ -21166,7 +23147,43 @@
       "title": "Fluxo de caixa",
       "description": "Entradas e saídas por semana (saídas negativas), saldo projetado contra o mínimo de segurança, ponte do mês em cascata, próximos pagamentos e saldo por conta.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "Responder se vai faltar caixa nas próximas semanas e o que vence antes.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo",
+          "Entradas/saídas por semana (saídas negativas) e saldo projetado × mínimo",
+          "Ponte do mês em cascata; próximos pagamentos"
+        ],
+        "adapt": [
+          "Projeção de capacidade, consumo de licenças"
+        ],
+        "avoid": [
+          "Saldo projetado sem o mínimo de segurança"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarChart",
+        "Button",
+        "ChartCard",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "DatePicker",
+        "FieldBlock",
+        "KpiCard",
+        "KpiGrid",
+        "LineChart",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "ProportionBar",
+        "SegmentedControl",
+        "TextField",
+        "WaterfallChart",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "fin-dashboard",
@@ -21174,7 +23191,36 @@
       "title": "Visão financeira",
       "description": "O dia da controladoria em uma tela: caixa e projeção contra o mínimo, liquidez, aging do a receber, aprovações de pagamento, conciliação pendente, maiores devedores e centros estourados.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "O dia da controladoria em uma tela: caixa, recebíveis, aprovações e pendências.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com período",
+          "KPIs de liquidez, aging e caixa contra o mínimo",
+          "Filas de ação (aprovar, conciliar) antes dos detalhes"
+        ],
+        "adapt": [
+          "Painel de operações, de RH"
+        ],
+        "avoid": [
+          "Painel só com gráficos, sem o que fazer hoje"
+        ]
+      },
+      "uses": [
+        "BarList",
+        "Button",
+        "ChartCard",
+        "GaugeChart",
+        "KpiCard",
+        "KpiGrid",
+        "LineChart",
+        "ListPanel",
+        "ListRow",
+        "Meter",
+        "Page",
+        "PageHeading",
+        "ProportionBar",
+        "formatCurrency"
+      ]
     },
     {
       "slug": "fin-dre",
@@ -21182,7 +23228,34 @@
       "title": "DRE gerencial",
       "description": "Demonstrativo de resultado com grupos expansíveis, realizado × orçado com variação favorável/desfavorável, cascata da receita ao lucro, margens contra a meta e receita × margem no semestre.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "Explicar o resultado do mês: da receita ao lucro, contra o orçado.",
+        "patterns": [
+          "Anatomia B · Painel com tabela hierárquica: grupos expansíveis",
+          "Realizado × orçado com variação favorável/desfavorável",
+          "Cascata da receita ao lucro; margens contra a meta"
+        ],
+        "adapt": [
+          "Relatório de unidade de negócio, P&L de produto"
+        ],
+        "avoid": [
+          "Tabela plana sem grupos (impossível de ler)"
+        ]
+      },
+      "uses": [
+        "BulletChart",
+        "Button",
+        "ChartCard",
+        "ComboChart",
+        "Delta",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "WaterfallChart",
+        "formatCurrency",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "fin-payables",
@@ -21190,7 +23263,50 @@
       "title": "Contas a pagar",
       "description": "Títulos de fornecedores, folha e impostos: aprovação em massa, agendamento, pagamento, recusa com motivo e gaveta com boleto anexo. Filtros por categoria, centro de custo e vencimento.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "Pagar em dia e só o que foi aprovado, com o comprovante à mão.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada; abas por situação",
+          "Aprovação e agendamento em massa (BulkBar)",
+          "Recusa com motivo; boleto anexo na gaveta"
+        ],
+        "adapt": [
+          "Reembolsos, comissões, faturas de fornecedor"
+        ],
+        "avoid": [
+          "Pagar em massa sem confirmação do total"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BulkBar",
+        "Button",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "EmptyFilterResult",
+        "FileCard",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "SortHeader",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "TextareaField",
+        "formatCurrency",
+        "notify",
+        "plural",
+        "selectionColumn",
+        "useFilters",
+        "useSelection",
+        "useSort"
+      ]
     },
     {
       "slug": "fin-receivables",
@@ -21198,7 +23314,48 @@
       "title": "Contas a receber",
       "description": "Vencidos e a vencer em abas, aging em barras, DataGrid com tom por atraso, total fixo, cobrança em massa, ações rápidas (receber, cobrar), CSV e gaveta para registrar pagamento ou promessa.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "Cobrar quem está atrasado, começando pelo maior risco.",
+        "patterns": [
+          "Anatomia A · Lista com resumo de aging no topo e DataGrid abaixo",
+          "Tom da linha por atraso; total fixo no rodapé da grade",
+          "Cobrança em massa e ações rápidas (receber, cobrar)",
+          "Registrar pagamento ou promessa em gaveta"
+        ],
+        "adapt": [
+          "Faturas em atraso (SaaS), devoluções pendentes"
+        ],
+        "avoid": [
+          "Ordenar por nome em vez de atraso"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarChart",
+        "Button",
+        "ChartCard",
+        "DataGrid",
+        "DatePicker",
+        "Drawer",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FieldBlock",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "TableSearch",
+        "Tabs",
+        "formatCurrency",
+        "formatPercent",
+        "notify",
+        "useFilters"
+      ]
     },
     {
       "slug": "fin-reconciliation",
@@ -21206,7 +23363,33 @@
       "title": "Conciliação bancária",
       "description": "Extrato do banco × lançamentos do ERP lado a lado: sugestões com grau de confiança, aceite em massa, vínculo manual e lançamento para tarifas e rendimentos sem documento.",
       "category": "Financeiro",
-      "uses": []
+      "concept": {
+        "goal": "Bater o extrato com o ERP rápido, aceitando o óbvio e resolvendo só as exceções.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: extrato × lançamentos lado a lado",
+          "Sugestões com grau de confiança; aceite em massa",
+          "Vínculo manual e lançamento para tarifas sem documento"
+        ],
+        "adapt": [
+          "Conciliação de cartões, de estoque físico × sistema"
+        ],
+        "avoid": [
+          "Pedir confirmação item a item quando a confiança é alta"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Empty",
+        "FieldBlock",
+        "Meter",
+        "Page",
+        "PageHeading",
+        "Select",
+        "formatCurrency",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "marketing-landing",
@@ -21214,7 +23397,35 @@
       "title": "Landing de produto",
       "description": "Página pública completa: navegação, hero com o produto real na moldura, logos em movimento, recursos, esfera de clientes, números, depoimentos, planos e chamada final.",
       "category": "Marketing",
-      "uses": []
+      "concept": {
+        "goal": "Apresentar o produto e levar a pessoa ao cadastro com prova real (o produto na moldura).",
+        "patterns": [
+          "Anatomia I · Público: rolagem do documento, cabeçalho do site fixo",
+          "Hero com o produto real; logos; recursos; números; depoimentos",
+          "CTAs levam a cadastro, preços ou vendas"
+        ],
+        "adapt": [
+          "Página de módulo, de evento, de parceiro"
+        ],
+        "avoid": [
+          "Ilustrações genéricas no lugar do produto real"
+        ]
+      },
+      "uses": [
+        "AreaChart",
+        "Button",
+        "FeatureGrid",
+        "HeroSection",
+        "ImageSphere",
+        "KpiCard",
+        "KpiGrid",
+        "LogoCloud",
+        "ScreenFrame",
+        "StatsBand",
+        "Testimonial",
+        "formatCompact",
+        "formatCurrency"
+      ]
     },
     {
       "slug": "marketing-pricing",
@@ -21222,7 +23433,29 @@
       "title": "Página de preços",
       "description": "Planos com ciclo mensal/anual e calculadora por usuários, tabela comparativa por grupo de recurso (fixa ao rolar), FAQ em acordeão e CTA que leva ao cadastro com o plano escolhido.",
       "category": "Marketing",
-      "uses": []
+      "concept": {
+        "goal": "Ajudar a escolher o plano certo e ir para o cadastro com ele selecionado.",
+        "patterns": [
+          "Anatomia I · Público: cabeçalho do site fixo",
+          "Ciclo mensal/anual e calculadora por usuários",
+          "Comparativo com cabeçalho fixo ao rolar; FAQ em acordeão",
+          "CTA leva ao cadastro com ?plan="
+        ],
+        "adapt": [
+          "Planos de suporte, pacotes de serviço"
+        ],
+        "avoid": [
+          "Esconder o preço ('fale com vendas') em todos os planos"
+        ]
+      },
+      "uses": [
+        "Accordion",
+        "Badge",
+        "Button",
+        "NumberField",
+        "SegmentedControl",
+        "formatCurrency"
+      ]
     },
     {
       "slug": "onboarding-checklist",
@@ -21230,7 +23463,28 @@
       "title": "Primeiros passos",
       "description": "Página inicial de conta nova: checklist com progresso, um passo aberto por vez com a ação direta, recursos de ajuda e opção de dispensar.",
       "category": "Onboarding",
-      "uses": []
+      "concept": {
+        "goal": "Levar uma conta nova ao primeiro valor com poucos passos, cada um com a ação direta.",
+        "patterns": [
+          "Anatomia B · Painel (home): cabeçalho fixo com saudação",
+          "Checklist com progresso; um passo aberto por vez",
+          "Cada passo leva à tela real onde a ação acontece",
+          "Pode ser dispensado; progresso salvo"
+        ],
+        "adapt": [
+          "Ativação de cliente no SaaS, implantação no ERP, onboarding de recrutador"
+        ],
+        "avoid": [
+          "Checklist com passos que não levam a lugar nenhum"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Callout",
+        "Page",
+        "PageHeading",
+        "ProgressRing"
+      ]
     },
     {
       "slug": "onboarding-wizard",
@@ -21238,7 +23492,30 @@
       "title": "Assistente de configuração",
       "description": "Onboarding em 4 passos (espaço → módulos → equipe → dados) com trilha lateral, rodapé fixo, pular etapa e tela de conclusão.",
       "category": "Onboarding",
-      "uses": []
+      "concept": {
+        "goal": "Configurar o espaço de trabalho em poucos passos guiados, com a opção de pular.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: trilha lateral de passos + rodapé fixo Voltar/Continuar",
+          "Um assunto por passo (espaço, módulos, equipe, dados)",
+          "Pular etapa sempre disponível; tela de conclusão leva ao checklist"
+        ],
+        "adapt": [
+          "Implantação de módulo, importação de dados, configuração de integração"
+        ],
+        "avoid": [
+          "Mais de 5 passos ou passos obrigatórios que podiam ser depois"
+        ]
+      },
+      "uses": [
+        "Button",
+        "ChoiceCards",
+        "FileDropzone",
+        "ProductMark",
+        "Select",
+        "TagInput",
+        "TextField",
+        "UploadItem"
+      ]
     },
     {
       "slug": "saas-analytics",
@@ -21246,7 +23523,38 @@
       "title": "Análise de aquisição",
       "description": "Funil de conversão em colunas, origem do tráfego, dispositivos, taxa de conversão no tempo e mapa de atividade diária.",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Entender de onde vêm os clientes e onde a aquisição perde gente.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com período",
+          "Funil em colunas com a maior perda destacada",
+          "Origem, dispositivos, conversão no tempo e atividade diária"
+        ],
+        "adapt": [
+          "Funil de recrutamento, funil comercial"
+        ],
+        "avoid": [
+          "Funil sem mostrar a conversão entre etapas"
+        ]
+      },
+      "uses": [
+        "BarList",
+        "Button",
+        "CalendarHeatmap",
+        "ChartCard",
+        "DonutChart",
+        "FunnelChart",
+        "KpiCard",
+        "KpiGrid",
+        "LineChart",
+        "Page",
+        "PageHeading",
+        "SankeyChart",
+        "SegmentedControl",
+        "formatNumber",
+        "formatPercent",
+        "notify"
+      ]
     },
     {
       "slug": "saas-billing",
@@ -21254,7 +23562,52 @@
       "title": "Cobrança e faturas",
       "description": "Ponte de MRR do mês, situação das faturas, régua de cobrança com retentativa, filtros, ações em massa e detalhe da fatura em gaveta (?id=).",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Proteger o MRR: ver de onde ele vem e recuperar cobranças que falharam.",
+        "patterns": [
+          "Anatomia B · Painel + lista: ponte de MRR no topo, faturas abaixo",
+          "Régua de cobrança com retentativa",
+          "Ações em massa; detalhe da fatura em gaveta (?id=)"
+        ],
+        "adapt": [
+          "Contas a receber (financeiro), assinaturas de serviço"
+        ],
+        "avoid": [
+          "Falha de cobrança sem próxima tentativa visível"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BulkBar",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "Pagination",
+        "PropertyList",
+        "ProportionBar",
+        "SortHeader",
+        "TableSearch",
+        "WaterfallChart",
+        "formatCurrency",
+        "formatDate",
+        "notify",
+        "selectionColumn",
+        "useFilters",
+        "usePagination",
+        "useSelection",
+        "useSort"
+      ]
     },
     {
       "slug": "saas-customer",
@@ -21262,7 +23615,47 @@
       "title": "Página da conta",
       "description": "Conta de cliente (?id=): saúde, uso diário, adoção por recurso, faturas, chamados, ajuste de plano com prévia de MRR e cancelamento com confirmação.",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Decidir o que fazer com uma conta: saúde, uso, cobrança e suporte em um lugar.",
+        "patterns": [
+          "Anatomia C · Registro: KPIs da conta no topo; propriedades fixas à direita",
+          "Saúde e adoção por recurso",
+          "Ajuste de plano com prévia de MRR; cancelamento com confirmação"
+        ],
+        "adapt": [
+          "Empresa (CRM), cliente B2B (ERP)"
+        ],
+        "avoid": [
+          "Cancelar sem mostrar o impacto"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "AreaChart",
+        "Badge",
+        "Button",
+        "ChartCard",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "EntityMark",
+        "FieldBlock",
+        "KpiCard",
+        "KpiGrid",
+        "Modal",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "RadialBars",
+        "Select",
+        "SplitLayout",
+        "Tabs",
+        "formatCurrency",
+        "formatDate",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "saas-customers",
@@ -21270,7 +23663,58 @@
       "title": "Lista de clientes",
       "description": "Tabela com visões salvas, busca local (/), filtros por campo (plano, saúde, MRR, uso…), estado na URL, seleção em massa, paginação e drawer.",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Achar e agir sobre contas em escala: quem está em risco, quem pode expandir.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (visões, filtros, busca)",
+          "Visões salvas por pergunta de negócio ('Em risco', 'Potencial de expansão')",
+          "Estado na URL; seleção em massa com BulkBar; paginação",
+          "Linha abre a conta"
+        ],
+        "adapt": [
+          "Empresas (CRM), clientes (ERP), candidatos (ATS)"
+        ],
+        "avoid": [
+          "Filtros fora da PageToolbar (somem ao rolar)"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Badge",
+        "BulkBar",
+        "Button",
+        "Column",
+        "DataTable",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FieldBlock",
+        "FieldGrid",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Modal",
+        "NumberField",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Pagination",
+        "SavedView",
+        "SavedViews",
+        "Select",
+        "SortHeader",
+        "Sparkline",
+        "TableSearch",
+        "TextField",
+        "formatCurrency",
+        "formatNumber",
+        "notify",
+        "selectionColumn",
+        "useFilters",
+        "usePagination",
+        "useSavedViews",
+        "useSelection",
+        "useSort"
+      ]
     },
     {
       "slug": "saas-dashboard",
@@ -21278,7 +23722,41 @@
       "title": "Dashboard de produto SaaS",
       "description": "KPIs com variação, visitantes com seletor de período, movimento de MRR, NPS e contas recentes que abrem a página da conta.",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar a saúde do produto SaaS em uma olhada: receita, aquisição, retenção e satisfação.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com Exportar e Nova conta",
+          "KPIs com variação e sparkline",
+          "Visitantes com seletor de período; movimento de MRR; NPS",
+          "Contas recentes abrem a página da conta"
+        ],
+        "adapt": [
+          "Painel de qualquer produto: troque os KPIs e as perguntas"
+        ],
+        "avoid": [
+          "Mais de 5 KPIs no topo"
+        ]
+      },
+      "uses": [
+        "AreaChart",
+        "Badge",
+        "BarChart",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "EntityMark",
+        "KpiCard",
+        "KpiGrid",
+        "NpsChart",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Tabs",
+        "formatCurrency",
+        "formatNumber",
+        "notify"
+      ]
     },
     {
       "slug": "saas-integrations",
@@ -21286,7 +23764,38 @@
       "title": "Integrações",
       "description": "Catálogo por categoria com busca, estado de sincronização, erro com reconexão, conexão por autorização e configuração em gaveta.",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Manter as integrações funcionando e conectar novas sem sair do produto.",
+        "patterns": [
+          "Catálogo por categoria com busca",
+          "Estado de sincronização e erro com reconexão em destaque",
+          "Autorização em modal; configuração em gaveta"
+        ],
+        "adapt": [
+          "Conexões bancárias, canais de venda, provedores de e-mail"
+        ],
+        "avoid": [
+          "Integração com erro sem botão de reconectar"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Banner",
+        "Button",
+        "ConfirmDialog",
+        "Drawer",
+        "FieldBlock",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Select",
+        "Switch",
+        "TableSearch",
+        "TextField",
+        "matchesQuery",
+        "notify"
+      ]
     },
     {
       "slug": "saas-reports",
@@ -21294,7 +23803,40 @@
       "title": "Relatórios",
       "description": "Modelos prontos, relatórios salvos com agendamento, execução manual e criação com destinatários.",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Gerar e agendar relatórios recorrentes para quem precisa receber números sem entrar no app.",
+        "patterns": [
+          "Anatomia A · Lista: modelos prontos + relatórios salvos",
+          "Agendamento e execução manual",
+          "Criação com destinatários em modal"
+        ],
+        "adapt": [
+          "Relatórios do financeiro, do recrutamento, de operações"
+        ],
+        "avoid": [
+          "Relatório sem dono nem próxima execução visível"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Card",
+        "Column",
+        "DataTable",
+        "FieldBlock",
+        "FieldGrid",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "Select",
+        "Sparkline",
+        "TagInput",
+        "TextField",
+        "formatDate",
+        "notify"
+      ]
     },
     {
       "slug": "saas-support",
@@ -21302,7 +23844,40 @@
       "title": "Central de suporte",
       "description": "Fila de chamados com filtros e SLA, conversa com resposta, status, prioridade e responsável; no celular a conversa abre em tela cheia (?id=).",
       "category": "SaaS",
-      "uses": []
+      "concept": {
+        "goal": "Atender a fila de chamados priorizando SLA, sem perder a conversa.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: fila à esquerda, conversa à direita",
+          "PageToolbar com filtros e busca colada ao cabeçalho",
+          "SLA, prioridade e responsável no detalhe; no celular a conversa abre em tela cheia (?id=)"
+        ],
+        "adapt": [
+          "Atendimento interno (TI, RH), pós-venda, ouvidoria"
+        ],
+        "avoid": [
+          "Abrir cada chamado em página nova"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "EntityMark",
+        "FieldBlock",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Select",
+        "TableSearch",
+        "TextareaField",
+        "notify",
+        "useFilters"
+      ]
     },
     {
       "slug": "settings-appearance",
@@ -21310,7 +23885,32 @@
       "title": "Aparência e marca",
       "description": "Modo claro/escuro/sistema, marca do cliente (white-label) e tipografia aplicados ao vivo no app inteiro, com prévia e restauração.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Aplicar a marca do cliente (white-label), o modo e a tipografia no app inteiro, ao vivo.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Prévia ao vivo antes de salvar; restaurar padrão",
+          "Usa os tokens semânticos: só --ds-* mudam"
+        ],
+        "adapt": [
+          "Qualquer produto vendido para vários clientes"
+        ],
+        "avoid": [
+          "Trocar cores em componentes em vez de tokens"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Delta",
+        "SettingsSection",
+        "Switch",
+        "ThemeToggle",
+        "brandPresets",
+        "notify",
+        "typePresets",
+        "useTheme"
+      ]
     },
     {
       "slug": "settings-audit-log",
@@ -21318,7 +23918,40 @@
       "title": "Log de auditoria",
       "description": "Quem fez o quê e quando: busca, filtros por pessoa, área e risco, período, exportação e detalhe do evento (antes/depois, IP) em drawer por ?id=.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Responder quem fez o quê e quando, para segurança e compliance.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "PageToolbar com busca e filtros por pessoa, área e risco",
+          "Detalhe do evento (antes/depois, IP) em gaveta por ?id=",
+          "Exportação do recorte"
+        ],
+        "adapt": [
+          "Histórico de alterações de pedidos, de contratos"
+        ],
+        "avoid": [
+          "Log sem o antes/depois"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "PageToolbar",
+        "Pagination",
+        "PropertyList",
+        "TableSearch",
+        "notify",
+        "useFilters",
+        "usePagination"
+      ]
     },
     {
       "slug": "settings-billing",
@@ -21326,7 +23959,32 @@
       "title": "Plano e cobrança",
       "description": "Plano atual com renovação, uso contra limites, troca de plano mensal/anual, forma de pagamento e histórico de faturas.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Mostrar o plano, o uso contra os limites e as faturas, e permitir trocar de plano.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Uso contra limites com aviso perto do teto",
+          "Planos lado a lado com o atual marcado; mensal/anual",
+          "Histórico de faturas com PDF"
+        ],
+        "adapt": [
+          "Contrato de serviço, consumo de créditos"
+        ],
+        "avoid": [
+          "Esconder o limite até ele estourar"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "Meter",
+        "SegmentedControl",
+        "formatCurrency",
+        "notify"
+      ]
     },
     {
       "slug": "settings-integrations",
@@ -21334,7 +23992,33 @@
       "title": "Integrações",
       "description": "Catálogo de integrações com filtros por categoria, conectar/desconectar, e detalhe em drawer (permissões, sincronização, histórico) aberto por ?id=.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Conectar e controlar integrações do workspace com permissões claras.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Catálogo com filtros por categoria",
+          "Detalhe em gaveta (permissões, sincronização, histórico) por ?id="
+        ],
+        "adapt": [
+          "Integrações de qualquer produto"
+        ],
+        "avoid": [
+          "Conectar sem mostrar o que será acessado"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Drawer",
+        "Empty",
+        "PropertyList",
+        "SearchInput",
+        "Switch",
+        "Tabs",
+        "Timeline",
+        "normalize",
+        "notify"
+      ]
     },
     {
       "slug": "settings-notifications",
@@ -21342,7 +24026,30 @@
       "title": "Notificações",
       "description": "Matriz evento × canal (e-mail, push, Slack) agrupada por módulo, resumo diário, horário de silêncio e pausa geral. Salva sozinho.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Deixar cada pessoa escolher onde quer ser avisada de quê, sem ruído.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Matriz evento × canal por módulo",
+          "Resumo diário, horário de silêncio e pausa geral",
+          "Salva sozinho (efeito imediato, sem botão)"
+        ],
+        "adapt": [
+          "Preferências de qualquer produto"
+        ],
+        "avoid": [
+          "Botão Salvar para switches de efeito imediato"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Checkbox",
+        "RadioGroup",
+        "Select",
+        "SettingsSection",
+        "Switch",
+        "notify"
+      ]
     },
     {
       "slug": "settings-profile",
@@ -21350,7 +24057,33 @@
       "title": "Perfil",
       "description": "Configurações com subnavegação lateral (vira abas roláveis no celular), seções rótulo-à-esquerda, barra de alterações não salvas e zona de perigo.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Manter os dados da pessoa e da conta com segurança e sem perder alterações.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Seções rótulo-à-esquerda",
+          "Barra de alterações não salvas no rodapé",
+          "Zona de perigo separada no fim"
+        ],
+        "adapt": [
+          "Perfil de empresa, dados fiscais"
+        ],
+        "avoid": [
+          "Ação destrutiva no meio do formulário"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Button",
+        "ConfirmDialog",
+        "MaskedField",
+        "Select",
+        "SettingsSection",
+        "TextField",
+        "TextareaField",
+        "masks",
+        "notify"
+      ]
     },
     {
       "slug": "settings-security",
@@ -21358,7 +24091,36 @@
       "title": "Segurança",
       "description": "Senha, verificação em duas etapas com código, sessões ativas com encerramento e chaves de API mostradas uma única vez.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Proteger a conta: senha, 2FA, sessões e chaves de API.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "2FA com código em modal (OtpInput)",
+          "Sessões ativas com encerramento",
+          "Chave de API mostrada uma única vez"
+        ],
+        "adapt": [
+          "Segurança de portal do cliente, acesso de parceiros"
+        ],
+        "avoid": [
+          "Mostrar a chave de API de novo depois de criada"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Column",
+        "ConfirmDialog",
+        "CopyButton",
+        "DataTable",
+        "Modal",
+        "OtpInput",
+        "PasswordField",
+        "SettingsSection",
+        "TextField",
+        "notify"
+      ]
     },
     {
       "slug": "settings-team",
@@ -21366,7 +24128,38 @@
       "title": "Equipe e permissões",
       "description": "Membros com papel editável na linha, convites pendentes, uso de licenças, modal de convite em massa e remoção com confirmação.",
       "category": "Configurações",
-      "uses": []
+      "concept": {
+        "goal": "Gerenciar quem tem acesso e com qual papel, dentro do limite de licenças.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Papel editável na linha",
+          "Convites pendentes e uso de licenças visíveis",
+          "Convite em massa em modal; remoção com confirmação"
+        ],
+        "adapt": [
+          "Equipes de qualquer produto; usuários de cliente no portal"
+        ],
+        "avoid": [
+          "Remover membro sem confirmação"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Badge",
+        "Button",
+        "ChoiceCards",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "Meter",
+        "Modal",
+        "Select",
+        "TableToolbar",
+        "TagInput",
+        "normalize",
+        "notify"
+      ]
     }
   ],
   "tokens": {

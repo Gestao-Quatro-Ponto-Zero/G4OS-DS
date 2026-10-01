@@ -58,9 +58,9 @@ export function doctor(target = ".") {
     if (v) add("ok", name, v);
     else add("block", name, "não instalado", `npm i ${name} (${why}).`);
   }
-  const ds = ver("@g4ai/ds") ?? (existsSync(join(root, "node_modules", "@g4os", "ds")) ? "link local" : null);
+  const ds = ver("@g4ai/ds") ?? (existsSync(join(root, "node_modules", "@g4ai", "ds")) ? "link local" : null);
   if (ds) add("ok", "@g4ai/ds", ds);
-  else add("block", "@g4ai/ds", "não instalado", "npm i ../G4OS-DS (pasta local) ou npm i github:<org>/G4OS-DS.");
+  else add("block", "@g4ai/ds", "não instalado", "pnpm add @g4ai/ds @base-ui/react lucide-react (ou npm i / yarn add).");
 
   const cssInJs = ["styled-components", "@emotion/react", "@mui/material", "@chakra-ui/react", "antd", "@mantine/core", "bootstrap", "react-bootstrap"].filter((n) => deps[n]);
   if (cssInJs.length) add("warn", "Outras bibliotecas de UI", cssInJs.join(", "), "Convivem durante a migração, mas não há mapeamento 1:1: reescreva por página com componentes do DS e remova a lib no fim.");
@@ -73,7 +73,7 @@ export function doctor(target = ".") {
   else {
     const css = readFileSync(globalCss, "utf8");
     const rel = globalCss.slice(root.length + 1);
-    if (/@g4os\/ds\/styles\.css|G4OS-DS\/src\/styles\/index\.css/.test(css)) add("ok", "Estilos do DS", `importados em ${rel}`);
+    if (/@g4ai\/ds\/styles\.css|G4OS-DS\/src\/styles\/index\.css/.test(css)) add("ok", "Estilos do DS", `importados em ${rel}`);
     else add("block", "Estilos do DS", `${rel} não importa @g4ai/ds/styles.css`, 'Adicione depois do tailwind: @import "@g4ai/ds/styles.css";');
     if (/@tailwind\s+base/.test(css)) add("block", "Sintaxe Tailwind v3", `${rel} usa @tailwind base`, 'Troque por @import "tailwindcss";');
   }
@@ -92,9 +92,6 @@ export function doctor(target = ".") {
     add(/Figtree/i.test(s) || all.some(([, x]) => /Figtree/i.test(x)) || (globalCss && /Figtree/i.test(readFileSync(globalCss, "utf8"))) ? "ok" : "warn", "Fonte Figtree", "", "next/font/google Figtree ou <link> do Google Fonts; ou defina --ds-font-sans da marca.");
   }
   if (deps.next) {
-    const nc = ["next.config.ts", "next.config.mjs", "next.config.js"].map((f) => join(root, f)).find(existsSync);
-    const txt = nc ? readFileSync(nc, "utf8") : "";
-    add(/transpilePackages[^\]]*@g4os\/ds/.test(txt) ? "ok" : "block", "Next transpilePackages", nc ? nc.slice(root.length + 1) : "sem next.config", 'transpilePackages: ["@g4ai/ds"] (o pacote é código-fonte TSX).');
     add(all.some(([, s]) => /setLinkComponent\(/.test(s)) ? "ok" : "warn", "setLinkComponent(Link)", "", "Registre next/link uma vez num módulo cliente importado pelo layout.");
   }
   const ok = !checks.some((c) => c.level === "block");

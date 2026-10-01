@@ -6,6 +6,24 @@
 
 Meta do trimestre com ritmo esperado, receita por mês contra a meta, funil de conversão, ranking de vendedores e motivos de perda.
 
+## Conceito
+
+**Objetivo:** Responder se o time vai bater a meta do trimestre e onde está perdendo negócios.
+
+**Padrões aplicados**
+
+- Anatomia B · Painel: cabeçalho fixo com seletor de time
+- Meta com ritmo esperado (GoalMeter) antes de tudo
+- Receita × meta, funil, ranking e motivos de perda (Pareto)
+
+**Quando usar e o que adaptar**
+
+- Painel de recrutamento, de cobrança ou de operações
+
+**Evite**
+
+- Mostrar receita sem meta nem ritmo esperado
+
 ## Componentes usados
 
-—
+`BarChart`, `ChartCard`, `CompareStat`, `FunnelChart`, `GaugeChart`, `GoalMeter`, `KpiCard`, `KpiGrid`, `Leaderboard`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCurrency`, `formatNumber`, `formatPercent`

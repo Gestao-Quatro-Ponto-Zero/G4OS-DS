@@ -366,7 +366,7 @@ function BlockConceptView({ block }: { block: BlockModule }) {
   const c = block.meta.concept;
   const imports = Array.from(
     new Set(
-      [...block.source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"@g4os\/ds"/g)]
+      [...block.source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"@g4ai\/ds"/g)]
         .flatMap((m) => m[1].split(","))
         .map((x) => x.trim().replace(/^type\s+/, ""))
         .filter((x) => /^[A-Z]/.test(x)),

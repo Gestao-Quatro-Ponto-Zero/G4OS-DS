@@ -3,12 +3,10 @@
  *
  * No globals.css do projeto:
  *   @import "tailwindcss";
- *   @import "@g4ai/ds/styles.css";      (ou o caminho relativo deste arquivo)
+ *   @import "@g4ai/ds/styles.css";
  *
  * As classes dos componentes e blocos são lidas pelos @source abaixo
- * (relativos a ESTE arquivo), então o app não precisa declarar nada. Se o seu
- * gerenciador de pacotes usar links que o Tailwind não segue, acrescente no app:
- *   @source "../node_modules/@g4ai/ds/src";
+ * (relativos a ESTE arquivo), então o app não precisa declarar nada.
  *
  * Tema: <html data-theme="light|dark|system" data-brand="…">. Ver src/lib/theme.ts.
  */

@@ -5,7 +5,7 @@ export const meta: PageMeta = {
   title: "Instalação",
   group: "Começar",
   order: 2,
-  description: "Do zero a um app com a casca do DS em cinco passos. O pacote é código-fonte: o Tailwind e o bundler do seu app compilam tudo.",
+  description: "Do zero a um app com a casca do DS em cinco passos. O pacote @g4ai/ds vem compilado (ESM e tipos) com o CSS: Next.js e Vite funcionam sem configuração extra.",
 };
 
 export default function Page() {
@@ -13,20 +13,18 @@ export default function Page() {
     <DocPage title={meta.title} kicker={meta.group} description={meta.description}>
       <DocSection title="1. Dependências" rule="React 19, Tailwind 4.3+ e as peer deps do DS.">
         <CodeBlock
-          code={`npm i @base-ui/react lucide-react
-npm i -D tailwindcss @tailwindcss/postcss     # Next.js  (ou @tailwindcss/vite)
+          code={`pnpm add @g4ai/ds @base-ui/react lucide-react    # ou npm i / yarn add
+pnpm add -D tailwindcss @tailwindcss/postcss     # Next.js  (Vite: @tailwindcss/vite)
 
-npm i ../G4OS-DS                              # pasta local
-# npm i github:<org>/G4OS-DS                  # ou repositório git`}
+npx g4os-ds doctor                               # confere React 19, Tailwind 4, CSS, tema e fonte`}
         />
       </DocSection>
 
-      <DocSection title="2. CSS global" rule="Importe os estilos do DS depois do Tailwind e aponte o @source para os componentes, senão as classes deles não são geradas.">
+      <DocSection title="2. CSS global" rule="Importe os estilos do DS depois do Tailwind. Eles já declaram os @source dos componentes: o Tailwind do app gera as classes sem configuração.">
         <CodeBlock
           code={`/* app/globals.css */
 @import "tailwindcss";
 @import "@g4ai/ds/styles.css";
-@source "../node_modules/@g4ai/ds/src";
 
 /* opcional: shadcn/ui e 21st.dev com a cara do DS */
 /* @import "@g4ai/ds/shadcn.css"; */`}
@@ -37,18 +35,20 @@ npm i ../G4OS-DS                              # pasta local
         <CodeBlock
           code={`// app/layout.tsx
 import { Figtree } from "next/font/google";
+import { themeScript } from "@g4ai/ds";
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree" });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR" className={\`ds-app \${figtree.variable}\`}>
+    <html lang="pt-BR" className={\`ds-app \${figtree.variable}\`} data-theme="system" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body><DsSetup />{children}</body>
     </html>
   );
 }
 
 /* globals.css */
-:root { --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif; }`}
+:root { --ds-font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif; }`}
         />
       </DocSection>
 
@@ -59,10 +59,7 @@ export default function RootLayout({ children }) {
 import Link from "next/link";
 import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
-export function DsSetup() { return null; }
-
-// next.config.ts
-export default { transpilePackages: ["@g4ai/ds"] };`}
+export function DsSetup() { return null; }`}
         />
       </DocSection>
 
@@ -106,7 +103,7 @@ export default function AppLayout({ children }) {
 </Page>`}
         />
         <Callout tone="info" title="Starter pronto">
-          A pasta <code className="font-mono text-[12px]">templates/next-app</code> tem tudo isso montado (casca, dashboard, lista). Guia completo em <code className="font-mono text-[12px]">docs/guias/instalacao.md</code>.
+          A pasta <code className="font-mono text-[12px]">templates/next-app</code> tem tudo isso montado (casca, dashboard, lista). Guias completos em <code className="font-mono text-[12px]">docs/guias/</code> (instalação, Next, Vite, migração). Para atualizar: <code className="font-mono text-[12px]">pnpm up @g4ai/ds</code> e leia o CHANGELOG.
         </Callout>
       </DocSection>
     </DocPage>

@@ -4,6 +4,7 @@
 //   derive --name acme --primary "#0b5cff" [--accent "#ffb020"] [--radius 1.15] [--font '"Inter", system-ui'] [--out tema.css]
 //   check tema.css            confere os blocos [data-brand] de um CSS existente
 //   ratio "#fff" "#202124"    contraste entre duas cores
+import { pathToFileURL } from "node:url";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const hexToRgb = (hex) => {
@@ -20,7 +21,7 @@ const luminance = (hex) => {
   });
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
-const contrast = (a, b) => {
+export const contrast = (a, b) => {
   const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
 };
@@ -92,39 +93,42 @@ function report(label, vars, surfaces) {
 }
 
 const parseVars = (body) => Object.fromEntries([...body.matchAll(/--ds-([\w-]+):\s*(#[0-9a-fA-F]{3,6})\b/g)].map(([, k, v]) => [k, v.toLowerCase()]));
-const args = process.argv.slice(2);
-const opt = (n) => {
-  const i = args.indexOf(`--${n}`);
-  return i >= 0 ? args[i + 1] : undefined;
-};
+// CLI só quando executado direto (o módulo também é importado pelo servidor MCP).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const args = process.argv.slice(2);
+  const opt = (n) => {
+    const i = args.indexOf(`--${n}`);
+    return i >= 0 ? args[i + 1] : undefined;
+  };
 
-if (args[0] === "derive") {
-  const name = opt("name") ?? "cliente";
-  const primary = opt("primary");
-  if (!primary) {
-    console.error('Informe --primary "#hex"');
-    process.exit(1);
+  if (args[0] === "derive") {
+    const name = opt("name") ?? "cliente";
+    const primary = opt("primary");
+    if (!primary) {
+      console.error('Informe --primary "#hex"');
+      process.exit(1);
+    }
+    const brand = deriveBrand(primary, opt("accent") ?? primary);
+    const css = brandCss(name, brand, { radius: opt("radius"), font: opt("font") });
+    if (opt("out")) writeFileSync(opt("out"), css);
+    console.log(css);
+    const ok1 = report(`Contraste · ${name} · claro`, { ...Object.fromEntries(Object.entries(brand.light).map(([k, v]) => [kebab[k] ?? k, v])) }, { surface: LIGHT_SURFACE, page: LIGHT_SURFACE });
+    const ok2 = report(`Contraste · ${name} · escuro`, { ...Object.fromEntries(Object.entries(brand.dark).map(([k, v]) => [kebab[k] ?? k, v])) }, { surface: DARK_SURFACE, page: "#111113" });
+    process.exit(ok1 && ok2 ? 0 : 1);
+  } else if (args[0] === "check" && args[1]) {
+    const css = readFileSync(args[1], "utf8");
+    let ok = true;
+    for (const m of css.matchAll(/\[data-brand="([\w-]+)"\](\[data-theme="dark"\])?\s*\{([^}]*)\}/g)) {
+      const dark = Boolean(m[2]);
+      if (!Object.keys(parseVars(m[3])).length) continue; // bloco sem cores (exemplo em comentário)
+      ok = report(`${m[1]} · ${dark ? "escuro" : "claro"}`, parseVars(m[3]), dark ? { surface: DARK_SURFACE, page: "#111113" } : { surface: LIGHT_SURFACE, page: LIGHT_SURFACE }) && ok;
+    }
+    process.exit(ok ? 0 : 1);
+  } else if (args[0] === "ratio" && args[2]) {
+    console.log(`${contrast(args[1], args[2]).toFixed(2)}:1`);
+  } else {
+    console.log(`contrast.mjs derive --name acme --primary "#0b5cff" [--accent "#ffb020"] [--radius 1.15] [--font '"Inter", system-ui'] [--out tema.css]
+  contrast.mjs check tema.css
+  contrast.mjs ratio "#ffffff" "#202124"`);
   }
-  const brand = deriveBrand(primary, opt("accent") ?? primary);
-  const css = brandCss(name, brand, { radius: opt("radius"), font: opt("font") });
-  if (opt("out")) writeFileSync(opt("out"), css);
-  console.log(css);
-  const ok1 = report(`Contraste · ${name} · claro`, { ...Object.fromEntries(Object.entries(brand.light).map(([k, v]) => [kebab[k] ?? k, v])) }, { surface: LIGHT_SURFACE, page: LIGHT_SURFACE });
-  const ok2 = report(`Contraste · ${name} · escuro`, { ...Object.fromEntries(Object.entries(brand.dark).map(([k, v]) => [kebab[k] ?? k, v])) }, { surface: DARK_SURFACE, page: "#111113" });
-  process.exit(ok1 && ok2 ? 0 : 1);
-} else if (args[0] === "check" && args[1]) {
-  const css = readFileSync(args[1], "utf8");
-  let ok = true;
-  for (const m of css.matchAll(/\[data-brand="([\w-]+)"\](\[data-theme="dark"\])?\s*\{([^}]*)\}/g)) {
-    const dark = Boolean(m[2]);
-    if (!Object.keys(parseVars(m[3])).length) continue; // bloco sem cores (exemplo em comentário)
-    ok = report(`${m[1]} · ${dark ? "escuro" : "claro"}`, parseVars(m[3]), dark ? { surface: DARK_SURFACE, page: "#111113" } : { surface: LIGHT_SURFACE, page: LIGHT_SURFACE }) && ok;
-  }
-  process.exit(ok ? 0 : 1);
-} else if (args[0] === "ratio" && args[2]) {
-  console.log(`${contrast(args[1], args[2]).toFixed(2)}:1`);
-} else {
-  console.log(`contrast.mjs derive --name acme --primary "#0b5cff" [--accent "#ffb020"] [--radius 1.15] [--font '"Inter", system-ui'] [--out tema.css]
-contrast.mjs check tema.css
-contrast.mjs ratio "#ffffff" "#202124"`);
 }

@@ -1,23 +1,21 @@
 # Instalação
 
-O pacote `@g4ai/ds` é distribuído como **código-fonte** (TSX + CSS). O Tailwind v4 do seu app compila as classes dos componentes; o bundler do app (Next, Vite) compila o TSX. Não há passo de build do DS.
+O pacote [`@g4ai/ds`](https://www.npmjs.com/package/@g4ai/ds) publica JavaScript compilado (ESM com `"use client"`) e tipos. Junto vão o CSS e o código-fonte dos componentes, que o Tailwind v4 do seu app lê para gerar as classes. Funciona em Next.js (App Router) e Vite sem configuração extra.
 
 ## Requisitos
 
-- React 19, Tailwind CSS 4.3+, TypeScript 5.
+- React 19, Tailwind CSS 4.3+, TypeScript 5, Node 20+.
 - Peer deps: `@base-ui/react`, `lucide-react`, `react`, `react-dom`, `tailwindcss`. Datas não precisam de dependência extra (Calendar próprio).
 
 ## 1. Instalar
 
 ```bash
-npm i @base-ui/react lucide-react
-npm i -D tailwindcss @tailwindcss/postcss       # Next.js
-# ou: npm i -D tailwindcss @tailwindcss/vite    # Vite
-
-# o DS (escolha um)
-npm i ../G4OS-DS                                # pasta local (monorepo, desenvolvimento)
-npm i github:<org>/G4OS-DS                      # repositório git
+pnpm add @g4ai/ds @base-ui/react lucide-react     # ou: npm i … / yarn add …
+pnpm add -D tailwindcss @tailwindcss/postcss      # Next.js
+# Vite: pnpm add -D tailwindcss @tailwindcss/vite
 ```
+
+Projeto novo em Next: copie [`templates/next-app`](../../templates/next-app/README.md), que já vem pronto. Vite: [vite.md](vite.md).
 
 ## 2. CSS global
 
@@ -30,7 +28,7 @@ npm i github:<org>/G4OS-DS                      # repositório git
 /* @import "@g4ai/ds/shadcn.css"; */
 ```
 
-`styles.css` já declara os `@source` dos componentes e blocos (relativos a ele), então o Tailwind do app compila as classes do DS sem configuração. Se o seu gerenciador de pacotes usar links que o Tailwind não segue (alguns setups de pnpm), acrescente no CSS do app: `@source "../node_modules/@g4ai/ds/src";` (relativo ao arquivo CSS).
+`styles.css` já declara os `@source` dos componentes e blocos (relativos a ele), então o Tailwind do app compila as classes do DS sem configuração.
 
 ## 3. Fonte e raiz
 
@@ -66,13 +64,9 @@ setLinkComponent(Link);
 
 ## 5. TypeScript
 
-O pacote publicado no npm já vem compilado (`dist/`, ESM com `"use client"` e tipos): Next.js e Vite funcionam sem configuração extra.
+Os tipos vêm no pacote (`dist/types`). Nada a configurar.
 
-Só se você usar o código-fonte direto (link local `npm i ../G4OS-DS` durante o desenvolvimento do DS, ou `import … from "@g4ai/ds/source"`), adicione no Next:
-
-```ts
-const config = { transpilePackages: ["@g4ai/ds"] };
-```
+Testar uma versão do DS ainda não publicada: [contribuir › Testar num app antes de publicar](contribuir.md#testar-num-app-antes-de-publicar).
 
 ## 6. Usar
 
@@ -92,3 +86,5 @@ Imports por módulo também funcionam: `@g4ai/ds/components/charts`, `@g4ai/ds/l
 - [ ] Figtree nos títulos → fonte OK.
 
 Starter pronto: [`templates/next-app`](../../templates/next-app/README.md). Detalhes de Next: [next.md](next.md).
+
+Agentes de IA: [usar com IA](usar-com-ia.md) (MCP, `llms.txt`, plugin). Atualizar de versão: [migração › Atualizar de versão](migracao.md#atualizar-de-versão).

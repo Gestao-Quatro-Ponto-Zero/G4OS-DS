@@ -18,7 +18,11 @@ npx g4os-ds doctor
 
 ## 1. Ligar o DS (um PR)
 
-[Instalação](instalacao.md): pacote, `@import "@g4ai/ds/styles.css"`, `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript`, fonte, `transpilePackages`, `setLinkComponent`. `doctor` sem ✗ e build verde.
+```bash
+pnpm add @g4ai/ds @base-ui/react lucide-react
+```
+
+[Instalação](instalacao.md): `@import "@g4ai/ds/styles.css"`, `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript`, fonte, `setLinkComponent`. `doctor` sem ✗ e build verde.
 
 ## 2. Linha de base e plano
 
@@ -46,8 +50,16 @@ Liste as telas por importância (tráfego, dinheiro, frequência) e, para cada u
 
 `doctor` ✓ · `audit src` com 0 erros · build/testes verdes · todas as telas do `MIGRATION.md` marcadas · libs antigas removidas.
 
-## Atualizar a versão do DS
+## Atualizar de versão
 
-1. Leia o `CHANGELOG.md` entre as versões.
-2. Aplique `ai/renames.json` (exports e classes renomeados).
-3. `audit` + typecheck. Registre no `MIGRATION.md`.
+```bash
+npm view @g4ai/ds version            # última publicada
+pnpm up @g4ai/ds                     # ou: npm i @g4ai/ds@latest
+npx g4os-ds audit src                # aponta nomes antigos e regras novas
+```
+
+1. Leia o [CHANGELOG](../../CHANGELOG.md) entre a sua versão e a nova. Cada entrada diz o que o app precisa fazer.
+2. Aplique as renomeações de `node_modules/@g4ai/ds/ai/renames.json` (exports e classes).
+3. `audit` com 0 erros + typecheck + build. Confira as telas principais em claro e escuro.
+
+Com agente: *"Atualize o @g4ai/ds e ajuste o código"* (skill `ds-migrate`, modo atualização), que faz os três passos. Enquanto o DS estiver em `0.x`, mudança que quebra sobe o **minor** (0.2 → 0.3): leia o changelog antes de subir um minor.

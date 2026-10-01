@@ -1,10 +1,17 @@
 # Usando com Next.js (App Router)
 
+```bash
+pnpm add @g4ai/ds @base-ui/react lucide-react
+pnpm add -D tailwindcss @tailwindcss/postcss
+```
+
+`postcss.config.mjs`: `export default { plugins: { "@tailwindcss/postcss": {} } };`. Passos comuns (CSS, fonte, tema): [instalação](instalacao.md).
+
 ## Estrutura recomendada
 
 ```
 app/
-  globals.css            @import tailwind + @g4ai/ds/styles.css + @source
+  globals.css            @import "tailwindcss" + @import "@g4ai/ds/styles.css"
   layout.tsx             <html className="ds-app"> + fonte + <DsSetup/>
   (auth)/entrar/page.tsx tela cheia, sem sidebar
   (app)/layout.tsx       AppShell + Sidebar (client component)
@@ -44,8 +51,10 @@ const op = useOperation({ busyLabel: "Salvando…" });
 
 ## Checklist
 
-- [ ] (Só se importar o código-fonte via `@g4ai/ds/source` ou link local) `transpilePackages: ["@g4ai/ds"]` no `next.config.ts`. O pacote publicado já vem compilado.
-- [ ] `@source` apontando para `node_modules/@g4ai/ds/src` no CSS global.
-- [ ] `setLinkComponent(Link)` registrado.
-- [ ] `<html lang="pt-BR" className="ds-app">`.
-- [ ] Figtree carregada.
+- [ ] `@import "tailwindcss"; @import "@g4ai/ds/styles.css";` no CSS global (os `@source` do DS já vêm dentro).
+- [ ] `<html lang="pt-BR" className="ds-app" data-theme="system" suppressHydrationWarning>` + `themeScript` no `<head>`.
+- [ ] `setLinkComponent(Link)` registrado num módulo cliente.
+- [ ] Figtree carregada (`next/font/google` + `--ds-font-sans`).
+- [ ] `npx g4os-ds doctor` sem ✗.
+
+Não precisa de `transpilePackages`: o pacote publicado já vem compilado. (Exceção: link local do código-fonte ao desenvolver o próprio DS.)

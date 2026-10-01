@@ -1,4 +1,4 @@
-import { ArrowRight, Blocks, BookOpen, Menu, Search } from "lucide-react";
+import { ArrowRight, Blocks, BookOpen, Check, Copy, Menu, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
@@ -319,6 +319,32 @@ function SiteSearch() {
 /* Início                                                              */
 /* ------------------------------------------------------------------ */
 
+const INSTALL = "pnpm add @g4ai/ds";
+
+function InstallCommand() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(INSTALL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      notify(`Não foi possível copiar. Comando: ${INSTALL}`, undefined, "bad");
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      aria-label={copied ? "Comando copiado" : `Copiar comando: ${INSTALL}`}
+      className="mx-auto mt-5 inline-flex h-10 items-center gap-3 rounded-lg bg-soft px-4 font-mono text-[13px] text-ink ring-1 ring-line transition-colors hover:bg-surface"
+    >
+      <span className="text-muted">$</span> {INSTALL}
+      {copied ? <Check className="h-4 w-4 text-ok" aria-hidden /> : <Copy className="h-4 w-4 text-muted" aria-hidden />}
+    </button>
+  );
+}
+
 function Home() {
   const [tab, setTab] = useState(featured[0]?.slug);
   const current = featured.find((b) => b.slug === tab) ?? featured[0];
@@ -340,6 +366,10 @@ function Home() {
             Começar
           </a>
         </div>
+        <InstallCommand />
+        <p className="m-0 mt-3 text-[12px] text-muted">
+          Para agentes de IA: <a href="./llms.txt" className="text-blue hover:underline">llms.txt</a> · <a href="#/p/guia-agentes" className="text-blue hover:underline">servidor MCP</a>
+        </p>
       </section>
       {current && (
         <section>

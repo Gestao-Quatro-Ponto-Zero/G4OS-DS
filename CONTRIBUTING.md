@@ -13,11 +13,12 @@ Obrigado por querer melhorar o design system. Este guia cobre o fluxo; o passo a
 ```bash
 git clone https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS.git
 cd G4OS-DS
-npm install
-npm run showcase:watch      # site em modo watch (abra showcase/dist/index.html via `npx serve showcase/dist`)
+npm ci
+npm run showcase:watch      # recompila o site a cada mudança
+npx serve showcase/dist     # em outro terminal: abre o site local
 ```
 
-Requisitos: Node 20+.
+Requisitos: Node 20+ (o CI usa Node 24). Para testar uma mudança num app antes de publicar, veja [Testar num app antes de publicar](docs/guias/contribuir.md#testar-num-app-antes-de-publicar).
 
 ## Fluxo
 
@@ -35,11 +36,28 @@ Requisitos: Node 20+.
    ```
 6. Abra o PR preenchendo o modelo. Inclua prints em claro e escuro (e em 390px quando houver layout).
 
-## Versões
+## Versões e publicação
 
-Seguimos [SemVer](https://semver.org/lang/pt-BR/). Enquanto estivermos em `0.x`, mudanças que quebram API sobem o **minor** e são descritas no changeset com o "como migrar". Renomeações entram em `ai/renames.json` para a skill `ds-migrate` atualizar projetos automaticamente.
+Seguimos [SemVer](https://semver.org/lang/pt-BR/):
 
-A publicação no npm é automática e sem token: usamos **Trusted Publishing** (OIDC do GitHub Actions configurado no pacote em npmjs.com). Ao fazer merge na `main`, o Action abre um PR "Versão de lançamento"; quando esse PR é mesclado, o pacote é publicado com provenance.
+| Tipo | Quando | Exemplo |
+| --- | --- | --- |
+| `patch` | correção sem mudar API | ajuste visual, bug em gráfico |
+| `minor` | novidade compatível (e, enquanto estivermos em `0.x`, mudança que quebra) | componente novo, prop nova |
+| `major` | mudança que quebra, a partir da 1.0 | prop removida |
+
+Mudança que quebra traz no changeset o "como migrar"; renomeações entram em `ai/renames.json` para a skill `ds-migrate` atualizar projetos sozinha.
+
+### Como uma versão chega ao npm
+
+Ninguém roda `npm publish` à mão. O caminho é sempre:
+
+1. Seu PR inclui um arquivo em `.changeset/` (criado por `npx changeset`). Sem changeset, a mudança entra na `main` mas não gera versão.
+2. Quando o PR entra na `main`, o GitHub Actions ([release.yml](.github/workflows/release.yml)) abre ou atualiza um PR chamado **"Versão de lançamento"**: ele junta os changesets, sobe o número em `package.json`, escreve o `CHANGELOG.md` e regenera `ai/`.
+3. Quem mantém revisa e **mescla** esse PR. O Action roda `npm run check`, `npm run build` e publica `@g4ai/ds` no npm com provenance, usando **Trusted Publishing** (OIDC do GitHub configurado no npmjs.com, sem token guardado no repositório).
+4. O site (GitHub Pages, com `llms.txt` e `ai/`) é republicado a cada push na `main` ([pages.yml](.github/workflows/pages.yml)).
+
+Conferir a versão publicada: `npm view @g4ai/ds version`.
 
 ## Padrões de código
 

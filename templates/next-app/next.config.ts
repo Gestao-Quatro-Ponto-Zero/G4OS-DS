@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
-const config: NextConfig = {
-  // O DS é publicado como TSX: o Next precisa compilar o pacote.
-  transpilePackages: ["@g4ai/ds"],
-};
+// O @g4ai/ds publicado vem compilado: nenhuma configuração extra é necessária.
+const config: NextConfig = {};
 
 export default config;

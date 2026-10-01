@@ -22,7 +22,7 @@ Aplique antes a skill **g4os-ds** (localizar `DS`). Leia `DS/docs/fundamentos/te
 node <caminho-desta-skill>/scripts/contrast.mjs derive --name acme --primary "#0b5cff" --accent "#ffb020" [--radius 1.15] [--font '"Inter", system-ui, sans-serif']
 ```
 
-O script (mesma lógica de `deriveBrand`/`brandCss` de `@g4ai/ds`) escreve os blocos `[data-brand="acme"]` e `[data-brand="acme"][data-theme="dark"]` e imprime a tabela de contraste. Para conferir um CSS já existente:
+Sem o plugin, o mesmo script está em `node_modules/@g4ai/ds/plugin/skills/ds-theme/scripts/contrast.mjs`; com o servidor MCP `g4os-ds`, a ferramenta `theme_from_colors` faz o mesmo. O script (mesma lógica de `deriveBrand`/`brandCss` de `@g4ai/ds`; também importável: `import { brandCss, contrast, deriveBrand } from ".../contrast.mjs"`) escreve os blocos `[data-brand="acme"]` e `[data-brand="acme"][data-theme="dark"]` e imprime a tabela de contraste. Para conferir um CSS já existente:
 
 ```bash
 node <caminho-desta-skill>/scripts/contrast.mjs check caminho/do/tema.css

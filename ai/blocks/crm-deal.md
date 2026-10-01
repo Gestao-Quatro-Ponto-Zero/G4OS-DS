@@ -6,6 +6,25 @@
 
 Registro de um negócio (?id=): caminho de etapas, ganho/perda com motivo, nota rápida, feed, tarefas, arquivos, edição em gaveta.
 
+## Conceito
+
+**Objetivo:** Avançar um negócio: ver em que etapa está, registrar o que aconteceu e decidir ganho ou perda.
+
+**Padrões aplicados**
+
+- Anatomia C · Registro: trilha + título + Perdido/Ganho fixos; propriedades fixas à direita
+- StagePath clicável; perda pede motivo
+- Nota rápida alimenta o feed de atividade
+- Edição longa em gaveta (Drawer)
+
+**Quando usar e o que adaptar**
+
+- Proposta (ATS), pedido (ERP), chamado (suporte)
+
+**Evite**
+
+- Ganho/perda sem motivo (perde o dado para o painel)
+
 ## Componentes usados
 
-—
+`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `Checkbox`, `ConfirmDialog`, `CurrencyField`, `DatePicker`, `Drawer`, `EntityMark`, `FieldBlock`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `StagePath`, `Tabs`, `TextField`, `areaClass`, `formatCurrency`, `formatDate`, `formatPercent`, `notify`

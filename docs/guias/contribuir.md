@@ -145,3 +145,19 @@ O Chrome headless não desenha abaixo de ~500 px de largura: para 390 px, carreg
 - [ ] Conferido em 1440 e 390 px, **claro e escuro**, teclado e leitor de tela no básico.
 - [ ] Mudança de API registrada em `CHANGELOG.md` e `ai/renames.json`.
 - [ ] Doc em `docs/` atualizada se criou padrão novo.
+- [ ] Changeset criado (`npx changeset`): é ele que gera a versão e a entrada do `CHANGELOG.md`.
+
+## Testar num app antes de publicar
+
+Apps reais usam o pacote do npm (`pnpm add @g4ai/ds`). Para testar uma mudança do DS num app local antes de publicar:
+
+```bash
+npm run build                       # neste repositório: gera dist/
+cd ../meu-app && pnpm add ../G4OS-DS   # link local para a pasta do DS
+```
+
+Com o link local tudo funciona como no npm (o app usa `dist/`). Só se você importar o código-fonte (`@g4ai/ds/source`) o Next precisa de `transpilePackages: ["@g4ai/ds"]`. Depois do teste, volte para a versão publicada: `pnpm add @g4ai/ds@latest`.
+
+## Publicar
+
+Não se publica à mão. O changeset do seu PR entra na `main`, o Action abre o PR **"Versão de lançamento"**, e mesclar esse PR publica no npm. Detalhes em [CONTRIBUTING.md](../../CONTRIBUTING.md#como-uma-versão-chega-ao-npm).

@@ -1,4 +1,4 @@
-import { Blocks, BookOpen, ChartArea, LayoutDashboard, Puzzle, Sparkles } from "lucide-react";
+import { Blocks, BookOpen, Bot, ChartArea, LayoutDashboard, Puzzle, Sparkles } from "lucide-react";
 import { Card } from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, type PageMeta } from "../kit";
 
@@ -26,22 +26,34 @@ export default function Page() {
           </Card>
         </div>
       </DocSection>
-      <DocSection title="Instalar em um projeto" rule="O pacote é código-fonte (TSX + CSS). O Tailwind do seu app compila as classes.">
+      <DocSection title="Instalar em um projeto" rule="Pacote @g4ai/ds no npm: JavaScript compilado, tipos e CSS. Funciona em Next.js e Vite sem configuração extra.">
         <CodeBlock
           code={`# 1. dependências
-npm i @base-ui/react lucide-react tailwindcss @tailwindcss/postcss
-npm i ../G4OS-DS            # ou via git: github:g4educacao/G4OS-DS
+pnpm add @g4ai/ds @base-ui/react lucide-react      # ou npm i / yarn add
+pnpm add -D tailwindcss @tailwindcss/postcss       # Vite: @tailwindcss/vite
 
 /* 2. app/globals.css */
 @import "tailwindcss";
 @import "@g4ai/ds/styles.css";
-@source "../node_modules/@g4ai/ds/src";
 
-// 3. app/layout.tsx: <html lang="pt-BR" className="ds-app"> + fonte Figtree
+// 3. app/layout.tsx: <html lang="pt-BR" className="ds-app" data-theme="system"> + themeScript + Figtree
 
 // 4. use
 import { AppShell, Sidebar, PageHeading, KpiCard, AreaChart } from "@g4ai/ds";`}
         />
+      </DocSection>
+      <DocSection title="Com agentes de IA" rule="O DS se descreve para agentes: servidor MCP local, llms.txt no site e skills para o Claude Code.">
+        <CodeBlock
+          code={`claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+
+# ou, para agentes que leem URLs
+https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt`}
+        />
+        <Card href="#/p/guia-agentes">
+          <Bot className="mb-2 h-5 w-5 text-muted" />
+          <div className="text-[14px] font-medium">Agentes de IA</div>
+          <p className="m-0 mt-1 text-[12.5px] text-muted">MCP no Claude Code, Cursor e VS Code, endereços para agentes, plugin e pedidos que funcionam.</p>
+        </Card>
       </DocSection>
       <DocSection title="Por onde seguir">
         <div className="grid gap-3 md:grid-cols-3">

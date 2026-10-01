@@ -4,105 +4,163 @@
 [![CI](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/actions/workflows/ci.yml/badge.svg)](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-b9915b.svg)](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/blob/main/LICENSE)
 
-**Site e documentação:** https://gestao-quatro-ponto-zero.github.io/G4OS-DS/
+**Site e documentação:** https://gestao-quatro-ponto-zero.github.io/G4OS-DS/ · **npm:** [`@g4ai/ds`](https://www.npmjs.com/package/@g4ai/ds)
 
-Design system para construir **qualquer aplicação G4 OS** — CRM, ATS, ERP, financeiro, portal do cliente, produto SaaS — com a mesma linguagem visual. Três camadas:
+Design system para construir **qualquer aplicação G4 OS** — CRM, ATS, ERP, financeiro, IA, portal do cliente, produto SaaS — com a mesma linguagem visual:
 
 - **Tokens** em três camadas (primitivos → semânticos → utilitários), com **tema escuro** e **marcas de cliente** trocando só variáveis.
 - **Componentes**: React 19 + Base UI + Tailwind v4, em português, acessíveis, responsivos. Gráficos em SVG sem dependência.
-- **Blocos**: telas completas (dashboards, pipelines, registros, listas, login, configurações, onboarding) para copiar e trocar os dados.
+- **Blocos**: 85+ telas completas (dashboards, pipelines, registros, listas, IA, login, configurações) para copiar e trocar os dados.
+- **Feito para agentes**: servidor MCP, `llms.txt`, guia `ai/` gerado do código e skills para Claude Code.
 
-A linguagem visual nasceu no G4 Delivery e foi generalizada: superfície e gelo, ação em tinta escura (ou na cor da marca do cliente), dourado só como gesto de marca, borda em vez de sombra, número com contexto, português claro. Agentes de IA aplicam o DS em qualquer repositório com o guia `ai/`, a CLI `g4os-ds` e as skills em `plugin/` ([usar com IA](docs/guias/usar-com-ia.md)).
+## Instalar
 
-## Começar
+Requisitos: React 19, Tailwind CSS 4, Node 20+.
 
 ```bash
-pnpm add @g4ai/ds @base-ui/react lucide-react      # ou: npm i … / yarn add …
-pnpm add -D tailwindcss @tailwindcss/postcss
+pnpm add @g4ai/ds @base-ui/react lucide-react        # ou npm i / yarn add
+pnpm add -D tailwindcss @tailwindcss/postcss         # Vite: @tailwindcss/vite
+npx g4os-ds doctor                                    # confere React, Tailwind, CSS, tema e fonte
 ```
 
-O pacote publica JavaScript compilado (ESM, com `"use client"`) e tipos; o CSS e o código-fonte vão junto para o Tailwind ler as classes. Funciona em Next.js (App Router) e Vite sem configuração extra.
-
 ```css
-/* globals.css */
+/* app/globals.css (Next) ou src/index.css (Vite) */
 @import "tailwindcss";
-@import "@g4ai/ds/styles.css";   /* já traz os @source do DS */
-/* opcional, para shadcn/ui e 21st.dev: @import "@g4ai/ds/shadcn.css"; */
+@import "@g4ai/ds/styles.css";   /* tokens, temas, componentes; já traz os @source do DS */
+```
+
+O pacote publica JavaScript compilado (ESM com `"use client"`) e tipos, junto com o CSS e o código-fonte que o Tailwind lê. Não precisa de `transpilePackages` nem plugin extra.
+
+### Next.js (App Router)
+
+```tsx
+// app/layout.tsx
+import { themeScript } from "@g4ai/ds";
+import { DsSetup } from "@/lib/ds";
+import "./globals.css";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR" className="ds-app" data-theme="system" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <body><DsSetup />{children}</body>
+    </html>
+  );
+}
 ```
 
 ```tsx
-// layout raiz
-<html lang="pt-BR" className="ds-app" data-theme="system">   // + fonte Figtree
-  <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>   // tema salvo, sem piscar
-
-// uma vez, no cliente (Next.js)
+// lib/ds.tsx — registra o Link do Next nos componentes com href
+"use client";
 import Link from "next/link";
 import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
-
+export function DsSetup() { return null; }
 ```
+
+Starter completo: [`templates/next-app`](templates/next-app) · guia: [docs/guias/next.md](docs/guias/next.md).
+
+### Vite
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import { themeScript } from "@g4ai/ds/lib/theme";
+
+// Aplica o tema salvo antes da primeira pintura (sem piscar).
+const dsTheme = { name: "ds-theme", transformIndexHtml: () => [{ tag: "script", children: themeScript, injectTo: "head-prepend" as const }] };
+
+export default defineConfig({ plugins: [react(), tailwindcss(), dsTheme] });
+```
+
+```html
+<!-- index.html -->
+<html lang="pt-BR" class="ds-app" data-theme="system">
+```
+
+Guia: [docs/guias/vite.md](docs/guias/vite.md).
+
+### Usar
 
 ```tsx
 import { AppShell, Sidebar, Page, PageHeading, KpiGrid, KpiCard, ChartCard, AreaChart, formatCurrency } from "@g4ai/ds";
 ```
 
-Guia completo: [docs/guias/instalacao.md](docs/guias/instalacao.md). Starter pronto: [templates/next-app](templates/next-app). Regras para quem constrói (inclusive agentes de IA): [AGENTS.md](AGENTS.md).
+Para começar uma tela, copie o bloco mais parecido de `node_modules/@g4ai/ds/src/blocks/` (ou do site, aba **Código**) e troque os dados.
+
+## Tema, dark mode e marca
+
+```html
+<html data-theme="dark">                <!-- light | dark | system; ThemeToggle/useTheme trocam e salvam -->
+<html data-brand="g4-institucional">    <!-- presets de marca; ou o seu [data-brand="acme"] com --ds-primary… -->
+<html data-type="editorial">            <!-- presets de tipografia -->
+```
+
+Marca de cliente com contraste AA (claro e escuro): skill `ds-theme`, ferramenta MCP `theme_from_colors` ou [docs/fundamentos/temas-e-dark-mode.md](docs/fundamentos/temas-e-dark-mode.md).
 
 ## Usar com IA
 
+**MCP** (Claude Code, Cursor, VS Code, qualquer cliente MCP). Roda local, lê a versão instalada do DS, sem rede:
+
+```bash
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+```
+
+```json
+// Cursor (.cursor/mcp.json) · VS Code (.vscode/mcp.json usa "servers" no lugar de "mcpServers")
+{ "mcpServers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
+```
+
+Ferramentas: `search`, `get_component`, `list_blocks`, `get_block`, `get_guide`, `get_tokens`, `theme_from_colors`, `audit`, `doctor`.
+
+**Web** (para agentes que só leem URLs):
+
+- https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt — índice
+- https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms-full.txt — tudo num arquivo
+- `…/ai/core.md`, `…/ai/components/<módulo>.md`, `…/ai/blocks/<slug>.md`, `…/ai/manifest.json`, `…/docs/…`
+
+**No projeto**: `node_modules/@g4ai/ds/ai/core.md` é a porta de entrada. Cole [`templates/AGENTS.snippet.md`](templates/AGENTS.snippet.md) no `AGENTS.md`/`CLAUDE.md` do app.
+
+**Plugin do Claude Code** (skills `g4os-ds`, `ds-create`, `ds-migrate`, `ds-review`, `ds-theme`):
+
 ```text
-/plugin marketplace add ../G4OS-DS      # ou a URL git
+/plugin marketplace add Gestao-Quatro-Ponto-Zero/G4OS-DS
 /plugin install g4os-ds@g4os
 ```
 
-Depois, no projeto: *"Adapte este projeto ao G4OS-DS"*, *"Crie a tela de pedidos com o design system"*, *"Revise esta tela"*, *"Tema do cliente Acme, azul #0b5cff"*. Sem plugin, cole [`templates/AGENTS.snippet.md`](templates/AGENTS.snippet.md) no `AGENTS.md` do projeto.
+Depois peça: *"Adapte este projeto ao G4OS-DS"*, *"Crie a tela de pedidos com o design system"*, *"Revise esta tela"*, *"Tema do cliente Acme, azul #0b5cff"*. Guia: [docs/guias/usar-com-ia.md](docs/guias/usar-com-ia.md) · no site: **Guias › Agentes de IA**.
+
+## CLI
 
 ```bash
-npx g4os-ds doctor              # o projeto pode usar o DS? (React 19, Tailwind v4, CSS, tema…)
-npx g4os-ds audit src --fix-hints   # o que foge do DS, com a troca sugerida; --json para acompanhar migração
+npx g4os-ds doctor                    # o projeto pode usar o DS?
+npx g4os-ds audit src --fix-hints     # o que foge do DS, com a troca sugerida (--json para acompanhar)
+npx g4os-ds guide                     # imprime o caminho do guia ai/core.md
+npx g4os-ds mcp                       # servidor MCP (stdio)
 ```
 
-Guia: [docs/guias/usar-com-ia.md](docs/guias/usar-com-ia.md) · migração: [docs/guias/migracao.md](docs/guias/migracao.md) · temas: [docs/fundamentos/temas-e-dark-mode.md](docs/fundamentos/temas-e-dark-mode.md).
+## Atualizar de versão
 
-## Scripts
+```bash
+pnpm up @g4ai/ds                      # ou npm i @g4ai/ds@latest
+npx g4os-ds audit src                 # aponta nomes antigos e o que mudou de regra
+```
 
-| Comando | Faz |
+Leia o [CHANGELOG](CHANGELOG.md) entre a sua versão e a nova: cada entrada diz o que o app precisa fazer. Renomeações ficam em `ai/renames.json`; com o plugin, peça *"Atualize o @g4ai/ds e ajuste o código"* (skill `ds-migrate`, modo atualização). Seguimos [SemVer](https://semver.org/lang/pt-BR/): enquanto estivermos em `0.x`, mudança que quebra sobe o **minor** e vem com "como migrar".
+
+## Documentação
+
+| Para | Onde |
 | --- | --- |
-| `npm run check` | tokens CSS ↔ TS + TypeScript + `ai/` em dia + auditoria do próprio DS (critério de pronto) |
-| `npm run ai:build` | regenera `ai/` (guia para agentes) a partir do código |
-| `npm run audit:self` | `g4os-ds audit` em `src/` e `templates/` |
-| `npm run check:tokens` | só a paridade de tokens |
-| `npm run typecheck` | gera o registro do showcase e roda `tsc` |
-| `npm run showcase:build` | compila o site de documentação em `showcase/dist` |
-| `npm run showcase:watch` | recompila a cada mudança |
-| `npm run showcase` | build + servidor em http://localhost:4173 |
-
-## Mapa do repositório
-
-```
-src/
-  styles/      tokens.css (3 camadas, claro/escuro) · themes.css (marcas) · base.css · components.css ·
-               index.css (entrada, com @source) · shadcn.css (ponte opcional)
-  tokens/      espelho TS dos tokens (color / colorDark) para canvas, PDF, e-mail
-  lib/         cn · format (pt-BR) · text · portal · theme (useTheme, themeScript) · color (contraste, deriveBrand)
-  components/  componentes por família (abaixo)
-  blocks/      telas completas, um arquivo por bloco
-  index.ts     exporta tudo
-showcase/      site de documentação (main.tsx, kit.tsx, pages/*.tsx, build.mjs)
-docs/
-  fundamentos/ tokens · temas e dark mode · cor · tipografia · espaço e forma · movimento · dados · iconografia · escrita
-  padroes/     layout e navegação · densidade · formulários · tabelas e coleções · superfícies ·
-               feedback e estados · dashboards · pipelines · acessibilidade · responsivo
-  receitas/    crm · ats · erp · financeiro · portal do cliente
-  guias/       instalação · next · shadcn (e 21st.dev) · migração · usar com IA · contribuir
-ai/            guia gerado para agentes: core.md · components/*.md · blocks/*.md · tokens.md · manifest.json · llms.txt · renames.json
-scripts/       cli.mjs (g4os-ds audit | doctor | guide) · build-ai-docs.mjs · check-tokens.mjs
-plugin/        plugin do Claude Code: skills g4os-ds · ds-create · ds-migrate · ds-review · ds-theme
-.claude/skills ds-contribute (para quem mexe neste repositório)
-templates/     next-app (starter App Router) · AGENTS.snippet.md (colar no projeto que usa o DS)
-AGENTS.md      regras obrigatórias, 10 passos para um app novo, qual bloco usar
-CHANGELOG.md   o que mudou por versão e o que o app precisa fazer
-```
+| Ver e copiar componentes e blocos | [site](https://gestao-quatro-ponto-zero.github.io/G4OS-DS/) (⌘K busca tudo) |
+| Instalar e configurar | [instalação](docs/guias/instalacao.md) · [Next](docs/guias/next.md) · [Vite](docs/guias/vite.md) · [shadcn/21st.dev](docs/guias/shadcn.md) |
+| Migrar um projeto existente | [migração](docs/guias/migracao.md) |
+| Montar telas | [anatomia de página](docs/padroes/anatomia-de-pagina.md) · [padrões](docs/padroes) · [blocos](ai/blocks) |
+| Montar um app inteiro | [receitas](docs/receitas): CRM, ATS, ERP, financeiro, portal do cliente |
+| Fundamentos | [tokens](docs/fundamentos/tokens.md) · [temas e dark mode](docs/fundamentos/temas-e-dark-mode.md) · [escrita](docs/fundamentos/escrita.md) |
+| Regras para quem constrói (pessoas e agentes) | [AGENTS.md](AGENTS.md) |
 
 ## Componentes
 
@@ -131,62 +189,63 @@ Todos exportados por `@g4ai/ds` (ou por módulo: `@g4ai/ds/components/<arquivo>`
 | **Mídia e conteúdo** | `media` | `Carousel`, `SlideDeck`, `Slide`, `SlideTitle`, `SlideBullets`, `SlideSplit`, `SlideStat`, `SlideQuote`, `SlideCanvas`, `ImageGallery`, `AspectFrame`, `FileCard`, `FileIcon`, `formatBytes` |
 | **Utilitários** | `lib/*` | `cn`, `formatCurrency`, `formatNumber`, `formatPercent`, `formatDelta`, `formatCompact`, `formatDate`, `formatRelative`, `normalize`, `plural`, `initials`, `usePortalContainer`, `tokens` |
 
-Exemplos vivos, regras e props de cada um: rode `npm run showcase` e abra **Componentes**, **Gráficos** e **Dashboards**.
+Exemplos vivos, regras e props: [site](https://gestao-quatro-ponto-zero.github.io/G4OS-DS/) ou `ai/components/<arquivo>.md`. A lista completa está em [`src/index.ts`](src/index.ts).
 
 ## Blocos
 
-Arquivos em `src/blocks/`. Cada um importa só de `@g4ai/ds`, traz os dados de exemplo no topo e funciona de 320 a 1440 px. No showcase, **Blocos** mostra Preview (desktop/tablet/celular) e Código.
+Arquivos em `src/blocks/` (também no pacote: `node_modules/@g4ai/ds/src/blocks/`). Cada bloco importa só de `@g4ai/ds`, traz os dados de exemplo no topo, funciona de 320 a 1440 px e explica o **conceito** (objetivo, padrões, quando usar, o que evitar) em `ai/blocks/<slug>.md`.
 
-| Categoria | Bloco | O que é |
-| --- | --- | --- |
-| SaaS | `saas-dashboard` | Dashboard de produto: sidebar, KPIs com variação, área com seletor de período, contas recentes |
-| SaaS | `saas-analytics` | Aquisição: funil em colunas, origem do tráfego, dispositivos, conversão no tempo, mapa de atividade |
-| SaaS | `saas-customers` | Clientes: busca, filtros, ordenação, seleção com ações em massa, paginação, detalhe em drawer |
-| CRM | `crm-sales-dashboard` | Painel comercial: meta com ritmo, receita × meta, funil, ranking de vendedores, motivos de perda |
-| CRM | `crm-pipeline` | Pipeline: quadro por etapa com soma de valor, previsão ponderada, filtros, arrastar entre etapas |
-| CRM | `crm-deal` | Negócio: caminho de etapas, propriedades, nota rápida, atividade, contatos e tarefas |
-| CRM | `crm-contacts` | Empresas e contatos: abas, filtros, ordenação, lista/cards, ações rápidas |
-| ATS | `ats-dashboard` | Recrutamento: tempo até contratar × SLA, funil, contratações/mês, aceite, qualidade por origem |
-| ATS | `ats-jobs` | Vagas abertas: distribuição por etapa, tempo em aberto × SLA, recrutador, filtros por área |
-| ATS | `ats-pipeline` | Candidatos da vaga: quadro por etapa com nota média, origem, tempo na etapa |
-| ATS | `ats-candidate` | Perfil do candidato: etapas, avaliações por critério e entrevistador, currículo, agenda |
-| ERP | `erp-orders` | Pedidos de venda: abas por situação, totais do dia, faturamento em massa, detalhe com itens |
-| ERP | `erp-inventory` | Estoque: saldo × mínimo, cobertura em dias, ruptura com ação de compra, valor por categoria |
-| ERP | `erp-purchase-requests` | Requisições de compra: cadeia de aprovação, cotações comparadas, aprovar/recusar |
-| ERP | `erp-invoice` | Nota fiscal (NF-e) em formato de leitura e impressão |
-| Financeiro | `fin-cashflow` | Fluxo de caixa: entradas × saídas, saldo projetado × mínimo, cascata do mês, contas a pagar |
-| Financeiro | `fin-receivables` | Contas a receber: aging, inadimplência, prazo médio, cobrança individual e em massa |
-| Financeiro | `fin-dre` | DRE gerencial: grupos expansíveis, realizado × orçado, análise vertical, cascata, margens |
-| Autenticação | `auth-login` | Entrar: e-mail e senha, SSO, link mágico, painel de marca navy |
-| Autenticação | `auth-signup` | Criar conta em duas etapas, força de senha, termos, SSO |
-| Autenticação | `auth-otp` | Verificar código de 6 dígitos: colar, verificação automática, reenvio com contagem |
-| Autenticação | `auth-forgot-password` | Redefinir senha de ponta a ponta, sem revelar se o e-mail existe |
-| Configurações | `settings-profile` | Perfil com subnavegação, alterações não salvas e zona de perigo |
-| Configurações | `settings-team` | Equipe e permissões: papéis, convites, licenças, remoção com confirmação |
-| Configurações | `settings-billing` | Plano e cobrança: uso × limites, troca de plano, pagamento, faturas |
-| Configurações | `settings-notifications` | Matriz evento × canal, resumo diário, horário de silêncio |
-| Onboarding | `onboarding-wizard` | Assistente em 4 passos com trilha lateral e conclusão |
-| Onboarding | `onboarding-checklist` | Primeiros passos com progresso e ação direta |
-| Aplicação | `app-command-palette` | Paleta de comandos ⌘K |
-| Aplicação | `app-notifications` | Central de notificações |
-| Aplicação | `app-file-manager` | Gerenciador de arquivos com árvore, grade/lista, envio e prévia |
-| Aplicação | `app-error-pages` | 404, 500, 403, offline e manutenção dentro da casca |
-| Aplicação | `app-presentation` | Apresentação (QBR) com os layouts de slide do DS |
+| Categoria | Exemplos |
+| --- | --- |
+| SaaS | `saas-dashboard`, `saas-analytics`, `saas-customers` |
+| CRM | `crm-sales-dashboard`, `crm-pipeline`, `crm-deal`, `crm-contacts`, `crm-company` |
+| ATS | `ats-dashboard`, `ats-jobs`, `ats-pipeline`, `ats-candidate`, `ats-interviews` |
+| ERP | `erp-orders`, `erp-inventory`, `erp-purchase-requests`, `erp-invoice` |
+| Financeiro | `fin-dashboard`, `fin-cashflow`, `fin-receivables`, `fin-dre`, `fin-reconciliation` |
+| IA | `ai-workspace`, `ai-chat`, `ai-sessions`, `ai-trace`, `ai-agent-builder`, `ai-agent-connections` |
+| Aplicação | `app-command-palette`, `app-notifications`, `app-file-manager`, `app-error-pages`, `app-presentation` |
+| Autenticação, configurações, onboarding | `auth-login`, `auth-otp`, `settings-team`, `settings-billing`, `onboarding-wizard` |
 
-Qual bloco usar para cada tipo de app: [AGENTS.md](AGENTS.md#qual-bloco-usar). Como montar cada app: [docs/receitas](docs/receitas).
+Catálogo completo com objetivo de cada um: [ai/llms.txt](ai/llms.txt) ou `list_blocks` no MCP. Qual bloco usar por tipo de app: [AGENTS.md](AGENTS.md#qual-bloco-usar).
 
 ## shadcn/ui e 21st.dev
 
-Para o que o DS não tem, traga do shadcn/ui ou do 21st.dev e importe `@g4ai/ds/shadcn.css`: as variáveis do shadcn passam a apontar para os tokens do DS. Leia as colisões (`bg-accent`, `bg-muted`) e o checklist em [docs/guias/shadcn.md](docs/guias/shadcn.md).
+Para o que o DS não tem, traga do shadcn/ui ou do 21st.dev e importe `@g4ai/ds/shadcn.css`: as variáveis do shadcn passam a apontar para os tokens do DS. Colisões (`bg-accent`, `bg-muted`) e checklist: [docs/guias/shadcn.md](docs/guias/shadcn.md).
 
 ## Contribuir
 
-Novo componente, página de documentação ou bloco: [docs/guias/contribuir.md](docs/guias/contribuir.md). Critério de pronto: `npm run check` verde e tela conferida em 1440 e 390 px.
+```bash
+git clone https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS.git && cd G4OS-DS
+npm ci
+npm run showcase:watch                # site local em showcase/dist
+npm run check                         # tokens + tipos + ai/ em dia + auditoria (critério de pronto)
+npx changeset                         # descreve a mudança: patch, minor ou major
+```
 
+**Como sai uma versão:** o PR com changeset entra na `main` → o GitHub Actions abre (ou atualiza) o PR **"Versão de lançamento"** com o novo número e o CHANGELOG → ao mesclar esse PR, o pacote é publicado no npm automaticamente (Trusted Publishing, com provenance). Ninguém roda `npm publish` à mão. O site é republicado a cada push na `main`.
 
-## Contribuir
+Fluxo completo: [CONTRIBUTING.md](CONTRIBUTING.md) · contratos técnicos (componente, bloco, página do site): [docs/guias/contribuir.md](docs/guias/contribuir.md).
 
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) (fluxo, verificação, changesets) e [docs/guias/contribuir.md](docs/guias/contribuir.md) (contratos técnicos). Releases saem automaticamente pelo GitHub Actions.
+| Comando | Faz |
+| --- | --- |
+| `npm run check` | tokens CSS ↔ TS + TypeScript + `ai/` em dia + auditoria do próprio DS |
+| `npm run build` | compila `dist/` (o que vai para o npm) |
+| `npm run ai:build` | regenera `ai/` (guia para agentes) a partir do código |
+| `npm run showcase` | compila o site e serve em http://localhost:4173 |
+| `npm run showcase:watch` | recompila o site a cada mudança |
+
+## Mapa do repositório
+
+```
+src/           styles/ (tokens, temas, componentes, shadcn.css) · tokens/ · lib/ · components/ · blocks/ · index.ts
+showcase/      site de documentação (main.tsx, kit.tsx, pages/*.tsx, build.mjs → também gera llms.txt)
+docs/          fundamentos · padroes · receitas · guias
+ai/            gerado: core.md · tokens.md · components/*.md · blocks/*.md · manifest.json · llms.txt · renames.json
+scripts/       cli.mjs (g4os-ds audit | doctor | guide | mcp) · mcp.mjs · build-ai-docs.mjs · build-lib.mjs
+plugin/        plugin do Claude Code (skills) · .claude-plugin/marketplace.json
+templates/     next-app (starter) · AGENTS.snippet.md
+AGENTS.md      regras obrigatórias e qual bloco usar · CHANGELOG.md  o que mudou e o que o app precisa fazer
+```
 
 ## Licença
 

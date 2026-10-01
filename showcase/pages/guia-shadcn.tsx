@@ -25,8 +25,7 @@ export default function Page() {
           code={`/* globals.css */
 @import "tailwindcss";
 @import "@g4ai/ds/styles.css";
-@import "@g4ai/ds/shadcn.css";
-@source "../node_modules/@g4ai/ds/src";`}
+@import "@g4ai/ds/shadcn.css";`}
         />
         <GuideTable
           head={["Variável do shadcn", "Token do DS", "Valor", "Papel"]}

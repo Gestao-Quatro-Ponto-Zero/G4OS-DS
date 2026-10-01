@@ -11,12 +11,14 @@ Você está num projeto que usa (ou vai usar) o **G4OS-DS**: tokens semânticos 
 
 Na ordem, pare no primeiro que existir:
 
-1. Caminho dado pelo usuário (ex.: `../G4OS-DS`, `~/Documents/GitHub/G4OS-DS`).
-2. `node_modules/@g4ai/ds/` no projeto atual (ou no workspace do monorepo).
-3. `npx g4os-ds guide` imprime o caminho de `ai/core.md`.
-4. Pastas irmãs: `../G4OS-DS`, `../../G4OS-DS`.
+1. `node_modules/@g4ai/ds/` no projeto atual (ou no workspace do monorepo). É o caso normal: o DS vem do npm.
+2. `npx g4os-ds guide` imprime o caminho de `ai/core.md` da versão instalada.
+3. Caminho dado pelo usuário (ex.: um clone do repositório para desenvolver o próprio DS).
+4. Sem nada local: leia https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt (os mesmos arquivos `ai/` e `docs/` estão no site).
 
-Chame essa pasta de `DS`. Se não achar, pergunte ao usuário onde está (e siga a skill **ds-migrate**, passo "Instalar", se o projeto ainda não tem o pacote).
+Chame essa pasta de `DS`. Se o projeto ainda não tem o pacote, instale (`pnpm add @g4ai/ds @base-ui/react lucide-react`) seguindo a skill **ds-migrate**, fase 1.
+
+**Se o servidor MCP `g4os-ds` estiver disponível** (ferramentas `search`, `get_component`, `get_block`, `get_guide`, `get_tokens`, `theme_from_colors`, `audit`, `doctor`), prefira-o à leitura de arquivos: `get_guide core` → `search` → `get_component`/`get_block`. Para ligar: `claude mcp add g4os-ds -- npx -y @g4ai/ds mcp`.
 
 ## 2. Leia antes de escrever código
 

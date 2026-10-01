@@ -43,7 +43,7 @@ export default function Dashboard() {
           <SegmentedControl
             label="Período"
             value={period}
-            onChange={setPeriod}
+            onChange={(v) => setPeriod(v as "6m" | "12m")}
             options={[
               { value: "6m", label: "6 meses" },
               { value: "12m", label: "12 meses" },

@@ -13,7 +13,8 @@ import { cn } from "../lib/cn";
 
 /**
  * Componentes que navegam aceitam `href`. Por padrão renderizam `<a>`.
- * Em Next.js, registre o `Link` uma vez no boot do app:
+ * Em Next.js, registre o `Link` uma vez, num módulo "use client" importado
+ * pelo layout raiz (nenhuma outra configuração é necessária):
  *
  *   import Link from "next/link";
  *   import { setLinkComponent } from "@g4ai/ds";

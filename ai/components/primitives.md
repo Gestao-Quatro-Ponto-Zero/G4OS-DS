@@ -348,9 +348,6 @@ import Link from "next/link";
 import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
 export function DsSetup() { return null; }
-
-// next.config.ts
-export default { transpilePackages: ["@g4ai/ds"] };
 ```
 
 ## StatCell

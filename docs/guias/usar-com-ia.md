@@ -1,40 +1,83 @@
 # Usar o G4OS-DS com agentes de IA
 
-O DS foi feito para ser aplicado por agentes (Claude Code, Cursor, Codex, Copilot) em **qualquer** repositório: criar telas, adaptar um projeto existente, revisar e tematizar. Três peças:
+O DS foi feito para ser aplicado por agentes (Claude Code, Cursor, Codex, Copilot) em **qualquer** repositório: criar telas, adaptar um projeto existente, revisar e tematizar.
 
 | Peça | O que é | Onde |
 | --- | --- | --- |
-| **Guia gerado** | Regras, tokens, props de cada componente, catálogo de blocos, em Markdown e JSON, gerado do código a cada versão | `ai/` (`core.md` é a porta de entrada) |
-| **CLI** | `g4os-ds doctor` (pré-requisitos) e `g4os-ds audit` (o que foge do DS, com sugestão e contagem) | `scripts/cli.mjs` → `npx g4os-ds` |
-| **Skills** | Fluxos prontos: `g4os-ds`, `ds-create`, `ds-migrate`, `ds-review`, `ds-theme` | `plugin/` (plugin do Claude Code) |
+| **Servidor MCP** | Busca, componentes, blocos, guias, tokens, tema de marca, audit e doctor como ferramentas | `npx -y @g4ai/ds mcp` |
+| **Web** | `llms.txt`, `llms-full.txt`, `ai/` e `docs/` publicados com o site | https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt |
+| **Guia gerado** | Regras, tokens, props de cada componente e catálogo de blocos (com o conceito de cada um), em Markdown e JSON | `node_modules/@g4ai/ds/ai/` (`core.md` é a porta de entrada) |
+| **CLI** | `g4os-ds doctor` (pré-requisitos), `g4os-ds audit` (o que foge do DS), `g4os-ds mcp` | `npx g4os-ds` |
+| **Skills** | Fluxos prontos: `g4os-ds`, `ds-create`, `ds-migrate`, `ds-review`, `ds-theme` | plugin do Claude Code |
 
-O guia e a CLI vêm **dentro do pacote instalado** (`node_modules/@g4ai/ds/ai`, `…/scripts`). As skills são finas: mandam o agente ler a versão instalada, então nunca ficam desatualizadas em relação ao código.
+Tudo sai da mesma fonte (o código do DS) e vem dentro do pacote: o MCP e as skills leem a versão **instalada**, então nunca ficam desatualizados em relação ao projeto.
 
 ## Instalar
 
-### Opção A · plugin do Claude Code (recomendado)
+### Opção A · servidor MCP (qualquer cliente MCP)
+
+```bash
+# Claude Code
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp
+```
+
+```json
+// Cursor: .cursor/mcp.json
+{ "mcpServers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
+```
+
+```json
+// VS Code: .vscode/mcp.json
+{ "servers": { "g4os-ds": { "type": "stdio", "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
+```
+
+Com o DS instalado no projeto, `npx` usa a versão de `node_modules`. Fora de um projeto, baixa a última do npm.
+
+| Ferramenta | O que devolve |
+| --- | --- |
+| `search` | componentes, blocos e guias por palavra-chave, com a próxima ferramenta sugerida |
+| `get_component` | props, regras e exemplos de um componente ou módulo, com a linha de import |
+| `list_blocks` | telas prontas por categoria, com o objetivo de cada uma |
+| `get_block` | conceito (objetivo, padrões, o que adaptar, o que evitar); `include_source: true` traz o código |
+| `get_guide` | guias, padrões, receitas e fundamentos (sem `slug`, lista todos; aceita `core` e `tokens`) |
+| `get_tokens` | tokens semânticos, presets de marca e de tipografia |
+| `theme_from_colors` | CSS `[data-brand]` claro e escuro a partir das cores do cliente, com contraste WCAG |
+| `audit` | violações numa pasta do projeto, com a troca sugerida |
+| `doctor` | pré-requisitos do projeto (React 19, Tailwind 4, CSS, tema, fonte) |
+
+Recursos: `g4os-ds://core`, `g4os-ds://tokens`, `g4os-ds://llms`, `g4os-ds://components/<módulo>`, `g4os-ds://blocks/<slug>`, `g4os-ds://guides/<slug>`.
+
+### Opção B · web (agentes que leem URLs)
+
+| Endereço | Conteúdo |
+| --- | --- |
+| https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt | índice com links para tudo |
+| https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms-full.txt | o essencial num arquivo só (regras, tokens, anatomia, instalação, catálogos) |
+| https://gestao-quatro-ponto-zero.github.io/G4OS-DS/ai/core.md | porta de entrada |
+| `https://gestao-quatro-ponto-zero.github.io/G4OS-DS/ai/components/<módulo>.md` | props e exemplos de um módulo |
+| `https://gestao-quatro-ponto-zero.github.io/G4OS-DS/ai/blocks/<slug>.md` | conceito e componentes de um bloco |
+| https://gestao-quatro-ponto-zero.github.io/G4OS-DS/ai/manifest.json | catálogo estruturado |
+| `https://gestao-quatro-ponto-zero.github.io/G4OS-DS/docs/<pasta>/<arquivo>.md` | fundamentos, padrões, receitas, guias |
+
+### Opção C · plugin do Claude Code
 
 ```text
-/plugin marketplace add ../G4OS-DS            # pasta local, ou a URL git do repositório
+/plugin marketplace add Gestao-Quatro-Ponto-Zero/G4OS-DS
 /plugin install g4os-ds@g4os
 ```
 
-As skills passam a disparar sozinhas pelos pedidos (ver abaixo). Atualize com `/plugin marketplace update g4os`.
+As skills disparam sozinhas pelos pedidos (ver abaixo). Atualize com `/plugin marketplace update g4os`. Sem o plugin, copie `node_modules/@g4ai/ds/plugin/skills/<nome>` para `.claude/skills/` do projeto (ou `~/.claude/skills/`).
 
-### Opção B · sem plugin (qualquer agente)
+### Opção D · só um arquivo no projeto
 
-Cole `templates/AGENTS.snippet.md` no `AGENTS.md`/`CLAUDE.md`/`.cursorrules` do projeto. O agente lê `node_modules/@g4ai/ds/ai/core.md` e segue as skills em `node_modules/@g4ai/ds/plugin/skills/*/SKILL.md` como roteiro.
-
-### Opção C · skills soltas
-
-Copie `plugin/skills/<nome>` para `~/.claude/skills/` (todas as sessões) ou `.claude/skills/` do projeto.
+Cole [`templates/AGENTS.snippet.md`](../../templates/AGENTS.snippet.md) no `AGENTS.md`/`CLAUDE.md`/`.cursorrules` do app. O agente lê `node_modules/@g4ai/ds/ai/core.md` e usa as skills em `node_modules/@g4ai/ds/plugin/skills/*/SKILL.md` como roteiro.
 
 ## Pedidos que funcionam
 
 | Você diz | Skill | O agente faz |
 | --- | --- | --- |
-| "Adapte este projeto ao G4OS-DS (está em ../G4OS-DS)" | ds-migrate | `doctor` (para se React < 19 / Tailwind < 4) → instala e liga CSS/tema/fonte → `audit --json` como linha de base → `MIGRATION.md` com telas em ordem → migra casca e depois página a página, com audit 0 e tsc verde a cada passo |
-| "Atualize o @g4ai/ds para a 0.3 e ajuste o código" | ds-migrate (modo atualização) | lê `CHANGELOG.md` e `ai/renames.json`, aplica, audita |
+| "Adapte este projeto ao G4OS-DS" | ds-migrate | `doctor` (para se React < 19 / Tailwind < 4) → instala e liga CSS/tema/fonte → `audit --json` como linha de base → `MIGRATION.md` com telas em ordem → migra casca e depois página a página, com audit 0 e tsc verde a cada passo |
+| "Atualize o @g4ai/ds e ajuste o código" | ds-migrate (modo atualização) | lê `CHANGELOG.md` e `ai/renames.json`, aplica, audita |
 | "Crie a tela de contas a receber com o design system" | ds-create | escolhe o bloco mais próximo (`fin-receivables`), adapta aos dados reais, cinco estados, audita |
 | "Refaça esta página a partir deste print" | ds-create (modo imagem) | mapeia regiões do print para padrões do DS sem copiar cores do print |
 | "Revise esta tela / está no padrão?" | ds-review | audit + checklist, relatório por gravidade; corrige se pedido |

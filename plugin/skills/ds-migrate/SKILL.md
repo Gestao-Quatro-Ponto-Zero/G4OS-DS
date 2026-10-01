@@ -21,10 +21,10 @@ npx g4os-ds doctor            # ou: node <DS>/scripts/cli.mjs doctor .
 
 Siga `DS/docs/guias/instalacao.md`. Resumo:
 
-1. `npm i @base-ui/react lucide-react` e o DS (`npm i ../G4OS-DS`, ou git).
+1. `pnpm add @g4ai/ds @base-ui/react lucide-react` (ou `npm i` / `yarn add`, conforme o lockfile do projeto).
 2. CSS global: `@import "tailwindcss"; @import "@g4ai/ds/styles.css";` (+ `@g4ai/ds/shadcn.css` se houver shadcn). Remova o tema antigo do shadcn (`:root { --background… }`, `.dark {…}`).
 3. `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript` no `<head>` + Figtree (`--ds-font-sans`).
-4. Next: `transpilePackages: ["@g4ai/ds"]`; `setLinkComponent(Link)` num módulo cliente.
+4. Next: `setLinkComponent(Link)` num módulo cliente importado pelo layout. O pacote vem compilado: não adicione `transpilePackages`.
 5. `doctor` sem ✗, build verde. **Commit.**
 
 ## Fase 2 · Inventário
@@ -62,7 +62,7 @@ Não faça "busca e troca" global cega de classes: o mesmo `bg-gray-100` pode se
 
 ## Modo atualização (versão nova do DS)
 
-1. Leia `DS/CHANGELOG.md` entre a versão instalada (`node_modules/@g4ai/ds/package.json`) e a nova.
+1. Veja a versão instalada (`node_modules/@g4ai/ds/package.json`) e a última (`npm view @g4ai/ds version`). Atualize com o gerenciador do projeto: `pnpm up @g4ai/ds` (ou `npm i @g4ai/ds@latest`). Leia `DS/CHANGELOG.md` entre as duas: cada entrada diz o que o app precisa fazer. Em `0.x`, um minor novo pode quebrar.
 2. Aplique `DS/ai/renames.json` (exports e classes renomeados) com busca precisa, arquivo a arquivo.
 3. `audit` + `tsc`; registre em `MIGRATION.md` (seção "Atualizações").
 

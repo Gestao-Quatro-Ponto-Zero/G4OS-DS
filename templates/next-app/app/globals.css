@@ -3,9 +3,6 @@
 /* Opcional: componentes do shadcn/ui e 21st.dev com a cara do DS. */
 /* @import "@g4ai/ds/shadcn.css"; */
 
-/* Se o Tailwind não achar as classes do DS (links de pnpm), descomente: */
-/* @source "../node_modules/@g4ai/ds/src"; */
-
 /* Figtree carregada por next/font (ver app/layout.tsx). */
 :root {
   --ds-font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;

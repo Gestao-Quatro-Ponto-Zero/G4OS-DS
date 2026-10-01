@@ -4,7 +4,17 @@ Design system para construir **qualquer aplicação G4 OS** (CRM, ATS, ERP, fina
 
 Quem constrói um app **com** o DS: leia "Regras obrigatórias", "Começar um app em 10 passos" e "Qual bloco usar". Quem mexe **no** DS: leia também "Trabalhando neste repositório".
 
-## Comandos
+## Usar num app
+
+```bash
+pnpm add @g4ai/ds @base-ui/react lucide-react && pnpm add -D tailwindcss @tailwindcss/postcss
+npx g4os-ds doctor                              # pré-requisitos
+claude mcp add g4os-ds -- npx -y @g4ai/ds mcp   # MCP: search, get_component, get_block, get_guide, audit…
+```
+
+Guia da versão instalada: `node_modules/@g4ai/ds/ai/core.md`. Na web: https://gestao-quatro-ponto-zero.github.io/G4OS-DS/llms.txt. Detalhes: [usar com IA](docs/guias/usar-com-ia.md).
+
+## Comandos (neste repositório)
 
 ```bash
 npm run check            # tokens CSS↔TS + TypeScript + ai/ atualizado + auditoria do próprio DS (critério de pronto)
@@ -83,7 +93,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 
 ## Começar um app em 10 passos
 
-1. Copie `templates/next-app` (ou siga [instalação](docs/guias/instalacao.md)): Tailwind v4 + `@import "@g4ai/ds/styles.css"` (os `@source` já vêm dentro) + `transpilePackages`. Rode `npx g4os-ds doctor` para conferir.
+1. `pnpm add @g4ai/ds @base-ui/react lucide-react` + Tailwind v4 (ou copie `templates/next-app`; ver [instalação](docs/guias/instalacao.md)). CSS: `@import "tailwindcss"; @import "@g4ai/ds/styles.css";` (os `@source` já vêm dentro; nada de `transpilePackages`). Rode `npx g4os-ds doctor` para conferir.
 2. `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript` no `<head>`, Figtree, `setLinkComponent(Link)`.
 3. **Glossário**: um nome por conceito (Negócio, Vaga, Pedido…). Escreva num arquivo de rótulos e use em tudo.
 4. **Entidades e relações**: liste as 3–6 entidades, os campos que decidem ações e a etapa/status de cada uma. Veja a receita do tipo de app em `docs/receitas/`.
@@ -130,7 +140,9 @@ Catálogo completo com descrições no [README](README.md#blocos).
 
 ## Trabalhando neste repositório
 
-- Pacote distribuído como **código-fonte** (TSX + CSS); não há build de biblioteca. `package.json#exports` define os pontos de entrada.
+- Publicado no npm como `@g4ai/ds`: `npm run build` (scripts/build-lib.mjs) compila `dist/` (ESM com `"use client"` + tipos); CSS, `src/`, `ai/`, `docs/`, `plugin/` e `scripts/` vão junto. `package.json#exports` define os pontos de entrada.
+- Versões: `npx changeset` no PR → o Action abre o PR "Versão de lançamento" → ao mesclar, publica no npm (Trusted Publishing). Ver [CONTRIBUTING.md](CONTRIBUTING.md#como-uma-versão-chega-ao-npm).
+- Agentes: `scripts/mcp.mjs` (servidor MCP, `g4os-ds mcp`) lê `ai/` e `docs/`; `showcase/build.mjs` publica `llms.txt`, `llms-full.txt`, `ai/` e `docs/` no site. Mudou a estrutura de `ai/`? Confira os dois.
 - Novo componente: arquivo da família em `src/components/`, export em `src/index.ts`, página em `showcase/pages/<slug>.tsx` (registro automático; contrato em `showcase/kit.tsx`). Ver [contribuir.md](docs/guias/contribuir.md).
 - Novo bloco: `src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order, concept } as const` e `export default function`. `concept` é obrigatório (`goal`, `patterns` começando pela anatomia, `adapt`, `avoid`) e aparece na aba Conceito do showcase. Importa só de `@g4ai/ds`; dados de exemplo no topo; realista em pt-BR.
 - Mudou token: CSS **e** TS (`color` e `colorDark`), `npm run check:tokens`, docs de fundamentos.

@@ -6,6 +6,24 @@
 
 Funil de conversão em colunas, origem do tráfego, dispositivos, taxa de conversão no tempo e mapa de atividade diária.
 
+## Conceito
+
+**Objetivo:** Entender de onde vêm os clientes e onde a aquisição perde gente.
+
+**Padrões aplicados**
+
+- Anatomia B · Painel: cabeçalho fixo com período
+- Funil em colunas com a maior perda destacada
+- Origem, dispositivos, conversão no tempo e atividade diária
+
+**Quando usar e o que adaptar**
+
+- Funil de recrutamento, funil comercial
+
+**Evite**
+
+- Funil sem mostrar a conversão entre etapas
+
 ## Componentes usados
 
-—
+`BarList`, `Button`, `CalendarHeatmap`, `ChartCard`, `DonutChart`, `FunnelChart`, `KpiCard`, `KpiGrid`, `LineChart`, `Page`, `PageHeading`, `SankeyChart`, `SegmentedControl`, `formatNumber`, `formatPercent`, `notify`

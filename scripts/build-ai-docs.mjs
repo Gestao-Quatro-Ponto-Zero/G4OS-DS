@@ -192,12 +192,19 @@ const blocks = existsSync(blockDir)
         const s = read(join(blockDir, f));
         const metaSrc = s.match(/export const meta[^=]*=\s*\{([\s\S]*?)\}\s*(as const)?;/)?.[1] ?? "";
         const field = (k) => metaSrc.match(new RegExp(`${k}:\\s*"((?:[^"\\\\]|\\\\.)*)"`))?.[1] ?? null;
-        const imports = [...s.matchAll(/import\s*\{([^}]*)\}\s*from\s*"@g4os\/ds"/g)]
+        const imports = [...s.matchAll(/import\s*\{([^}]*)\}\s*from\s*"@g4ai\/ds"/g)]
           .flatMap((m) => m[1].split(","))
           .map((x) => x.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0])
           .filter((x) => x && allExports.has(x))
           .sort();
-        return { slug: f.replace(".tsx", ""), file: `src/blocks/${f}`, title: field("title"), description: field("description"), category: field("category"), uses: [...new Set(imports)] };
+        // meta.concept: { goal, patterns[], adapt[], avoid[] } (aba Conceito do showcase).
+        const unq = (x) => x.replace(/\\(["\\])/g, "$1");
+        const strs = (body) => [...(body ?? "").matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => unq(m[1]));
+        const conceptSrc = s.match(/concept:\s*\{([\s\S]*?)\n\s*\},?\s*\n/)?.[1] ?? "";
+        const arr = (k) => strs(conceptSrc.match(new RegExp(`${k}:\\s*\\[([\\s\\S]*?)\\]`))?.[1]);
+        const goal = conceptSrc.match(/goal:\s*"((?:[^"\\]|\\.)*)"/)?.[1];
+        const concept = goal ? { goal: unq(goal), patterns: arr("patterns"), adapt: arr("adapt"), avoid: arr("avoid") } : null;
+        return { slug: f.replace(".tsx", ""), file: `src/blocks/${f}`, title: field("title"), description: field("description"), category: field("category"), concept, uses: [...new Set(imports)] };
       })
   : [];
 
@@ -267,6 +274,17 @@ function renderBlock(b) {
     "",
     b.description ?? "",
     "",
+    ...(b.concept
+      ? [
+          "## Conceito",
+          "",
+          `**Objetivo:** ${b.concept.goal}`,
+          "",
+          ...(b.concept.patterns.length ? ["**Padrões aplicados**", "", ...b.concept.patterns.map((x) => `- ${x}`), ""] : []),
+          ...(b.concept.adapt.length ? ["**Quando usar e o que adaptar**", "", ...b.concept.adapt.map((x) => `- ${x}`), ""] : []),
+          ...(b.concept.avoid.length ? ["**Evite**", "", ...b.concept.avoid.map((x) => `- ${x}`), ""] : []),
+        ]
+      : []),
     "## Componentes usados",
     "",
     b.uses.length ? b.uses.map((u) => `\`${u}\``).join(", ") : "—",

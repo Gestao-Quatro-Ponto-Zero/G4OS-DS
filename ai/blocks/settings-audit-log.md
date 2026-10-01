@@ -6,6 +6,25 @@
 
 Quem fez o quê e quando: busca, filtros por pessoa, área e risco, período, exportação e detalhe do evento (antes/depois, IP) em drawer por ?id=.
 
+## Conceito
+
+**Objetivo:** Responder quem fez o quê e quando, para segurança e compliance.
+
+**Padrões aplicados**
+
+- Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)
+- PageToolbar com busca e filtros por pessoa, área e risco
+- Detalhe do evento (antes/depois, IP) em gaveta por ?id=
+- Exportação do recorte
+
+**Quando usar e o que adaptar**
+
+- Histórico de alterações de pedidos, de contratos
+
+**Evite**
+
+- Log sem o antes/depois
+
 ## Componentes usados
 
-—
+`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `Highlight`, `PageToolbar`, `Pagination`, `PropertyList`, `TableSearch`, `notify`, `useFilters`, `usePagination`
