@@ -1,4 +1,4 @@
-# G4OS-DS · guia essencial para agentes (v0.5.4)
+# G4OS-DS · guia essencial para agentes (v0.5.5)
 
 Leia isto inteiro antes de escrever ou mudar UI num projeto com `@g4ai/ds`. Detalhes ao lado (mesma pasta): `components/<módulo>.md` (props + exemplos), `blocks/<bloco>.md`, `tokens.md`, `manifest.json`. Com o MCP `g4os-ds` ligado, use `plan_screen` (pedido → anatomia, bloco e componentes), `get_component`, `get_block` e `audit`.
 
