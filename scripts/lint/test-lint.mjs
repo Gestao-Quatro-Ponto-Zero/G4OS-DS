@@ -391,6 +391,25 @@ await test("init: pnpm + husky + simple-git-hooks + ESLint já existente", () =>
   rmSync(dir, { recursive: true, force: true });
 });
 
+await test("init: vários lockfiles seguem o CI existente; pastas vêm de quem importa o DS", () => {
+  const dir = project({
+    "bun.lock": "",
+    "package-lock.json": "{}",
+    ".github/workflows/deploy.yml": "jobs:\n  d:\n    steps:\n      - run: npm ci\n",
+    "src/index.ts": "export default {};\n",
+    "frontend/src/main.tsx": 'import { Button } from "@g4ai/ds";\nexport const M = () => <Button>Ok</Button>;\n',
+    "frontend/src/views/a.tsx": 'import { Card } from "@g4ai/ds";\nexport const A = () => <Card />;\n',
+  });
+  const r = run(["init", "--dry-run"], dir);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /pastas frontend\/src\b/);
+  assert.doesNotMatch(r.stdout, /pastas [^\n]*\bsrc,/);
+  assert.match(r.stdout, /npm: já usado no CI/);
+  writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "x", packageManager: "pnpm@9.0.0" }));
+  assert.match(run(["init", "--dry-run"], dir).stdout, /pnpm: campo packageManager/);
+  rmSync(dir, { recursive: true, force: true });
+});
+
 await test("doctor: bloqueia sem pré-requisitos, aponta ordem do CSS e formatos", () => {
   const dir = project({
     "app/globals.css": '@import "@g4ai/ds/styles.css";\n@import "tailwindcss";\n',

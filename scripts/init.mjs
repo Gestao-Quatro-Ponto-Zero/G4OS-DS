@@ -1,16 +1,81 @@
 // g4os-ds init: prepara um projeto para checagem contínua do design system.
 // Seguro: nunca sobrescreve sem --force, mostra tudo o que muda, --dry-run não grava nada.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { usageError } from "./lint/engine.mjs";
 
 const AUDIT_EXT = "*.{ts,tsx,js,jsx,mjs,css,html}";
 
-function detectPm(root) {
-  if (existsSync(join(root, "pnpm-lock.yaml"))) return { name: "pnpm", install: "pnpm install --frozen-lockfile", exec: "pnpm exec g4os-ds", cache: "pnpm" };
-  if (existsSync(join(root, "yarn.lock"))) return { name: "yarn", install: "yarn install --frozen-lockfile", exec: "yarn g4os-ds", cache: "yarn" };
-  if (existsSync(join(root, "bun.lockb")) || existsSync(join(root, "bun.lock"))) return { name: "bun", install: "bun install --frozen-lockfile", exec: "bunx g4os-ds", cache: null };
-  return { name: "npm", install: existsSync(join(root, "package-lock.json")) ? "npm ci" : "npm install", exec: "npx g4os-ds", cache: existsSync(join(root, "package-lock.json")) ? "npm" : null };
+const PMS = {
+  pnpm: { name: "pnpm", lock: ["pnpm-lock.yaml"], install: "pnpm install --frozen-lockfile", exec: "pnpm exec g4os-ds", cache: "pnpm" },
+  yarn: { name: "yarn", lock: ["yarn.lock"], install: "yarn install --frozen-lockfile", exec: "yarn g4os-ds", cache: "yarn" },
+  bun: { name: "bun", lock: ["bun.lock", "bun.lockb"], install: "bun install --frozen-lockfile", exec: "bunx g4os-ds", cache: null },
+  npm: { name: "npm", lock: ["package-lock.json"], install: "npm ci", exec: "npx g4os-ds", cache: "npm" },
+};
+
+/**
+ * Gerenciador de pacotes do projeto, nesta ordem: campo `packageManager`,
+ * o que os workflows de CI existentes já rodam, o único lockfile presente,
+ * ou (vários lockfiles) o modificado por último. `why` explica a escolha.
+ */
+export function detectPm(root) {
+  const locks = Object.values(PMS).filter((pm) => pm.lock.some((f) => existsSync(join(root, f))));
+  try {
+    const field = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).packageManager;
+    const name = typeof field === "string" ? field.split("@")[0] : "";
+    if (PMS[name]) return { ...PMS[name], why: `campo packageManager (${field})` };
+  } catch {
+    /* sem package.json legível: segue */
+  }
+  if (locks.length > 1) {
+    const wfDir = join(root, ".github", "workflows");
+    if (existsSync(wfDir)) {
+      const ci = readdirSync(wfDir)
+        .filter((f) => /\.ya?ml$/.test(f) && f !== "g4os-ds.yml")
+        .map((f) => readFileSync(join(wfDir, f), "utf8"))
+        .join("\n");
+      const used = locks.find((pm) => new RegExp(`(^|\\s)${pm.name === "npm" ? "npm (ci|install)" : `${pm.name} install`}`, "m").test(ci));
+      if (used) return { ...used, why: `já usado no CI (${locks.map((l) => l.lock[0]).join(" e ")} presentes)` };
+    }
+    const newest = locks
+      .map((pm) => ({ pm, t: Math.max(...pm.lock.filter((f) => existsSync(join(root, f))).map((f) => statSync(join(root, f)).mtimeMs)) }))
+      .sort((a, b) => b.t - a.t)[0].pm;
+    return { ...newest, why: `lockfile mais recente entre ${locks.map((l) => l.lock[0]).join(", ")}; remova os outros` };
+  }
+  if (locks.length === 1) return { ...locks[0], why: locks[0].lock.find((f) => existsSync(join(root, f))) };
+  return { ...PMS.npm, install: "npm install", cache: null, why: "sem lockfile" };
+}
+
+const SKIP_DIRS = new Set(["node_modules", "dist", "build", "out", ".next", ".git", ".turbo", ".vercel", ".wrangler", "coverage", "public", "vendor"]);
+
+/** Pastas com arquivos que importam @g4ai/ds (até 3 níveis), resumidas ao prefixo comum de 2 níveis. */
+export function detectIncludes(root) {
+  const found = new Set();
+  const walk = (dir, depth) => {
+    if (depth > 4) return;
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.name.startsWith(".") || SKIP_DIRS.has(e.name)) continue;
+      const abs = join(dir, e.name);
+      if (e.isDirectory()) walk(abs, depth + 1);
+      else if (/\.(tsx|ts|jsx|js|mjs)$/.test(e.name) && depth > 0) {
+        try {
+          if (/from\s+["']@g4ai\/ds/.test(readFileSync(abs, "utf8"))) {
+            const parts = relative(root, abs).split(sep).slice(0, -1);
+            found.add(parts.slice(0, Math.min(parts.length, 2)).join("/"));
+          }
+        } catch {
+          /* ilegível: ignora */
+        }
+      }
+    }
+  };
+  try {
+    walk(root, 0);
+  } catch {
+    return [];
+  }
+  // remove pastas cobertas por outra mais curta
+  return [...found].sort().filter((d, _, all) => !all.some((o) => o !== d && d.startsWith(`${o}/`)));
 }
 
 function workflow(pm) {
@@ -100,7 +165,8 @@ export async function init({ cwd = process.cwd(), dryRun = false, force = false,
   };
 
   // 1. config
-  const include = ["src", "app", "components", "lib", "pages", "features", "modules"].filter((d) => existsSync(join(root, d)));
+  const usesDs = detectIncludes(root);
+  const include = usesDs.length ? usesDs : ["src", "app", "components", "lib", "pages", "features", "modules"].filter((d) => existsSync(join(root, d)));
   const blFile = ".g4os-ds-baseline.json";
   const config = {
     $schema: "./node_modules/@g4ai/ds/scripts/lint/config.schema.json",
@@ -142,7 +208,7 @@ export async function init({ cwd = process.cwd(), dryRun = false, force = false,
   if (!added.length && !kept.length) log.push("= package.json já tem os scripts ds:*");
 
   // 3. CI
-  if (ci) write(".github/workflows/g4os-ds.yml", workflow(pm), `doctor + audit (anotações e SARIF), ${pm.name}`);
+  if (ci) write(".github/workflows/g4os-ds.yml", workflow(pm), `doctor + audit (anotações e SARIF), ${pm.name}: ${pm.why}`);
 
   // 4. ESLint
   if (eslint) {

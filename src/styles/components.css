@@ -64,6 +64,15 @@
 .page-inset[data-page-width] > :is(.sticky-page-header, .page-toolbar) {
   padding-inline: max(0px, calc((100% - var(--page-max)) / 2));
 }
+/* Respiro padrão entre o cabeçalho da página e o conteúdo: o app não precisa
+   lembrar de um mt-*. Na camada components, um mt-* explícito ainda vence.
+   A barra da página (PageToolbar) fica colada ao cabeçalho de propósito. */
+.page-inset > .page-heading + :not(.page-toolbar) {
+  margin-top: 24px;
+}
+@media (max-width: 639.98px) {
+  .page-inset > .page-heading + :not(.page-toolbar) { margin-top: 20px; }
+}
 }
 
 /* ==================================================================== */
