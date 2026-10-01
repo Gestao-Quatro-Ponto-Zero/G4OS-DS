@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (435 componentes) → `components/<nome>.md`
+## Módulos (442 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -157,10 +157,11 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **attachment**: Attachment (equivalente ao Attachment do shadcn/ui): anexo componível para composer de IA, mensagens, formulários e listas de documentos.
 - **command**: Command componível (equivalente ao Command do shadcn/ui, sem cmdk): busca + lista com grupos, ↑ ↓ Home End Enter, vazio, carregando e atalhos.
 - **conversation**: Conversa (equivalentes a Bubble, Marker e Message Scroller do shadcn/ui).
+- **nav-tree**: Navegação com subitens: tipos NavItem/NavGroup/NavSubItem/NavParentItem da Sidebar, WorkspaceMenu, menu da pessoa, SectionNav (docs/ajuda), flyout do trilho recolhido e helpers navMatches/navActiveDeep.
 
-## Blocos (85) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
+## Blocos (87) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`
-- **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-marketplace`, `app-notifications`, `app-presentation`, `app-record-tracker`
+- **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-marketplace`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
 - **CRM**: `crm-activities`, `crm-company`, `crm-contact`, `crm-contacts`, `crm-deal`, `crm-pipeline`, `crm-sales-dashboard`, `crm-settings`, `crm-team`
 - **Configurações**: `settings-appearance`, `settings-audit-log`, `settings-billing`, `settings-integrations`, `settings-notifications`, `settings-profile`, `settings-security`, `settings-team`

@@ -68,18 +68,6 @@ type Crumb = { label: string; href?: string }
 type MenuAction = { label: string; icon?: ReactNode; onSelect?: () => void; href?: string; disabled?: boolean; tone?: "neutral" | "danger"; checked?: boolean; separator?: boolean; }
 ```
 
-## NavGroup (type)
-
-```ts
-type NavGroup = { label: string; items: NavItem[] }
-```
-
-## NavItem (type)
-
-```ts
-type NavItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; match?: string; badge?: number; }
-```
-
 ## PageHeading
 
 Título da tela + descrição opcional + ações à direita.
@@ -213,28 +201,43 @@ Exemplo (showcase `#/p/dash-como-montar`):
 
 ## Sidebar
 
-Navegação principal do app: marca + busca + grupos rotulados + rodapé com a pessoa.
+Navegação principal do app: marca (ou `header`, ex.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `currentPath` * | `string` |  |  |
-| `groups` * | `NavGroup[]` |  |  |
 | `product` * | `string` |  |  |
 | `collapsed` | `boolean \| undefined` | `false` |  |
 | `footer` | `ReactNode` |  |  |
+| `groups` | `NavGroup[] \| undefined` | `[]` |  |
+| `header` | `ReactNode` |  | Substitui marca + nome do produto (ex.: `<WorkspaceMenu collapsed={collapsed} …/>`). |
 | `mark` | `ReactNode` |  |  |
 | `mobileOpen` | `boolean \| undefined` | `false` |  |
+| `nav` | `ReactNode` |  | Navegação livre no lugar dos grupos (ex.: `<SectionNav>` em app de documentação). |
+| `onNavigate` | `(() => void) \| undefined` |  | Chamado ao navegar (feche a gaveta do celular). |
 | `onSearch` | `(() => void) \| undefined` |  |  |
 | `onToggle` | `(() => void) \| undefined` |  |  |
-| `user` | `{ name: string; initials: string; role?: string; href?: string; } \| undefined` |  |  |
+| `storageKey` | `string \| undefined` |  | Guarda quais itens/grupos estão abertos no localStorage com esta chave. |
+| `user` | `SidebarUser \| undefined` |  | Pessoa no rodapé; com `menu`, abre o menu da conta. |
 | `workspace` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/form-listas`):
+**Uso certo**
+
+- ✓ Subitens: `{ href: "/vendas", label: "Vendas", icon: Handshake, items: [{ href: "/vendas/negocios", label: "Negócios" }] }`. Pai sem página: `{ label: "Cadastros", icon: Building2, items: [...] }` (sem href, a linha só abre e fecha).
+- ✓ No AppShell: `sidebar={({ mobileOpen, close }) => <Sidebar … mobileOpen={mobileOpen} onNavigate={close} storageKey="app:sidebar" />}`.
+- ✓ Muitas áreas: agrupe páginas irmãs sob um pai (2–7 subitens) em vez de criar mais grupos; documentação longa: `nav={<SectionNav sections={…} currentPath={…} search />}`.
+
+**Evite**
+
+- ✗ Mais de 2 níveis abaixo do item, pai com verbo (“Gerenciar…”), subitem que repete o pai (Vendas → Vendas) ou subitem para filtro (Abertos/Fechados: isso é visão salva).
+- ✗ Página vazia só para o pai ter `href`: use o pai sem href (NavParentItem).
+
+Exemplo (showcase `#/p/nav-sidebar-submenus`):
 
 ```tsx
-<Sidebar … footer={<Button variant="ghost" size="sm" onClick={logout}><LogOut /> Sair da demonstração</Button>} user={{ … }} />
+<AppShell sidebar={({ mobileOpen, close }) => <Sidebar … mobileOpen={mobileOpen} onNavigate={close} />}>
 ```
 
 ## StickyHeader

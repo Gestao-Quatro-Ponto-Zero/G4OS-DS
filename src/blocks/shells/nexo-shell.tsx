@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, Boxes, Building2, ClipboardList, FileText, Gauge, Landmark, PieChart, Plus, Receipt, Scale, Search, ShoppingCart, Truck, Users, Wallet } from "lucide-react";
+import { ArrowLeftRight, Boxes, ClipboardList, FileText, Gauge, Landmark, Package, PieChart, Plus, Receipt, Scale, Search, ShoppingCart, Truck, Users, Wallet } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { AppShell, Badge, EntityMark, IconButton, SearchPalette, Sidebar, formatCurrency, useCommandShortcut, type NavGroup, type NavItem, type SearchResult, type SearchScope } from "@g4ai/ds";
 import { customers, invoices, me, orderStatus, orderTotal, orders, products, customerById, levelInfo, levelOf, qtyOf, suppliers } from "../data/erp";
@@ -8,14 +8,16 @@ import { finUser, payables, receivables } from "../data/fin";
 import { frameHref, go } from "./frame-route";
 
 /*
- * Casca do produto "Nexo ERP". Um produto, dois módulos:
- *   Operações  → vendas, clientes, estoque, compras, fornecedores, notas
- *   Financeiro → caixa, a receber, a pagar, conciliação, orçamento, DRE
- * A sidebar mostra só o módulo atual (≤ 7 itens) + atalho para o outro;
- * o público de cada módulo é diferente (comercial/almoxarifado × controller).
+ * Casca do produto "Nexo ERP". Um produto, duas áreas na mesma sidebar:
+ *   Operações  → painel, vendas (pedidos, notas), estoque, compras, cadastros
+ *   Financeiro → visão, caixa, contas (a receber, a pagar), controladoria
+ * Páginas irmãs ficam sob um item-pai que abre e fecha (Vendas, Cadastros,
+ * Contas, Controladoria): a sidebar mostra 9 linhas em vez de 15, e o pai
+ * abre sozinho quando a tela atual é um subitem. Recolhida, cada pai abre
+ * um menu à direita com os subitens.
  *
- * Celular: mobileNav="both". O ☰ dá acesso a tudo, inclusive à troca de
- * módulo; a pílula traz as 4 telas do dia a dia do módulo atual.
+ * Celular: mobileNav="both". O ☰ dá acesso a tudo; a pílula traz as 4 telas
+ * do dia a dia da área atual.
  */
 
 export type NexoModule = "operacoes" | "financeiro";
@@ -26,6 +28,7 @@ export type NexoSection =
   | "estoque"
   | "compras"
   | "fornecedores"
+  | "produtos"
   | "notas"
   | "fin-painel"
   | "caixa"
@@ -44,6 +47,7 @@ const items: Record<NexoSection, NavItem> = {
   estoque: { href: frameHref("erp-inventory"), label: "Estoque", icon: Boxes, badge: products.filter((p) => levelOf(p) === "ruptura").length },
   compras: { href: frameHref("erp-purchase-requests"), label: "Compras", icon: ClipboardList, badge: 2 },
   fornecedores: { href: frameHref("erp-suppliers"), label: "Fornecedores", icon: Truck },
+  produtos: { href: frameHref("erp-product"), label: "Produtos", icon: Package },
   notas: { href: frameHref("erp-invoices"), label: "Notas fiscais", icon: FileText },
   "fin-painel": { href: frameHref("fin-dashboard"), label: "Visão financeira", icon: PieChart },
   caixa: { href: frameHref("fin-cashflow"), label: "Fluxo de caixa", icon: Wallet },
@@ -54,20 +58,32 @@ const items: Record<NexoSection, NavItem> = {
   dre: { href: frameHref("fin-dre"), label: "DRE", icon: FileText },
 };
 
-const moduleOf = (s: NexoSection): NexoModule => (["painel", "pedidos", "clientes", "estoque", "compras", "fornecedores", "notas"].includes(s) ? "operacoes" : "financeiro");
+const moduleOf = (s: NexoSection): NexoModule => (["painel", "pedidos", "clientes", "estoque", "compras", "fornecedores", "produtos", "notas"].includes(s) ? "operacoes" : "financeiro");
 
-const groups: Record<NexoModule, NavGroup[]> = {
-  operacoes: [
-    { label: "Vendas", items: [items.painel, items.pedidos, items.clientes, items.notas] },
-    { label: "Suprimentos", items: [items.estoque, items.compras, items.fornecedores] },
-    { label: "Módulos", items: [{ href: frameHref("fin-dashboard"), label: "Ir para Financeiro", icon: Landmark, match: "#none-fin" }] },
-  ],
-  financeiro: [
-    { label: "Financeiro", items: [items["fin-painel"], items.caixa, items.receber, items.pagar] },
-    { label: "Controladoria", items: [items.conciliacao, items.orcamento, items.dre] },
-    { label: "Módulos", items: [{ href: frameHref("erp-dashboard"), label: "Ir para Operações", icon: Building2, match: "#none-ops" }] },
-  ],
-};
+/** Subitem a partir de um item da tabela acima (sem ícone: o pai já tem). */
+const subOf = (key: NexoSection) => ({ href: items[key].href, label: items[key].label, badge: items[key].badge });
+
+const groups: NavGroup[] = [
+  {
+    label: "Operações",
+    items: [
+      items.painel,
+      { label: "Vendas", icon: ShoppingCart, items: [subOf("pedidos"), subOf("notas")] },
+      items.estoque,
+      items.compras,
+      { label: "Cadastros", icon: Users, items: [subOf("clientes"), subOf("fornecedores"), subOf("produtos")] },
+    ],
+  },
+  {
+    label: "Financeiro",
+    items: [
+      items["fin-painel"],
+      items.caixa,
+      { label: "Contas", icon: Receipt, items: [subOf("receber"), subOf("pagar")] },
+      { label: "Controladoria", icon: Scale, items: [subOf("conciliacao"), subOf("orcamento"), subOf("dre")] },
+    ],
+  },
+];
 // Na pílula, rótulos curtos (cabem em 4 colunas de ~80px).
 const short = (item: NavItem, label: string): NavItem => ({ ...item, label });
 const tabs: Record<NexoModule, NavItem[]> = {
@@ -150,7 +166,8 @@ export function NexoShell({ section, children }: { section: NexoSection; childre
           currentPath={current}
           mobileOpen={mobileOpen}
           onSearch={() => setSearch(true)}
-          groups={groups[mod]}
+          groups={groups}
+          storageKey="nexo-erp:sidebar"
           user={{ name: who.name, initials: who.initials, role: who.role }}
         />
       )}

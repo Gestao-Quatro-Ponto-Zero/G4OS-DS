@@ -26,6 +26,22 @@ Celular (< 768 px): barra de 48 px no topo + sidebar em drawer.
 - `badge` no item só para **pendência que pede ação** (alertas não lidos, aprovações), nunca total.
 - Ordem: o que se usa todo dia primeiro (Início, entidade principal), configuração por último.
 
+### Subitens (submenus)
+
+Quando o produto tem mais áreas do que cabem em 10 linhas, agrupe páginas irmãs sob um **item-pai** (`items`) em vez de criar mais grupos. No site: página “Sidebar com subitens” (`#/p/nav-sidebar-submenus`); blocos `app-sidebar-submenus` (todas as variações) e `erp-*` (Nexo ERP: Vendas, Cadastros, Contas, Controladoria).
+
+- **Pai = nome de área (substantivo):** Cadastros, Vendas, Contas, Controladoria. Nunca verbo (“Gerenciar…”) e nunca um subitem que repete o pai (Vendas → Vendas).
+- **Com ou sem página própria.** Pai com `href` (há uma visão geral da área): o rótulo navega, a seta abre. Pai sem página (`NavParentItem`, sem `href`): a linha inteira abre e fecha. Não invente uma página vazia só para o pai ter destino.
+- **2 a 7 subitens; no máximo 2 níveis abaixo do item.** Árvore mais funda vira abas na página ou `SectionNav`.
+- **Subitem = página irmã que a pessoa alterna.** Recorte da mesma lista (Abertos, Fechados, Meus) é visão salva na lista, não subitem. Seções de um registro são abas.
+- **Ativo:** o subitem ativo ganha a superfície e o marcador sobre a linha-guia; o pai abre sozinho e fica em destaque. Fechado, o pai soma os contadores dos subitens.
+- **Recolhida** (`collapsed`): o ícone do pai abre um menu à direita (hover, clique, Enter ou →) com “Visão geral” (se o pai tiver `href`) e os subitens.
+- **Teclado:** Enter/Espaço abrem e fecham; → abre e depois entra no primeiro subitem; ← fecha ou volta ao pai.
+- **Estado aberto** persiste com `storageKey`. No celular a gaveta mostra a mesma árvore; passe `onNavigate={close}`.
+- **Grupos:** `collapsible` (rótulo vira botão), `action` (+ “Novo projeto”), `limit` (“Mais N”) e `actions` por item (⋯) para listas do usuário (projetos, canais, carteiras).
+- **Topo e rodapé:** `header={<WorkspaceMenu …/>}` quando a pessoa tem mais de um workspace (⌘1…⌘9); `user.menu` para Conta, Faturamento, Notificações, Sair.
+- **Documentação, ajuda, configurações com 20+ páginas:** `SectionNav` (só texto, seções, filtro), na `Sidebar` via `nav` ou numa coluna da página. Bloco `app-help-center`.
+
 ## Tipos de página
 
 | Tipo | Estrutura | Exemplo |

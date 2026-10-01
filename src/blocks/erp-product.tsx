@@ -73,7 +73,7 @@ function ProductPage({ product }: { product: Product }) {
     { key: "qty", header: "Quantidade", align: "right", nowrap: true, cell: (m) => <span className={m.qty > 0 ? "font-medium tabular-nums text-ok" : "tabular-nums"}>{m.qty > 0 ? "+" : "−"}{formatNumber(Math.abs(m.qty))} {p.unit}</span> },
   ];
   return (
-    <NexoShell section="estoque">
+    <NexoShell section="produtos">
       <Page>
         <PageHeading
           crumbs={[{ label: "Estoque", href: "#/frame/erp-inventory" }, { label: p.category }]}

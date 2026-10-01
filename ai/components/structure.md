@@ -80,7 +80,7 @@ Grupo de campos com legenda: endereço, dados de cobrança, permissões.
 | `className` | `string \| undefined` |  |  |
 | `description` | `ReactNode` |  |  |
 | `disabled` | `boolean \| undefined` |  |  |
-| `variant` | `"section" \| "label" \| undefined` | `"section"` | "section" = título de seção (15 px); "label" = rótulo de grupo (12.5 px), para radios/checkboxes. |
+| `variant` | `"label" \| "section" \| undefined` | `"section"` | "section" = título de seção (15 px); "label" = rótulo de grupo (12.5 px), para radios/checkboxes. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

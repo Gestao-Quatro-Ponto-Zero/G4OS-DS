@@ -4,7 +4,8 @@ import { Ellipsis, Menu, X } from "lucide-react";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Toaster } from "./feedback";
-import { Breadcrumb, PageHeading, StickyHeader, Tabs, type Crumb, type NavItem, type TabItem } from "./navigation";
+import { Breadcrumb, PageHeading, StickyHeader, Tabs, type Crumb, type TabItem } from "./navigation";
+import { navActiveDeep, navHref, type NavEntry } from "./nav-tree";
 import { DsLink } from "./primitives";
 import { EntityMark } from "./primitives";
 import { inertProps } from "../lib/inert";
@@ -43,7 +44,7 @@ export function AppShell({
   children: ReactNode;
   mobileNav?: "drawer" | "tabbar" | "both";
   /** Destinos da pílula (3–4). Use os mesmos NavItem da sidebar. */
-  tabs?: NavItem[];
+  tabs?: NavEntry[];
   /** Rota atual, para marcar a aba ativa. */
   currentPath?: string;
   /** Ações à direita no cabeçalho do celular (notificações, avatar). */
@@ -119,7 +120,8 @@ export function BottomNav({
   className,
   alwaysVisible = false,
 }: {
-  items: NavItem[];
+  /** Item com subitens leva ao próprio href ou ao primeiro subitem. */
+  items: NavEntry[];
   currentPath: string;
   /** Mostra "Mais" como último item (abre a gaveta/menu completo). */
   more?: { open: boolean; onToggle: () => void; label?: string };
@@ -127,10 +129,7 @@ export function BottomNav({
   /** true = também no desktop (apps que só existem como mobile). */
   alwaysVisible?: boolean;
 }) {
-  const isActive = (item: NavItem) => {
-    const base = (item.match ?? item.href).split("?")[0];
-    return base === "/" ? currentPath === "/" : currentPath === base || currentPath.startsWith(`${base}/`);
-  };
+  const isActive = (item: NavEntry) => navActiveDeep(item, currentPath);
   const cell = "relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 text-[11px] leading-tight transition-colors";
   return (
     <nav
@@ -147,8 +146,8 @@ export function BottomNav({
         const Icon = item.icon;
         return (
           <DsLink
-            key={item.href}
-            href={item.href}
+            key={item.href ?? item.label}
+            href={navHref(item)}
             aria-current={on ? "page" : undefined}
             className={cn(cell, on ? "bg-soft font-medium text-primary" : "text-muted hover:text-ink")}
           >

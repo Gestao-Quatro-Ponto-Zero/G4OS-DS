@@ -67,3 +67,5 @@ export { effectiveBackground, surfaceTone, useReadableFills } from "./lib/readab
 export * from "./components/attachment";
 export * from "./components/command";
 export * from "./components/conversation";
+// front AD: navegação com subitens (Sidebar items/flyout, WorkspaceMenu, menu da pessoa, SectionNav)
+export * from "./components/nav-tree";

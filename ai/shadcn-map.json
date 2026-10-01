@@ -1549,6 +1549,16 @@
           "doc": "components/layout.md"
         },
         {
+          "name": "WorkspaceMenu",
+          "module": "nav-tree",
+          "doc": "components/nav-tree.md"
+        },
+        {
+          "name": "SectionNav",
+          "module": "nav-tree",
+          "doc": "components/nav-tree.md"
+        },
+        {
           "name": "IconRail",
           "module": "ai-workspace",
           "doc": "components/ai-workspace.md"
@@ -1565,11 +1575,12 @@
         }
       ],
       "pages": [
+        "nav-sidebar-submenus",
         "nav-mobile",
         "ia-layout"
       ],
       "aliases": [],
-      "notes": "AppShell monta sidebar no desktop e topo + pílula inferior no celular."
+      "notes": "Subitens que abrem e fecham (sidebar-03/07), recolhida só com ícones e menu à direita para os subitens, grupo recolhível com + e Mais, ⋯ por item, WorkspaceMenu no topo e menu da conta no rodapé. Documentação longa: SectionNav. AppShell monta a sidebar no desktop e topo + pílula no celular."
     },
     {
       "shadcn": "skeleton",

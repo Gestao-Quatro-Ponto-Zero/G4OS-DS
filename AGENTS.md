@@ -74,6 +74,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 11. Trilha **só com ancestrais**; página global não tem trilha; página de registro usa `ContextBar` e **não herda o cabeçalho do pai**.
 12. **Controle só quando há o que controlar**: busca ≥ 12 itens, filtro ≥ 8, alternador de visualização ≥ 8 (`collectionThresholds`).
 13. Contador em aba/sidebar **só quando pede ação**, nunca total.
+13a. **Muitas áreas na sidebar: subitens**, não mais grupos. Item-pai com nome de área (`items`, 2–7 subitens, até 2 níveis); pai sem página própria vai sem `href`. Documentação/ajuda longa: `SectionNav`. Ver [layout e navegação](docs/padroes/layout-e-navegacao.md#subitens-submenus).
 14. `<html lang="pt-BR" className="ds-app" data-theme="system">`: o documento não rola; `Page` rola. Tema e marca pelo `<html>` (ver "Tema escuro e marca" abaixo).
 14a. **Toda tela segue uma das nove anatomias** de [anatomia de página](docs/padroes/anatomia-de-pagina.md) (Lista, Painel, Registro, Configurações, Quadro, Mestre-detalhe, App de altura total, Fluxo focado, Público). Cabeçalho da página fixo; **o que é da página fica junto** (filtros em `PageToolbar`, subnavegação, coluna de propriedades em `SplitLayout` grudam colados ao cabeçalho); nunca um elemento fixo cujo contexto rolou embora; uma rolagem por eixo.
 

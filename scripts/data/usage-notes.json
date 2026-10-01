@@ -127,5 +127,32 @@
     "dont": [
       "`description=` no `Empty` (não existe; é `hint`). Tela inteira de erro/404: use `StateView` (esse sim tem `description`)."
     ]
+  },
+  "Sidebar": {
+    "do": [
+      "Subitens: `{ href: \"/vendas\", label: \"Vendas\", icon: Handshake, items: [{ href: \"/vendas/negocios\", label: \"Negócios\" }] }`. Pai sem página: `{ label: \"Cadastros\", icon: Building2, items: [...] }` (sem href, a linha só abre e fecha).",
+      "No AppShell: `sidebar={({ mobileOpen, close }) => <Sidebar … mobileOpen={mobileOpen} onNavigate={close} storageKey=\"app:sidebar\" />}`.",
+      "Muitas áreas: agrupe páginas irmãs sob um pai (2–7 subitens) em vez de criar mais grupos; documentação longa: `nav={<SectionNav sections={…} currentPath={…} search />}`."
+    ],
+    "dont": [
+      "Mais de 2 níveis abaixo do item, pai com verbo (“Gerenciar…”), subitem que repete o pai (Vendas → Vendas) ou subitem para filtro (Abertos/Fechados: isso é visão salva).",
+      "Página vazia só para o pai ter `href`: use o pai sem href (NavParentItem)."
+    ]
+  },
+  "WorkspaceMenu": {
+    "do": [
+      "`<Sidebar header={<WorkspaceMenu workspaces={ws} value={id} onValueChange={trocar} onAdd={criar} collapsed={collapsed} />} …/>`: só quando a pessoa tem mais de um workspace."
+    ],
+    "dont": [
+      "Confundir com `WorkspaceSwitcher` (rodapé da coluna de sessões de IA)."
+    ]
+  },
+  "SectionNav": {
+    "do": [
+      "Documentação, central de ajuda e configurações com 20+ páginas: só texto, seções, `search` a partir de ~20 itens, `onNavigate={close}` na gaveta do celular."
+    ],
+    "dont": [
+      "Ícone em cada item ou usar a Sidebar com ícones para 30 páginas de documentação."
+    ]
   }
 }

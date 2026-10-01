@@ -233,13 +233,10 @@ Navegação compacta só com ícones (56px), rótulo no tooltip.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ia-layout`):
+Exemplo (showcase `#/p/nav-sidebar-submenus`):
 
 ```tsx
-<AppShell sidebar={({ mobileOpen }) => <IconRail groups={grupos} currentPath={rota} mobileOpen={mobileOpen} mark={<Logo />} />} …>
-  <ResizableSplit storageKey="minha-tela" defaultSize={0.46} min={0.28} max={0.72}
-    left={<Conversa />} right={<ArtifactPanel …/>} rightOpen={aberto} />
-</AppShell>
+<IconRail groups={[[{ href: "/", label: "Início", icon: Home }, { href: "/relatorios", label: "Relatórios", icon: BarChart3, items: [{ href: "/relatorios/receita", label: "Receita" }] }]]} currentPath={pathname} />
 ```
 
 ## InsightCard
@@ -329,7 +326,7 @@ type PlanStep = { id: string; label: string; status: "pending" | "active" | "don
 ## RailItem (type)
 
 ```ts
-type RailItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; dot?: boolean; badge?: number; match?: string; }
+type RailItem = { href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; dot?: boolean; badge?: number; match?: string; items?: NavSubItem[]; }
 ```
 
 ## RankedList

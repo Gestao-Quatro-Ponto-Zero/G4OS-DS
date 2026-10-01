@@ -51,6 +51,7 @@ import { cn } from "../lib/cn";
 import { formatNumber, formatPercent } from "../lib/format";
 import { formatDuration } from "./ai";
 import { Menu, Tooltip, type MenuEntry } from "./overlays-extra";
+import { NavFlyout, navActiveDeep, navMatches, type NavSubItem } from "./nav-tree";
 import { DsLink } from "./primitives";
 
 /*
@@ -231,6 +232,8 @@ export type RailItem = {
   dot?: boolean;
   badge?: number;
   match?: string;
+  /** Subitens: o ícone abre um menu à direita (hover, clique, teclado). */
+  items?: NavSubItem[];
 };
 
 /**
@@ -256,10 +259,7 @@ export function IconRail({
   mobileOpen?: boolean;
   label?: string;
 }) {
-  const active = (it: RailItem) => {
-    const base = (it.match ?? it.href).split("?")[0];
-    return currentPath === base || currentPath.split("?")[0] === base || currentPath.startsWith(`${base}/`);
-  };
+  const active = (it: RailItem) => navActiveDeep(it, currentPath);
   if (mobileOpen) {
     return (
       <nav aria-label={label} className="fixed inset-y-12 bottom-0 left-0 z-40 flex w-[250px] flex-col gap-4 overflow-y-auto border-r border-line bg-rail p-3 md:hidden">
@@ -279,6 +279,20 @@ export function IconRail({
                     <span className="flex-1">{it.label}</span>
                     {!!it.badge && <span className="text-[11px] tabular-nums text-muted">{it.badge}</span>}
                   </DsLink>
+                  {!!it.items?.length && (
+                    <ul className="m-0 mb-1 ml-[18px] list-none space-y-px border-l border-line p-0 pl-2">
+                      {it.items.map((sub) => {
+                        const subOn = navMatches(sub, currentPath);
+                        return (
+                          <li key={sub.href}>
+                            <DsLink href={sub.href} aria-current={subOn ? "page" : undefined} className={cn("flex items-center rounded-md px-2 py-1.5 text-[12.5px]", subOn ? "bg-ink/[0.08] font-medium text-ink" : "text-muted hover:bg-ink/[0.05] hover:text-ink")}>
+                              {sub.label}
+                            </DsLink>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </li>
               );
             })}
@@ -296,6 +310,25 @@ export function IconRail({
             {g.map((it) => {
               const on = active(it);
               const Icon = it.icon;
+              const railCls = cn(
+                "relative grid h-9 w-9 place-items-center rounded-lg transition-colors data-popup-open:bg-ink/[0.05] data-popup-open:text-ink",
+                // Ativo: fundo tingido com a tinta (visível em qualquer tema/marca) + marcador na borda.
+                on ? "bg-ink/[0.08] text-ink" : "text-muted hover:bg-ink/[0.05] hover:text-ink",
+              );
+              const railInner = (
+                <>
+                  {on && <span aria-hidden className="absolute -left-[9px] top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-nav-marker" />}
+                  <Icon className="h-[17px] w-[17px]" strokeWidth={on ? 2 : 1.65} />
+                  {(it.dot || !!it.badge) && <span aria-hidden className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-accent ring-2 ring-rail" />}
+                </>
+              );
+              if (it.items?.length) {
+                return (
+                  <NavFlyout key={it.href} item={it} currentPath={currentPath} triggerClassName={railCls}>
+                    {railInner}
+                  </NavFlyout>
+                );
+              }
               return (
                 <Tooltip key={it.href} content={it.label} side="right" delay={200}>
                   <DsLink

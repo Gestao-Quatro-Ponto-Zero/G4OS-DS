@@ -106,7 +106,7 @@ export function DocSection({ id, title, rule, children }: { id?: string; title: 
   return (
     <section id={id} className="scroll-mt-20 py-9">
       <h2 data-toc="" className="m-0 scroll-mt-20 text-[18px] font-semibold tracking-tight">{title}</h2>
-      {rule && <div className="m-0 mt-1.5 max-w-[720px] text-[13px] leading-relaxed text-muted">{rule}</div>}
+      {rule && <div className="m-0 mt-1.5 max-w-[720px] text-[13px] leading-relaxed text-muted">{typeof rule === "string" ? inlineCode(rule) : rule}</div>}
       <div className="mt-5 space-y-6">{children}</div>
     </section>
   );

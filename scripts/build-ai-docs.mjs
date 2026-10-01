@@ -46,6 +46,7 @@ const moduleSummary = {
   structure: "Estrutura: Separator, ScrollArea, Label, FieldSet/FieldGroup/FieldSeparator, Item (mídia · título · ações), Table estática, Prose (texto longo).",
   controls: "Controles: Toggle, ButtonGroup, InputGroup (complementos dentro do campo), ColorPicker.",
   "navigation-extra": "NavigationMenu: navegação de site/portal com painéis de links.",
+  "nav-tree": "Navegação com subitens: tipos NavItem/NavGroup/NavSubItem/NavParentItem da Sidebar, WorkspaceMenu, menu da pessoa, SectionNav (docs/ajuda), flyout do trilho recolhido e helpers navMatches/navActiveDeep.",
   sortable: "SortableList: reordenar por arraste e teclado, com anúncios pt-BR.",
   questionnaire: "Questionnaire: perguntas uma por vez (escolha, múltipla, livre, condicionais).",
   disclosure: "Revelação progressiva: Accordion, Collapsible, TreeView, DescriptionToggle.",

@@ -2193,18 +2193,6 @@
           "definition": "{ label: string; icon?: ReactNode; onSelect?: () => void; href?: string; disabled?: boolean; tone?: \"neutral\" | \"danger\"; checked?: boolean; separator?: boolean; }"
         },
         {
-          "name": "NavGroup",
-          "kind": "type",
-          "summary": null,
-          "definition": "{ label: string; items: NavItem[] }"
-        },
-        {
-          "name": "NavItem",
-          "kind": "type",
-          "summary": null,
-          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; match?: string; badge?: number; }"
-        },
-        {
           "name": "PageHeading",
           "kind": "component",
           "summary": "Título da tela + descrição opcional + ações à direita.",
@@ -2344,18 +2332,11 @@
         {
           "name": "Sidebar",
           "kind": "component",
-          "summary": "Navegação principal do app: marca + busca + grupos rotulados + rodapé com a pessoa.",
+          "summary": "Navegação principal do app: marca (ou `header`, ex.",
           "props": [
             {
               "name": "currentPath",
               "type": "string",
-              "required": true,
-              "default": null,
-              "description": null
-            },
-            {
-              "name": "groups",
-              "type": "NavGroup[]",
               "required": true,
               "default": null,
               "description": null
@@ -2382,6 +2363,20 @@
               "description": null
             },
             {
+              "name": "groups",
+              "type": "NavGroup[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "header",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Substitui marca + nome do produto (ex.: `<WorkspaceMenu collapsed={collapsed} …/>`)."
+            },
+            {
               "name": "mark",
               "type": "ReactNode",
               "required": false,
@@ -2394,6 +2389,20 @@
               "required": false,
               "default": "false",
               "description": null
+            },
+            {
+              "name": "nav",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Navegação livre no lugar dos grupos (ex.: `<SectionNav>` em app de documentação)."
+            },
+            {
+              "name": "onNavigate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Chamado ao navegar (feche a gaveta do celular)."
             },
             {
               "name": "onSearch",
@@ -2410,11 +2419,18 @@
               "description": null
             },
             {
-              "name": "user",
-              "type": "{ name: string; initials: string; role?: string; href?: string; } | undefined",
+              "name": "storageKey",
+              "type": "string | undefined",
               "required": false,
               "default": null,
-              "description": null
+              "description": "Guarda quais itens/grupos estão abertos no localStorage com esta chave."
+            },
+            {
+              "name": "user",
+              "type": "SidebarUser | undefined",
+              "required": false,
+              "default": null,
+              "description": "Pessoa no rodapé; com `menu`, abre o menu da conta."
             },
             {
               "name": "workspace",
@@ -2424,7 +2440,7 @@
               "description": null
             }
           ],
-          "examplePage": "form-listas"
+          "examplePage": "nav-sidebar-submenus"
         },
         {
           "name": "StickyHeader",
@@ -3783,7 +3799,7 @@
             },
             {
               "name": "tabs",
-              "type": "NavItem[] | undefined",
+              "type": "NavEntry[] | undefined",
               "required": false,
               "default": null,
               "description": "Destinos da pílula (3–4)."
@@ -3796,7 +3812,7 @@
               "description": null
             }
           ],
-          "examplePage": "ia-layout"
+          "examplePage": "nav-sidebar-submenus"
         },
         {
           "name": "BottomNav",
@@ -3812,10 +3828,10 @@
             },
             {
               "name": "items",
-              "type": "NavItem[]",
+              "type": "NavEntry[]",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Item com subitens leva ao próprio href ou ao primeiro subitem."
             },
             {
               "name": "alwaysVisible",
@@ -16796,7 +16812,7 @@
               "description": null
             }
           ],
-          "examplePage": "ia-layout"
+          "examplePage": "nav-sidebar-submenus"
         },
         {
           "name": "InsightCard",
@@ -16937,7 +16953,7 @@
           "name": "RailItem",
           "kind": "type",
           "summary": null,
-          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; dot?: boolean; badge?: number; match?: string; }"
+          "definition": "{ href: string; label: string; icon: ComponentType<{ className?: string; strokeWidth?: number | string }>; dot?: boolean; badge?: number; match?: string; items?: NavSubItem[]; }"
         },
         {
           "name": "RankedList",
@@ -22053,7 +22069,7 @@
             },
             {
               "name": "variant",
-              "type": "\"section\" | \"label\" | undefined",
+              "type": "\"label\" | \"section\" | undefined",
               "required": false,
               "default": "\"section\"",
               "description": "\"section\" = título de seção (15 px); \"label\" = rótulo de grupo (12.5 px), para radios/checkboxes."
@@ -24437,6 +24453,432 @@
         }
       ],
       "doc": "components/conversation.md"
+    },
+    {
+      "name": "nav-tree",
+      "file": "src/components/nav-tree.tsx",
+      "summary": "Navegação com subitens: tipos NavItem/NavGroup/NavSubItem/NavParentItem da Sidebar, WorkspaceMenu, menu da pessoa, SectionNav (docs/ajuda), flyout do trilho recolhido e helpers navMatches/navActiveDeep.",
+      "exports": [
+        {
+          "name": "navActiveDeep",
+          "kind": "function",
+          "summary": "O item ou um descendente está ativo.",
+          "signature": "navActiveDeep(item, currentPath): boolean"
+        },
+        {
+          "name": "NavEntry",
+          "kind": "type",
+          "summary": "Entrada de um grupo da Sidebar: item com destino (com ou sem subitens) ou item-pai sem destino.",
+          "definition": "NavItem | NavParentItem"
+        },
+        {
+          "name": "NavFlyout",
+          "kind": "component",
+          "summary": "Item com subitens no trilho recolhido: o ícone abre um menu à direita (hover, clique, Enter/Espaço/↓ ou →) com o nome do item e os subitens.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": "Conteúdo do gatilho (ícone, marcador, ponto)."
+            },
+            {
+              "name": "currentPath",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "item",
+              "type": "{ href?: string; label: string; match?: string; items?: NavSubItem[]; }",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNavigate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "triggerClassName",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Classes do gatilho (o botão do ícone)."
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "NavGroup",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ label: string; items: NavEntry[]; collapsible?: boolean; defaultOpen?: boolean; action?: NavGroupAction; limit?: number; }"
+        },
+        {
+          "name": "NavGroupAction",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ label: string; icon?: ReactNode; onSelect?: () => void; href?: string }"
+        },
+        {
+          "name": "navHasActiveChild",
+          "kind": "function",
+          "summary": "Algum descendente (subitem, sub-subitem) está ativo?",
+          "signature": "navHasActiveChild(item, currentPath): boolean"
+        },
+        {
+          "name": "navHref",
+          "kind": "function",
+          "summary": "Destino de um item: o próprio href ou o do primeiro subitem.",
+          "signature": "navHref(item): string"
+        },
+        {
+          "name": "NavIcon",
+          "kind": "type",
+          "summary": null,
+          "definition": "ComponentType<{ className?: string; strokeWidth?: number | string }>"
+        },
+        {
+          "name": "NavItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ href: string; label: string; icon: NavIcon; match?: string; badge?: number; items?: NavSubItem[]; defaultOpen?: boolean; actions?: MenuEntry[]; }"
+        },
+        {
+          "name": "navMatches",
+          "kind": "function",
+          "summary": "O caminho atual corresponde a este destino (exato ou prefixo de segmento)?",
+          "signature": "navMatches(target, currentPath): boolean"
+        },
+        {
+          "name": "NavParentItem",
+          "kind": "type",
+          "summary": "Item-pai sem página própria (\"Cadastros\"): a linha inteira só abre e fecha os subitens.",
+          "definition": "Omit<NavItem, \"href\" | \"items\"> & { href?: undefined; items: NavSubItem[] }"
+        },
+        {
+          "name": "NavRailItem",
+          "kind": "component",
+          "summary": "Item do trilho recolhido da Sidebar: link com tooltip, ou flyout se tiver subitens.",
+          "props": [
+            {
+              "name": "currentPath",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "item",
+              "type": "NavEntry",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNavigate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "NavSection",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ label: string; href?: string; items: NavSubItem[]; }"
+        },
+        {
+          "name": "NavSubItem",
+          "kind": "type",
+          "summary": "Subitem de um item da navegação.",
+          "definition": "{ href: string; label: string; match?: string; badge?: number; items?: NavSubItem[]; }"
+        },
+        {
+          "name": "NavTreeGroup",
+          "kind": "component",
+          "summary": "Peça interna da Sidebar (grupo com recolher, + e “Mais”).",
+          "props": [
+            {
+              "name": "currentPath",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "group",
+              "type": "NavGroup",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "Record<string, boolean>",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "setOpen",
+              "type": "(id: string, value: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNavigate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "NavTreeItem",
+          "kind": "component",
+          "summary": "Peça interna da Sidebar (item aberto com subitens).",
+          "props": [
+            {
+              "name": "currentPath",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "idPrefix",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "item",
+              "type": "NavEntry",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "Record<string, boolean>",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "setOpen",
+              "type": "(id: string, value: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNavigate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "SectionNav",
+          "kind": "component",
+          "summary": "Navegação de seções para conteúdo longo (documentação, central de ajuda, configurações com muitas páginas): só texto, títulos de seção, subitens na linha-guia, filtro opcional fixo no topo e o item ativo sempre visível.",
+          "props": [
+            {
+              "name": "currentPath",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "sections",
+              "type": "NavSection[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Seções\"",
+              "description": null
+            },
+            {
+              "name": "onNavigate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Chamado ao clicar num item (feche a gaveta no celular)."
+            },
+            {
+              "name": "search",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Campo de filtro (use com 20+ itens)."
+            },
+            {
+              "name": "searchPlaceholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Filtrar seções…\"",
+              "description": null
+            }
+          ],
+          "examplePage": "nav-sidebar-submenus"
+        },
+        {
+          "name": "SidebarUser",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ name: string; initials?: string; role?: string; email?: string; avatar?: string; href?: string; menu?: MenuEntry[]; }"
+        },
+        {
+          "name": "SidebarUserMenu",
+          "kind": "component",
+          "summary": "Rodapé com a pessoa logada; com `menu`, abre um menu (à direita no desktop, para cima no celular).",
+          "props": [
+            {
+              "name": "user",
+              "type": "SidebarUser",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "collapsed",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "mobile",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "sumBadges",
+          "kind": "function",
+          "summary": "Soma dos contadores dos subitens (todos os níveis).",
+          "signature": "sumBadges(items?): number"
+        },
+        {
+          "name": "useNavOpenState",
+          "kind": "hook",
+          "summary": "Estado aberto/fechado da árvore (por id), persistido com `storageKey`.",
+          "signature": "useNavOpenState(storageKey?): readonly [Record<string, boolean>, (id: string, open: boolean) => void]"
+        },
+        {
+          "name": "Workspace",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; plan?: string; logo?: ReactNode; }"
+        },
+        {
+          "name": "WorkspaceMenu",
+          "kind": "component",
+          "summary": "Seletor de workspace/empresa no topo da sidebar (`<Sidebar header={…}>`): logo, nome e plano; o menu lista os workspaces com atalhos ⌘1…⌘9 e \"Adicionar workspace\".",
+          "props": [
+            {
+              "name": "onValueChange",
+              "type": "(id: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "workspaces",
+              "type": "Workspace[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "addLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Adicionar workspace\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "collapsed",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Trilho recolhido: só o logo."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Trocar de workspace\"",
+              "description": null
+            },
+            {
+              "name": "onAdd",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "shortcuts",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "⌘1…⌘9 (Ctrl no Windows/Linux) trocam de workspace."
+            }
+          ],
+          "examplePage": "nav-sidebar-submenus"
+        }
+      ],
+      "doc": "components/nav-tree.md"
     }
   ],
   "blocks": [
@@ -25400,6 +25842,44 @@
       ]
     },
     {
+      "slug": "app-help-center",
+      "file": "src/blocks/app-help-center.tsx",
+      "title": "Central de ajuda (navegação de seções)",
+      "description": "Documentação com muitas páginas: SectionNav na sidebar com seções, subitens na linha-guia, terceiro nível em Relatórios e API, filtro fixo no topo, item ativo sempre visível e anterior/próximo no fim do artigo.",
+      "category": "Aplicação",
+      "concept": {
+        "goal": "Achar e ler um artigo entre dezenas sem perder o lugar na árvore de seções.",
+        "patterns": [
+          "Anatomia Público/leitura: Page width=\"reading\" com artigo; navegação longa na Sidebar via `nav={<SectionNav/>}`",
+          "SectionNav: só texto, títulos de seção, subitens na linha-guia, até 2 níveis abaixo da seção",
+          "Filtro no topo (sem acento, sem caixa) que mantém o caminho até o item encontrado",
+          "Item ativo rola para dentro da coluna (só a coluna, não a página)",
+          "Anterior/próximo no pé do artigo seguindo a ordem da árvore"
+        ],
+        "adapt": [
+          "Central de ajuda do produto, base de conhecimento interna, manual de processos",
+          "Configurações com 20+ páginas (Conta, Equipe, Segurança, Faturamento, Integrações…)"
+        ],
+        "avoid": [
+          "Ícone em cada item: em navegação longa, ícone vira ruído",
+          "Mais de 3 níveis: quebre em seções ou páginas com abas",
+          "Sidebar de app (com ícones) para documentação com 30 itens: use SectionNav"
+        ]
+      },
+      "uses": [
+        "AppShell",
+        "Callout",
+        "IconButton",
+        "NavSection",
+        "NavSubItem",
+        "Page",
+        "PageHeading",
+        "SectionNav",
+        "Sidebar",
+        "notify"
+      ]
+    },
+    {
       "slug": "app-marketplace",
       "file": "src/blocks/app-marketplace.tsx",
       "title": "Marketplace de apps",
@@ -25548,6 +26028,52 @@
         "priorityLabel",
         "taskStatusLabel",
         "useTableSearch"
+      ]
+    },
+    {
+      "slug": "app-sidebar-submenus",
+      "file": "src/blocks/app-sidebar-submenus.tsx",
+      "title": "Sidebar com subitens",
+      "description": "Menu com subitens que abrem e fecham, grupo de projetos recolhível com “+”, ações por item e “Mais”, seletor de workspace no topo, menu da conta no rodapé e, recolhido, os subitens num menu flutuante à direita.",
+      "category": "Aplicação",
+      "concept": {
+        "goal": "Navegar num app com muitas áreas sem passar de 10 itens visíveis: agrupar páginas irmãs sob um item-pai que abre e fecha.",
+        "patterns": [
+          "Casca de app (AppShell + Sidebar) com grupos rotulados; anatomia de cada página: Painel ou Lista",
+          "Item-pai com página própria (Vendas, Relatórios): o rótulo navega, a seta abre os subitens",
+          "Item-pai sem página (Cadastros, Configurações): a linha inteira abre e fecha",
+          "Subitem ativo abre o pai sozinho; o pai mostra que há um filho ativo",
+          "Grupo Projetos recolhível, com “+” (novo projeto), ⋯ por item e “Mais” depois de 3",
+          "Recolhido (botão ⇤): ícones; item com subitens abre um menu à direita (hover, clique ou →)",
+          "Topo: WorkspaceMenu (⌘1…⌘9); rodapé: menu da conta"
+        ],
+        "adapt": [
+          "ERP: Cadastros → Clientes, Fornecedores, Produtos; Financeiro → A pagar, A receber",
+          "CRM: Vendas → Negócios, Propostas, Metas; Projetos vira Carteiras ou Times",
+          "Portal com várias empresas: WorkspaceMenu troca a empresa; o resto não muda"
+        ],
+        "avoid": [
+          "Mais de 2 níveis abaixo do item (vire páginas com abas ou SectionNav)",
+          "Mais de 7 subitens por item: divida em dois itens-pai",
+          "Item-pai com verbo (“Gerenciar…”): o rótulo é um substantivo (área)",
+          "Subitem que repete o pai (“Vendas → Vendas”): use “Visão geral” ou dê href ao pai"
+        ]
+      },
+      "uses": [
+        "AppShell",
+        "Button",
+        "Card",
+        "IconButton",
+        "MenuEntry",
+        "NavGroup",
+        "NavSubItem",
+        "Page",
+        "PageHeading",
+        "Sidebar",
+        "Workspace",
+        "WorkspaceMenu",
+        "navActiveDeep",
+        "notify"
       ]
     },
     {

@@ -17,18 +17,15 @@ Casca do app: sidebar à esquerda (ou topo+drawer no celular), conteúdo que rol
 | `currentPath` | `string \| undefined` |  | Rota atual, para marcar a aba ativa. |
 | `headerActions` | `ReactNode` |  | Ações à direita no cabeçalho do celular (notificações, avatar). |
 | `mobileNav` | `"drawer" \| "tabbar" \| "both" \| undefined` | `"drawer"` |  |
-| `tabs` | `NavItem[] \| undefined` |  | Destinos da pílula (3–4). |
+| `tabs` | `NavEntry[] \| undefined` |  | Destinos da pílula (3–4). |
 | `workspace` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ia-layout`):
+Exemplo (showcase `#/p/nav-sidebar-submenus`):
 
 ```tsx
-<AppShell sidebar={({ mobileOpen }) => <IconRail groups={grupos} currentPath={rota} mobileOpen={mobileOpen} mark={<Logo />} />} …>
-  <ResizableSplit storageKey="minha-tela" defaultSize={0.46} min={0.28} max={0.72}
-    left={<Conversa />} right={<ArtifactPanel …/>} rightOpen={aberto} />
-</AppShell>
+<AppShell sidebar={({ mobileOpen, close }) => <Sidebar … mobileOpen={mobileOpen} onNavigate={close} />}>
 ```
 
 ## BottomNav
@@ -38,7 +35,7 @@ Barra de navegação em pílula, flutuando no rodapé (só no celular por padrã
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `currentPath` * | `string` |  |  |
-| `items` * | `NavItem[]` |  |  |
+| `items` * | `NavEntry[]` |  | Item com subitens leva ao próprio href ou ao primeiro subitem. |
 | `alwaysVisible` | `boolean \| undefined` | `false` | true = também no desktop (apps que só existem como mobile). |
 | `className` | `string \| undefined` |  |  |
 | `more` | `{ open: boolean; onToggle: () => void; label?: string; } \| undefined` |  | Mostra "Mais" como último item (abre a gaveta/menu completo). |

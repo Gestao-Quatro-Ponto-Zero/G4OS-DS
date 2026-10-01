@@ -234,7 +234,7 @@ Arquivos em `src/blocks/` (também no pacote: `node_modules/@g4ai/ds/src/blocks/
 | ERP | `erp-orders`, `erp-inventory`, `erp-purchase-requests`, `erp-invoice` |
 | Financeiro | `fin-dashboard`, `fin-cashflow`, `fin-receivables`, `fin-dre`, `fin-reconciliation` |
 | IA | `ai-workspace`, `ai-chat`, `ai-sessions`, `ai-trace`, `ai-agent-builder`, `ai-agent-connections` |
-| Aplicação | `app-command-palette`, `app-notifications`, `app-file-manager`, `app-error-pages`, `app-presentation` |
+| Aplicação | `app-command-palette`, `app-notifications`, `app-file-manager`, `app-error-pages`, `app-presentation`, `app-sidebar-submenus`, `app-help-center` |
 | Autenticação, configurações, onboarding | `auth-login`, `auth-otp`, `settings-team`, `settings-billing`, `onboarding-wizard` |
 
 Catálogo completo com objetivo de cada um: [ai/llms.txt](ai/llms.txt) ou `list_blocks` no MCP. Qual bloco usar por tipo de app: [AGENTS.md](AGENTS.md#qual-bloco-usar).

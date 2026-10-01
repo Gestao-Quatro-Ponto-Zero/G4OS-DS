@@ -2,11 +2,12 @@
 
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Check, ChevronRight, MoreHorizontal, PanelLeft, Search } from "lucide-react";
-import { useEffect, useRef, type ComponentType, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { usePortalContainer } from "../lib/portal";
 import { popupClass } from "./overlays";
-import { Avatar, DsLink } from "./primitives";
+import { NavRailItem, NavTreeGroup, SidebarUserMenu, navHasActiveChild, useNavOpenState, type NavGroup, type SidebarUser } from "./nav-tree";
+import { DsLink } from "./primitives";
 
 /* ================================================================== */
 /* StickyHeader                                                        */
@@ -418,28 +419,22 @@ export function ActionMenu({
 /* Sidebar                                                             */
 /* ================================================================== */
 
-export type NavItem = {
-  href: string;
-  label: string;
-  icon: ComponentType<{ className?: string; strokeWidth?: number | string }>;
-  /** Prefixo que marca o item como ativo; padrão = href. */
-  match?: string;
-  /** Contador de atenção (alertas). */
-  badge?: number;
-};
-export type NavGroup = { label: string; items: NavItem[] };
-
 /**
- * Navegação principal do app: marca + busca + grupos rotulados + rodapé com a
- * pessoa. 224px aberta, 64px recolhida (só ícones com title), drawer abaixo de
- * 768px. Item ativo = superfície branca com borda e sombra mínima.
- * Máximo recomendado: 10 itens em até 2 grupos.
+ * Navegação principal do app: marca (ou `header`, ex. WorkspaceMenu) +
+ * busca + grupos rotulados + rodapé com a pessoa. 224px aberta, 64px
+ * recolhida (só ícones; itens com subitens abrem um menu à direita), gaveta
+ * abaixo de 768px. Item ativo = superfície branca com borda e marcador.
+ * Itens podem ter `items` (subitens, até 2 níveis) que abrem e fecham;
+ * grupos podem ser recolhíveis, ter ação "+" e "Mais" (`limit`).
+ * Máximo recomendado: 10 itens em até 3 grupos; 2–7 subitens por item.
  */
 export function Sidebar({
   product,
   workspace,
   mark,
-  groups,
+  header,
+  groups = [],
+  nav,
   currentPath,
   collapsed = false,
   onToggle,
@@ -447,24 +442,37 @@ export function Sidebar({
   user,
   footer,
   mobileOpen = false,
+  storageKey,
+  onNavigate,
 }: {
   product: string;
   workspace?: string;
   mark?: ReactNode;
-  groups: NavGroup[];
+  /** Substitui marca + nome do produto (ex.: `<WorkspaceMenu collapsed={collapsed} …/>`). */
+  header?: ReactNode;
+  groups?: NavGroup[];
+  /** Navegação livre no lugar dos grupos (ex.: `<SectionNav>` em app de documentação). */
+  nav?: ReactNode;
   currentPath: string;
   collapsed?: boolean;
   onToggle?: () => void;
   onSearch?: () => void;
-  user?: { name: string; initials: string; role?: string; href?: string };
+  /** Pessoa no rodapé; com `menu`, abre o menu da conta. */
+  user?: SidebarUser;
   footer?: ReactNode;
   mobileOpen?: boolean;
+  /** Guarda quais itens/grupos estão abertos no localStorage com esta chave. */
+  storageKey?: string;
+  /** Chamado ao navegar (feche a gaveta do celular). */
+  onNavigate?: () => void;
 }) {
-  const isActive = (item: NavItem) => {
-    const base = (item.match ?? item.href).split("?")[0];
-    return base === "/" ? currentPath === "/" : currentPath === base || currentPath.startsWith(`${base}/`);
-  };
   const rail = collapsed && !mobileOpen;
+  const [open, setOpen] = useNavOpenState(storageKey);
+  // Ao chegar num subitem (outra rota), o item-pai abre de novo mesmo que tenha sido fechado.
+  useEffect(() => {
+    for (const g of groups) for (const it of g.items) if (navHasActiveChild(it, currentPath)) setOpen(`${g.label}/${it.label}`, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPath]);
   return (
     <aside
       aria-label="Menu principal"
@@ -475,24 +483,28 @@ export function Sidebar({
         rail ? "md:w-[64px]" : "md:w-[224px]",
       )}
     >
-      <div className={cn("pb-5 pt-5", rail ? "px-2" : "px-3.5")}>
+      <div className={cn("pb-5 pt-5", rail ? "px-2" : header ? "px-2.5" : "px-3.5")}>
         <div className={cn("flex items-center", rail ? "flex-col gap-3" : "justify-between gap-2")}>
-          <div className="flex min-w-0 items-center gap-2.5">
-            {mark ?? <ProductMark />}
-            {!rail && (
-              <div className="min-w-0">
-                <div className="text-[14px] font-semibold tracking-tight">{product}</div>
-                {workspace && <div className="mt-0.5 truncate text-[11px] text-muted">{workspace}</div>}
-              </div>
-            )}
-          </div>
+          {header ? (
+            <div className={cn("flex min-w-0", rail ? "justify-center" : "flex-1")}>{header}</div>
+          ) : (
+            <div className="flex min-w-0 items-center gap-2.5">
+              {mark ?? <ProductMark />}
+              {!rail && (
+                <div className="min-w-0">
+                  <div className="text-[14px] font-semibold tracking-tight">{product}</div>
+                  {workspace && <div className="mt-0.5 truncate text-[11px] text-muted">{workspace}</div>}
+                </div>
+              )}
+            </div>
+          )}
           {onToggle && (
             <button
               type="button"
               onClick={onToggle}
               aria-label={rail ? "Expandir menu" : "Recolher menu"}
               aria-expanded={!rail}
-              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted hover:bg-soft md:inline-flex"
+              className="hidden h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted hover:bg-soft md:inline-flex"
             >
               <PanelLeft className="h-3.5 w-3.5" />
             </button>
@@ -518,73 +530,29 @@ export function Sidebar({
           </button>
         )}
       </div>
-      <nav className="min-h-0 flex-1 overflow-y-auto px-2.5" aria-label="Navegação">
-        {groups.map((group, gi) => (
-          <div key={group.label}>
-            {gi > 0 && <div className="mx-2.5 my-4 h-px bg-line" />}
-            {!rail && (
-              <p className="m-0 mb-2 px-2.5 text-[10px] font-medium uppercase tracking-[0.1em] text-muted">{group.label}</p>
-            )}
-            {group.items.map((item) => {
-              const active = isActive(item);
-              const Icon = item.icon;
-              return (
-                <DsLink
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  title={rail ? item.label : undefined}
-                  className={cn(
-                    "relative mb-1 flex h-9 items-center rounded-lg border text-[12.5px] transition-colors duration-150",
-                    rail ? "justify-center" : "gap-2.5 px-2.5",
-                    active
-                      ? "border-line-strong bg-surface font-medium text-ink shadow-surface" // borda firme: visível mesmo quando rail ≈ surface (Ledger, escuro)
-                      : "border-transparent text-muted hover:bg-soft hover:text-ink",
-                  )}
-                >
-                  {/* Gesto de marca: marcador Royal Gold no item ativo (token --ds-nav-marker). */}
-                  {active && <span aria-hidden className={cn("absolute top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-nav-marker", rail ? "-left-2" : "-left-[10px]")} />}
-                  <Icon className={cn("h-4 w-4 shrink-0", active ? "text-ink-soft" : "text-muted")} strokeWidth={1.65} />
-                  {!rail && <span className="flex-1 truncate">{item.label}</span>}
-                  {!!item.badge && (
-                    <span
-                      className={cn(
-                        "rounded-full bg-amber-soft px-1.5 text-[10.5px] font-medium tabular-nums leading-[18px] text-amber",
-                        rail && "sr-only",
-                      )}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </DsLink>
-              );
-            })}
-          </div>
-        ))}
-      </nav>
+      {nav && !rail ? (
+        <div className="flex min-h-0 flex-1 flex-col px-1.5">{nav}</div>
+      ) : (
+        <nav className="min-h-0 flex-1 overflow-y-auto px-2.5" aria-label="Navegação">
+          {groups.map((group, gi) => (
+            <div key={group.label}>
+              {gi > 0 && <div className="mx-2.5 my-4 h-px bg-line" />}
+              {rail ? (
+                group.items.map((item) => <NavRailItem key={item.href ?? item.label} item={item} currentPath={currentPath} onNavigate={onNavigate} />)
+              ) : (
+                <NavTreeGroup group={group} currentPath={currentPath} open={open} setOpen={setOpen} onNavigate={onNavigate} />
+              )}
+            </div>
+          ))}
+        </nav>
+      )}
       {/* Rodapé com o mesmo respiro da navegação: qualquer filho (Button,
           SyncStatus, card de plano) cabe no trilho sem vazar pelas bordas. */}
       {footer && <div className={cn("mt-2 flex shrink-0 flex-col gap-2 pt-2 [&>.ui-button]:w-full", rail ? "items-center px-2" : "px-2.5")}>{footer}</div>}
       {user && (
-        <DsLink
-          href={user.href ?? "#"}
-          title={user.name}
-          className={cn(
-            "mt-3 flex min-h-16 shrink-0 items-center border-t border-line px-4 py-3 transition-colors hover:bg-soft",
-            rail ? "justify-center px-0" : "gap-3",
-          )}
-        >
-          <Avatar initials={user.initials} tint="#28282e" size="sm" />
-          {!rail && (
-            <>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[12px] font-medium">{user.name}</div>
-                {user.role && <div className="mt-0.5 text-[11px] text-muted">{user.role}</div>}
-              </div>
-              <ChevronRight className="h-3.5 w-3.5 text-muted" />
-            </>
-          )}
-        </DsLink>
+        <div className="mt-3">
+          <SidebarUserMenu user={user} collapsed={rail} mobile={mobileOpen} />
+        </div>
       )}
     </aside>
   );
