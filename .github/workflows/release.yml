@@ -5,19 +5,21 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write # provenance do npm
+  id-token: write # Trusted Publishing (OIDC) do npm + provenance
 concurrency: { group: release, cancel-in-progress: false }
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Node 24 traz npm 11 (Trusted Publishing exige npm >= 11.5.1). Sem NPM_TOKEN:
+      # o npm autentica pelo OIDC do GitHub Actions, configurado no pacote em npmjs.com.
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm, registry-url: "https://registry.npmjs.org" }
+        with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
       - run: npm ci
       - run: npm run check && npm run build
       # Com changesets pendentes: abre/atualiza o PR "Versão de lançamento".
-      # Ao mesclar esse PR: publica no npm com provenance.
+      # Ao mesclar esse PR: publica no npm (com provenance automática).
       - uses: changesets/action@v1
         with:
           title: "Versão de lançamento"
@@ -25,5 +27,3 @@ jobs:
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true

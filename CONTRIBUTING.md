@@ -39,7 +39,7 @@ Requisitos: Node 20+.
 
 Seguimos [SemVer](https://semver.org/lang/pt-BR/). Enquanto estivermos em `0.x`, mudanças que quebram API sobem o **minor** e são descritas no changeset com o "como migrar". Renomeações entram em `ai/renames.json` para a skill `ds-migrate` atualizar projetos automaticamente.
 
-A publicação no npm é automática: ao fazer merge na `main`, o GitHub Action abre um PR "Versão de lançamento"; quando esse PR é aprovado e mesclado, o pacote é publicado.
+A publicação no npm é automática e sem token: usamos **Trusted Publishing** (OIDC do GitHub Actions configurado no pacote em npmjs.com). Ao fazer merge na `main`, o Action abre um PR "Versão de lançamento"; quando esse PR é mesclado, o pacote é publicado com provenance.
 
 ## Padrões de código
 
