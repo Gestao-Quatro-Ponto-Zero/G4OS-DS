@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "package": "@g4ai/ds",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "modules": [
     {
       "name": "primitives",
