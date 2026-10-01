@@ -992,13 +992,19 @@ export function ThreadMinimap({ items, scrollRef, className }: { items: MinimapI
     box.addEventListener("scroll", on, { passive: true });
     return () => box.removeEventListener("scroll", on);
   }, [items, scrollRef]);
-  if (items.length < 3) return null;
+  if (items.length < 2) return null;
+  // Fica centralizado na calha esquerda da conversa (o pai é o contêiner que NÃO rola),
+  // então permanece no meio da tela enquanto o histórico rola. Some abaixo de 1024px.
   return (
-    <nav aria-label="Mapa da conversa" className={cn("flex flex-col items-start gap-[7px] py-2", className)} onPointerLeave={() => setHover(null)}>
+    <nav
+      aria-label="Mapa da conversa"
+      className={cn("absolute left-3 top-1/2 z-[1] hidden max-h-[70%] -translate-y-1/2 flex-col items-start gap-0 overflow-hidden py-1 lg:flex", className)}
+      onPointerLeave={() => setHover(null)}
+    >
       {items.map((it, i) => {
         const near = hover == null ? 0 : Math.max(0, 1 - Math.abs(hover - i) / 3);
         const on = it.id === active;
-        const base = it.role === "user" ? 8 : 14;
+        const base = 10;
         return (
           <Tooltip key={it.id} content={<span className="line-clamp-2">{it.preview}</span>} side="right" delay={80}>
             <button
@@ -1008,11 +1014,11 @@ export function ThreadMinimap({ items, scrollRef, className }: { items: MinimapI
               onPointerEnter={() => setHover(i)}
               onFocus={() => setHover(i)}
               onClick={() => document.getElementById(it.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              className="group flex h-2.5 items-center outline-none"
+              className="group flex h-[8px] items-center pr-2 outline-none"
             >
               <span
-                className={cn("block h-[2px] rounded-full transition-[width,background-color] duration-150", on ? "bg-ink" : "bg-line-strong group-hover:bg-ink-soft group-focus-visible:bg-ink")}
-                style={{ width: base + near * 10 + (on ? 4 : 0) }}
+                className={cn("block h-[1.5px] rounded-full transition-[width,background-color] duration-150", on ? "bg-ink" : "bg-line-strong group-hover:bg-ink-soft group-focus-visible:bg-ink")}
+                style={{ width: on ? 18 : base + near * 8 }}
               />
             </button>
           </Tooltip>

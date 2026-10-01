@@ -132,7 +132,7 @@ export function FacetFilter({
       left: Math.max(20, Math.min(preferredLeft, window.innerWidth - width - 20)),
       top: upwards ? undefined : rect.bottom + 8,
       bottom: upwards ? window.innerHeight - rect.top + 8 : undefined,
-      maxHeight: Math.min(360, (upwards ? above : below) - 8),
+      maxHeight: Math.max(160, Math.min(360, (upwards ? above : below) - 8)),
     });
     setOpen(true);
   }
@@ -179,7 +179,7 @@ export function FacetFilter({
       </button>
       {open &&
         createPortal(
-          <div ref={menu} id={id} role="menu" aria-label={label} style={position} className="fixed z-[100] flex flex-col overflow-hidden rounded-xl bg-surface py-2 shadow-lg ring-1 ring-line">
+          <div ref={menu} id={id} role="menu" aria-label={label} style={position} className="fixed z-[100] flex flex-col overflow-hidden rounded-xl bg-popover py-2 shadow-lg ring-1 ring-line">
             {options.length > 7 && (
               <div className="px-2 pb-1 pt-1">
                 <input

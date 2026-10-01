@@ -72,7 +72,7 @@ export function Tooltip({
     <BaseTooltip.Root>
       <BaseTooltip.Trigger delay={delay} render={children} />
       <BaseTooltip.Portal>
-        <BaseTooltip.Positioner side={side} sideOffset={6} collisionPadding={8} className="z-[100]">
+        <BaseTooltip.Positioner side={side} sideOffset={6} collisionPadding={12} className="z-[100]">
           <BaseTooltip.Popup className="inline-flex max-w-[260px] origin-[var(--transform-origin)] items-center gap-2 rounded-md bg-ink px-2 py-1 text-[12px] leading-snug text-on-ink shadow-raised transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
             {content}
             {shortcut && (
@@ -122,7 +122,7 @@ export function HoverCard({
     <BasePreviewCard.Root>
       <BasePreviewCard.Trigger delay={delay} closeDelay={150} render={children} />
       <BasePreviewCard.Portal>
-        <BasePreviewCard.Positioner side={side} sideOffset={8} collisionPadding={8} className="z-[100]">
+        <BasePreviewCard.Positioner side={side} sideOffset={8} collisionPadding={12} className="z-[100]">
           <BasePreviewCard.Popup className={cn(popupClass, "max-w-[calc(100vw-16px)] p-4")} style={{ width }}>
             {content}
           </BasePreviewCard.Popup>
@@ -196,7 +196,7 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
                 </BaseMenu.SubmenuTrigger>
                 <BaseMenu.Portal container={container}>
-                  <BaseMenu.Positioner sideOffset={4} alignOffset={-6} collisionPadding={8} className="z-[100] outline-none">
+                  <BaseMenu.Positioner sideOffset={4} alignOffset={-6} collisionPadding={12} className="z-[100] outline-none">
                     <BaseMenu.Popup className={menuPopup}>
                       <MenuEntries items={it.items} container={container} />
                     </BaseMenu.Popup>
@@ -264,7 +264,7 @@ export function Menu({
         {trigger}
       </BaseMenu.Trigger>
       <BaseMenu.Portal container={container}>
-        <BaseMenu.Positioner side={side} align={align} sideOffset={6} collisionPadding={8} className="z-[100] outline-none">
+        <BaseMenu.Positioner side={side} align={align} sideOffset={6} collisionPadding={12} className="z-[100] outline-none">
           <BaseMenu.Popup className={menuPopup}>
             <MenuEntries items={items} container={container} />
           </BaseMenu.Popup>

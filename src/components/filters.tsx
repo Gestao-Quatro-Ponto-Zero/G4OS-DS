@@ -438,8 +438,8 @@ function Pop({
         {trigger}
       </BasePopover.Trigger>
       <BasePopover.Portal container={container}>
-        <BasePopover.Positioner sideOffset={6} align={align} collisionPadding={8} className="z-[100]">
-          <BasePopover.Popup className={cn(popup, "max-w-[calc(100vw-16px)] overflow-hidden")} style={{ width }}>
+        <BasePopover.Positioner sideOffset={6} align={align} collisionPadding={12} className="z-[100]">
+          <BasePopover.Popup className={cn(popup, "max-w-[calc(100vw-16px)] overflow-y-auto")} style={{ width }}>
             {children}
           </BasePopover.Popup>
         </BasePopover.Positioner>

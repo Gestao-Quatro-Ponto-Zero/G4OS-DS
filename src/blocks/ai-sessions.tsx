@@ -383,7 +383,7 @@ export default function AiSessions() {
         }
       />
       <div className="relative min-h-0 flex-1">
-        <div ref={scroller} className="docs-scroll h-full overflow-y-auto overscroll-contain px-4 pb-20 pt-6 sm:px-8 sm:pb-6">
+        <div ref={scroller} className="docs-scroll h-full overflow-y-auto overscroll-contain px-4 pb-20 pt-6 sm:px-8 sm:pb-6 lg:pl-14">
           <div className="mx-auto flex max-w-[760px] flex-col gap-4">
             {!active?.thread.length && (
               <div className="py-16 text-center">
@@ -408,7 +408,7 @@ export default function AiSessions() {
             })}
           </div>
         </div>
-        <ThreadMinimap items={minimap} scrollRef={scroller} className="absolute left-3 top-6 hidden lg:flex" />
+        <ThreadMinimap items={minimap} scrollRef={scroller} />
       </div>
       <div className="relative shrink-0 px-4 pb-3 sm:px-8">
         <VoiceModeButton onClick={() => setVoice(true)} className="absolute -top-14 right-4 sm:hidden" />

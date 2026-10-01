@@ -177,7 +177,7 @@ export function Select({
         </BaseSelect.Icon>
       </BaseSelect.Trigger>
       <BaseSelect.Portal container={container}>
-        <BaseSelect.Positioner align={align} sideOffset={5} collisionPadding={8} className="z-[100] select-none outline-none">
+        <BaseSelect.Positioner align={align} sideOffset={5} collisionPadding={12} className="z-[100] select-none outline-none">
           <BaseSelect.Popup aria-label={label} className={cn(popupClass, "min-w-[max(180px,var(--anchor-width))] max-w-[calc(100vw-16px)] p-1.5")}>
             <BaseSelect.List className="max-h-[min(320px,var(--available-height))] overflow-y-auto overscroll-contain outline-none">
               {options.map((option) => (
@@ -306,10 +306,10 @@ export function Combobox({ options, label, placeholder = "Selecione…", disable
         </ul>
       )}
       <BaseCombobox.Portal container={container}>
-        <BaseCombobox.Positioner align="start" sideOffset={5} collisionPadding={8} className="z-[100] max-w-[calc(100vw-16px)]">
+        <BaseCombobox.Positioner align="start" sideOffset={5} collisionPadding={12} className="z-[100] max-w-[calc(100vw-16px)]">
           <BaseCombobox.Popup
             aria-label={label}
-            className="flex max-h-[min(360px,var(--available-height))] w-[max(240px,var(--anchor-width))] max-w-[calc(100vw-16px)] flex-col overflow-hidden rounded-xl border border-line bg-surface text-ink shadow-xl shadow-black/10"
+            className="flex max-h-[min(360px,var(--available-height))] w-[max(240px,var(--anchor-width))] max-w-[calc(100vw-16px)] flex-col overflow-hidden rounded-xl border border-line bg-popover text-ink shadow-xl shadow-black/10"
           >
             <div className="focus-field flex shrink-0 items-center gap-2 border-b border-line px-3">
               <Search aria-hidden className="h-4 w-4 shrink-0 text-muted" />

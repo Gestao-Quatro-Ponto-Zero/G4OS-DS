@@ -70,7 +70,7 @@ export function DatePicker({
         )}
       </Popover.Trigger>
       <Popover.Portal container={container}>
-        <Popover.Positioner sideOffset={6} align="start" collisionPadding={8} className="z-[100]">
+        <Popover.Positioner sideOffset={6} align="start" collisionPadding={12} className="z-[100]">
           <Popover.Popup className={popupClass} aria-label={`Calendário · ${label}`}>
             <Calendar
               selected={value || null}

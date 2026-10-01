@@ -4,3 +4,4 @@ showcase/dist
 .DS_Store
 showcase/.generated
 dist
+.publicar.sh

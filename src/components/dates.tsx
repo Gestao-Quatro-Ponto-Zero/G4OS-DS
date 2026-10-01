@@ -118,14 +118,29 @@ function PickerPopover({
         {trigger}
       </BasePopover.Trigger>
       <BasePopover.Portal container={container}>
-        <BasePopover.Positioner sideOffset={6} align={align} collisionPadding={8} className="z-[100]">
-          <BasePopover.Popup className={cn(popupClass, "max-w-[calc(100vw-16px)] overflow-hidden")} aria-label={triggerLabel}>
+        {/* Flip + shift automáticos; a altura do popup acompanha o espaço disponível
+            (--available-height) e o conteúdo rola por dentro, nunca é cortado. */}
+        <BasePopover.Positioner sideOffset={6} align={align} collisionPadding={12} className="z-[100]">
+          <BasePopover.Popup className={cn(popupClass, "flex flex-col overflow-hidden")} aria-label={triggerLabel}>
             {children}
           </BasePopover.Popup>
         </BasePopover.Positioner>
       </BasePopover.Portal>
     </BasePopover.Root>
   );
+}
+
+/** Consulta de mídia reativa (largura/altura da janela). */
+function useMedia(query: string) {
+  const [match, setMatch] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setMatch(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [query]);
+  return match;
 }
 
 function useIsMobile() {
@@ -666,6 +681,11 @@ export function DateRangePicker({
 }) {
   const [open, setOpen] = useState(false);
   const mobile = useIsMobile();
+  // Sem espaço para dois meses → um mês; janela baixa → presets viram faixa horizontal no topo.
+  const narrow = useMedia("(max-width: 899.98px)");
+  const short = useMedia("(max-height: 599.98px)");
+  const oneMonth = mobile || narrow;
+  const stripPresets = mobile || short;
   const [draft, setDraft] = useState<Partial<IsoRange>>({ from: value.from, to: value.to });
   const [compare, setCompare] = useState<CompareMode>(value.compare ?? "none");
   const [month, setMonth] = useState(startOfMonth(value.from || now));
@@ -673,7 +693,7 @@ export function DateRangePicker({
     if (open) {
       setDraft({ from: value.from, to: value.to });
       setCompare(value.compare ?? "none");
-      setMonth(addMonths(startOfMonth(value.to || now), mobile ? 0 : -1));
+      setMonth(addMonths(startOfMonth(value.to || now), oneMonth ? 0 : -1));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -696,8 +716,13 @@ export function DateRangePicker({
   };
 
   const body = (
-    <div className="flex max-h-[80dvh] flex-col sm:flex-row">
-      <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-line p-2 sm:w-44 sm:flex-col sm:overflow-visible sm:border-b-0 sm:border-r">
+    <div className={cn("flex min-h-0 flex-col", mobile ? "max-h-[80dvh]" : "max-h-[min(var(--available-height,80dvh),680px)]", !stripPresets && "flex-row")}>
+      <div
+        className={cn(
+          "flex shrink-0 gap-1 p-2",
+          stripPresets ? "overflow-x-auto border-b border-line [scrollbar-width:none]" : "w-44 flex-col overflow-y-auto overscroll-contain border-r border-line",
+        )}
+      >
         {presets.map((id) => {
           const p = periodPresets.find((x) => x.id === id)!;
           const on = preset === id;
@@ -709,26 +734,27 @@ export function DateRangePicker({
               onClick={() => {
                 const r = resolvePeriod(id, now);
                 setDraft(r);
-                setMonth(addMonths(startOfMonth(r.to), mobile ? 0 : -1));
+                setMonth(addMonths(startOfMonth(r.to), oneMonth ? 0 : -1));
               }}
               className={cn("flex shrink-0 items-center justify-between gap-2 whitespace-nowrap rounded-md px-2.5 py-1.5 text-left text-[12.5px]", on ? "bg-primary font-medium text-on-primary" : "text-ink-soft hover:bg-soft hover:text-ink")}
             >
               {p.label}
-              {on && <Check className="hidden h-3.5 w-3.5 sm:block" />}
+              {on && !stripPresets && <Check className="h-3.5 w-3.5" />}
             </button>
           );
         })}
         <span className={cn("shrink-0 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[12.5px]", complete && !preset ? "bg-soft font-medium text-ink" : "text-muted")}>Personalizado</span>
       </div>
-      <div className="min-w-0 flex-1 overflow-y-auto">
-        <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2.5">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-line px-3 py-2.5">
           <RangeTextBox label="De" value={draft.from} now={now} onChange={(iso) => setDraft((d) => ({ from: iso, to: d.to && d.to >= iso ? d.to : undefined }))} />
           <span className="text-muted">→</span>
           <RangeTextBox label="Até" value={draft.to} now={now} onChange={(iso) => setDraft((d) => (d.from && iso < d.from ? { from: iso, to: d.from } : { from: d.from ?? iso, to: iso }))} />
         </div>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <Calendar
           mode="range"
-          months={mobile ? 1 : 2}
+          months={oneMonth ? 1 : 2}
           range={draft}
           compare={cmp}
           month={month}
@@ -765,7 +791,8 @@ export function DateRangePicker({
             )}
           </div>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-soft/40 px-3 py-2.5">
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-line bg-soft/40 px-3 py-2.5">
           <span className="text-[12px] tabular-nums text-muted" aria-live="polite">
             {complete ? (
               <>

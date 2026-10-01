@@ -378,7 +378,7 @@ export function ActionMenu({
         {trigger ?? <MoreHorizontal className="h-4 w-4" aria-hidden />}
       </BaseMenu.Trigger>
       <BaseMenu.Portal container={container}>
-        <BaseMenu.Positioner align={align} sideOffset={6} collisionPadding={8} className="z-[100] outline-none">
+        <BaseMenu.Positioner align={align} sideOffset={6} collisionPadding={12} className="z-[100] outline-none">
           <BaseMenu.Popup className={cn(popupClass, "min-w-[180px] p-1.5")}>
             {actions.map((action, index) => {
               const cls = cn(

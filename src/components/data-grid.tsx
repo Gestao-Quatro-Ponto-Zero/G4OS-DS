@@ -323,7 +323,7 @@ function CellEditor({ editor, initial, label, onCommit, onCancel }: { editor: Gr
           <BaseSelect.Value className="truncate" />
         </BaseSelect.Trigger>
         <BaseSelect.Portal>
-          <BaseSelect.Positioner sideOffset={4} collisionPadding={8} className="z-[100] outline-none">
+          <BaseSelect.Positioner sideOffset={4} collisionPadding={12} className="z-[100] outline-none">
             <BaseSelect.Popup className={cn(popupClass, "min-w-[max(160px,var(--anchor-width))] p-1.5")}>
               <BaseSelect.List className="max-h-[260px] overflow-y-auto outline-none">
                 {editor.options.map((o) => (

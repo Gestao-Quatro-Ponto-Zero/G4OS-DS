@@ -599,7 +599,7 @@ export function ThreadView({
   }, [follow, ref]);
   return (
     <div className={cn("relative min-h-0 flex-1", className)}>
-      <div ref={ref} onScroll={onScroll} className="docs-scroll h-full overflow-y-auto overscroll-contain px-4 pt-6 sm:px-8" style={{ paddingBottom: 24 + bottomOffset }}>
+      <div ref={ref} onScroll={onScroll} className={cn("docs-scroll h-full overflow-y-auto overscroll-contain px-4 pt-6 sm:px-8", minimap && minimap.length > 1 && "lg:pl-14")} style={{ paddingBottom: 24 + bottomOffset }}>
         <div className={cn("mx-auto flex flex-col gap-5", contentClassName)} style={{ maxWidth }}>
           {hidden > 0 && <CollapsedHistory label={collapsedLabel(hidden)} onExpand={() => setExpanded(true)} />}
           {hidden > 0 ? items.slice(hidden) : children}
@@ -610,7 +610,6 @@ export function ThreadView({
           // Com histórico recolhido, só as mensagens visíveis (as últimas) entram no minimapa.
           items={hidden > 0 ? minimap.slice(Math.max(0, minimap.length - (items.length - hidden))) : minimap}
           scrollRef={ref}
-          className="absolute left-3 top-6 hidden lg:flex"
         />
       )}
       {!atBottom && (

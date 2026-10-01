@@ -335,17 +335,17 @@ export default function Page() {
         </Demo>
       </DocSection>
 
-      <DocSection title="Minimapa da conversa" rule="Uma marca por mensagem (curta = pessoa, longa = agente). Marcas perto do ponteiro crescem; a atual fica escura; clique rola até a mensagem.">
+      <DocSection title="Minimapa da conversa" rule="Uma marca curta por mensagem, centralizada na calha esquerda (fica no meio enquanto a conversa rola). A atual é mais longa e escura; marcas perto do ponteiro crescem; clique rola até a mensagem. Some com menos de 2 mensagens e abaixo de 1024px.">
         <Demo bare code={`<ThreadMinimap items={[{ id: "msg-1", role: "user", preview: "…" }]} scrollRef={scrollerRef} />`}>
           <div className="relative h-56 overflow-hidden rounded-2xl border border-line bg-page">
-            <div ref={box} className="h-full overflow-y-auto py-3 pl-14 pr-5">
+            <div ref={box} className="h-full overflow-y-auto py-3 pl-16 pr-5">
               {mini.map((m) => (
                 <div key={m.id} id={m.id} className={m.role === "user" ? "mb-3 ml-auto w-2/3 rounded-xl bg-ink/[0.05] px-3 py-2 text-[13px]" : "mb-3 rounded-xl border border-line bg-surface px-3 py-6 text-[13px]"}>
                   {m.preview}
                 </div>
               ))}
             </div>
-            <ThreadMinimap items={mini} scrollRef={box} className="absolute left-4 top-3" />
+            <ThreadMinimap items={mini} scrollRef={box} />
           </div>
         </Demo>
       </DocSection>

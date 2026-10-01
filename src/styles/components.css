@@ -688,3 +688,19 @@
 @media (min-width: 640px) {
   .data-grid-capped { max-height: var(--dg-max-h); }
 }
+
+/* ==================================================================== */
+/* Popups inteligentes: nunca passam da janela.                          */
+/* O Positioner do Base UI publica --available-height/--available-width  */
+/* (espaço até a borda no lado escolhido, já descontado o collisionPadding).
+/* Em @layer components: utilitários do componente (ex.: overflow-hidden) */
+/* continuam vencendo quando ele mesmo cuida da rolagem interna.         */
+/* ==================================================================== */
+@layer components {
+  .ui-popup {
+    max-height: var(--available-height, calc(100dvh - 16px));
+    max-width: var(--available-width, calc(100vw - 16px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
