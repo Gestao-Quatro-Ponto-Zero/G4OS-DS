@@ -35,7 +35,7 @@ import {
   type FilterField,
   type SavedView,
   type Tone, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { me as workspaceMe, people } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { setFrameQuery, useFrameQuery } from "./shells/frame-route";

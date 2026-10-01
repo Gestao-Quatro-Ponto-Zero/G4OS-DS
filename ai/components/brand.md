@@ -1,6 +1,6 @@
 # brand
 
-Arquivo: `src/components/brand.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/brand.tsx` · importe de `@g4ai/ds`.
 
 Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
 

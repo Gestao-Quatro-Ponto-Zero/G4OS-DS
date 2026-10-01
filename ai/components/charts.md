@@ -1,6 +1,6 @@
 # charts
 
-Arquivo: `src/components/charts.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/charts.tsx` · importe de `@g4ai/ds`.
 
 Gráficos SVG sem dependência: AreaChart, LineChart, BarChart, Sparkline, BarList, DonutChart, FunnelChart, CalendarHeatmap, ProgressRing.
 

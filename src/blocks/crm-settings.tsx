@@ -11,7 +11,7 @@ import {
   TextField,
   cn,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { lostReasons, stages as baseStages } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

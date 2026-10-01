@@ -1,6 +1,6 @@
 # dashboard
 
-Arquivo: `src/components/dashboard.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/dashboard.tsx` · importe de `@g4ai/ds`.
 
 Dashboard: KpiCard, KpiGrid, Delta, ChartCard, GoalMeter, ActivityFeed, Leaderboard, CompareStat.
 

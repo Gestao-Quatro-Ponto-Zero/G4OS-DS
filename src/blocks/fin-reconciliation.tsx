@@ -13,7 +13,7 @@ import {
   formatCurrency,
   formatPercent,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { accounts, bankLines, br, ledger, type BankLine } from "./data/fin";
 import { NexoShell } from "./shells/nexo-shell";
 

@@ -1,6 +1,6 @@
 import { CalendarDays, FileText, Mail, MessageSquareText, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Disclaimer, FileCard, Page, SessionComposer, SessionStatusChip, ToolsBar, VoiceModeButton, notify, type SlashCommand } from "@g4os/ds";
+import { Disclaimer, FileCard, Page, SessionComposer, SessionStatusChip, ToolsBar, VoiceModeButton, notify, type SlashCommand } from "@g4ai/ds";
 import { agents, osUser, sessions, tools } from "./data/os-sessions";
 import { frameHref, go } from "./shells/frame-route";
 import { OsShell, osRoutes } from "./shells/os-shell";

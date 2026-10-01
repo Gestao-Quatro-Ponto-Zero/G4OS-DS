@@ -22,7 +22,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 1. **Bloco pronto** (`src/blocks/*.tsx`): copie o arquivo, troque os dados do topo.
 2. **Composição de componentes do DS**.
 3. **Componente do DS com props diferentes**.
-4. shadcn/ui ou 21st.dev **com a ponte** `@g4os/ds/shadcn.css` ([guia](docs/guias/shadcn.md)).
+4. shadcn/ui ou 21st.dev **com a ponte** `@g4ai/ds/shadcn.css` ([guia](docs/guias/shadcn.md)).
 5. Escrever do zero, com tokens. Se for reaproveitável, promova ao DS.
 
 ## Regras obrigatórias
@@ -83,7 +83,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 
 ## Começar um app em 10 passos
 
-1. Copie `templates/next-app` (ou siga [instalação](docs/guias/instalacao.md)): Tailwind v4 + `@import "@g4os/ds/styles.css"` (os `@source` já vêm dentro) + `transpilePackages`. Rode `npx g4os-ds doctor` para conferir.
+1. Copie `templates/next-app` (ou siga [instalação](docs/guias/instalacao.md)): Tailwind v4 + `@import "@g4ai/ds/styles.css"` (os `@source` já vêm dentro) + `transpilePackages`. Rode `npx g4os-ds doctor` para conferir.
 2. `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript` no `<head>`, Figtree, `setLinkComponent(Link)`.
 3. **Glossário**: um nome por conceito (Negócio, Vaga, Pedido…). Escreva num arquivo de rótulos e use em tudo.
 4. **Entidades e relações**: liste as 3–6 entidades, os campos que decidem ações e a etapa/status de cada uma. Veja a receita do tipo de app em `docs/receitas/`.
@@ -132,7 +132,7 @@ Catálogo completo com descrições no [README](README.md#blocos).
 
 - Pacote distribuído como **código-fonte** (TSX + CSS); não há build de biblioteca. `package.json#exports` define os pontos de entrada.
 - Novo componente: arquivo da família em `src/components/`, export em `src/index.ts`, página em `showcase/pages/<slug>.tsx` (registro automático; contrato em `showcase/kit.tsx`). Ver [contribuir.md](docs/guias/contribuir.md).
-- Novo bloco: `src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order, concept } as const` e `export default function`. `concept` é obrigatório (`goal`, `patterns` começando pela anatomia, `adapt`, `avoid`) e aparece na aba Conceito do showcase. Importa só de `@g4os/ds`; dados de exemplo no topo; realista em pt-BR.
+- Novo bloco: `src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order, concept } as const` e `export default function`. `concept` é obrigatório (`goal`, `patterns` começando pela anatomia, `adapt`, `avoid`) e aparece na aba Conceito do showcase. Importa só de `@g4ai/ds`; dados de exemplo no topo; realista em pt-BR.
 - Mudou token: CSS **e** TS (`color` e `colorDark`), `npm run check:tokens`, docs de fundamentos.
 - Mudou export, prop ou bloco: `npm run ai:build` (o `check` falha se `ai/` estiver desatualizado). Renomeou um export: registre em `ai/renames.json` e no `CHANGELOG.md`.
 - Nomes exportados são únicos no pacote inteiro.

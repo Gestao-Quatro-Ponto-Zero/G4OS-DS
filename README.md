@@ -1,6 +1,6 @@
 # G4OS-DS
 
-[![npm](https://img.shields.io/npm/v/@g4os/ds?color=202124&label=%40g4os%2Fds)](https://www.npmjs.com/package/@g4os/ds)
+[![npm](https://img.shields.io/npm/v/@g4ai/ds?color=202124&label=%40g4ai%2Fds)](https://www.npmjs.com/package/@g4ai/ds)
 [![CI](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/actions/workflows/ci.yml/badge.svg)](https://github.com/Gestao-Quatro-Ponto-Zero/G4OS-DS/actions/workflows/ci.yml)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-b9915b)](LICENSE)
 
@@ -17,7 +17,7 @@ A linguagem visual nasceu no G4 Delivery e foi generalizada: superfície e gelo,
 ## Começar
 
 ```bash
-pnpm add @g4os/ds @base-ui/react lucide-react      # ou: npm i … / yarn add …
+pnpm add @g4ai/ds @base-ui/react lucide-react      # ou: npm i … / yarn add …
 pnpm add -D tailwindcss @tailwindcss/postcss
 ```
 
@@ -26,8 +26,8 @@ O pacote publica JavaScript compilado (ESM, com `"use client"`) e tipos; o CSS e
 ```css
 /* globals.css */
 @import "tailwindcss";
-@import "@g4os/ds/styles.css";   /* já traz os @source do DS */
-/* opcional, para shadcn/ui e 21st.dev: @import "@g4os/ds/shadcn.css"; */
+@import "@g4ai/ds/styles.css";   /* já traz os @source do DS */
+/* opcional, para shadcn/ui e 21st.dev: @import "@g4ai/ds/shadcn.css"; */
 ```
 
 ```tsx
@@ -37,13 +37,13 @@ O pacote publica JavaScript compilado (ESM, com `"use client"`) e tipos; o CSS e
 
 // uma vez, no cliente (Next.js)
 import Link from "next/link";
-import { setLinkComponent } from "@g4os/ds";
+import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
 
 ```
 
 ```tsx
-import { AppShell, Sidebar, Page, PageHeading, KpiGrid, KpiCard, ChartCard, AreaChart, formatCurrency } from "@g4os/ds";
+import { AppShell, Sidebar, Page, PageHeading, KpiGrid, KpiCard, ChartCard, AreaChart, formatCurrency } from "@g4ai/ds";
 ```
 
 Guia completo: [docs/guias/instalacao.md](docs/guias/instalacao.md). Starter pronto: [templates/next-app](templates/next-app). Regras para quem constrói (inclusive agentes de IA): [AGENTS.md](AGENTS.md).
@@ -106,7 +106,7 @@ CHANGELOG.md   o que mudou por versão e o que o app precisa fazer
 
 ## Componentes
 
-Todos exportados por `@g4os/ds` (ou por módulo: `@g4os/ds/components/<arquivo>`).
+Todos exportados por `@g4ai/ds` (ou por módulo: `@g4ai/ds/components/<arquivo>`).
 
 | Família | Arquivo | Exporta |
 | --- | --- | --- |
@@ -135,7 +135,7 @@ Exemplos vivos, regras e props de cada um: rode `npm run showcase` e abra **Comp
 
 ## Blocos
 
-Arquivos em `src/blocks/`. Cada um importa só de `@g4os/ds`, traz os dados de exemplo no topo e funciona de 320 a 1440 px. No showcase, **Blocos** mostra Preview (desktop/tablet/celular) e Código.
+Arquivos em `src/blocks/`. Cada um importa só de `@g4ai/ds`, traz os dados de exemplo no topo e funciona de 320 a 1440 px. No showcase, **Blocos** mostra Preview (desktop/tablet/celular) e Código.
 
 | Categoria | Bloco | O que é |
 | --- | --- | --- |
@@ -177,7 +177,7 @@ Qual bloco usar para cada tipo de app: [AGENTS.md](AGENTS.md#qual-bloco-usar). C
 
 ## shadcn/ui e 21st.dev
 
-Para o que o DS não tem, traga do shadcn/ui ou do 21st.dev e importe `@g4os/ds/shadcn.css`: as variáveis do shadcn passam a apontar para os tokens do DS. Leia as colisões (`bg-accent`, `bg-muted`) e o checklist em [docs/guias/shadcn.md](docs/guias/shadcn.md).
+Para o que o DS não tem, traga do shadcn/ui ou do 21st.dev e importe `@g4ai/ds/shadcn.css`: as variáveis do shadcn passam a apontar para os tokens do DS. Leia as colisões (`bg-accent`, `bg-muted`) e o checklist em [docs/guias/shadcn.md](docs/guias/shadcn.md).
 
 ## Contribuir
 

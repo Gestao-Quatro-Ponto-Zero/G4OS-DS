@@ -1,6 +1,6 @@
 # navigation
 
-Arquivo: `src/components/navigation.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/navigation.tsx` · importe de `@g4ai/ds`.
 
 Navegação: Sidebar, PageHeading, StickyHeader, Breadcrumb, ContextBar, Tabs, SegmentedControl, ActionMenu, ProductMark.
 

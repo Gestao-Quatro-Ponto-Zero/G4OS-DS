@@ -14,7 +14,7 @@ import {
   PageHeading,
   ProportionBar,
   formatCurrency,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { agingBuckets, bankLines, br, budget, cashBalance, customerById, customers, finUser, lateDays, minimumCash, payables, receivables, weeks } from "./data/fin";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

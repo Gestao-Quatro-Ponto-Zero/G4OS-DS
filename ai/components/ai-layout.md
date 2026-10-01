@@ -1,6 +1,6 @@
 # ai-layout
 
-Arquivo: `src/components/ai-layout.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/ai-layout.tsx` · importe de `@g4ai/ds`.
 
 Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
 

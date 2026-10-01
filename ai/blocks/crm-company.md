@@ -8,4 +8,4 @@ Conta (?id=): indicadores, negócios, contatos e atividades da empresa, propried
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `EntityMark`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PropertyList`, `SplitLayout`, `Tabs`, `formatCurrency`, `formatDate`, `notify`
+—

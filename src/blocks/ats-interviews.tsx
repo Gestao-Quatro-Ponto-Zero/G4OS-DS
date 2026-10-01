@@ -16,7 +16,7 @@ import {
   TextareaField,
   notify,
   plural,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { candidateById, interviews as seed, iso, jobById, me, person, today, type Interview, type Verdict } from "./data/ats";
 import { go } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

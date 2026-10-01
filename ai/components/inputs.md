@@ -1,6 +1,6 @@
 # inputs
 
-Arquivo: `src/components/inputs.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/inputs.tsx` · importe de `@g4ai/ds`.
 
 Entradas especializadas: TextField, PasswordField, NumberField, CurrencyField, MaskedField (CPF/CNPJ/CEP/telefone), OtpInput, TagInput, Slider, RadioGroup, ChoiceCards, ToggleGroup, FileDropzone, Rating, InlineEdit.
 

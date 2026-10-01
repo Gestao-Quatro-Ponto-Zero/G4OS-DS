@@ -24,7 +24,7 @@ import {
   type ArtifactKind,
   type ArtifactTab,
   type ContextItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import { useFrameParam } from "./shells/frame-route";
 import { answer, context as baseContext, followUps, insights, projectById, sheetChanged, sheetColumns, sheetRows, slashCommands, traceFor, visibility } from "./data/agent";

@@ -8,4 +8,4 @@ Atingimento de meta por vendedor (bullet), evolução do ranking (bump), trimest
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `BulletChart`, `BumpChart`, `Button`, `ChartCard`, `Column`, `CurrencyField`, `DataTable`, `IconButton`, `KpiCard`, `KpiGrid`, `Modal`, `Page`, `PageHeading`, `SegmentedControl`, `SlopeChart`, `formatCurrency`, `formatPercent`, `notify`
+—

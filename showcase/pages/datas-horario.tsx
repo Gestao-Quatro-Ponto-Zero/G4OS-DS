@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DateTimePicker, TimePicker, describeTimeZone, parseTimeInput } from "@g4os/ds";
+import { DateTimePicker, TimePicker, describeTimeZone, parseTimeInput } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

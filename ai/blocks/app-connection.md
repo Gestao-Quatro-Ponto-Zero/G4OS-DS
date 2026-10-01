@@ -8,4 +8,4 @@ Um app conectado: estado, exemplo de pedido, dados sincronizados, contas e permi
 
 ## Componentes usados
 
-`AccountRow`, `AppIcon`, `Breadcrumb`, `Button`, `ConfirmDialog`, `ConnectionStatus`, `DataSyncTable`, `MarketplaceHero`, `Page`, `ToolPermissionList`, `formatNumber`, `notify`
+—

@@ -8,4 +8,4 @@ Meta do trimestre com ritmo esperado, receita por mês contra a meta, funil de c
 
 ## Componentes usados
 
-`BarChart`, `ChartCard`, `CompareStat`, `FunnelChart`, `GaugeChart`, `GoalMeter`, `KpiCard`, `KpiGrid`, `Leaderboard`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCurrency`, `formatNumber`, `formatPercent`
+—

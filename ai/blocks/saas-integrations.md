@@ -8,4 +8,4 @@ Catálogo por categoria com busca, estado de sincronização, erro com reconexã
 
 ## Componentes usados
 
-`Badge`, `Banner`, `Button`, `ConfirmDialog`, `Drawer`, `FieldBlock`, `Modal`, `Page`, `PageHeading`, `SegmentedControl`, `Select`, `Switch`, `TableSearch`, `TextField`, `matchesQuery`, `notify`
+—

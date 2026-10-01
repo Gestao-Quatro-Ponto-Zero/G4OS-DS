@@ -1,4 +1,4 @@
-# @g4os/ds
+# @g4ai/ds
 
 > Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 358 componentes, gráficos SVG e 85 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 

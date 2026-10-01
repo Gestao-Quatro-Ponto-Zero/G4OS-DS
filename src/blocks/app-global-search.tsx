@@ -14,7 +14,7 @@ import {
   useTheme,
   type SearchResult,
   type SearchScope,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { deals as crmDeals } from "./data/crm";
 import { me } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";

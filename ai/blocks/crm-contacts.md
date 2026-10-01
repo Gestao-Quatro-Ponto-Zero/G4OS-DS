@@ -8,4 +8,4 @@ Base de contas em DataGrid: rolagem interna com cabeçalho e total fixos, empres
 
 ## Componentes usados
 
-`Avatar`, `AvatarGroup`, `Badge`, `Button`, `DataGrid`, `EmptyFilterResult`, `EntityMark`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Modal`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `Select`, `TableSearch`, `Tabs`, `TextField`, `downloadCsv`, `formatCurrency`, `gridToCsv`, `matchesQuery`, `notify`, `useFilters`, `useSavedViews`
+—

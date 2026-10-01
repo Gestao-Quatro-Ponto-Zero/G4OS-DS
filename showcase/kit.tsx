@@ -12,7 +12,7 @@
  */
 import { Check, Copy, Maximize2, Monitor, Moon, RotateCw, Smartphone, Sun, Tablet } from "lucide-react";
 import { useState, type ComponentType, type ReactNode } from "react";
-import { cn } from "@g4os/ds";
+import { cn } from "@g4ai/ds";
 import { blockFiles } from "./.generated/registry";
 
 export const groups = [

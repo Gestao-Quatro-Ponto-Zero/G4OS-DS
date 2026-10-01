@@ -8,4 +8,4 @@ Catálogo de integrações com filtros por categoria, conectar/desconectar, e de
 
 ## Componentes usados
 
-`Badge`, `Button`, `Drawer`, `Empty`, `PropertyList`, `SearchInput`, `Switch`, `Tabs`, `Timeline`, `normalize`, `notify`
+—

@@ -24,7 +24,7 @@ import {
   notify,
   useFilters,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { activities as initial, activityLabel, companies, companyById, daysFromToday, dealById, iso, me, repById, reps, today, useFrameParam, type Activity, type ActivityType } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

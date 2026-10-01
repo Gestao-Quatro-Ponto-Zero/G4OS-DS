@@ -8,4 +8,4 @@ Trace completo de uma execução em cascata com o passo selecionado ao lado: ent
 
 ## Componentes usados
 
-`AgentPlan`, `AgentTrace`, `Badge`, `Button`, `JsonView`, `Page`, `PageHeading`, `PropertyList`, `ReportSection`, `ResizableSplit`, `StatCell`, `StatGrid`, `SystemMessage`, `TraceStep`, `formatCurrency`, `formatDuration`, `formatNumber`, `notify`
+—

@@ -23,7 +23,7 @@ import {
   useSort,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, customerById, invoiceStatus, invoices as seed, orderById, today, type Invoice, type InvoiceStatus } from "./data/erp";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

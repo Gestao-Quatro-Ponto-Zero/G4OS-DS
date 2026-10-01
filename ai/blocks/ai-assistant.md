@@ -8,4 +8,4 @@ Painel Ask AI ao lado de uma tela de CRM: sugestões, resposta com ferramentas u
 
 ## Componentes usados
 
-`AiBadge`, `AiSource`, `AskAILauncher`, `AskAIPanel`, `Badge`, `ChatComposer`, `ChatMessage`, `CitationChip`, `Column`, `ComposerChip`, `DataTable`, `EntityMark`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PromptSuggestion`, `PromptSuggestions`, `SourceList`, `SystemMessage`, `ThinkingIndicator`, `ToolCall`, `ToolCallsSection`, `formatCurrency`
+—

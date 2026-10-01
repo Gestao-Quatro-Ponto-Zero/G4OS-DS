@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import type { ReactNode } from "react";
-import { themeScript } from "@g4os/ds";
+import { themeScript } from "@g4ai/ds";
 import { DsSetup } from "../lib/ds";
 import "./globals.css";
 

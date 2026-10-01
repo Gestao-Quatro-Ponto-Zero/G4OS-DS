@@ -17,7 +17,7 @@ import {
   deriveBrand,
   useTheme,
   type BrandTokens,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -214,14 +214,14 @@ export default function Page() {
         </div>
         <CodeBlock
           code={`// app/layout.tsx (Next.js)
-import { themeScript } from "@g4os/ds";
+import { themeScript } from "@g4ai/ds";
 
 <html lang="pt-BR" className="ds-app" data-theme="system" suppressHydrationWarning>
   <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
   …
 
 // em qualquer lugar (sidebar, menu do usuário)
-import { ThemeToggle, useTheme } from "@g4os/ds";
+import { ThemeToggle, useTheme } from "@g4ai/ds";
 <ThemeToggle />                      // Claro · Escuro · Sistema
 const { mode, setMode, brand, setBrand, resolved } = useTheme();
 

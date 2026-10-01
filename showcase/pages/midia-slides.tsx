@@ -1,4 +1,4 @@
-import { SlideBullets, SlideCanvas, SlideDeck, SlideQuote, SlideSplit, SlideStat, SlideTitle, type DeckSlide } from "@g4os/ds";
+import { SlideBullets, SlideCanvas, SlideDeck, SlideQuote, SlideSplit, SlideStat, SlideTitle, type DeckSlide } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -70,7 +70,7 @@ export default function Page() {
             </figure>
           ))}
         </div>
-        <CodeBlock code={`import { Slide, SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote, SlideCanvas } from "@g4os/ds";
+        <CodeBlock code={`import { Slide, SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote, SlideCanvas } from "@g4ai/ds";
 
 // Slide livre: 1280×720, margens de 80px
 <Slide theme="soft" footer={<span>Fonte: CRM</span>}>…seu conteúdo…</Slide>

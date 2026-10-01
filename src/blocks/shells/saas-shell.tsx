@@ -11,7 +11,7 @@ import {
   type NavGroup,
   type SearchResult,
   type SearchScope,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customerById, customers, failingCount, healthLabel, healthTone, invoiceLabel, invoices, ticketLabel, tickets, urgentOpen } from "../data/saas";
 
 /*

@@ -1,6 +1,6 @@
 # dates
 
-Arquivo: `src/components/dates.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/dates.tsx` · importe de `@g4ai/ds`.
 
 Datas e horários. Regras (docs/padroes/datas.md · showcase Formulários › Datas): · valor é ISO só-data ("2026-09-30"); horário "HH:MM"; nada de <input type="date"> · digitar é sempre possível (dd/mm/aaaa, "sexta", "em 3
 

@@ -1,6 +1,6 @@
 ---
 name: ds-create
-description: Cria tela, página, fluxo ou app novo com o G4OS-DS partindo do bloco mais próximo. Use quando o usuário pedir "criar/fazer/montar uma tela, página, dashboard, CRUD, app novo com o design system", "tela a partir deste print/Figma", "refazer esta página no DS". Triggers in English: "create a new screen/page/app with the G4OS design system", "build this from a screenshot using @g4os/ds". Não use para adaptar um projeto inteiro (ds-migrate) nem só para revisar (ds-review).
+description: Cria tela, página, fluxo ou app novo com o G4OS-DS partindo do bloco mais próximo. Use quando o usuário pedir "criar/fazer/montar uma tela, página, dashboard, CRUD, app novo com o design system", "tela a partir deste print/Figma", "refazer esta página no DS". Triggers in English: "create a new screen/page/app with the G4OS design system", "build this from a screenshot using @g4ai/ds". Não use para adaptar um projeto inteiro (ds-migrate) nem só para revisar (ds-review).
 ---
 
 # Criar com o G4OS-DS
@@ -27,7 +27,7 @@ Decisões de superfície: entidade = página; criar/editar sem perder a lista = 
 
 ## 3. Construa
 
-- Imports só de `@g4os/ds` (+ `lucide-react`). Nada de cor, raio ou tamanho fora dos tokens.
+- Imports só de `@g4ai/ds` (+ `lucide-react`). Nada de cor, raio ou tamanho fora dos tokens.
 - Rótulos e textos em pt-BR (`DS/docs/fundamentos/escrita.md`); números/datas com `format*`.
 - Controles só quando há o que controlar (busca ≥ 12, filtros ≥ 8).
 - Um primário por área; secundárias no `ActionMenu`.

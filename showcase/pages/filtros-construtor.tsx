@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActiveFilterChip, AddFilterMenu, Button, ConditionEditor, FilterSheet, QuickFilter, filterOperators, useFilters, type FilterCondition, type FilterType } from "@g4os/ds";
+import { ActiveFilterChip, AddFilterMenu, Button, ConditionEditor, FilterSheet, QuickFilter, filterOperators, useFilters, type FilterCondition, type FilterType } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { dealFields, dealSearch, deals, me, now } from "./_filtros-data";
 

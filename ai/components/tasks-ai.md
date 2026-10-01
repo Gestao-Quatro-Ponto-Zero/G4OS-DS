@@ -1,6 +1,6 @@
 # tasks-ai
 
-Arquivo: `src/components/tasks-ai.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/tasks-ai.tsx` · importe de `@g4ai/ds`.
 
 Tarefas propostas pela IA (a partir de uma reunião, documento ou análise).
 

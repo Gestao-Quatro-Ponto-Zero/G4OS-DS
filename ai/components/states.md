@@ -1,6 +1,6 @@
 # states
 
-Arquivo: `src/components/states.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/states.tsx` · importe de `@g4ai/ds`.
 
 Estados de tela e avisos: StateView e presets (404, erro, sem acesso, offline), Spinner, LoadingState, Banner, InlineMessage, AlertCard, notifyPromise.
 

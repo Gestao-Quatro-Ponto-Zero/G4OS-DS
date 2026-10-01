@@ -1,6 +1,6 @@
 ---
 name: ds-migrate
-description: Adapta um projeto existente ao G4OS-DS (ou atualiza a versão do DS) em fases verificáveis. Use quando o usuário pedir "adapte/migre/aplique este projeto ao nosso design system", "use o G4OS-DS aqui", "troque o visual deste app pelo DS", "atualize o @g4os/ds para a versão nova". Triggers in English: "migrate this project to the G4OS design system", "apply @g4os/ds to this app", "upgrade @g4os/ds". Para uma única tela nova use ds-create; para só revisar use ds-review.
+description: Adapta um projeto existente ao G4OS-DS (ou atualiza a versão do DS) em fases verificáveis. Use quando o usuário pedir "adapte/migre/aplique este projeto ao nosso design system", "use o G4OS-DS aqui", "troque o visual deste app pelo DS", "atualize o @g4ai/ds para a versão nova". Triggers in English: "migrate this project to the G4OS design system", "apply @g4ai/ds to this app", "upgrade @g4ai/ds". Para uma única tela nova use ds-create; para só revisar use ds-review.
 ---
 
 # Migrar um projeto para o G4OS-DS
@@ -15,16 +15,16 @@ npx g4os-ds doctor            # ou: node <DS>/scripts/cli.mjs doctor .
 
 - React < 19, Tailwind < 4 (ou `@tailwind base`), sem Base UI → **não migre ainda**. Proponha ao usuário um plano de atualização (React 19 / Next 15+, `npx @tailwindcss/upgrade`) e só continue com o de acordo dele.
 - MUI/Chakra/Ant/styled-components: convivem durante a migração, mas **não há mapeamento 1:1**; a estratégia é reescrever por página e remover a lib no fim. Avise o custo.
-- shadcn/ui: importe `@g4os/ds/shadcn.css` na fase 1 para tudo herdar os tokens já; depois troque por componentes do DS página a página.
+- shadcn/ui: importe `@g4ai/ds/shadcn.css` na fase 1 para tudo herdar os tokens já; depois troque por componentes do DS página a página.
 
 ## Fase 1 · Instalar e ligar (um PR pequeno)
 
 Siga `DS/docs/guias/instalacao.md`. Resumo:
 
 1. `npm i @base-ui/react lucide-react` e o DS (`npm i ../G4OS-DS`, ou git).
-2. CSS global: `@import "tailwindcss"; @import "@g4os/ds/styles.css";` (+ `@g4os/ds/shadcn.css` se houver shadcn). Remova o tema antigo do shadcn (`:root { --background… }`, `.dark {…}`).
+2. CSS global: `@import "tailwindcss"; @import "@g4ai/ds/styles.css";` (+ `@g4ai/ds/shadcn.css` se houver shadcn). Remova o tema antigo do shadcn (`:root { --background… }`, `.dark {…}`).
 3. `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript` no `<head>` + Figtree (`--ds-font-sans`).
-4. Next: `transpilePackages: ["@g4os/ds"]`; `setLinkComponent(Link)` num módulo cliente.
+4. Next: `transpilePackages: ["@g4ai/ds"]`; `setLinkComponent(Link)` num módulo cliente.
 5. `doctor` sem ✗, build verde. **Commit.**
 
 ## Fase 2 · Inventário
@@ -62,7 +62,7 @@ Não faça "busca e troca" global cega de classes: o mesmo `bg-gray-100` pode se
 
 ## Modo atualização (versão nova do DS)
 
-1. Leia `DS/CHANGELOG.md` entre a versão instalada (`node_modules/@g4os/ds/package.json`) e a nova.
+1. Leia `DS/CHANGELOG.md` entre a versão instalada (`node_modules/@g4ai/ds/package.json`) e a nova.
 2. Aplique `DS/ai/renames.json` (exports e classes renomeados) com busca precisa, arquivo a arquivo.
 3. `audit` + `tsc`; registre em `MIGRATION.md` (seção "Atualizações").
 

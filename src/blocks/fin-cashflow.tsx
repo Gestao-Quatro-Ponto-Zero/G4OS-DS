@@ -22,7 +22,7 @@ import {
   formatCurrency,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { accounts, br, bridge, cashBalance, iso, minimumCash, payableStatus, payables as seed, weeks, type Payable } from "./data/fin";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

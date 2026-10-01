@@ -8,4 +8,4 @@ Login com e-mail e senha, SSO Google/Microsoft, link mágico e painel de marca n
 
 ## Componentes usados
 
-`Button`, `Callout`, `Checkbox`, `PasswordField`, `TextField`
+—

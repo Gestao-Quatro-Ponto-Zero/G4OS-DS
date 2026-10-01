@@ -1,6 +1,6 @@
 import { Building, Folder, FolderOpen, Landmark, Users, Wallet } from "lucide-react";
 import { useState } from "react";
-import { Accordion, Collapsible, DescriptionToggle, FieldBlock, Switch, TreeView, fieldClass, type TreeNode } from "@g4os/ds";
+import { Accordion, Collapsible, DescriptionToggle, FieldBlock, Switch, TreeView, fieldClass, type TreeNode } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

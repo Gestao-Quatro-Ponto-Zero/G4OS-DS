@@ -10,7 +10,7 @@ import {
   cn,
   formatCurrency,
   notify,
-  type Column } from "@g4os/ds";
+  type Column } from "@g4ai/ds";
 import { plans as sharedPlans, type PlanId } from "./data/plans";
 import { org } from "./data/workspace";
 import { SettingsShell } from "./shells/settings-shell";

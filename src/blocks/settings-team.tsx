@@ -16,7 +16,7 @@ import {
   cn,
   normalize,
   notify,
-  type Column } from "@g4os/ds";
+  type Column } from "@g4ai/ds";
 import { org, people, roleLabel, type Person, type Role } from "./data/workspace";
 import { SettingsShell } from "./shells/settings-shell";
 

@@ -8,4 +8,4 @@ Senha, verificação em duas etapas com código, sessões ativas com encerrament
 
 ## Componentes usados
 
-`Badge`, `Button`, `Callout`, `Column`, `ConfirmDialog`, `CopyButton`, `DataTable`, `Modal`, `OtpInput`, `PasswordField`, `SettingsSection`, `TextField`, `notify`
+—

@@ -1,5 +1,5 @@
 import { ArrowRight, BarChart3, Bot, Lock, Rocket, Workflow, Zap } from "lucide-react";
-import { Button, FeatureGrid, HeroSection, LogoCloud, ScreenFrame, StatsBand, Testimonial, formatCurrency } from "@g4os/ds";
+import { Button, FeatureGrid, HeroSection, LogoCloud, ScreenFrame, StatsBand, Testimonial, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { art } from "./_media-data";
 

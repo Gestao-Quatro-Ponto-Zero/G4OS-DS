@@ -8,4 +8,4 @@ Pessoa (?id=): papel na decisão, dados de contato, negócios em que participa, 
 
 ## Componentes usados
 
-`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `EntityMark`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `SplitLayout`, `TextField`, `TextareaField`, `formatCurrency`, `formatDate`, `notify`
+—

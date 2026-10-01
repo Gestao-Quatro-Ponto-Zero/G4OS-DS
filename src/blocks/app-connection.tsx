@@ -13,7 +13,7 @@ import {
   ToolPermissionList,
   formatNumber,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { appById, apps, type Account, type App } from "./data/apps";
 import { go, goTo, useFrameParam } from "./shells/frame-route";
 import { StudioShell, studioRoutes } from "./shells/studio-shell";

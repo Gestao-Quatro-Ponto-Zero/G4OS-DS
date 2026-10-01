@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileDropzone, type UploadItem } from "@g4os/ds";
+import { FileDropzone, type UploadItem } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Upload de arquivos", group: "Formulários", order: 25, description: "FileDropzone: clicar ou arrastar, validação de tipo/tamanho/quantidade, lista com progresso, erro e remoção." };

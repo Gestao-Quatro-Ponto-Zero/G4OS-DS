@@ -1,6 +1,6 @@
 # lib-dates
 
-Arquivo: `src/lib/dates.ts` · importe de `@g4os/ds`.
+Arquivo: `src/lib/dates.ts` · importe de `@g4ai/ds`.
 
 Datas só-dia em pt-BR, sem dependência.
 
@@ -15,7 +15,7 @@ addBusinessDays(iso, n, extra?): string
 Exemplo (showcase `#/p/datas-prazos-e-dias-uteis`):
 
 ```tsx
-import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4os/ds";
+import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4ai/ds";
 
 addBusinessDays("2026-10-09", 5)                  // "2026-10-19" (pula 12/10)
 businessDaysBetween("2026-10-01", "2026-10-31")    // 21
@@ -66,7 +66,7 @@ businessDaysBetween(from, to, extra?): number
 Exemplo (showcase `#/p/datas-prazos-e-dias-uteis`):
 
 ```tsx
-import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4os/ds";
+import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4ai/ds";
 
 addBusinessDays("2026-10-09", 5)                  // "2026-10-19" (pula 12/10)
 businessDaysBetween("2026-10-01", "2026-10-31")    // 21
@@ -117,7 +117,7 @@ describeDue(due, now?, props?): { label: string; tone: "bad"; diff: number; } | 
 Exemplo (showcase `#/p/datas-prazos-e-dias-uteis`):
 
 ```tsx
-import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4os/ds";
+import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4ai/ds";
 
 addBusinessDays("2026-10-09", 5)                  // "2026-10-19" (pula 12/10)
 businessDaysBetween("2026-10-01", "2026-10-31")    // 21
@@ -258,7 +258,7 @@ isBusinessDay(iso, extra?): boolean
 Exemplo (showcase `#/p/datas-prazos-e-dias-uteis`):
 
 ```tsx
-import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4os/ds";
+import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4ai/ds";
 
 addBusinessDays("2026-10-09", 5)                  // "2026-10-19" (pula 12/10)
 businessDaysBetween("2026-10-01", "2026-10-31")    // 21

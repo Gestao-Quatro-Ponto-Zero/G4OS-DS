@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionRequiredBanner, DateSeparator, ReadingDocument, TeamComposer, TeamMessage, TypingIndicator } from "@g4os/ds";
+import { ActionRequiredBanner, DateSeparator, ReadingDocument, TeamComposer, TeamMessage, TypingIndicator } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

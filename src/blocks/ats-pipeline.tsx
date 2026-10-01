@@ -17,7 +17,7 @@ import {
   chartColor,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { candidatesOf, company, iso, jobById, openDays, person, stageLabel, stages, type Candidate, type StageId } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

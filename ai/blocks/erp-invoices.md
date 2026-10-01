@@ -8,4 +8,4 @@ NF-e emitidas com situação na SEFAZ, rejeições em destaque com o motivo e re
 
 ## Componentes usados
 
-`Badge`, `BulkBar`, `Button`, `Callout`, `Column`, `DataTable`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `Highlight`, `Page`, `PageHeading`, `PageToolbar`, `SortHeader`, `StatCell`, `StatGrid`, `TableSearch`, `formatCurrency`, `notify`, `selectionColumn`, `useFilters`, `useSelection`, `useSort`
+—

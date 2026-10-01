@@ -19,7 +19,7 @@ import {
   formatNumber,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customers, daily, go, healthLabel, healthTone, mrrMovements, npsScores, totalMrr, type Customer } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

@@ -14,7 +14,7 @@ import {
   TextField,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { SettingsShell } from "./shells/settings-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */

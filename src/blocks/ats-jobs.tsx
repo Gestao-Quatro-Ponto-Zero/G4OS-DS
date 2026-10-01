@@ -22,7 +22,7 @@ import {
   useSort,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { areas, candidatesOf, company, jobs as allJobs, me, offers, openDays, person, stages, team, today, type Job, type JobStatus } from "./data/ats";
 import { go } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

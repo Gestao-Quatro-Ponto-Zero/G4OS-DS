@@ -8,4 +8,4 @@ Página inicial de conta nova: checklist com progresso, um passo aberto por vez 
 
 ## Componentes usados
 
-`Button`, `Callout`, `Page`, `PageHeading`, `ProgressRing`
+—

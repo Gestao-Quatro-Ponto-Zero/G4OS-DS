@@ -13,7 +13,7 @@ import {
   useSelection,
   useSort,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

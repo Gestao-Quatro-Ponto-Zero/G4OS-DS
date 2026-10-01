@@ -8,4 +8,4 @@
 
 ## Componentes usados
 
-`Banner`, `Button`, `ErrorState`, `ForbiddenState`, `MaintenanceState`, `NotFoundState`, `OfflineState`, `SegmentedControl`, `notify`
+—

@@ -20,7 +20,7 @@ import {
   Timeline,
   formatCurrency,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { candidateById, interviewsOf, iso, jobById, person, scorecardsOf, shortDate, stageLabel, stages, team, verdictInfo, type Candidate } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

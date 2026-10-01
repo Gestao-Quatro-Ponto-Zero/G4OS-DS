@@ -14,7 +14,7 @@ Gerador visual no showcase: **Fundamentos › Temas e marca** (`#/p/fund-temas`)
 ```
 
 ```tsx
-import { ThemeToggle, useTheme } from "@g4os/ds";
+import { ThemeToggle, useTheme } from "@g4ai/ds";
 
 <ThemeToggle />                        // Claro · Escuro · Sistema, persiste em localStorage
 const { mode, setMode, brand, setBrand, resolved } = useTheme();
@@ -33,7 +33,7 @@ Presets prontos em `src/styles/themes.css` (importado por `styles.css`): `oceano
 <html data-theme="system" data-brand="oceano">
 ```
 
-Marca nova, no CSS global do app (depois de `@import "@g4os/ds/styles.css"`):
+Marca nova, no CSS global do app (depois de `@import "@g4ai/ds/styles.css"`):
 
 ```css
 [data-brand="acme"] {
@@ -58,12 +58,12 @@ Marca nova, no CSS global do app (depois de `@import "@g4os/ds/styles.css"`):
 }
 ```
 
-Sem escrever à mão: `deriveBrand(primary, accent)` + `brandCss(nome, marca, { radiusScale, fontSans })` (de `@g4os/ds`) geram os dois blocos com contraste AA garantido. A skill `ds-theme` faz o mesmo a partir do logo ou das cores do cliente.
+Sem escrever à mão: `deriveBrand(primary, accent)` + `brandCss(nome, marca, { radiusScale, fontSans })` (de `@g4ai/ds`) geram os dois blocos com contraste AA garantido. A skill `ds-theme` faz o mesmo a partir do logo ou das cores do cliente.
 
 ### Regras de marca
 
 1. **Só semânticos** (`--ds-*`). Nunca redefina `--color-*` (a ponte) nem primitivos `--g4-*`.
-2. **Contraste AA nos dois temas**: `on-primary` sobre `primary` ≥ 4,5; `accent-deep` sobre `surface` ≥ 4,5; `primary` sobre `page` ≥ 3 (é usado como fundo de controle). `contrast(a, b)` de `@g4os/ds` calcula.
+2. **Contraste AA nos dois temas**: `on-primary` sobre `primary` ≥ 4,5; `accent-deep` sobre `surface` ≥ 4,5; `primary` sobre `page` ≥ 3 (é usado como fundo de controle). `contrast(a, b)` de `@g4ai/ds` calcula.
 3. **Estados não são marca**: `ok`, `amber`, `rose` continuam verde, âmbar e vermelho em qualquer cliente. Uma marca vermelha não pode deixar "erro" indistinguível: se `primary` for vermelho, mantenha `rose` e confira que o botão principal não parece destrutivo (considere um primário escuro e o vermelho só no `accent`).
 4. Marca não troca densidade, escala de texto nem layout.
 5. `data-theme="system"` + marca: o bloco `[data-brand][data-theme="dark"]` não casa com `system`. Se a marca precisar de ajuste no escuro do sistema, repita-o dentro de `@media (prefers-color-scheme: dark) { [data-brand="x"][data-theme="system"] { … } }`.

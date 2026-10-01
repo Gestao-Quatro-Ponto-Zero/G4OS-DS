@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { Button, ConfirmDialog, Empty, notify } from "@g4os/ds";
+import { Button, ConfirmDialog, Empty, notify } from "@g4ai/ds";
 import { useState } from "react";
 import { DocPage, DocSection, Rules, type PageMeta } from "../kit";
 import { GuideTable } from "./_guia-table";

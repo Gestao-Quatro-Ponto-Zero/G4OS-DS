@@ -8,4 +8,4 @@ Plano atual com renovação, uso contra limites, troca de plano mensal/anual, fo
 
 ## Componentes usados
 
-`Badge`, `Button`, `Column`, `ConfirmDialog`, `DataTable`, `Meter`, `SegmentedControl`, `formatCurrency`, `notify`
+—

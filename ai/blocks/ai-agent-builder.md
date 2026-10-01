@@ -8,4 +8,4 @@ Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, proprieda
 
 ## Componentes usados
 
-`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `BuilderSection`, `ChipPicker`, `MenuEntry`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `ToolGlyph`, `TriggerList`, `notify`
+—

@@ -1,6 +1,6 @@
 # interactive
 
-Arquivo: `src/components/interactive.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/interactive.tsx` · importe de `@g4ai/ds`.
 
 Interação e marketing: InputModal, AnimatedModal, LimitDialog, ImageSphere, Hero, FeatureGrid, BeforeAfter, NumberTicker.
 

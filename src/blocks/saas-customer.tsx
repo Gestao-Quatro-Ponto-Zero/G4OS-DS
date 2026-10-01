@@ -26,7 +26,7 @@ import {
   formatNumber,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customerById, go, healthLabel, healthTone, invoiceLabel, invoices, invoiceTone, personById, planPrice, plans, priorityLabel, priorityTone, ticketLabel, tickets, useFrameParam, type Invoice, type Plan, type Ticket } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

@@ -15,7 +15,7 @@ import {
   cn,
   formatCompact,
   formatCurrency,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { plans } from "./data/plans";
 import { authRoutes } from "./shells/auth-shell";
 import { SiteShell } from "./shells/site-shell";

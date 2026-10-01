@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart, ChartCardTotals, formatCompact, formatCurrency, formatNumber } from "@g4os/ds";
+import { BarChart, ChartCardTotals, formatCompact, formatCurrency, formatNumber } from "@g4ai/ds";
 import { DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { ChartDemo, ChartGrid } from "./_chart-kit";
 import * as d from "./_chart-data";

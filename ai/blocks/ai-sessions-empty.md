@@ -8,4 +8,4 @@ Início de uma sessão: saudação, campo com agentes e ferramentas, tarefas sug
 
 ## Componentes usados
 
-`Disclaimer`, `FileCard`, `Page`, `SessionComposer`, `SessionStatusChip`, `SlashCommand`, `ToolsBar`, `VoiceModeButton`, `notify`
+—

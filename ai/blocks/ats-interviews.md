@@ -8,4 +8,4 @@ Agenda de entrevistas por dia com sala/link, avaliações pendentes em destaque 
 
 ## Componentes usados
 
-`Avatar`, `AvatarGroup`, `Badge`, `Button`, `ChoiceCards`, `Empty`, `ListPanel`, `Page`, `PageHeading`, `Rating`, `SegmentedControl`, `Sheet`, `TextareaField`, `notify`, `plural`
+—

@@ -1,6 +1,6 @@
 # charts-extra
 
-Arquivo: `src/components/charts-extra.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/charts-extra.tsx` · importe de `@g4ai/ds`.
 
 Gráficos de negócio que as bibliotecas comuns não trazem prontos.
 

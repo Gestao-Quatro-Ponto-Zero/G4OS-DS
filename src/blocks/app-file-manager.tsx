@@ -19,7 +19,7 @@ import {
   normalize,
   notify,
   type Column,
-  type TreeNode } from "@g4os/ds";
+  type TreeNode } from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { setFrameQuery, useFrameQuery } from "./shells/frame-route";

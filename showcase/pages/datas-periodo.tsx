@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DateRangePicker, MonthPicker, QuarterPicker, YearPicker, comparePeriod, formatRange, resolvePeriod, type DateRangeValue } from "@g4os/ds";
+import { DateRangePicker, MonthPicker, QuarterPicker, YearPicker, comparePeriod, formatRange, resolvePeriod, type DateRangeValue } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

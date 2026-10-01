@@ -8,4 +8,4 @@ Cadastro em duas etapas (você → empresa), senha com força visível, aceite d
 
 ## Componentes usados
 
-`Badge`, `Button`, `Checkbox`, `PasswordField`, `Select`, `Stepper`, `TextField`
+—

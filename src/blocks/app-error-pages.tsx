@@ -8,7 +8,7 @@ import {
   NotFoundState,
   OfflineState,
   SegmentedControl,
-  notify } from "@g4os/ds";
+  notify } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
 

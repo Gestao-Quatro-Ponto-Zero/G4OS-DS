@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, Building2, Mail, User } from "lucide-react";
 import { useState } from "react";
-import { Badge, Button, Checkbox, PasswordField, Select, Stepper, TextField } from "@g4os/ds";
+import { Badge, Button, Checkbox, PasswordField, Select, Stepper, TextField } from "@g4ai/ds";
 import { planById } from "./data/plans";
 import { AuthBrand, OrDivider, SsoButtons, authRoutes } from "./shells/auth-shell";
 import { useFrameQuery } from "./shells/frame-route";

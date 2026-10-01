@@ -16,7 +16,7 @@ import {
   usePagination,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { me, people } from "./data/workspace";
 import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
 import { SettingsShell } from "./shells/settings-shell";

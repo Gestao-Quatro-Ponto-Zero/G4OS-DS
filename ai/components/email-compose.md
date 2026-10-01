@@ -1,6 +1,6 @@
 # email-compose
 
-Arquivo: `src/components/email-compose.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/email-compose.tsx` · importe de `@g4ai/ds`.
 
 Escrever e-mail (com ou sem IA): remetente, destinatários com busca, assunto, corpo, modelo e envio com agendamento.
 

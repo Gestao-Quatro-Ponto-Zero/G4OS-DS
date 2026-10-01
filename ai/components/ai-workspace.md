@@ -1,6 +1,6 @@
 # ai-workspace
 
-Arquivo: `src/components/ai-workspace.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/ai-workspace.tsx` · importe de `@g4ai/ds`.
 
 Workspace de agente (docs: showcase › IA e interação › Workspace de agente).
 

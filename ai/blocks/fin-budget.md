@@ -8,4 +8,4 @@ Orçado × realizado por centro de custo no mês ou no acumulado: halteres de va
 
 ## Componentes usados
 
-`Badge`, `Button`, `ChartCard`, `Column`, `CurrencyField`, `DataTable`, `DumbbellChart`, `FieldBlock`, `KpiCard`, `KpiGrid`, `Meter`, `Modal`, `Page`, `PageHeading`, `SegmentedControl`, `Select`, `TextareaField`, `formatCurrency`, `formatPercent`, `notify`
+—

@@ -4,7 +4,7 @@
  * pedido; o a pagar é da compra aprovada. "Hoje" = 30/09/2026.
  */
 
-import type { Tone } from "@g4os/ds";
+import type { Tone } from "@g4ai/ds";
 import { iso } from "./erp";
 
 export { br, company, customerById, customers, daysAgo, iso, supplierById, suppliers, today } from "./erp";

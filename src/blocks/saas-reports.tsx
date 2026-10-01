@@ -19,7 +19,7 @@ import {
   formatDate,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { me, personById, reports as baseReports, today, useFrameParam, type Report } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

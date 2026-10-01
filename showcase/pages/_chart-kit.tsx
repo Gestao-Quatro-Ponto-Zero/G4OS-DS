@@ -2,7 +2,7 @@
 // no canto, alternando entre o gráfico e o trecho de uso. Não é página.
 import { Code2, Eye } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { ChartCard, cn } from "@g4os/ds";
+import { ChartCard, cn } from "@g4ai/ds";
 import { CodeBlock } from "../kit";
 
 export function ChartDemo({

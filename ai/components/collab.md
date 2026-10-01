@@ -1,6 +1,6 @@
 # collab
 
-Arquivo: `src/components/collab.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/collab.tsx` · importe de `@g4ai/ds`.
 
 Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
 

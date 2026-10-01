@@ -8,4 +8,4 @@ O dia da controladoria em uma tela: caixa e projeção contra o mínimo, liquide
 
 ## Componentes usados
 
-`BarList`, `Button`, `ChartCard`, `GaugeChart`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Meter`, `Page`, `PageHeading`, `ProportionBar`, `formatCurrency`
+—

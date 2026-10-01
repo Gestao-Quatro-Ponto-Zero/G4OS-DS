@@ -21,7 +21,7 @@ import {
   formatPercent,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { candidateById, hiresByMonth, hiringFunnel, interviews, iso, jobById, jobs, offers, openDays, sourceQuality, timeByArea } from "./data/ats";
 import { go } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

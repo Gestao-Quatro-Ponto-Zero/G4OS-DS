@@ -11,7 +11,7 @@ import {
   Tabs,
   Tooltip,
   cn,
-  notify } from "@g4os/ds";
+  notify } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { frameHref } from "./shells/frame-route";
 

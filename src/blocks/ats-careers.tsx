@@ -14,7 +14,7 @@ import {
   matchesQuery,
   notify,
   type UploadItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { areas, company, jobById, jobs, openDays, type Job } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
 

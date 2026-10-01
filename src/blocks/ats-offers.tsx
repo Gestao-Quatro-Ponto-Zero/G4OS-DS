@@ -14,7 +14,7 @@ import {
   Tabs,
   formatCurrency,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { candidateById, iso, jobById, me, offerStatus, offers as seed, person, shortDate, type Offer, type OfferStatus } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

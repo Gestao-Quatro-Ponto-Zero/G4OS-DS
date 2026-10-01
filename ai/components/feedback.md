@@ -1,6 +1,6 @@
 # feedback
 
-Arquivo: `src/components/feedback.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/feedback.tsx` · importe de `@g4ai/ds`.
 
 Feedback de operação: notify/Toaster, Callout, useOperation, OperationButton, OperationFeedback, Skeleton.
 
@@ -106,7 +106,7 @@ Monte uma vez perto da raiz (AppShell já monta).
 Exemplo (showcase `#/p/fb-toasts`):
 
 ```tsx
-import { Toaster, notify } from "@g4os/ds";
+import { Toaster, notify } from "@g4ai/ds";
 
 // raiz do app (se não usar AppShell)
 <Toaster duration={6500} />

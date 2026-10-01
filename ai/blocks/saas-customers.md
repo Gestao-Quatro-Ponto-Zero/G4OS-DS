@@ -8,4 +8,4 @@ Tabela com visões salvas, busca local (/), filtros por campo (plano, saúde, MR
 
 ## Componentes usados
 
-`ActionMenu`, `Badge`, `BulkBar`, `Button`, `Column`, `DataTable`, `EmptyFilterResult`, `EntityMark`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `Highlight`, `Modal`, `NumberField`, `Page`, `PageHeading`, `PageToolbar`, `Pagination`, `SavedView`, `SavedViews`, `Select`, `SortHeader`, `Sparkline`, `TableSearch`, `TextField`, `formatCurrency`, `formatNumber`, `notify`, `selectionColumn`, `useFilters`, `usePagination`, `useSavedViews`, `useSelection`, `useSort`
+—

@@ -1,6 +1,6 @@
 import { Bell, Database, FileText, FolderOpen, Home, Inbox, Presentation, Search, Settings, Sparkles, Activity } from "lucide-react";
 import type { ReactNode } from "react";
-import { AppShell, IconButton, Sidebar, type NavGroup, type NavItem } from "@g4os/ds";
+import { AppShell, IconButton, Sidebar, type NavGroup, type NavItem } from "@g4ai/ds";
 import { me, org } from "../data/workspace";
 import { frameHref, goTo } from "./frame-route";
 

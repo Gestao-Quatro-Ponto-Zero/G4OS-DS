@@ -20,7 +20,7 @@ import {
   formatPercent,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, coverageDays, levelInfo, levelOf, movementsOf, productBySku, qtyOf, supplierById, warehouses, type Product } from "./data/erp";
 import { go, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

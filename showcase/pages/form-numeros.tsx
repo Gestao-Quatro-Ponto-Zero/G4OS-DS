@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CurrencyField, NumberField, formatCurrency } from "@g4os/ds";
+import { CurrencyField, NumberField, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Números e moeda", group: "Formulários", order: 22, description: "NumberField com passo e teclado; CurrencyField em reais com máscara de caixa registradora." };

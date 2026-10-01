@@ -17,7 +17,7 @@ import {
   formatNumber,
   formatPercent,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { SaasShell } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */

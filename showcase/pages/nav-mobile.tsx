@@ -1,6 +1,6 @@
 import { Bell, CalendarDays, Home, Inbox, KanbanSquare, Menu, Users } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { Avatar, BottomNav, cn, type NavItem } from "@g4os/ds";
+import { Avatar, BottomNav, cn, type NavItem } from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

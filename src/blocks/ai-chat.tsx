@@ -22,7 +22,7 @@ import {
   type ComposerAttachment,
   type PromptSuggestion,
   type ToolCall,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AssistantShell, assistantRoutes } from "./shells/assistant-shell";
 import { goTo, setFrameQuery, useFrameQuery } from "./shells/frame-route";

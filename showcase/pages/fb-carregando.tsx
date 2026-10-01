@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { Button, DataTable, LoadingOverlay, LoadingState, Skeleton, Spinner, type Column } from "@g4os/ds";
+import { Button, DataTable, LoadingOverlay, LoadingState, Skeleton, Spinner, type Column } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

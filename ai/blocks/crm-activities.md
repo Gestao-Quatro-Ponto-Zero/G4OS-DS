@@ -8,4 +8,4 @@ Tarefas, ligações, reuniões e e-mails agrupados por prazo (atrasadas primeiro
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Checkbox`, `Combobox`, `DatePicker`, `EmptyFilterResult`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `Highlight`, `Modal`, `Page`, `PageHeading`, `PageToolbar`, `SegmentedControl`, `Select`, `TableSearch`, `TextField`, `formatDate`, `notify`, `useFilters`
+—

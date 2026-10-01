@@ -16,7 +16,7 @@ import {
   type AiSource,
   type ApprovalState,
   type ToolCall,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import { frameHref, go } from "./shells/frame-route";
 import { slashCommands } from "./data/agent";

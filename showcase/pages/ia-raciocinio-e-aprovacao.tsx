@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AgentPlan, ApprovalRequest, ReasoningBlock, notify, type ApprovalState } from "@g4os/ds";
+import { AgentPlan, ApprovalRequest, ReasoningBlock, notify, type ApprovalState } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Raciocínio, plano e aprovação", group: "IA e interação", order: 23, description: "ReasoningBlock (pensou por N s), AgentPlan (o que vai fazer e onde está) e ApprovalRequest (humano no controle antes de ações com efeito externo)." };

@@ -8,4 +8,4 @@ Matriz evento × canal (e-mail, push, Slack) agrupada por módulo, resumo diári
 
 ## Componentes usados
 
-`Button`, `Checkbox`, `RadioGroup`, `Select`, `SettingsSection`, `Switch`, `notify`
+—

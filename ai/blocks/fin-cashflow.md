@@ -8,4 +8,4 @@ Entradas e saídas por semana (saídas negativas), saldo projetado contra o mín
 
 ## Componentes usados
 
-`Badge`, `BarChart`, `Button`, `ChartCard`, `Column`, `CurrencyField`, `DataTable`, `DatePicker`, `FieldBlock`, `KpiCard`, `KpiGrid`, `LineChart`, `Modal`, `Page`, `PageHeading`, `ProportionBar`, `SegmentedControl`, `TextField`, `WaterfallChart`, `formatCurrency`, `notify`
+—

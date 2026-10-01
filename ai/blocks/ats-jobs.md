@@ -8,4 +8,4 @@ Vagas com funil por etapa, tempo em aberto contra o SLA, filtros por área e rec
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `Highlight`, `Page`, `PageHeading`, `PageToolbar`, `SortHeader`, `StatCell`, `StatGrid`, `TableSearch`, `Tabs`, `chartColor`, `notify`, `useFilters`, `useSort`
+—

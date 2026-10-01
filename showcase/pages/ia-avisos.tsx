@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, CitationChip, LimitDialog, RateLimitNotice, SourceList, SystemMessage, TokenUsageMeter } from "@g4os/ds";
+import { Button, CitationChip, LimitDialog, RateLimitNotice, SourceList, SystemMessage, TokenUsageMeter } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { sources } from "./_ia-data";
 

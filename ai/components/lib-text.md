@@ -1,6 +1,6 @@
 # lib-text
 
-Arquivo: `src/lib/text.ts` · importe de `@g4os/ds`.
+Arquivo: `src/lib/text.ts` · importe de `@g4ai/ds`.
 
 Texto pt-BR: normalize (busca sem acento), plural, initials.
 

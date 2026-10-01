@@ -16,7 +16,7 @@ import { cn } from "../lib/cn";
  * Em Next.js, registre o `Link` uma vez no boot do app:
  *
  *   import Link from "next/link";
- *   import { setLinkComponent } from "@g4os/ds";
+ *   import { setLinkComponent } from "@g4ai/ds";
  *   setLinkComponent(Link);
  */
 type LinkLike = ComponentType<

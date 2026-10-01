@@ -1,4 +1,4 @@
-import { AiBadge, SystemMessage, ToolCallsSection } from "@g4os/ds";
+import { AiBadge, SystemMessage, ToolCallsSection } from "@g4ai/ds";
 import { DocPage, DocSection, Rules, type PageMeta } from "../kit";
 import { toolCalls } from "./_ia-data";
 

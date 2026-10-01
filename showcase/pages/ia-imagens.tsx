@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BeforeAfter, CopyButton, ImageSphere, ImageWithFallback, KeyCombo, Lightbox, NumberTicker, formatCurrency } from "@g4os/ds";
+import { BeforeAfter, CopyButton, ImageSphere, ImageWithFallback, KeyCombo, Lightbox, NumberTicker, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { art } from "./_media-data";
 import { sphereImages } from "./_ia-data";

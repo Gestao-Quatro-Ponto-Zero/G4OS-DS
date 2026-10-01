@@ -6,7 +6,7 @@
  * Respostas vêm como blocos de texto rico simples (`Rich`), para virar JSX
  * no bloco e Markdown no "Copiar Markdown" sem depender de parser.
  */
-import type { AgentOption, ArtifactKind, ConnectedTool, ContextItem, ModelOption, SessionFile, SessionMode, SessionProject, SessionSummary, StepItem } from "@g4os/ds";
+import type { AgentOption, ArtifactKind, ConnectedTool, ContextItem, ModelOption, SessionFile, SessionMode, SessionProject, SessionSummary, StepItem } from "@g4ai/ds";
 
 export const osUser = { name: "João Vitor", first: "João", initials: "JV", title: "Head de Produto" };
 export const osWorkspace = "G4 OS";

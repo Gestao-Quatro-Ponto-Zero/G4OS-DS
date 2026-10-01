@@ -8,4 +8,4 @@ App desktop de sessões com agente: lista com status ao vivo, conversa com passo
 
 ## Componentes usados
 
-`AnswerCard`, `Disclaimer`, `InputModal`, `ListToggle`, `MenuEntry`, `MessageActions`, `MinimapItem`, `ResizableSplit`, `SessionComposer`, `SessionHeader`, `SessionInfoPanel`, `SessionQuickSwitcher`, `SessionSidebar`, `SlashCommand`, `StepGroup`, `ThreadMinimap`, `UserBubble`, `VoiceModeButton`, `VoiceOverlay`, `WorkspaceSwitcher`, `notify`
+—

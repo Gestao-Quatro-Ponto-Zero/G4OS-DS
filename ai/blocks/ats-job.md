@@ -8,4 +8,4 @@ Detalhe da vaga: resumo, funil, melhores candidatos, modelo de avaliação (crit
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Callout`, `ChoiceCards`, `CurrencyField`, `FunnelChart`, `IconButton`, `ListPanel`, `ListRow`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `Rating`, `Select`, `SplitLayout`, `Tabs`, `TextField`, `TextareaField`, `formatCurrency`, `notify`
+—

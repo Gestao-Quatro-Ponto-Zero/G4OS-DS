@@ -1,6 +1,6 @@
 import { Wand2 } from "lucide-react";
 import { useState } from "react";
-import { RichTextEditor, RichTextToolbar, richTextContentClass } from "@g4os/ds";
+import { RichTextEditor, RichTextToolbar, richTextContentClass } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

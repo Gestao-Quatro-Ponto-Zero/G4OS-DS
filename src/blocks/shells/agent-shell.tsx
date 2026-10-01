@@ -1,6 +1,6 @@
 import { Bot, FolderKanban, History, ListChecks, MessagesSquare, Network, Settings, Sparkles, SquareTerminal } from "lucide-react";
 import type { ReactNode } from "react";
-import { AppShell, Avatar, IconRail, Tooltip, type NavItem, type RailItem } from "@g4os/ds";
+import { AppShell, Avatar, IconRail, Tooltip, type NavItem, type RailItem } from "@g4ai/ds";
 import { me, org } from "../data/workspace";
 import { frameHref } from "./frame-route";
 

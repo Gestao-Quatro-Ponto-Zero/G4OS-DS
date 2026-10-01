@@ -10,7 +10,7 @@ import {
   notify,
   type AgentConnection,
   type Subagent,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { agent, appById } from "./data/apps";
 import { go, goTo } from "./shells/frame-route";
 import { StudioShell, studioRoutes } from "./shells/studio-shell";

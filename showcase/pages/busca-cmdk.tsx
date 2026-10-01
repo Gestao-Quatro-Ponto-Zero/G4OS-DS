@@ -1,6 +1,6 @@
 import { Briefcase, Building2, FilePlus2, Keyboard, Moon, Search, Users } from "lucide-react";
 import { useState } from "react";
-import { Badge, Button, SearchPalette, formatCurrency, notify, type SearchResult, type SearchScope } from "@g4os/ds";
+import { Badge, Button, SearchPalette, formatCurrency, notify, type SearchResult, type SearchScope } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { deals, owners } from "./_filtros-data";
 

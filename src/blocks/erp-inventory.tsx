@@ -28,7 +28,7 @@ import {
   useSort,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { categories, coverageDays, levelInfo, levelOf, products as seed, qtyOf, today, warehouses, type Level, type Product, type WarehouseId } from "./data/erp";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

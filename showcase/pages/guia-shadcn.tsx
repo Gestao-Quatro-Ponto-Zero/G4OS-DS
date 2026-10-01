@@ -1,4 +1,4 @@
-import { Callout } from "@g4os/ds";
+import { Callout } from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 import { GuideTable } from "./_guia-table";
 
@@ -24,9 +24,9 @@ export default function Page() {
         <CodeBlock
           code={`/* globals.css */
 @import "tailwindcss";
-@import "@g4os/ds/styles.css";
-@import "@g4os/ds/shadcn.css";
-@source "../node_modules/@g4os/ds/src";`}
+@import "@g4ai/ds/styles.css";
+@import "@g4ai/ds/shadcn.css";
+@source "../node_modules/@g4ai/ds/src";`}
         />
         <GuideTable
           head={["Variável do shadcn", "Token do DS", "Valor", "Papel"]}

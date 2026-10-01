@@ -8,4 +8,4 @@ Rascunhos preparados pelo agente: destinatários com busca e sugestões, modelo,
 
 ## Componentes usados
 
-`AiBadge`, `Button`, `ComposeEmail`, `ComposeEmailDialog`, `ComposeStatus`, `MenuEntry`, `Page`, `PageHeading`, `Person`, `notify`
+—

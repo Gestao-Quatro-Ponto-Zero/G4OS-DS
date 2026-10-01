@@ -1,6 +1,6 @@
 # tags
 
-Arquivo: `src/components/tags.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/tags.tsx` · importe de `@g4ai/ds`.
 
 Etiquetas coloridas (categoria, tipo, status) no estilo "banco de dados": fundo suave + texto AA, 9 matizes em tokens (--ds-tag-*-bg/-fg), claros e escuros.
 

@@ -1,6 +1,6 @@
 # lib-theme
 
-Arquivo: `src/lib/theme.ts` · importe de `@g4os/ds`.
+Arquivo: `src/lib/theme.ts` · importe de `@g4ai/ds`.
 
 Tema e marca: useTheme, applyTheme, themeScript, brandPresets.
 
@@ -56,14 +56,14 @@ Exemplo (showcase `#/p/fund-temas`):
 
 ```tsx
 // app/layout.tsx (Next.js)
-import { themeScript } from "@g4os/ds";
+import { themeScript } from "@g4ai/ds";
 
 <html lang="pt-BR" className="ds-app" data-theme="system" suppressHydrationWarning>
   <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
   …
 
 // em qualquer lugar (sidebar, menu do usuário)
-import { ThemeToggle, useTheme } from "@g4os/ds";
+import { ThemeToggle, useTheme } from "@g4ai/ds";
 <ThemeToggle />                      // Claro · Escuro · Sistema
 const { mode, setMode, brand, setBrand, resolved } = useTheme();
 

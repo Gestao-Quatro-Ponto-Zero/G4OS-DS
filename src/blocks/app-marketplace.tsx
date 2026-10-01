@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { AppGrid, AppTile, Button, Empty, HalftoneBand, MarketplaceHero, Page, cn, normalize, notify } from "@g4os/ds";
+import { AppGrid, AppTile, Button, Empty, HalftoneBand, MarketplaceHero, Page, cn, normalize, notify } from "@g4ai/ds";
 import { appCategories, apps as seed, type AppCategory } from "./data/apps";
 import { go, goTo } from "./shells/frame-route";
 import { StudioShell, studioRoutes } from "./shells/studio-shell";

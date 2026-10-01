@@ -1,6 +1,6 @@
 import { ArrowLeft, Coins, History, KanbanSquare, MessagesSquare, Plug, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
-import { AppShell, Sidebar, type NavGroup, type NavItem } from "@g4os/ds";
+import { AppShell, Sidebar, type NavGroup, type NavItem } from "@g4ai/ds";
 import { me, org } from "../data/workspace";
 import { atlasRoutes } from "./atlas-shell";
 import { frameHref } from "./frame-route";

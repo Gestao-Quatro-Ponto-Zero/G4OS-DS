@@ -1,6 +1,6 @@
 import { Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import { Button, ProductMark, cn } from "@g4os/ds";
+import { Button, ProductMark, cn } from "@g4ai/ds";
 import { org } from "../data/workspace";
 import { authRoutes } from "./auth-shell";
 import { frameHref, goTo, useFrameQuery } from "./frame-route";

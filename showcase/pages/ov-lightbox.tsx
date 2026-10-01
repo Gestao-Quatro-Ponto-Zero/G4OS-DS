@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Lightbox } from "@g4os/ds";
+import { Lightbox } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, type PageMeta } from "../kit";
 import { gallery } from "./_media-data";
 

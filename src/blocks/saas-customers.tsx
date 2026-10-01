@@ -35,7 +35,7 @@ import {
   type Column,
   type FilterField,
   type SavedView, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customers as baseCustomers, go, healthLabel, healthTone, iso, personById, planPrice, plans, segments, team, useFrameParam, type Customer, type Health, type Plan } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

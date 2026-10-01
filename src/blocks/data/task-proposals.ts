@@ -2,7 +2,7 @@
  * Revisão de reunião + tarefas propostas pela IA. Troque pela sua API:
  * documento de origem, destinos (Linear, Jira, Asana, G4 Tarefas), pessoas.
  */
-import type { TaskProposal } from "@g4os/ds";
+import type { TaskProposal } from "@g4ai/ds";
 import { people } from "./workspace";
 
 const p = (id: string) => {

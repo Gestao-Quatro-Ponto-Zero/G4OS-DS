@@ -10,7 +10,7 @@ import {
   PageHeading,
   useCommandShortcut,
   useTheme,
-  type Command } from "@g4os/ds";
+  type Command } from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { frameHref, goTo } from "./shells/frame-route";

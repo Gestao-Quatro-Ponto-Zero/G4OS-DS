@@ -1,6 +1,6 @@
 import { AlignCenter, AlignLeft, AlignRight, Briefcase, Building2, Rocket, User } from "lucide-react";
 import { useState } from "react";
-import { ChoiceCards, RadioGroup, Slider, ToggleGroup, formatCurrency } from "@g4os/ds";
+import { ChoiceCards, RadioGroup, Slider, ToggleGroup, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Escolha e faixa", group: "Formulários", order: 24, description: "RadioGroup, ChoiceCards, ToggleGroup e Slider (valor único ou intervalo)." };

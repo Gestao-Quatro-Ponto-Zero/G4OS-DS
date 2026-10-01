@@ -2,7 +2,7 @@ import { ArrowRight, Blocks, BookOpen, Menu, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { Popover, Toaster, cn, normalize, notify, ProductMark, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4os/ds";
+import { Popover, Toaster, cn, normalize, notify, ProductMark, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
 import { Palette } from "lucide-react";
 import { blocks, pages } from "./.generated/registry";
 import { BlockPreview, blockCategories, groups, type BlockModule, type PageModule } from "./kit";

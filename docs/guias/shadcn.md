@@ -1,6 +1,6 @@
 # shadcn/ui e 21st.dev com o G4OS-DS
 
-O DS cobre as telas de produto. Quando faltar algo (um calendário de agenda, um editor rico, um componente de marketing), você pode trazer do **shadcn/ui** ou do **21st.dev** e fazê-lo parecer nativo com a ponte `@g4os/ds/shadcn.css`.
+O DS cobre as telas de produto. Quando faltar algo (um calendário de agenda, um editor rico, um componente de marketing), você pode trazer do **shadcn/ui** ou do **21st.dev** e fazê-lo parecer nativo com a ponte `@g4ai/ds/shadcn.css`.
 
 **Ordem de preferência:** componente do DS → bloco do DS → composição de componentes do DS → shadcn/21st com a ponte → escrever do zero.
 
@@ -9,8 +9,8 @@ O DS cobre as telas de produto. Quando faltar algo (um calendário de agenda, um
 ```css
 /* globals.css */
 @import "tailwindcss";
-@import "@g4os/ds/styles.css";
-@import "@g4os/ds/shadcn.css";
+@import "@g4ai/ds/styles.css";
+@import "@g4ai/ds/shadcn.css";
 ```
 
 A ponte define as variáveis do shadcn (`--background`, `--primary`, `--border`, `--ring`, `--chart-1…5`, `--sidebar-*`, `--radius`) apontando para os **semânticos** do DS (`--ds-*`) e cria os utilitários `text-muted-foreground`, `border-border`, `bg-sidebar` etc. Por apontar para os semânticos, tudo o que você colar segue o **tema escuro** (`data-theme`) e a **marca** (`data-brand`) sozinho. `bg-primary` e `bg-popover` já existem no DS com o mesmo sentido.

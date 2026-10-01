@@ -1,5 +1,5 @@
 import { Archive, Download } from "lucide-react";
-import { Button, notify, notifyPromise } from "@g4os/ds";
+import { Button, notify, notifyPromise } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -59,7 +59,7 @@ notify("Candidato arquivado", () => restaurar(candidato));`}>
       </DocSection>
 
       <DocSection title="Montagem" rule="O AppShell já monta o Toaster. Fora dele, monte uma vez perto da raiz. `notify` funciona de qualquer lugar (não precisa de contexto React).">
-        <CodeBlock code={`import { Toaster, notify } from "@g4os/ds";
+        <CodeBlock code={`import { Toaster, notify } from "@g4ai/ds";
 
 // raiz do app (se não usar AppShell)
 <Toaster duration={6500} />

@@ -1,6 +1,6 @@
 /**
- * @g4os/ds — Design system para construir qualquer produto G4 OS (CRM, ATS, ERP, financeiro, portais).
- * Importe os estilos uma vez: `@import "@g4os/ds/styles.css";` no seu CSS global.
+ * @g4ai/ds — Design system para construir qualquer produto G4 OS (CRM, ATS, ERP, financeiro, portais).
+ * Importe os estilos uma vez: `@import "@g4ai/ds/styles.css";` no seu CSS global.
  */
 export * from "./components/primitives";
 export * from "./components/overlays";

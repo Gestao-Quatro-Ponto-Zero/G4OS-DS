@@ -8,4 +8,4 @@ Fluxo completo em uma tela: pedir link → conferir e-mail → nova senha com co
 
 ## Componentes usados
 
-`Button`, `PasswordField`, `TextField`
+—

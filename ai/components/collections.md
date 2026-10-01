@@ -1,6 +1,6 @@
 # collections
 
-Arquivo: `src/components/collections.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/collections.tsx` · importe de `@g4ai/ds`.
 
 Coleções: TableToolbar, FacetFilter, DataTable (vira cards no celular), DisplayControls, ListPanel/ListRow, Kanban.
 

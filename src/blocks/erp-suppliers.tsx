@@ -26,7 +26,7 @@ import {
   useSort,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, products, suppliers, today, type Supplier } from "./data/erp";
 import { payableStatus, payables } from "./data/fin";
 import { go, useFrameParam } from "./shells/frame-route";

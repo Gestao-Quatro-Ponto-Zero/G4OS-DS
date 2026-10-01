@@ -13,7 +13,7 @@ import {
   formatCurrency,
   formatNumber,
   formatPercent,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 
 // Troque pelos seus dados (fetch, Server Action, SDK).
 const revenue = [

@@ -1,6 +1,6 @@
 # record-panel
 
-Arquivo: `src/components/record-panel.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/record-panel.tsx` · importe de `@g4ai/ds`.
 
 Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
 

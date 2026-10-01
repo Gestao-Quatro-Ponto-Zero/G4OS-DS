@@ -3,7 +3,7 @@
 import { Handshake, Home, Settings, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { AppShell, Sidebar, ThemeToggle } from "@g4os/ds";
+import { AppShell, Sidebar, ThemeToggle } from "@g4ai/ds";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? "/";

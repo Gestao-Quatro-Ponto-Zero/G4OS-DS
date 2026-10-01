@@ -2,7 +2,7 @@
 
 ## Versões suportadas
 
-Corrigimos vulnerabilidades na versão mais recente publicada no npm (`@g4os/ds`).
+Corrigimos vulnerabilidades na versão mais recente publicada no npm (`@g4ai/ds`).
 
 ## Como relatar
 

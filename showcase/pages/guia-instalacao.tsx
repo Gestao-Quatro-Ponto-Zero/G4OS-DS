@@ -1,4 +1,4 @@
-import { Callout } from "@g4os/ds";
+import { Callout } from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -25,11 +25,11 @@ npm i ../G4OS-DS                              # pasta local
         <CodeBlock
           code={`/* app/globals.css */
 @import "tailwindcss";
-@import "@g4os/ds/styles.css";
-@source "../node_modules/@g4os/ds/src";
+@import "@g4ai/ds/styles.css";
+@source "../node_modules/@g4ai/ds/src";
 
 /* opcional: shadcn/ui e 21st.dev com a cara do DS */
-/* @import "@g4os/ds/shadcn.css"; */`}
+/* @import "@g4ai/ds/shadcn.css"; */`}
         />
       </DocSection>
 
@@ -57,12 +57,12 @@ export default function RootLayout({ children }) {
           code={`// lib/ds.tsx
 "use client";
 import Link from "next/link";
-import { setLinkComponent } from "@g4os/ds";
+import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
 export function DsSetup() { return null; }
 
 // next.config.ts
-export default { transpilePackages: ["@g4os/ds"] };`}
+export default { transpilePackages: ["@g4ai/ds"] };`}
         />
       </DocSection>
 
@@ -70,7 +70,7 @@ export default { transpilePackages: ["@g4os/ds"] };`}
         <CodeBlock
           code={`"use client";
 import { usePathname } from "next/navigation";
-import { AppShell, Sidebar } from "@g4os/ds";
+import { AppShell, Sidebar } from "@g4ai/ds";
 import { Home, Handshake, Users, Settings } from "lucide-react";
 
 export default function AppLayout({ children }) {

@@ -8,4 +8,4 @@ Central de atendimento: período no topo, visões salvas, busca local, atalhos d
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `DateRange`, `DateRangeFilter`, `Drawer`, `EmptyFilterResult`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `Highlight`, `Modal`, `Page`, `PageHeading`, `PageToolbar`, `Pagination`, `PropertyList`, `SavedView`, `SavedViews`, `Select`, `SortHeader`, `TableSearch`, `TextField`, `TextareaField`, `Timeline`, `Tone`, `notify`, `resolveDateRange`, `useFilters`, `usePagination`, `useSavedViews`, `useSort`
+—

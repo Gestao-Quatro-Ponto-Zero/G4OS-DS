@@ -1,5 +1,5 @@
 import { DollarSign, Users } from "lucide-react";
-import { Delta, KpiCard, KpiGrid, formatCurrency } from "@g4os/ds";
+import { Delta, KpiCard, KpiGrid, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

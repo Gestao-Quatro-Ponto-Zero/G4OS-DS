@@ -6,8 +6,8 @@
  *
  * No globals.css do app, DEPOIS dos estilos do DS:
  *   @import "tailwindcss";
- *   @import "@g4os/ds/styles.css";
- *   @import "@g4os/ds/shadcn.css";
+ *   @import "@g4ai/ds/styles.css";
+ *   @import "@g4ai/ds/shadcn.css";
  *
  * NÃO cole o bloco `:root { --background: oklch(...) }` nem o
  * `@theme inline { --color-accent: var(--accent) ... }` que o `shadcn init`

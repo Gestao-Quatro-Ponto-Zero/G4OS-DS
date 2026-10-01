@@ -18,7 +18,7 @@ import {
   formatDate,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { activities, activityLabel, companyById, contactsOf, daysFromToday, dealsOf, go, repById, stageById, useFrameParam, type Deal } from "./data/crm";
 import { CrmShell, NewDealModal } from "./shells/crm-shell";
 

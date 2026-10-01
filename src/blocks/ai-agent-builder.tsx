@@ -18,7 +18,7 @@ import {
   type AgentStatus,
   type MenuEntry,
   type RunStatus,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import {
   agent,

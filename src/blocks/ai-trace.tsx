@@ -19,7 +19,7 @@ import {
   formatNumber,
   notify,
   type TraceStep,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import { frameHref, useFrameParam } from "./shells/frame-route";
 import { ownerOf, projectById, statusLabel, statusTone, stepIO, traceFor } from "./data/agent";

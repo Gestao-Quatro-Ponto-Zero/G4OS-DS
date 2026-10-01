@@ -13,7 +13,7 @@ import {
   normalize,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 
 type Deal = { id: string; name: string; company: string; value: number; stage: string };
 

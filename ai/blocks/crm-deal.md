@@ -8,4 +8,4 @@ Registro de um negócio (?id=): caminho de etapas, ganho/perda com motivo, nota 
 
 ## Componentes usados
 
-`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `Checkbox`, `ConfirmDialog`, `CurrencyField`, `DatePicker`, `Drawer`, `EntityMark`, `FieldBlock`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `StagePath`, `Tabs`, `TextField`, `areaClass`, `formatCurrency`, `formatDate`, `formatPercent`, `notify`
+—

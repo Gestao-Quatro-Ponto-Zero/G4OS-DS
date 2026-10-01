@@ -17,7 +17,7 @@
     "noUnusedLocals": true,
     "baseUrl": ".",
     "paths": {
-      "@g4os/ds": [
+      "@g4ai/ds": [
         "./src/index.ts"
       ]
     }

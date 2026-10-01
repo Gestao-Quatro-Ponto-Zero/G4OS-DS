@@ -18,7 +18,7 @@ import {
   formatDate,
   notify,
   type ActivityItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { activities, activityLabel, companyById, contactById, deals, me, repById, stageById, useFrameParam, type Contact } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

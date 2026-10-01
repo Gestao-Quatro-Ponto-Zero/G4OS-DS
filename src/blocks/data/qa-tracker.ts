@@ -1,7 +1,7 @@
 /*
  * Rastreador de QA (banco de registros estilo Notion). Troque pela sua API.
  */
-import type { Priority, RecordFile, TagColor, TaskStatus } from "@g4os/ds";
+import type { Priority, RecordFile, TagColor, TaskStatus } from "@g4ai/ds";
 import { people } from "./workspace";
 
 export type QaCase = {

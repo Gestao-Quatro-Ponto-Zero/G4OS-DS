@@ -80,7 +80,7 @@ import {
   type CollectionView,
   type Density,
   type WorkStatus,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 
 /* ------------------------------------------------------------------ */
 /* Dados de exemplo                                                    */

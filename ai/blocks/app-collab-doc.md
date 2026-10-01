@@ -8,4 +8,4 @@ Conversa entre pessoas ao lado de um documento em tipografia de leitura: mensage
 
 ## Componentes usados
 
-`ActionRequiredBanner`, `AvatarGroup`, `DateSeparator`, `ReadingDocument`, `SegmentedControl`, `TeamComposer`, `TeamMessage`, `TypingIndicator`, `notify`
+—

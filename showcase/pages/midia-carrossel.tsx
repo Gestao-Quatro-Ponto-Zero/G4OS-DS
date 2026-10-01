@@ -1,5 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
-import { AspectFrame, Badge, Carousel } from "@g4os/ds";
+import { AspectFrame, Badge, Carousel } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { art } from "./_media-data";
 

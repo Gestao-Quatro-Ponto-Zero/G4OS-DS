@@ -1,4 +1,4 @@
-import { Badge, DataGrid, formatDate, type GridColumn } from "@g4os/ds";
+import { Badge, DataGrid, formatDate, type GridColumn } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { brl, contaColumns, makeContas, statusLabel, type Conta } from "./_grid-data";
 

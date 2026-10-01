@@ -4,7 +4,7 @@
 
 ```
 app/
-  globals.css            @import tailwind + @g4os/ds/styles.css + @source
+  globals.css            @import tailwind + @g4ai/ds/styles.css + @source
   layout.tsx             <html className="ds-app"> + fonte + <DsSetup/>
   (auth)/entrar/page.tsx tela cheia, sem sidebar
   (app)/layout.tsx       AppShell + Sidebar (client component)
@@ -44,8 +44,8 @@ const op = useOperation({ busyLabel: "Salvando…" });
 
 ## Checklist
 
-- [ ] (Só se importar o código-fonte via `@g4os/ds/source` ou link local) `transpilePackages: ["@g4os/ds"]` no `next.config.ts`. O pacote publicado já vem compilado.
-- [ ] `@source` apontando para `node_modules/@g4os/ds/src` no CSS global.
+- [ ] (Só se importar o código-fonte via `@g4ai/ds/source` ou link local) `transpilePackages: ["@g4ai/ds"]` no `next.config.ts`. O pacote publicado já vem compilado.
+- [ ] `@source` apontando para `node_modules/@g4ai/ds/src` no CSS global.
 - [ ] `setLinkComponent(Link)` registrado.
 - [ ] `<html lang="pt-BR" className="ds-app">`.
 - [ ] Figtree carregada.

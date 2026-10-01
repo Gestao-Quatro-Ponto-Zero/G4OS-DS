@@ -1,6 +1,6 @@
 # ai-sessions
 
-Arquivo: `src/components/ai-sessions.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/ai-sessions.tsx` · importe de `@g4ai/ds`.
 
 Interface agêntica de sessões (app de trabalho com agente: G4 OS desktop, Codex, T3).
 

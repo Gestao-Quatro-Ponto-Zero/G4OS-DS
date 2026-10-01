@@ -8,4 +8,4 @@ Contratações contra a meta, tempo até contratar por área contra o SLA, funil
 
 ## Componentes usados
 
-`AreaChart`, `Avatar`, `Button`, `ChartCard`, `Column`, `DataTable`, `DonutChart`, `DumbbellChart`, `FunnelChart`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `SegmentedControl`, `formatCurrency`, `formatNumber`, `formatPercent`, `notify`
+—

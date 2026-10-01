@@ -18,7 +18,7 @@ import {
   cn,
   matchesQuery,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { integrations as base, type Integration } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

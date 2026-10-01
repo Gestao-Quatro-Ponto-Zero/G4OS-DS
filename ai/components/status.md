@@ -1,6 +1,6 @@
 # status
 
-Arquivo: `src/components/status.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/status.tsx` · importe de `@g4ai/ds`.
 
 Status de trabalho (5 estados), StatusLabel, StatusBar, HealthDot, Stepper, NextStep, Timeline.
 

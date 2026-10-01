@@ -11,7 +11,7 @@ import {
   type ProposalState,
   type TaskDestination,
   type TaskProposal,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import { meeting, projects, proposals as initial, team } from "./data/task-proposals";
 

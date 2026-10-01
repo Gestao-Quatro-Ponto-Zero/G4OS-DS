@@ -8,4 +8,4 @@ Conversa longa com raciocínio recolhível, plano, ferramentas, fontes citadas, 
 
 ## Componentes usados
 
-`AgentComposer`, `AgentMessage`, `AgentPlan`, `AiSource`, `ApprovalRequest`, `ApprovalState`, `ArtifactCard`, `CitationChip`, `ReasoningBlock`, `RunSummary`, `SourceList`, `SystemMessage`, `ToolCall`, `ToolCallsSection`, `formatCurrency`, `notify`
+—

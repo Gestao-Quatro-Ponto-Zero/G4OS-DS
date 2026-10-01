@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CalendarClock, Clock } from "lucide-react";
-import { ComposeEmail, PersonChip, RecipientInput, SplitButton, notify, type ComposeStatus, type Person } from "@g4os/ds";
+import { ComposeEmail, PersonChip, RecipientInput, SplitButton, notify, type ComposeStatus, type Person } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

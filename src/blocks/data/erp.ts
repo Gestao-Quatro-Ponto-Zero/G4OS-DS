@@ -6,7 +6,7 @@
  * "Hoje" = 30/09/2026. Troque pela sua API.
  */
 
-import type { Tone } from "@g4os/ds";
+import type { Tone } from "@g4ai/ds";
 
 export const today = new Date(2026, 8, 30);
 export const iso = (days: number) => {

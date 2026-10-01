@@ -1,6 +1,6 @@
 import { ArrowRight, Check, ChevronDown, Gauge, Import, Mail, Palette, PartyPopper, PlayCircle, Plug, Sparkles, UserPlus, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button, Callout, Page, PageHeading, ProgressRing, cn } from "@g4os/ds";
+import { Button, Callout, Page, PageHeading, ProgressRing, cn } from "@g4ai/ds";
 import { me, org } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { frameHref, goTo, useFrameQuery } from "./shells/frame-route";

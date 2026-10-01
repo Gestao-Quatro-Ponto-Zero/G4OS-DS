@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, DateInput, DatePicker, MultiDatePicker, WeekPicker, addDays, formatDateLong, type IsoDate } from "@g4os/ds";
+import { Calendar, DateInput, DatePicker, MultiDatePicker, WeekPicker, addDays, formatDateLong, type IsoDate } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

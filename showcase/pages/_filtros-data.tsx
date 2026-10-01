@@ -1,6 +1,6 @@
 // Dados de exemplo das páginas de Filtros e busca (não vira página: começa com "_").
 import { Briefcase, Building2, CalendarDays, CircleDollarSign, Flag, MapPin, User } from "lucide-react";
-import type { FilterField, SavedView } from "@g4os/ds";
+import type { FilterField, SavedView } from "@g4ai/ds";
 
 export type Deal = { id: string; name: string; company: string; stage: string; owner: string; value: number; closes: string; city: string; priority: string };
 export const me = "ana";

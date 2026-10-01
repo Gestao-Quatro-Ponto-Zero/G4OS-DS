@@ -1,6 +1,6 @@
 import { Bell, BellOff, Mail, MessageSquare, Smartphone } from "lucide-react";
 import { useState } from "react";
-import { Button, Checkbox, RadioGroup, Select, Switch, cn, notify, SettingsSection } from "@g4os/ds";
+import { Button, Checkbox, RadioGroup, Select, Switch, cn, notify, SettingsSection } from "@g4ai/ds";
 import { frameHref } from "./shells/frame-route";
 import { SettingsShell } from "./shells/settings-shell";
 

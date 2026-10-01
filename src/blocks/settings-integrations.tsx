@@ -12,7 +12,7 @@ import {
   Timeline,
   normalize,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
 import { SettingsShell } from "./shells/settings-shell";
 

@@ -1,6 +1,6 @@
 import { Check, Minus } from "lucide-react";
 import { Fragment, useState } from "react";
-import { Accordion, Badge, Button, NumberField, SegmentedControl, cn, formatCurrency } from "@g4os/ds";
+import { Accordion, Badge, Button, NumberField, SegmentedControl, cn, formatCurrency } from "@g4ai/ds";
 import { featureGroups, plans, type Plan } from "./data/plans";
 import { authRoutes } from "./shells/auth-shell";
 import { frameHref } from "./shells/frame-route";

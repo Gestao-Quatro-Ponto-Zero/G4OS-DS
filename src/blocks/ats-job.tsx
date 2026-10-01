@@ -23,7 +23,7 @@ import {
   TextareaField,
   formatCurrency,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { areas, candidatesOf, company, jobById, openDays, person, stageLabel, stages, team, type Job } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

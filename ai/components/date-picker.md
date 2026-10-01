@@ -1,6 +1,6 @@
 # date-picker
 
-Arquivo: `src/components/date-picker.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/date-picker.tsx` · importe de `@g4ai/ds`.
 
 DatePicker (Calendar próprio do DS) e utilitários de data ISO.
 

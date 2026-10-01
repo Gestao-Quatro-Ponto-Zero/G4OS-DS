@@ -22,7 +22,7 @@ import {
   useSort,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, customers as seed, orderStatus, orderTotal, ordersOf, sellers, today, user, type Customer } from "./data/erp";
 import { lateDays, receivables } from "./data/fin";
 import { go, useFrameParam } from "./shells/frame-route";

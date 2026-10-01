@@ -1,6 +1,6 @@
 import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import { useState } from "react";
-import { Button, Checkbox, Callout, PasswordField, TextField } from "@g4os/ds";
+import { Button, Checkbox, Callout, PasswordField, TextField } from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AuthSplit, OrDivider, SsoButtons, authRoutes } from "./shells/auth-shell";
 import { goTo } from "./shells/frame-route";

@@ -1,6 +1,6 @@
 # charts-shapes
 
-Arquivo: `src/components/charts-shapes.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/charts-shapes.tsx` · importe de `@g4ai/ds`.
 
 Formas: pizza/rosca e radial.
 

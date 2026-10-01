@@ -1,6 +1,6 @@
 # ai
 
-Arquivo: `src/components/ai.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/ai.tsx` · importe de `@g4ai/ds`.
 
 Padrões de IA: AskAI, mensagens de chat, SystemMessage, AgentTrace, ToolCallsSection, citações, sugestões.
 

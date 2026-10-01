@@ -12,7 +12,7 @@ import {
   type ComposeStatus,
   type MenuEntry,
   type Person,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { contacts } from "./data/apps";
 import { me } from "./data/workspace";
 import { setFrameQuery, useFrameParam } from "./shells/frame-route";

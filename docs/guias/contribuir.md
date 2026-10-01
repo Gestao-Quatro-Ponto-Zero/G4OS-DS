@@ -44,7 +44,7 @@ Crie `showcase/pages/<slug>.tsx`. O `build.mjs` registra sozinho (arquivos com `
 
 ```tsx
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
-import { MeuComponente } from "@g4os/ds";
+import { MeuComponente } from "@g4ai/ds";
 
 export const meta: PageMeta = {
   title: "Meu componente",
@@ -75,7 +75,7 @@ Grupos disponíveis (`groups` em `showcase/kit.tsx`): Começar, Fundamentos, Aç
 Crie `src/blocks/<slug>.tsx`. Aparece em **Blocos** na categoria indicada, com Preview em iframe (larguras desktop/tablet/celular) e aba Código com o arquivo inteiro.
 
 ```tsx
-import { AppShell, Sidebar, Page, PageHeading /* … */ } from "@g4os/ds";
+import { AppShell, Sidebar, Page, PageHeading /* … */ } from "@g4ai/ds";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -105,7 +105,7 @@ Regras de bloco:
 - **Escolha a anatomia antes dos componentes** ([anatomia de página](../padroes/anatomia-de-pagina.md)) e declare-a no primeiro item de `concept.patterns` ("Anatomia A · Lista: …"). Cabeçalho fixo, filtros em `PageToolbar`, propriedades em `SplitLayout`: o que é da página gruda junto.
 - **`meta.concept` é obrigatório**: objetivo (problema + para quem), padrões aplicados, onde adaptar, o que evitar.
 
-- **Importe de `@g4os/ds`** (não caminhos relativos): o arquivo copiado funciona igual no app.
+- **Importe de `@g4ai/ds`** (não caminhos relativos): o arquivo copiado funciona igual no app.
 - Autocontido: dados de exemplo no topo, nenhum import de outro bloco.
 - Tela inteira e realista, com os estados (vazio/carregando se fizer sentido), responsiva de 320 a 1440 px.
 - Dados plausíveis em pt-BR (nomes, empresas, valores em R$), nunca "Lorem ipsum" ou "Acme".

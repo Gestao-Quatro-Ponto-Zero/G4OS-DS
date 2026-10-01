@@ -11,7 +11,7 @@ import {
   Select,
   formatCurrency,
   formatNumber,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { DocPage, DocSection, type PageMeta } from "../kit";
 import * as d from "./_chart-data";
 

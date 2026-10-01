@@ -1,6 +1,6 @@
 import { Bot, CircleHelp, FolderOpen, Inbox, LayoutGrid, Settings, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
-import { AppShell, IconRail, notify, ProductMark, Tooltip, type NavItem, type RailItem } from "@g4os/ds";
+import { AppShell, IconRail, notify, ProductMark, Tooltip, type NavItem, type RailItem } from "@g4ai/ds";
 import { frameHref } from "./frame-route";
 
 /*

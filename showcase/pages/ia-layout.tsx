@@ -1,5 +1,5 @@
 import { FolderKanban, History, MessagesSquare, Settings, Sparkles } from "lucide-react";
-import { IconRail, ResizableSplit } from "@g4os/ds";
+import { IconRail, ResizableSplit } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Layout: painéis e trilho", group: "IA e interação", order: 24, description: "ResizableSplit (dois painéis com divisor arrastável e acessível) e IconRail (navegação só com ícones para telas de trabalho focado)." };

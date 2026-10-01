@@ -1,5 +1,5 @@
 // Dados de exemplo das páginas do DataGrid (determinísticos: sem Math.random).
-import { Badge, formatCurrency, formatDate, type GridColumn } from "@g4os/ds";
+import { Badge, formatCurrency, formatDate, type GridColumn } from "@g4ai/ds";
 
 export type Conta = {
   id: string;

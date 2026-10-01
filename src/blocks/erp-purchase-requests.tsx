@@ -19,7 +19,7 @@ import {
   formatCurrency,
   notify,
   type Tone,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { supplierByName } from "./data/erp";
 import { NexoShell } from "./shells/nexo-shell";
 

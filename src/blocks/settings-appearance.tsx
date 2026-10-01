@@ -1,5 +1,5 @@
 import { Check, Monitor, Moon, RotateCcw, Sun } from "lucide-react";
-import { Badge, Button, Delta, SettingsSection, Switch, ThemeToggle, brandPresets, cn, notify, typePresets, useTheme } from "@g4os/ds";
+import { Badge, Button, Delta, SettingsSection, Switch, ThemeToggle, brandPresets, cn, notify, typePresets, useTheme } from "@g4ai/ds";
 import { useState } from "react";
 import { org } from "./data/workspace";
 import { SettingsShell } from "./shells/settings-shell";

@@ -1,6 +1,6 @@
 # primitives
 
-Arquivo: `src/components/primitives.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/primitives.tsx` · importe de `@g4ai/ds`.
 
 Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 
@@ -345,12 +345,12 @@ Exemplo (showcase `#/p/guia-instalacao`):
 // lib/ds.tsx
 "use client";
 import Link from "next/link";
-import { setLinkComponent } from "@g4os/ds";
+import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
 export function DsSetup() { return null; }
 
 // next.config.ts
-export default { transpilePackages: ["@g4os/ds"] };
+export default { transpilePackages: ["@g4ai/ds"] };
 ```
 
 ## StatCell

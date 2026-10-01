@@ -11,7 +11,7 @@ import {
   TypingIndicator,
   cn,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { doc, initialMessages, me, others, replies, type TeamMsg } from "./data/collab";
 

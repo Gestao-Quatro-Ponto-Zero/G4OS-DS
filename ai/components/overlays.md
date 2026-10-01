@@ -1,6 +1,6 @@
 # overlays
 
-Arquivo: `src/components/overlays.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/overlays.tsx` · importe de `@g4ai/ds`.
 
 Modal, ConfirmDialog, Drawer, Popover (Base UI).
 

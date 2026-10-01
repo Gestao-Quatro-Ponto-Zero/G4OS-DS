@@ -8,4 +8,4 @@ Detalhe de uma execução: trace em cascata com replay, passo selecionado com en
 
 ## Componentes usados
 
-`AgentTrace`, `AiBadge`, `Badge`, `Button`, `JsonView`, `Page`, `PageHeading`, `PropertyList`, `StatCell`, `StatGrid`, `SystemMessage`, `Tabs`, `TokenUsageMeter`, `ToolCall`, `ToolCallsSection`, `TraceStep`, `formatCurrency`, `formatDuration`, `formatNumber`, `notify`
+—

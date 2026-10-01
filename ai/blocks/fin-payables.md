@@ -8,4 +8,4 @@ Títulos de fornecedores, folha e impostos: aprovação em massa, agendamento, p
 
 ## Componentes usados
 
-`Badge`, `BulkBar`, `Button`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `FileCard`, `FilterBar`, `FilterField`, `Highlight`, `Page`, `PageHeading`, `PageToolbar`, `PropertyList`, `SortHeader`, `StatCell`, `StatGrid`, `TableSearch`, `Tabs`, `TextareaField`, `formatCurrency`, `notify`, `plural`, `selectionColumn`, `useFilters`, `useSelection`, `useSort`
+—

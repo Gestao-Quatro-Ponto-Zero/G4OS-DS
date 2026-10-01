@@ -21,7 +21,7 @@ import {
   type NavGroup,
   type SearchResult,
   type SearchScope,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { companies, companyById, contacts, deals, iso, me, overdueCount, repById, reps, stageById, stages, type Deal, type StageId } from "../data/crm";
 
 /*

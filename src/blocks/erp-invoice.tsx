@@ -13,7 +13,7 @@ import {
   formatCurrency,
   formatNumber,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, company, customerById, invoiceById, invoiceStatus, orderById, productBySku, type Invoice } from "./data/erp";
 import { useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

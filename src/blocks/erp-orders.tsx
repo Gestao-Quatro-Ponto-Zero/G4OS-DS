@@ -19,7 +19,7 @@ import {
   useFilters,
   type FilterField,
   type GridColumn,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, customerById, customers, orderFlow, orderStatus, orderTotal, orders as seed, products, sellers, today, user, type Order, type OrderStatus, type Payment } from "./data/erp";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

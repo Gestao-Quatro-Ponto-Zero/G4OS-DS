@@ -1,6 +1,6 @@
 # Instalação
 
-O pacote `@g4os/ds` é distribuído como **código-fonte** (TSX + CSS). O Tailwind v4 do seu app compila as classes dos componentes; o bundler do app (Next, Vite) compila o TSX. Não há passo de build do DS.
+O pacote `@g4ai/ds` é distribuído como **código-fonte** (TSX + CSS). O Tailwind v4 do seu app compila as classes dos componentes; o bundler do app (Next, Vite) compila o TSX. Não há passo de build do DS.
 
 ## Requisitos
 
@@ -24,13 +24,13 @@ npm i github:<org>/G4OS-DS                      # repositório git
 ```css
 /* app/globals.css (Next) ou src/index.css (Vite) */
 @import "tailwindcss";
-@import "@g4os/ds/styles.css";   /* tokens, temas de marca, base e componentes */
+@import "@g4ai/ds/styles.css";   /* tokens, temas de marca, base e componentes */
 
 /* Opcional: componentes do shadcn/ui ou 21st.dev com a cara do DS */
-/* @import "@g4os/ds/shadcn.css"; */
+/* @import "@g4ai/ds/shadcn.css"; */
 ```
 
-`styles.css` já declara os `@source` dos componentes e blocos (relativos a ele), então o Tailwind do app compila as classes do DS sem configuração. Se o seu gerenciador de pacotes usar links que o Tailwind não segue (alguns setups de pnpm), acrescente no CSS do app: `@source "../node_modules/@g4os/ds/src";` (relativo ao arquivo CSS).
+`styles.css` já declara os `@source` dos componentes e blocos (relativos a ele), então o Tailwind do app compila as classes do DS sem configuração. Se o seu gerenciador de pacotes usar links que o Tailwind não segue (alguns setups de pnpm), acrescente no CSS do app: `@source "../node_modules/@g4ai/ds/src";` (relativo ao arquivo CSS).
 
 ## 3. Fonte e raiz
 
@@ -39,7 +39,7 @@ npm i github:<org>/G4OS-DS                      # repositório git
 import { Figtree } from "next/font/google";
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree" });
 
-import { themeScript } from "@g4os/ds";
+import { themeScript } from "@g4ai/ds";
 
 <html lang="pt-BR" className={`ds-app ${figtree.variable}`} data-theme="system" suppressHydrationWarning>
   <head>
@@ -60,7 +60,7 @@ Componentes que navegam (`Button href`, `Card href`, `Sidebar`, `Breadcrumb`, `T
 ```tsx
 "use client";
 import Link from "next/link";
-import { setLinkComponent } from "@g4os/ds";
+import { setLinkComponent } from "@g4ai/ds";
 setLinkComponent(Link);
 ```
 
@@ -68,19 +68,19 @@ setLinkComponent(Link);
 
 O pacote publicado no npm já vem compilado (`dist/`, ESM com `"use client"` e tipos): Next.js e Vite funcionam sem configuração extra.
 
-Só se você usar o código-fonte direto (link local `npm i ../G4OS-DS` durante o desenvolvimento do DS, ou `import … from "@g4os/ds/source"`), adicione no Next:
+Só se você usar o código-fonte direto (link local `npm i ../G4OS-DS` durante o desenvolvimento do DS, ou `import … from "@g4ai/ds/source"`), adicione no Next:
 
 ```ts
-const config = { transpilePackages: ["@g4os/ds"] };
+const config = { transpilePackages: ["@g4ai/ds"] };
 ```
 
 ## 6. Usar
 
 ```tsx
-import { AppShell, Sidebar, Page, PageHeading, KpiGrid, KpiCard, ChartCard, AreaChart, formatCurrency } from "@g4os/ds";
+import { AppShell, Sidebar, Page, PageHeading, KpiGrid, KpiCard, ChartCard, AreaChart, formatCurrency } from "@g4ai/ds";
 ```
 
-Imports por módulo também funcionam: `@g4os/ds/components/charts`, `@g4os/ds/lib/format`, `@g4os/ds/tokens`.
+Imports por módulo também funcionam: `@g4ai/ds/components/charts`, `@g4ai/ds/lib/format`, `@g4ai/ds/tokens`.
 
 ## Conferir
 

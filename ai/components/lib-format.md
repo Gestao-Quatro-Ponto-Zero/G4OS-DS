@@ -1,6 +1,6 @@
 # lib-format
 
-Arquivo: `src/lib/format.ts` · importe de `@g4os/ds`.
+Arquivo: `src/lib/format.ts` · importe de `@g4ai/ds`.
 
 Formatação pt-BR: formatCurrency, formatNumber, formatPercent, formatDelta, formatCompact, formatDate, formatRelative.
 

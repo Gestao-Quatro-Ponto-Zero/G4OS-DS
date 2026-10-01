@@ -21,7 +21,7 @@ import {
   notify,
   type ToolCall,
   type TraceStep,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AssistantShell, assistantRoutes } from "./shells/assistant-shell";
 import { frameHref } from "./shells/frame-route";
 

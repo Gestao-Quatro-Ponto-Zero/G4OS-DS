@@ -8,4 +8,4 @@ App com a paleta aberta: navegar, criar e achar registros pelo teclado. Busca se
 
 ## Componentes usados
 
-`Card`, `Command`, `CommandPalette`, `Kbd`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `useCommandShortcut`, `useTheme`
+—

@@ -1,6 +1,6 @@
 # lib-color
 
-Arquivo: `src/lib/color.ts` · importe de `@g4os/ds`.
+Arquivo: `src/lib/color.ts` · importe de `@g4ai/ds`.
 
 Utilidades de cor para temas de cliente: contraste WCAG e derivação de uma marca completa (claro + escuro) a partir de 1–2 cores.
 

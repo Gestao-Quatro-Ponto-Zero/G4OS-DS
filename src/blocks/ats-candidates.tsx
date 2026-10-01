@@ -24,7 +24,7 @@ import {
   type FilterField,
   type GridColumn,
   type SavedView,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { candidates as seed, iso, jobById, jobs, me, shortDate, stageLabel, stages, today, type Candidate, type StageId } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";

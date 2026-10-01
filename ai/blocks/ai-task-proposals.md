@@ -8,4 +8,4 @@ Resumo de reunião à esquerda e as tarefas que a IA sugere à direita: destino 
 
 ## Componentes usados
 
-`AvatarGroup`, `ProposalState`, `SegmentedControl`, `TaskDestination`, `TaskProposal`, `TaskProposalCard`, `TaskProposalList`, `ToolGlyph`, `notify`
+—

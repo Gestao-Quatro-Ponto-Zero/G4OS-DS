@@ -18,7 +18,7 @@ import {
   Stepper,
   formatCurrency,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, customerById, customers, orderById, orderFlow, orderStatus, orderTotal, productBySku, products, qtyOf, user, warehouses, type Order, type OrderStatus, type Payment, type WarehouseId } from "./data/erp";
 import { go, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

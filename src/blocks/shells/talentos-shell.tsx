@@ -2,7 +2,7 @@
 
 import { BarChart3, Briefcase, CalendarDays, FileSignature, Globe, Plus, Search, UserPlus, UserSearch } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { AppShell, Avatar, Badge, IconButton, SearchPalette, Sidebar, notify, useCommandShortcut, type NavItem, type SearchResult, type SearchScope } from "@g4os/ds";
+import { AppShell, Avatar, Badge, IconButton, SearchPalette, Sidebar, notify, useCommandShortcut, type NavItem, type SearchResult, type SearchScope } from "@g4ai/ds";
 import { candidates, interviews, jobs, me, offers, stageLabel } from "../data/ats";
 import { frameHref, go } from "./frame-route";
 

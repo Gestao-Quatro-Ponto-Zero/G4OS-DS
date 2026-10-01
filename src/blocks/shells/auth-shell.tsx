@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ProductMark, Spinner, cn } from "@g4os/ds";
+import { ProductMark, Spinner, cn } from "@g4ai/ds";
 import { org } from "../data/workspace";
 import { frameHref, goTo } from "./frame-route";
 import { atlasRoutes } from "./atlas-shell";

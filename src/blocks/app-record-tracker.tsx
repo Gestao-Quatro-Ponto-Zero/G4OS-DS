@@ -30,7 +30,7 @@ import {
   type Priority,
   type RecordFile,
   type TaskStatus,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { cases as initial, categories, categoryColor, notes, personOf, statuses, type QaCase } from "./data/qa-tracker";

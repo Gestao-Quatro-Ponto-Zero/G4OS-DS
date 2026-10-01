@@ -1,6 +1,6 @@
 # search
 
-Arquivo: `src/components/search.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/search.tsx` · importe de `@g4ai/ds`.
 
 Busca: SearchPalette (⌘K global com escopos e prévia) e busca local de tabela ("/").
 

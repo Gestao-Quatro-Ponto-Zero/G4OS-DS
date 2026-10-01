@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArtifactCard, InsightCard, KpiPair, MetricBar, RankedList, ReportSection, RunSummary, AgentTrace, type TraceStep } from "@g4os/ds";
+import { ArtifactCard, InsightCard, KpiPair, MetricBar, RankedList, ReportSection, RunSummary, AgentTrace, type TraceStep } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

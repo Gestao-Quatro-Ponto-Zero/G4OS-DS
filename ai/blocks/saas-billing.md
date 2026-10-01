@@ -8,4 +8,4 @@ Ponte de MRR do mês, situação das faturas, régua de cobrança com retentativ
 
 ## Componentes usados
 
-`Badge`, `BulkBar`, `Button`, `ChartCard`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `Pagination`, `PropertyList`, `ProportionBar`, `SortHeader`, `TableSearch`, `WaterfallChart`, `formatCurrency`, `formatDate`, `notify`, `selectionColumn`, `useFilters`, `usePagination`, `useSelection`, `useSort`
+—

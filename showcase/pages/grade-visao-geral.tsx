@@ -1,6 +1,6 @@
 import { Archive, Mail, Phone, Trash2, UserRoundPen } from "lucide-react";
 import { useMemo, useState } from "react";
-import { DataGrid, SearchInput, matchesQuery, notify } from "@g4os/ds";
+import { DataGrid, SearchInput, matchesQuery, notify } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 import { contaColumns, makeContas, type Conta } from "./_grid-data";
 

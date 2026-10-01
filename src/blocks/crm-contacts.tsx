@@ -30,7 +30,7 @@ import {
   type FilterField,
   type GridColumn,
   type SavedView,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { companies as baseCompanies, companyById, contacts, deals, go, iso, me, repById, reps, today, type Company, type Lifecycle } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

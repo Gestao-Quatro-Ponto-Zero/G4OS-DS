@@ -58,23 +58,23 @@ export function doctor(target = ".") {
     if (v) add("ok", name, v);
     else add("block", name, "não instalado", `npm i ${name} (${why}).`);
   }
-  const ds = ver("@g4os/ds") ?? (existsSync(join(root, "node_modules", "@g4os", "ds")) ? "link local" : null);
-  if (ds) add("ok", "@g4os/ds", ds);
-  else add("block", "@g4os/ds", "não instalado", "npm i ../G4OS-DS (pasta local) ou npm i github:<org>/G4OS-DS.");
+  const ds = ver("@g4ai/ds") ?? (existsSync(join(root, "node_modules", "@g4os", "ds")) ? "link local" : null);
+  if (ds) add("ok", "@g4ai/ds", ds);
+  else add("block", "@g4ai/ds", "não instalado", "npm i ../G4OS-DS (pasta local) ou npm i github:<org>/G4OS-DS.");
 
   const cssInJs = ["styled-components", "@emotion/react", "@mui/material", "@chakra-ui/react", "antd", "@mantine/core", "bootstrap", "react-bootstrap"].filter((n) => deps[n]);
   if (cssInJs.length) add("warn", "Outras bibliotecas de UI", cssInJs.join(", "), "Convivem durante a migração, mas não há mapeamento 1:1: reescreva por página com componentes do DS e remova a lib no fim.");
-  if (deps.recharts || deps["chart.js"] || deps["react-chartjs-2"]) add("info", "Gráficos", "recharts/chart.js presente", "Prefira os gráficos do DS (SVG, tokens, tema escuro). Se mantiver, use @g4os/ds/shadcn.css (--chart-1…5).");
-  if (deps["@radix-ui/react-dialog"] || existsSync(join(root, "components.json"))) add("info", "shadcn/ui", "detectado", "Importe @g4os/ds/shadcn.css para os componentes existentes herdarem tokens; troque por componentes do DS página a página.");
+  if (deps.recharts || deps["chart.js"] || deps["react-chartjs-2"]) add("info", "Gráficos", "recharts/chart.js presente", "Prefira os gráficos do DS (SVG, tokens, tema escuro). Se mantiver, use @g4ai/ds/shadcn.css (--chart-1…5).");
+  if (deps["@radix-ui/react-dialog"] || existsSync(join(root, "components.json"))) add("info", "shadcn/ui", "detectado", "Importe @g4ai/ds/shadcn.css para os componentes existentes herdarem tokens; troque por componentes do DS página a página.");
 
   const cssFiles = listFiles(root, [".css"]).filter((f) => /@import\s+["']tailwindcss["']|@tailwind\s+base/.test(readFileSync(f, "utf8")));
   const globalCss = cssFiles[0];
-  if (!globalCss) add("block", "CSS global", "nenhum CSS com @import \"tailwindcss\"", "Crie app/globals.css com @import \"tailwindcss\"; @import \"@g4os/ds/styles.css\";");
+  if (!globalCss) add("block", "CSS global", "nenhum CSS com @import \"tailwindcss\"", "Crie app/globals.css com @import \"tailwindcss\"; @import \"@g4ai/ds/styles.css\";");
   else {
     const css = readFileSync(globalCss, "utf8");
     const rel = globalCss.slice(root.length + 1);
     if (/@g4os\/ds\/styles\.css|G4OS-DS\/src\/styles\/index\.css/.test(css)) add("ok", "Estilos do DS", `importados em ${rel}`);
-    else add("block", "Estilos do DS", `${rel} não importa @g4os/ds/styles.css`, 'Adicione depois do tailwind: @import "@g4os/ds/styles.css";');
+    else add("block", "Estilos do DS", `${rel} não importa @g4ai/ds/styles.css`, 'Adicione depois do tailwind: @import "@g4ai/ds/styles.css";');
     if (/@tailwind\s+base/.test(css)) add("block", "Sintaxe Tailwind v3", `${rel} usa @tailwind base`, 'Troque por @import "tailwindcss";');
   }
 
@@ -94,7 +94,7 @@ export function doctor(target = ".") {
   if (deps.next) {
     const nc = ["next.config.ts", "next.config.mjs", "next.config.js"].map((f) => join(root, f)).find(existsSync);
     const txt = nc ? readFileSync(nc, "utf8") : "";
-    add(/transpilePackages[^\]]*@g4os\/ds/.test(txt) ? "ok" : "block", "Next transpilePackages", nc ? nc.slice(root.length + 1) : "sem next.config", 'transpilePackages: ["@g4os/ds"] (o pacote é código-fonte TSX).');
+    add(/transpilePackages[^\]]*@g4os\/ds/.test(txt) ? "ok" : "block", "Next transpilePackages", nc ? nc.slice(root.length + 1) : "sem next.config", 'transpilePackages: ["@g4ai/ds"] (o pacote é código-fonte TSX).');
     add(all.some(([, s]) => /setLinkComponent\(/.test(s)) ? "ok" : "warn", "setLinkComponent(Link)", "", "Registre next/link uma vez num módulo cliente importado pelo layout.");
   }
   const ok = !checks.some((c) => c.level === "block");

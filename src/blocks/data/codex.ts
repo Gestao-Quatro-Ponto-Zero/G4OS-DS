@@ -3,7 +3,7 @@
  * repositórios, sessões por projeto e a conversa da sessão aberta. "Hoje" =
  * 30/09/2026. Troque pela sua API (runs, commits, deploys, testes).
  */
-import type { SessionProject, SessionSummary, StepItem } from "@g4os/ds";
+import type { SessionProject, SessionSummary, StepItem } from "@g4ai/ds";
 
 export type CodexResult = { kind: "commit" | "deploy" | "tests" | "pr" | "link"; text: string; code?: string; href?: string; ok?: boolean };
 export type CodexEntry =

@@ -8,4 +8,4 @@ Conecte as ferramentas do time: busca, categorias, faixa de exemplos de pedido e
 
 ## Componentes usados
 
-`AppGrid`, `AppTile`, `Button`, `Empty`, `HalftoneBand`, `MarketplaceHero`, `Page`, `normalize`, `notify`
+—

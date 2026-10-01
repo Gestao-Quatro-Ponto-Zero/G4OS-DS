@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AreaChart, ChartCard, CompareStat, GoalMeter, SegmentedControl, formatCurrency, formatNumber } from "@g4os/ds";
+import { AreaChart, ChartCard, CompareStat, GoalMeter, SegmentedControl, formatCurrency, formatNumber } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

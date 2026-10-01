@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { DataTable, Pagination, usePagination, type Column } from "@g4os/ds";
+import { DataTable, Pagination, usePagination, type Column } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

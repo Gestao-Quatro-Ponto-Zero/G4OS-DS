@@ -1,6 +1,6 @@
 # layout
 
-Arquivo: `src/components/layout.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/layout.tsx` · importe de `@g4ai/ds`.
 
 Casca: AppShell, ShellBanner, EntityHeader, ReadingColumn, SplitLayout.
 

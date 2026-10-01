@@ -1,6 +1,6 @@
 import { Archive, ArrowUpDown, Columns3, Copy, Download, FileSpreadsheet, FileText, Link2, MoreHorizontal, Pencil, Share2, Star, Tag, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { ActionMenu, ContextMenu, Menu, notify, type MenuEntry } from "@g4os/ds";
+import { ActionMenu, ContextMenu, Menu, notify, type MenuEntry } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

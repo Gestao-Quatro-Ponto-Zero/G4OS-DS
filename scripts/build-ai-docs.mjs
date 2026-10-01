@@ -240,7 +240,7 @@ const files_ = new Map();
 const out = (p, content) => files_.set(p, content.replace(/\n{3,}/g, "\n\n").trimEnd() + "\n");
 
 function renderModule(m) {
-  const lines = [`# ${m.name}`, "", `Arquivo: \`${m.file}\` · importe de \`@g4os/ds\`.`, "", m.summary, ""];
+  const lines = [`# ${m.name}`, "", `Arquivo: \`${m.file}\` · importe de \`@g4ai/ds\`.`, "", m.summary, ""];
   for (const e of m.exports) {
     lines.push(`## ${e.name}${e.kind === "component" ? "" : ` (${e.kind})`}`, "");
     if (e.summary) lines.push(e.summary, "");
@@ -303,12 +303,12 @@ const categories = [...new Set(blocks.map((b) => b.category).filter(Boolean))].s
 function renderCore() {
   return `# G4OS-DS · guia essencial para agentes (v${pkg.version})
 
-Leia isto antes de escrever ou mudar qualquer UI num projeto que usa \`@g4os/ds\`. Os detalhes estão ao lado, em \`ai/\` (mesma pasta deste arquivo): \`tokens.md\`, \`components/<módulo>.md\` (props e exemplos), \`blocks/<bloco>.md\`, \`manifest.json\` (tudo em JSON). Leia só o módulo de que precisar.
+Leia isto antes de escrever ou mudar qualquer UI num projeto que usa \`@g4ai/ds\`. Os detalhes estão ao lado, em \`ai/\` (mesma pasta deste arquivo): \`tokens.md\`, \`components/<módulo>.md\` (props e exemplos), \`blocks/<bloco>.md\`, \`manifest.json\` (tudo em JSON). Leia só o módulo de que precisar.
 
 ## Como decidir
 1. **Bloco pronto** (\`src/blocks/<slug>.tsx\`): copie o arquivo inteiro e troque os dados do topo. Veja o catálogo abaixo.
-2. **Composição de componentes do DS** (import de \`@g4os/ds\`).
-3. Componente do DS com outras props. 4. shadcn/21st com a ponte \`@g4os/ds/shadcn.css\`. 5. Do zero, só com tokens.
+2. **Composição de componentes do DS** (import de \`@g4ai/ds\`).
+3. Componente do DS com outras props. 4. shadcn/21st com a ponte \`@g4ai/ds/shadcn.css\`. 5. Do zero, só com tokens.
 
 ## Regras (resumo de AGENTS.md; todas obrigatórias)
 1. **Só tokens semânticos**: \`bg-page\` (fundo), \`bg-surface\` (card/painel/campo), \`bg-popover\` (menu/modal), \`bg-soft\` (hover, cabeçalho), \`text-ink\` / \`text-ink-soft\` / \`text-muted\`, \`border-line\` / \`border-line-strong\`. Ação e seleção: \`bg-primary text-on-primary\`. Texto sobre preenchimento forte (\`bg-ink\`, \`bg-rose\`, \`bg-ok\`): \`text-on-ink\`. Estados: \`ok\`, \`amber\`, \`rose\`, \`info\` (+ \`-soft\` para fundo). **Proibido**: hex, \`bg-white\`, \`text-white\` (exceto sobre \`bg-navy\`), paleta do Tailwind (\`gray-500\`, \`blue-600\`…), \`bg-muted\` (no DS \`muted\` é cor de texto).
@@ -348,7 +348,7 @@ ${categories.map((c) => `- **${c}**: ${blocks.filter((b) => b.category === c).ma
 }
 
 function renderLlms() {
-  return `# @g4os/ds
+  return `# @g4ai/ds
 
 > Design system G4 OS (React 19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, ${componentCount} componentes, gráficos SVG e ${blocks.length} blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 

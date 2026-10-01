@@ -1,6 +1,6 @@
 // Dados de exemplo das páginas de IA e interação (só showcase).
 import { Database, FileSpreadsheet, Mail, Search } from "lucide-react";
-import type { AiSource, ToolCall, TraceStep } from "@g4os/ds";
+import type { AiSource, ToolCall, TraceStep } from "@g4ai/ds";
 import { art } from "./_media-data";
 
 export const sphereImages = Array.from({ length: 36 }, (_, i) => ({ src: art(i), alt: `Imagem ${i + 1} da galeria` }));

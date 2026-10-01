@@ -1,5 +1,5 @@
 import { Archive, Mail, Phone, Tag, Trash2 } from "lucide-react";
-import { DataGrid, notify, usePagination, Pagination } from "@g4os/ds";
+import { DataGrid, notify, usePagination, Pagination } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { contaColumns, makeContas } from "./_grid-data";
 

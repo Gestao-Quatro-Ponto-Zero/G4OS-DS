@@ -8,4 +8,4 @@ Revisão trimestral de negócio montada com os layouts de slide do DS: capa, nú
 
 ## Componentes usados
 
-`Button`, `DeckSlide`, `PageHeading`, `SlideBullets`, `SlideDeck`, `SlideQuote`, `SlideSplit`, `SlideStat`, `SlideTitle`, `notify`
+—

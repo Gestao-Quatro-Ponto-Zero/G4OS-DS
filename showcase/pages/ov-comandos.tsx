@@ -1,6 +1,6 @@
 import { BarChart3, Briefcase, Building2, FilePlus2, FileText, Home, LogOut, Moon, Search, Settings, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
-import { Button, CommandPalette, Kbd, notify, useCommandShortcut, type Command } from "@g4os/ds";
+import { Button, CommandPalette, Kbd, notify, useCommandShortcut, type Command } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

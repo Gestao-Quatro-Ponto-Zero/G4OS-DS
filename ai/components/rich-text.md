@@ -1,6 +1,6 @@
 # rich-text
 
-Arquivo: `src/components/rich-text.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/rich-text.tsx` · importe de `@g4ai/ds`.
 
 Editor de texto rico LEVE (contentEditable + comandos do navegador).
 

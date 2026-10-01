@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DataTable, EmptyFilterResult, Highlight, TableSearch, formatCurrency, useFilters, useTableSearch, type Column } from "@g4os/ds";
+import { DataTable, EmptyFilterResult, Highlight, TableSearch, formatCurrency, useFilters, useTableSearch, type Column } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { dealFields, dealSearch, deals, type Deal } from "./_filtros-data";
 

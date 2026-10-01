@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, OtpInput, PasswordField } from "@g4os/ds";
+import { Button, OtpInput, PasswordField } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Senha e código (OTP)", group: "Formulários", order: 21, description: "PasswordField com mostrar/ocultar e régua de força; OtpInput para códigos de verificação por e-mail/SMS/app." };

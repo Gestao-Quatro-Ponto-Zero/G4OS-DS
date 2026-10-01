@@ -21,7 +21,7 @@ import {
   formatPercent,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { activities, daysFromToday, deals, reps as baseReps, type Rep } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

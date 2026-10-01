@@ -2,7 +2,7 @@
 
 import { ArrowLeftRight, Boxes, Building2, ClipboardList, FileText, Gauge, Landmark, PieChart, Plus, Receipt, Scale, Search, ShoppingCart, Truck, Users, Wallet } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { AppShell, Badge, EntityMark, IconButton, SearchPalette, Sidebar, formatCurrency, useCommandShortcut, type NavGroup, type NavItem, type SearchResult, type SearchScope } from "@g4os/ds";
+import { AppShell, Badge, EntityMark, IconButton, SearchPalette, Sidebar, formatCurrency, useCommandShortcut, type NavGroup, type NavItem, type SearchResult, type SearchScope } from "@g4ai/ds";
 import { customers, invoices, me, orderStatus, orderTotal, orders, products, customerById, levelInfo, levelOf, qtyOf, suppliers } from "../data/erp";
 import { finUser, payables, receivables } from "../data/fin";
 import { frameHref, go } from "./frame-route";

@@ -8,4 +8,4 @@ Propostas de contratação em lista + detalhe: cadeia de aprovação, alerta de 
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Callout`, `ConfirmDialog`, `CurrencyField`, `Page`, `PageHeading`, `PropertyList`, `Stepper`, `Tabs`, `formatCurrency`, `notify`
+—

@@ -1,4 +1,4 @@
-import { BarList, DonutChart, ProgressRing, ProportionBar, Treemap, formatCurrency } from "@g4os/ds";
+import { BarList, DonutChart, ProgressRing, ProportionBar, Treemap, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import * as d from "./_chart-data";
 

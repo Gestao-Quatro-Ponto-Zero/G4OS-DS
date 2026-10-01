@@ -31,7 +31,7 @@ import {
   useSort,
   type Column,
   type FilterField,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customerById, daysFromToday, go, invoiceLabel, invoices as baseInvoices, invoiceTone, mrrMovements, today, totalMrr, useFrameParam, type Invoice, type InvoiceStatus } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

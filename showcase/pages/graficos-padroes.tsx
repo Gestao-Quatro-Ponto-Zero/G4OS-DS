@@ -1,4 +1,4 @@
-import { CalendarHeatmap, GanttChart, HeatmapMatrix, ScatterChart } from "@g4os/ds";
+import { CalendarHeatmap, GanttChart, HeatmapMatrix, ScatterChart } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import * as d from "./_chart-data";
 

@@ -1,6 +1,6 @@
 import { Briefcase, Building2, Handshake, Landmark, LayoutDashboard, Package } from "lucide-react";
 import type { ReactNode } from "react";
-import { Badge, Card, CardAction } from "@g4os/ds";
+import { Badge, Card, CardAction } from "@g4ai/ds";
 import { DocPage, DocSection, type PageMeta } from "../kit";
 import { GuideTable } from "./_guia-table";
 

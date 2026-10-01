@@ -10,7 +10,7 @@ import {
   TextField,
   cn,
   type UploadItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { org } from "./data/workspace";
 import { frameHref } from "./shells/frame-route";
 

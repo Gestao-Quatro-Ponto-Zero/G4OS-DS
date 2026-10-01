@@ -1,4 +1,4 @@
-import { DataGrid } from "@g4os/ds";
+import { DataGrid } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { contaColumns, makeContas } from "./_grid-data";
 

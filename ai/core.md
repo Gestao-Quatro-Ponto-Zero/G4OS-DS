@@ -1,11 +1,11 @@
 # G4OS-DS · guia essencial para agentes (v0.2.0)
 
-Leia isto antes de escrever ou mudar qualquer UI num projeto que usa `@g4os/ds`. Os detalhes estão ao lado, em `ai/` (mesma pasta deste arquivo): `tokens.md`, `components/<módulo>.md` (props e exemplos), `blocks/<bloco>.md`, `manifest.json` (tudo em JSON). Leia só o módulo de que precisar.
+Leia isto antes de escrever ou mudar qualquer UI num projeto que usa `@g4ai/ds`. Os detalhes estão ao lado, em `ai/` (mesma pasta deste arquivo): `tokens.md`, `components/<módulo>.md` (props e exemplos), `blocks/<bloco>.md`, `manifest.json` (tudo em JSON). Leia só o módulo de que precisar.
 
 ## Como decidir
 1. **Bloco pronto** (`src/blocks/<slug>.tsx`): copie o arquivo inteiro e troque os dados do topo. Veja o catálogo abaixo.
-2. **Composição de componentes do DS** (import de `@g4os/ds`).
-3. Componente do DS com outras props. 4. shadcn/21st com a ponte `@g4os/ds/shadcn.css`. 5. Do zero, só com tokens.
+2. **Composição de componentes do DS** (import de `@g4ai/ds`).
+3. Componente do DS com outras props. 4. shadcn/21st com a ponte `@g4ai/ds/shadcn.css`. 5. Do zero, só com tokens.
 
 ## Regras (resumo de AGENTS.md; todas obrigatórias)
 1. **Só tokens semânticos**: `bg-page` (fundo), `bg-surface` (card/painel/campo), `bg-popover` (menu/modal), `bg-soft` (hover, cabeçalho), `text-ink` / `text-ink-soft` / `text-muted`, `border-line` / `border-line-strong`. Ação e seleção: `bg-primary text-on-primary`. Texto sobre preenchimento forte (`bg-ink`, `bg-rose`, `bg-ok`): `text-on-ink`. Estados: `ok`, `amber`, `rose`, `info` (+ `-soft` para fundo). **Proibido**: hex, `bg-white`, `text-white` (exceto sobre `bg-navy`), paleta do Tailwind (`gray-500`, `blue-600`…), `bg-muted` (no DS `muted` é cor de texto).

@@ -8,7 +8,7 @@ O DS foi feito para ser aplicado por agentes (Claude Code, Cursor, Codex, Copilo
 | **CLI** | `g4os-ds doctor` (pré-requisitos) e `g4os-ds audit` (o que foge do DS, com sugestão e contagem) | `scripts/cli.mjs` → `npx g4os-ds` |
 | **Skills** | Fluxos prontos: `g4os-ds`, `ds-create`, `ds-migrate`, `ds-review`, `ds-theme` | `plugin/` (plugin do Claude Code) |
 
-O guia e a CLI vêm **dentro do pacote instalado** (`node_modules/@g4os/ds/ai`, `…/scripts`). As skills são finas: mandam o agente ler a versão instalada, então nunca ficam desatualizadas em relação ao código.
+O guia e a CLI vêm **dentro do pacote instalado** (`node_modules/@g4ai/ds/ai`, `…/scripts`). As skills são finas: mandam o agente ler a versão instalada, então nunca ficam desatualizadas em relação ao código.
 
 ## Instalar
 
@@ -23,7 +23,7 @@ As skills passam a disparar sozinhas pelos pedidos (ver abaixo). Atualize com `/
 
 ### Opção B · sem plugin (qualquer agente)
 
-Cole `templates/AGENTS.snippet.md` no `AGENTS.md`/`CLAUDE.md`/`.cursorrules` do projeto. O agente lê `node_modules/@g4os/ds/ai/core.md` e segue as skills em `node_modules/@g4os/ds/plugin/skills/*/SKILL.md` como roteiro.
+Cole `templates/AGENTS.snippet.md` no `AGENTS.md`/`CLAUDE.md`/`.cursorrules` do projeto. O agente lê `node_modules/@g4ai/ds/ai/core.md` e segue as skills em `node_modules/@g4ai/ds/plugin/skills/*/SKILL.md` como roteiro.
 
 ### Opção C · skills soltas
 
@@ -34,14 +34,14 @@ Copie `plugin/skills/<nome>` para `~/.claude/skills/` (todas as sessões) ou `.c
 | Você diz | Skill | O agente faz |
 | --- | --- | --- |
 | "Adapte este projeto ao G4OS-DS (está em ../G4OS-DS)" | ds-migrate | `doctor` (para se React < 19 / Tailwind < 4) → instala e liga CSS/tema/fonte → `audit --json` como linha de base → `MIGRATION.md` com telas em ordem → migra casca e depois página a página, com audit 0 e tsc verde a cada passo |
-| "Atualize o @g4os/ds para a 0.3 e ajuste o código" | ds-migrate (modo atualização) | lê `CHANGELOG.md` e `ai/renames.json`, aplica, audita |
+| "Atualize o @g4ai/ds para a 0.3 e ajuste o código" | ds-migrate (modo atualização) | lê `CHANGELOG.md` e `ai/renames.json`, aplica, audita |
 | "Crie a tela de contas a receber com o design system" | ds-create | escolhe o bloco mais próximo (`fin-receivables`), adapta aos dados reais, cinco estados, audita |
 | "Refaça esta página a partir deste print" | ds-create (modo imagem) | mapeia regiões do print para padrões do DS sem copiar cores do print |
 | "Revise esta tela / está no padrão?" | ds-review | audit + checklist, relatório por gravidade; corrige se pedido |
 | "Tema do cliente Acme: azul #0b5cff e amarelo #ffb020" | ds-theme | deriva claro e escuro com contraste AA, gera `[data-brand="acme"]`, aplica |
 | "Quero dark mode" | ds-theme | `data-theme` + `themeScript` + `ThemeToggle`, e usa o audit para achar o que não troca |
 
-Qualquer pedido de interface num projeto com `@g4os/ds` aciona a skill base `g4os-ds` (regras + onde ler).
+Qualquer pedido de interface num projeto com `@g4ai/ds` aciona a skill base `g4os-ds` (regras + onde ler).
 
 ## Acompanhar uma migração
 

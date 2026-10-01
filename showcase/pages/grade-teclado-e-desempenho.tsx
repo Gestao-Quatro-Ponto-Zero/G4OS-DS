@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DataGrid, SegmentedControl, notify } from "@g4os/ds";
+import { DataGrid, SegmentedControl, notify } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { contaColumns, makeContas } from "./_grid-data";
 

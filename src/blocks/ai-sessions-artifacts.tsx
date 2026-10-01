@@ -72,7 +72,7 @@ import {
   type RunStatus,
   type SlashCommand,
   type StepItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import {
   agents,
   artifactFor,

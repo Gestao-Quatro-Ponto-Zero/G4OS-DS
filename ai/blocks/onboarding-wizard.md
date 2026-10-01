@@ -8,4 +8,4 @@ Onboarding em 4 passos (espaço → módulos → equipe → dados) com trilha la
 
 ## Componentes usados
 
-`Button`, `ChoiceCards`, `FileDropzone`, `ProductMark`, `Select`, `TagInput`, `TextField`, `UploadItem`
+—

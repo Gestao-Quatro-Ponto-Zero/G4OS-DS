@@ -23,7 +23,7 @@ import {
   type MenuEntry,
   type MinimapItem,
   type SlashCommand,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { agents, cannedReply, markdown, osProjects, osUser, osWorkspace, plain, sessions as seed, tagSuggestions, tools, type OsSession, type Rich, type ThreadEntry } from "./data/os-sessions";
 import { useFrameParam } from "./shells/frame-route";
 import { OsShell, osRoutes } from "./shells/os-shell";

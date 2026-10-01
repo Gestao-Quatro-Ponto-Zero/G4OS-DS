@@ -1,6 +1,6 @@
 # agent-builder
 
-Arquivo: `src/components/agent-builder.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/agent-builder.tsx` · importe de `@g4ai/ds`.
 
 Construtor de agente: a "ficha" do agente ao lado da conversa com ele.
 

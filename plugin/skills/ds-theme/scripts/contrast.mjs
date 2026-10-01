@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Tema de cliente para o G4OS-DS com contraste WCAG garantido (sem dependências).
-// Mesma lógica de deriveBrand/brandCss em @g4os/ds (src/lib/color.ts).
+// Mesma lógica de deriveBrand/brandCss em @g4ai/ds (src/lib/color.ts).
 //   derive --name acme --primary "#0b5cff" [--accent "#ffb020"] [--radius 1.15] [--font '"Inter", system-ui'] [--out tema.css]
 //   check tema.css            confere os blocos [data-brand] de um CSS existente
 //   ratio "#fff" "#202124"    contraste entre duas cores

@@ -32,7 +32,7 @@ import {
   type PermissionMode,
   type RailItem,
   type StepItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { codexModels, codexProjects, codexRun, codexSessions, type CodexEntry, type CodexResult, type CodexSession } from "./data/codex";
 import { frameHref, useFrameParam } from "./shells/frame-route";
 

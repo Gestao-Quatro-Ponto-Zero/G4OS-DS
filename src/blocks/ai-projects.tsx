@@ -21,7 +21,7 @@ import {
   useFilters,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
 import { go } from "./shells/frame-route";
 import { ownerOf, projects, statusLabel, statusTone, type AgentProject } from "./data/agent";

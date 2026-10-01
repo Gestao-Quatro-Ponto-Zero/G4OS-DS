@@ -1,6 +1,6 @@
 ---
 name: ds-theme
-description: Cria o tema de um cliente (white-label) e ajusta o modo escuro no G4OS-DS a partir de logo, cores ou manual de marca, com checagem de contraste WCAG. Use quando o usuário pedir "tema do cliente", "white-label", "cores da marca X", "aplicar a identidade do cliente", "modo escuro / dark mode", "trocar a fonte/os cantos". Triggers in English: "client brand theme", "white-label theme", "dark mode" for @g4os/ds.
+description: Cria o tema de um cliente (white-label) e ajusta o modo escuro no G4OS-DS a partir de logo, cores ou manual de marca, com checagem de contraste WCAG. Use quando o usuário pedir "tema do cliente", "white-label", "cores da marca X", "aplicar a identidade do cliente", "modo escuro / dark mode", "trocar a fonte/os cantos". Triggers in English: "client brand theme", "white-label theme", "dark mode" for @g4ai/ds.
 ---
 
 # Tema de cliente e modo escuro
@@ -22,7 +22,7 @@ Aplique antes a skill **g4os-ds** (localizar `DS`). Leia `DS/docs/fundamentos/te
 node <caminho-desta-skill>/scripts/contrast.mjs derive --name acme --primary "#0b5cff" --accent "#ffb020" [--radius 1.15] [--font '"Inter", system-ui, sans-serif']
 ```
 
-O script (mesma lógica de `deriveBrand`/`brandCss` de `@g4os/ds`) escreve os blocos `[data-brand="acme"]` e `[data-brand="acme"][data-theme="dark"]` e imprime a tabela de contraste. Para conferir um CSS já existente:
+O script (mesma lógica de `deriveBrand`/`brandCss` de `@g4ai/ds`) escreve os blocos `[data-brand="acme"]` e `[data-brand="acme"][data-theme="dark"]` e imprime a tabela de contraste. Para conferir um CSS já existente:
 
 ```bash
 node <caminho-desta-skill>/scripts/contrast.mjs check caminho/do/tema.css
@@ -32,7 +32,7 @@ Critérios (o script reprova se falhar): `on-primary`/`primary` ≥ 4,5 nos dois
 
 ## 3. Aplicar
 
-1. Cole o CSS no CSS global do app, **depois** de `@import "@g4os/ds/styles.css"` (ou em `themes.css` se estiver trabalhando no próprio DS).
+1. Cole o CSS no CSS global do app, **depois** de `@import "@g4ai/ds/styles.css"` (ou em `themes.css` se estiver trabalhando no próprio DS).
 2. `<html data-brand="acme" data-theme="system">`. Para trocar em tempo de execução: `useTheme().setBrand("acme")`.
 3. Se a marca precisar de ajuste no escuro do sistema operacional, repita o bloco escuro dentro de `@media (prefers-color-scheme: dark) { [data-brand="acme"][data-theme="system"] { … } }`.
 

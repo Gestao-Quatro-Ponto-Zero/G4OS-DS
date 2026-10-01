@@ -9,7 +9,7 @@ import {
   SlideStat,
   SlideTitle,
   notify,
-  type DeckSlide } from "@g4os/ds";
+  type DeckSlide } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */

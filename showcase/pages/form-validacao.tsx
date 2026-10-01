@@ -1,6 +1,6 @@
 import { AlertCircle } from "lucide-react";
 import { useRef, useState } from "react";
-import { Button, CurrencyField, MaskedField, TextField, masks } from "@g4os/ds";
+import { Button, CurrencyField, MaskedField, TextField, masks } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, Specimen, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Validação e estados de campo", group: "Formulários", order: 27, description: "Os seis estados de um campo e o padrão de resumo de erros no envio." };

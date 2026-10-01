@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SlotPicker, isBusinessDay, timeSlots, type IsoDate, type Slot } from "@g4os/ds";
+import { SlotPicker, isBusinessDay, timeSlots, type IsoDate, type Slot } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

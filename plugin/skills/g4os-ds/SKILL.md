@@ -1,6 +1,6 @@
 ---
 name: g4os-ds
-description: Regras e mapa do design system G4OS-DS (@g4os/ds). Use SEMPRE que for escrever, editar ou revisar interface (componentes React, telas, CSS, classes Tailwind) num projeto que depende de @g4os/ds ou quando o usuário mencionar "G4OS-DS", "design system G4", "nosso design system". Also use whenever editing UI in a project that uses @g4os/ds. Carrega o guia essencial (tokens, regras, componentes, blocos) da cópia instalada do DS.
+description: Regras e mapa do design system G4OS-DS (@g4ai/ds). Use SEMPRE que for escrever, editar ou revisar interface (componentes React, telas, CSS, classes Tailwind) num projeto que depende de @g4ai/ds ou quando o usuário mencionar "G4OS-DS", "design system G4", "nosso design system". Also use whenever editing UI in a project that uses @g4ai/ds. Carrega o guia essencial (tokens, regras, componentes, blocos) da cópia instalada do DS.
 ---
 
 # G4OS-DS · base para qualquer trabalho de interface
@@ -12,7 +12,7 @@ Você está num projeto que usa (ou vai usar) o **G4OS-DS**: tokens semânticos 
 Na ordem, pare no primeiro que existir:
 
 1. Caminho dado pelo usuário (ex.: `../G4OS-DS`, `~/Documents/GitHub/G4OS-DS`).
-2. `node_modules/@g4os/ds/` no projeto atual (ou no workspace do monorepo).
+2. `node_modules/@g4ai/ds/` no projeto atual (ou no workspace do monorepo).
 3. `npx g4os-ds guide` imprime o caminho de `ai/core.md`.
 4. Pastas irmãs: `../G4OS-DS`, `../../G4OS-DS`.
 
@@ -32,9 +32,9 @@ Chame essa pasta de `DS`. Se não achar, pergunte ao usuário onde está (e siga
 ## 3. Ordem de preferência
 
 1. **Bloco pronto** (copie `DS/src/blocks/<slug>.tsx`, troque os dados do topo).
-2. **Composição** de componentes do DS (`import { … } from "@g4os/ds"`).
+2. **Composição** de componentes do DS (`import { … } from "@g4ai/ds"`).
 3. Componente do DS com outras props.
-4. shadcn/21st com a ponte `@g4os/ds/shadcn.css`.
+4. shadcn/21st com a ponte `@g4ai/ds/shadcn.css`.
 5. Do zero, só com tokens. Se ficar reaproveitável, sugira promover ao DS.
 
 ## 4. Regras que mais erram (o resto está no core.md)

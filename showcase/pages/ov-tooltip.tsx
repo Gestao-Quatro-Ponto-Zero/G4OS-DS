@@ -1,5 +1,5 @@
 import { Bold, Building2, Copy, Italic, Link2, Mail, MapPin, Phone, Trash2, Underline, Users } from "lucide-react";
-import { Avatar, Badge, EntityMark, HoverCard, IconButton, Tooltip, TooltipGroup } from "@g4os/ds";
+import { Avatar, Badge, EntityMark, HoverCard, IconButton, Tooltip, TooltipGroup } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

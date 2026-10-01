@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArtifactPanel, ContextView, SheetArtifact, ReportSection, notify, type ArtifactTab, type ContextItem } from "@g4os/ds";
+import { ArtifactPanel, ContextView, SheetArtifact, ReportSection, notify, type ArtifactTab, type ContextItem } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Artefatos e contexto", group: "IA e interação", order: 21, description: "ArtifactPanel (abas de artefatos), SheetArtifact (planilha com o que o agente mudou) e ContextView (o que o agente usou para responder)." };

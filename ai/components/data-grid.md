@@ -1,6 +1,6 @@
 # data-grid
 
-Arquivo: `src/components/data-grid.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/data-grid.tsx` · importe de `@g4ai/ds`.
 
 DataGrid: a tabela "de trabalho" do DS.
 

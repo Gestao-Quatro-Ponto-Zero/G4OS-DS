@@ -1,6 +1,6 @@
 import { PartyPopper, Wand2 } from "lucide-react";
 import { useState } from "react";
-import { AnimatedModal, Button, InputModal, notify } from "@g4os/ds";
+import { AnimatedModal, Button, InputModal, notify } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { sphereImages } from "./_ia-data";
 

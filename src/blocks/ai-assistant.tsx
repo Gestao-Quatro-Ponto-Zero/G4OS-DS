@@ -25,7 +25,7 @@ import {
   type Column,
   type PromptSuggestion,
   type ToolCall,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { deals as crmDeals } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 import { frameHref, goTo } from "./shells/frame-route";

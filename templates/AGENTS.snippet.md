@@ -7,9 +7,9 @@ Ajuste o caminho se o DS não estiver em node_modules (ex.: ../G4OS-DS).
 
 ## Design system: G4OS-DS
 
-Este projeto usa o **G4OS-DS** (`@g4os/ds`). Antes de criar, editar ou revisar qualquer interface:
+Este projeto usa o **G4OS-DS** (`@g4ai/ds`). Antes de criar, editar ou revisar qualquer interface:
 
-1. Leia `node_modules/@g4os/ds/ai/core.md` (regras, tokens, módulos, blocos). Se não existir, o DS está em `../G4OS-DS/ai/core.md` (ou rode `npx g4os-ds guide`).
+1. Leia `node_modules/@g4ai/ds/ai/core.md` (regras, tokens, módulos, blocos). Se não existir, o DS está em `../G4OS-DS/ai/core.md` (ou rode `npx g4os-ds guide`).
 2. Para um componente, leia só `…/ai/components/<módulo>.md`; para uma tela parecida pronta, `…/ai/blocks/<slug>.md` e copie `…/src/blocks/<slug>.tsx`.
 3. Ordem: bloco pronto → composição de componentes do DS → componente com outras props → do zero com tokens.
 4. Nunca: hex, `bg-white`, `text-white`, `gray-500`/`blue-600`, `<select>` nativo, `confirm`/`alert`, `toFixed` para dinheiro. Use `bg-surface`/`bg-popover`/`text-ink`/`bg-primary text-on-primary`, `Select`, `ConfirmDialog`, `notify`, `formatCurrency`.

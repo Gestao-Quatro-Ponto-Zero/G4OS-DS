@@ -8,4 +8,4 @@ Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\), co
 
 ## Componentes usados
 
-`AgentAppLayout`, `AgentComposer`, `AnswerCard`, `BottomNav`, `Disclaimer`, `IconRail`, `InputModal`, `ListToggle`, `MenuEntry`, `MessageActions`, `ModelEffort`, `ModelPicker`, `NavItem`, `PermissionMode`, `PermissionModeChip`, `ProductMark`, `RailItem`, `RunSummary`, `SessionQuickSwitcher`, `SessionSidebar`, `StepGroup`, `StepItem`, `ThreadHeader`, `ThreadView`, `Tooltip`, `UserBubble`, `VoiceModeButton`, `VoiceOverlay`, `WorkspaceSwitcher`, `notify`
+—

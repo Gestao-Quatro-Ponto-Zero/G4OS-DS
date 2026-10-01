@@ -1,6 +1,6 @@
 import { Bell, Inbox, MessageSquare } from "lucide-react";
 import { useState } from "react";
-import { AlertCard, Banner, Button, Callout, CountBadge, InlineMessage, NotificationDot } from "@g4os/ds";
+import { AlertCard, Banner, Button, Callout, CountBadge, InlineMessage, NotificationDot } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

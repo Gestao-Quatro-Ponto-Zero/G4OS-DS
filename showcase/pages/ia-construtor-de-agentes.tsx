@@ -1,6 +1,6 @@
 import { ListChecks } from "lucide-react";
 import { useState } from "react";
-import { AddPropertyMenu, AgentHeader, AgentInstructions, BuilderSection, ChipPicker, PropertyRow, PublishBar, ToolGlyph, TriggerList, notify, type AgentStatus } from "@g4os/ds";
+import { AddPropertyMenu, AgentHeader, AgentInstructions, BuilderSection, ChipPicker, PropertyRow, PublishBar, ToolGlyph, TriggerList, notify, type AgentStatus } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

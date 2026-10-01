@@ -1,6 +1,6 @@
 # connections
 
-Arquivo: `src/components/connections.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/connections.tsx` · importe de `@g4ai/ds`.
 
 Conexões e apps: marketplace de integrações, detalhe da conexão, permissões por conta e o "cartão do agente" (o que ele acessa, quem ele aciona, o que entrega).
 

@@ -1,6 +1,6 @@
 # charts-advanced
 
-Arquivo: `src/components/charts-advanced.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/charts-advanced.tsx` · importe de `@g4ai/ds`.
 
 Gráficos avançados: Treemap, WaterfallChart, ScatterChart, RadarChart, GaugeChart, BulletChart, SankeyChart, HeatmapMatrix, ComboChart, ProportionBar, GanttChart.
 

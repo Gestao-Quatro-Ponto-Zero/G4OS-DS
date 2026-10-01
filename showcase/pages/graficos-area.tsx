@@ -1,6 +1,6 @@
 import { Globe, Store } from "lucide-react";
 import { useMemo, useState } from "react";
-import { AreaChart, ChartContainer, Select, formatCompact, formatCurrency, formatNumber, type ChartConfig } from "@g4os/ds";
+import { AreaChart, ChartContainer, Select, formatCompact, formatCurrency, formatNumber, type ChartConfig } from "@g4ai/ds";
 import { DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { ChartDemo, ChartGrid } from "./_chart-kit";
 import * as d from "./_chart-data";

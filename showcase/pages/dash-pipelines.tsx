@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar, Badge, EntityMark, KanbanBoard, KanbanColumn, RecordCard, StagePath, formatCurrency } from "@g4os/ds";
+import { Avatar, Badge, EntityMark, KanbanBoard, KanbanColumn, RecordCard, StagePath, formatCurrency } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

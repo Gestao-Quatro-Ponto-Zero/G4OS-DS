@@ -1,6 +1,6 @@
 # disclosure
 
-Arquivo: `src/components/disclosure.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/disclosure.tsx` · importe de `@g4ai/ds`.
 
 Revelação progressiva: Accordion, Collapsible, TreeView, DescriptionToggle.
 

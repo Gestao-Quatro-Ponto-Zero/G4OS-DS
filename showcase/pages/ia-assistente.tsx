@@ -14,7 +14,7 @@ import {
   ToolCallsSection,
   useStreamingText,
   type PromptSuggestion,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { sources, toolCalls } from "./_ia-data";
 

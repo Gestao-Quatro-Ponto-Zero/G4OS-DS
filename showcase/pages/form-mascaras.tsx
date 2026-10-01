@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MaskedField, masks } from "@g4os/ds";
+import { MaskedField, masks } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Máscaras BR", group: "Formulários", order: 23, description: "CPF, CNPJ, CEP, telefone e data com máscara enquanto digita e validação de dígito verificador no blur." };
@@ -15,7 +15,7 @@ export default function Page() {
       <DocSection title="Documentos e contato" rule="A máscara aparece enquanto digita; o dígito verificador é conferido ao sair do campo. Check verde quando válido. O onChange entrega o texto mascarado e só os dígitos.">
         <Demo
           className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3"
-          code={`import { MaskedField, masks } from "@g4os/ds";
+          code={`import { MaskedField, masks } from "@g4ai/ds";
 
 <MaskedField label="CPF" mask={masks.cpf} value={cpf} onChange={(masked, digits) => setCpf(masked)} />
 <MaskedField label="CNPJ" mask={masks.cnpj} value={cnpj} onChange={setCnpj} />

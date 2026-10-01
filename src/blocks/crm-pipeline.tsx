@@ -16,7 +16,7 @@ import {
   notify,
   useFilters,
   type FilterField,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { companyById, deals as initialDeals, go, me, repById, reps, sources, stages, today, useFrameParam, type Deal, type Stage } from "./data/crm";
 import { CrmShell, NewDealModal } from "./shells/crm-shell";
 

@@ -8,4 +8,4 @@ Planos com ciclo mensal/anual e calculadora por usuários, tabela comparativa po
 
 ## Componentes usados
 
-`Accordion`, `Badge`, `Button`, `NumberField`, `SegmentedControl`, `formatCurrency`
+—

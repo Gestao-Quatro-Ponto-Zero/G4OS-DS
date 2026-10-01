@@ -26,7 +26,7 @@ import {
   useFilters,
   type FilterField,
   type GridColumn,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { agingBuckets, br, customerById, iso, lateDays, receivables as seed, today, type Receivable } from "./data/fin";
 import { NexoShell } from "./shells/nexo-shell";
 

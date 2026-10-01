@@ -8,4 +8,4 @@ Quadro de negócios por etapa com soma de valor, previsão ponderada, filtros, a
 
 ## Componentes usados
 
-`Badge`, `Button`, `EntityMark`, `FilterBar`, `FilterField`, `KanbanBoard`, `KanbanColumn`, `PageHeading`, `RecordCard`, `SegmentedControl`, `TableSearch`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`
+—

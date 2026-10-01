@@ -1,5 +1,5 @@
 import { Globe, Store } from "lucide-react";
-import { BarChart, ChartContainer, ChartTooltipContent, LineChart, formatCurrency, type ChartConfig } from "@g4os/ds";
+import { BarChart, ChartContainer, ChartTooltipContent, LineChart, formatCurrency, type ChartConfig } from "@g4ai/ds";
 import { DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { ChartDemo, ChartGrid } from "./_chart-kit";
 import * as d from "./_chart-data";

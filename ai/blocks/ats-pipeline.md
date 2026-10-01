@@ -8,4 +8,4 @@ Quadro (ou lista) de candidatos de uma vaga por etapa: nota média, origem, temp
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `KanbanBoard`, `KanbanColumn`, `Modal`, `Page`, `PageHeading`, `RecordCard`, `SegmentedControl`, `Select`, `TextField`, `chartColor`, `notify`
+—

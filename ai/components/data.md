@@ -1,6 +1,6 @@
 # data
 
-Arquivo: `src/components/data.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/data.tsx` · importe de `@g4ai/ds`.
 
 Estado de tabela: useSort, SortHeader, useSelection, selectionColumn, BulkBar, usePagination, Pagination, PropertyList.
 

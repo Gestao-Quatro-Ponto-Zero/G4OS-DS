@@ -28,7 +28,7 @@ import {
   formatPercent,
   notify,
   type ActivityItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { activities, companyById, contactById, daysFromToday, dealById, go, iso, lostReasons, me, repById, reps, stageById, stages, useFrameParam, type Activity, type Deal } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

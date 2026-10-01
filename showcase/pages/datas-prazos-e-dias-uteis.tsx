@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Badge, DateBadge, DueDatePicker, RelativeTime, addBusinessDays, brHolidays, businessDaysBetween, describeDue, formatDateLong, formatIsoBr, type IsoDate } from "@g4os/ds";
+import { Badge, DateBadge, DueDatePicker, RelativeTime, addBusinessDays, brHolidays, businessDaysBetween, describeDue, formatDateLong, formatIsoBr, type IsoDate } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -78,7 +78,7 @@ export default function Page() {
           ))}
         </div>
         <CodeBlock
-          code={`import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4os/ds";
+          code={`import { addBusinessDays, businessDaysBetween, isBusinessDay, brHolidays, describeDue } from "@g4ai/ds";
 
 addBusinessDays("2026-10-09", 5)                  // "2026-10-19" (pula 12/10)
 businessDaysBetween("2026-10-01", "2026-10-31")    // 21

@@ -1,6 +1,6 @@
 import { AtSign, Globe, Search } from "lucide-react";
 import { useState } from "react";
-import { TextField, TextareaField } from "@g4os/ds";
+import { TextField, TextareaField } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Campos de texto", group: "Formulários", order: 20, description: "TextField e TextareaField: rótulo sempre visível, ajuda e erro abaixo, prefixo/sufixo, ícone, limpar e contador." };

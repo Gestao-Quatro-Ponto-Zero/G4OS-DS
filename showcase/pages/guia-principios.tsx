@@ -1,5 +1,5 @@
 import { Download, MoreHorizontal, Plus } from "lucide-react";
-import { Badge, Button, Callout, Delta, Dot, Empty, IconButton, KpiCard, StatusLabel, formatCurrency } from "@g4os/ds";
+import { Badge, Button, Callout, Delta, Dot, Empty, IconButton, KpiCard, StatusLabel, formatCurrency } from "@g4ai/ds";
 import { DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

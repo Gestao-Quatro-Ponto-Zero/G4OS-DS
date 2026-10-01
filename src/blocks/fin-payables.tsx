@@ -28,7 +28,7 @@ import {
   useSort,
   type Column,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { br, iso, payableStatus, payables as seed, today, type Payable } from "./data/fin";
 import { useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

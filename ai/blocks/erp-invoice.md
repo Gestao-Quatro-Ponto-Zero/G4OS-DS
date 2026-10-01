@@ -8,4 +8,4 @@ Documento fiscal para tela e impressão: chave de acesso, emitente e destinatár
 
 ## Componentes usados
 
-`ActionMenu`, `Badge`, `Button`, `Callout`, `ConfirmDialog`, `Modal`, `Page`, `PageHeading`, `TextareaField`, `formatCurrency`, `formatNumber`, `notify`
+—

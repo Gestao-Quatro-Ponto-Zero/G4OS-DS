@@ -1,6 +1,6 @@
 # media
 
-Arquivo: `src/components/media.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/media.tsx` · importe de `@g4ai/ds`.
 
 Mídia: Carousel, SlideDeck + helpers de slide, ImageGallery, FileCard, AspectFrame.
 
@@ -141,7 +141,7 @@ Tela base de um slide (1280×720).
 Exemplo (showcase `#/p/midia-slides`):
 
 ```tsx
-import { Slide, SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote, SlideCanvas } from "@g4os/ds";
+import { Slide, SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote, SlideCanvas } from "@g4ai/ds";
 
 // Slide livre: 1280×720, margens de 80px
 <Slide theme="soft" footer={<span>Fonte: CRM</span>}>…seu conteúdo…</Slide>
@@ -185,7 +185,7 @@ Renderiza um slide de 1280×720 escalado para a largura disponível.
 Exemplo (showcase `#/p/midia-slides`):
 
 ```tsx
-import { Slide, SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote, SlideCanvas } from "@g4os/ds";
+import { Slide, SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote, SlideCanvas } from "@g4ai/ds";
 
 // Slide livre: 1280×720, margens de 80px
 <Slide theme="soft" footer={<span>Fonte: CRM</span>}>…seu conteúdo…</Slide>

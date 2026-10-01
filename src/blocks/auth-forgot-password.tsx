@@ -1,6 +1,6 @@
 import { ArrowLeft, Check, KeyRound, Mail } from "lucide-react";
 import { useState } from "react";
-import { Button, PasswordField, TextField } from "@g4os/ds";
+import { Button, PasswordField, TextField } from "@g4ai/ds";
 import { AuthBrand, authRoutes } from "./shells/auth-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */

@@ -1,6 +1,6 @@
 # pipeline
 
-Arquivo: `src/components/pipeline.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/pipeline.tsx` · importe de `@g4ai/ds`.
 
 Pipelines por etapa: StagePath, RecordCard.
 

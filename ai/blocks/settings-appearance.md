@@ -8,4 +8,4 @@ Modo claro/escuro/sistema, marca do cliente (white-label) e tipografia aplicados
 
 ## Componentes usados
 
-`Badge`, `Button`, `Delta`, `SettingsSection`, `Switch`, `ThemeToggle`, `brandPresets`, `notify`, `typePresets`, `useTheme`
+—

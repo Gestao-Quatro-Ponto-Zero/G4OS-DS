@@ -8,4 +8,4 @@ Site público de vagas, pensado primeiro para o celular: busca, filtro por área
 
 ## Componentes usados
 
-`Badge`, `Button`, `Checkbox`, `FileDropzone`, `Highlight`, `ProductMark`, `Sheet`, `TextField`, `UploadItem`, `formatCurrency`, `matchesQuery`, `notify`
+—

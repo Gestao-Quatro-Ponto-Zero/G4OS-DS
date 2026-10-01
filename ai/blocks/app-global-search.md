@@ -8,4 +8,4 @@ Busca em todo o app: escopos (Tab, prefixos > @ #), resultados por tipo com dest
 
 ## Componentes usados
 
-`Badge`, `Button`, `Card`, `Kbd`, `Page`, `PageHeading`, `SearchPalette`, `SearchResult`, `SearchScope`, `formatCurrency`, `notify`, `useCommandShortcut`, `useTheme`
+—

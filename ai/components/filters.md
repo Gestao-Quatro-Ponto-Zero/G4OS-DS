@@ -1,6 +1,6 @@
 # filters
 
-Arquivo: `src/components/filters.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/filters.tsx` · importe de `@g4ai/ds`.
 
 Filtros estruturados: FilterBar, filtros ativos, construtor campo/operador/valor, visões salvas, período, estado na URL.
 

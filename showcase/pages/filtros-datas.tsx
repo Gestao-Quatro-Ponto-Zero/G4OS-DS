@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DateRangeFilter, KpiCard, KpiGrid, PageHeading, describeDateRange, formatCurrency, resolveDateRange, type DateRange } from "@g4os/ds";
+import { DateRangeFilter, KpiCard, KpiGrid, PageHeading, describeDateRange, formatCurrency, resolveDateRange, type DateRange } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

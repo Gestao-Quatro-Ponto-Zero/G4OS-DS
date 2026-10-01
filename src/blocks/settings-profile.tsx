@@ -10,7 +10,7 @@ import {
   TextareaField,
   masks,
   notify,
-  SettingsSection } from "@g4os/ds";
+  SettingsSection } from "@g4ai/ds";
 import { me, org } from "./data/workspace";
 import { SettingsShell } from "./shells/settings-shell";
 

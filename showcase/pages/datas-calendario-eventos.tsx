@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MiniAgenda, MonthCalendar, notify, type AgendaEvent } from "@g4os/ds";
+import { MiniAgenda, MonthCalendar, notify, type AgendaEvent } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

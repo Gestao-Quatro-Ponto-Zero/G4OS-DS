@@ -1,5 +1,5 @@
 import { Blocks, BookOpen, ChartArea, LayoutDashboard, Puzzle, Sparkles } from "lucide-react";
-import { Card } from "@g4os/ds";
+import { Card } from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Introdução", group: "Começar", order: 0, description: "Um design system para construir qualquer aplicação G4 OS — CRM, ATS, ERP, financeiro, portais — com a mesma linguagem visual." };
@@ -34,13 +34,13 @@ npm i ../G4OS-DS            # ou via git: github:g4educacao/G4OS-DS
 
 /* 2. app/globals.css */
 @import "tailwindcss";
-@import "@g4os/ds/styles.css";
-@source "../node_modules/@g4os/ds/src";
+@import "@g4ai/ds/styles.css";
+@source "../node_modules/@g4ai/ds/src";
 
 // 3. app/layout.tsx: <html lang="pt-BR" className="ds-app"> + fonte Figtree
 
 // 4. use
-import { AppShell, Sidebar, PageHeading, KpiCard, AreaChart } from "@g4os/ds";`}
+import { AppShell, Sidebar, PageHeading, KpiCard, AreaChart } from "@g4ai/ds";`}
         />
       </DocSection>
       <DocSection title="Por onde seguir">

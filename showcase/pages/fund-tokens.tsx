@@ -1,6 +1,6 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { cn, notify } from "@g4os/ds";
+import { cn, notify } from "@g4ai/ds";
 import { CodeBlock, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

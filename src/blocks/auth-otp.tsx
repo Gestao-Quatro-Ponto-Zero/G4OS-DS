@@ -1,6 +1,6 @@
 import { ArrowLeft, MailCheck } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button, OtpInput, Spinner } from "@g4os/ds";
+import { Button, OtpInput, Spinner } from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AuthCard, authRoutes } from "./shells/auth-shell";
 import { goTo, useFrameQuery } from "./shells/frame-route";

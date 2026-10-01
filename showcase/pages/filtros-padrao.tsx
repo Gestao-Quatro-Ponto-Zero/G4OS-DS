@@ -13,7 +13,7 @@ import {
   useFilters,
   useSavedViews,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 import { dealFields, dealSearch, dealViews, deals, me, now, owners, type Deal } from "./_filtros-data";
 

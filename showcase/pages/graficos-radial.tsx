@@ -1,4 +1,4 @@
-import { GaugeChart, ProgressRing, RadialBars, RadialChart, formatNumber } from "@g4os/ds";
+import { GaugeChart, ProgressRing, RadialBars, RadialChart, formatNumber } from "@g4ai/ds";
 import { DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { ChartDemo, ChartGrid } from "./_chart-kit";
 

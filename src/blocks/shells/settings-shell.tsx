@@ -1,6 +1,6 @@
 import { Bell, CreditCard, History, KeyRound, Palette, Plug, User, Users } from "lucide-react";
 import type { ReactNode } from "react";
-import { Page, SettingsLayout, type SettingsNavItem } from "@g4os/ds";
+import { Page, SettingsLayout, type SettingsNavItem } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./atlas-shell";
 import { frameHref } from "./frame-route";
 

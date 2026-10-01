@@ -8,4 +8,4 @@ Candidato em uma vaga: etapas clicáveis, avaliações por critério e por entre
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `ConfirmDialog`, `DatePicker`, `Empty`, `FieldBlock`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `RadarChart`, `Select`, `SplitLayout`, `StagePath`, `Tabs`, `Timeline`, `formatCurrency`, `notify`
+—

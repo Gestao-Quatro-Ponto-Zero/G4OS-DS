@@ -3,7 +3,7 @@
  * relatório, contexto e planilha. Mesma empresa (Acme) e mesmas pessoas do
  * Atlas/CRM. "Hoje" = 30/09/2026. Troque pela sua API.
  */
-import type { ContextItem, SheetColumn, TraceStep } from "@g4os/ds";
+import type { ContextItem, SheetColumn, TraceStep } from "@g4ai/ds";
 import { people } from "./workspace";
 
 export type ProjectStatus = "concluido" | "executando" | "aguardando" | "falhou";

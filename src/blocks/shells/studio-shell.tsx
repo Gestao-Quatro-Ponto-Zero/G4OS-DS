@@ -33,7 +33,7 @@ import {
   useCommandShortcut,
   type Command,
   type NavItem,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { apps } from "../data/apps";
 import { me, org } from "../data/workspace";
 import { frameHref, go, goTo } from "./frame-route";

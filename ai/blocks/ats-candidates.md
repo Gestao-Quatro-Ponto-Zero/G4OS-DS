@@ -8,4 +8,4 @@ Todos os candidatos em DataGrid: visões salvas, filtros, busca local (/), sele�
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `DataGrid`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Menu`, `Modal`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `Select`, `TableSearch`, `TextField`, `formatCurrency`, `notify`, `plural`, `useFilters`, `useSavedViews`
+—

@@ -1,6 +1,6 @@
 # overlays-extra
 
-Arquivo: `src/components/overlays-extra.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/overlays-extra.tsx` · importe de `@g4ai/ds`.
 
 Tooltip, HoverCard, Menu (submenus, checkbox/radio), ContextMenu, Sheet, CommandPalette, Lightbox.
 

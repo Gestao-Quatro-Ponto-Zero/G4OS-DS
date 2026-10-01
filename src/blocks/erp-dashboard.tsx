@@ -17,7 +17,7 @@ import {
   formatCompact,
   formatCurrency,
   formatNumber,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customerById, customers, levelInfo, levelOf, me, orderTotal, orders, otifByWeek, lateReasons, products, qtyOf, salesByDay } from "./data/erp";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { InlineEdit, Rating, TagInput } from "@g4os/ds";
+import { InlineEdit, Rating, TagInput } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Tags, nota e edição inline", group: "Formulários", order: 26, description: "TagInput para listas livres, Rating para scorecards e avaliações, InlineEdit para editar no lugar." };

@@ -8,4 +8,4 @@ KPIs com variação, visitantes com seletor de período, movimento de MRR, NPS e
 
 ## Componentes usados
 
-`AreaChart`, `Badge`, `BarChart`, `Button`, `ChartCard`, `Column`, `DataTable`, `EntityMark`, `KpiCard`, `KpiGrid`, `NpsChart`, `Page`, `PageHeading`, `SegmentedControl`, `Tabs`, `formatCurrency`, `formatNumber`, `notify`
+—

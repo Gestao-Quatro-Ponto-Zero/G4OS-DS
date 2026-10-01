@@ -8,4 +8,4 @@ Etapas do funil com probabilidade e ordem, motivos de perda, regras de automaç�
 
 ## Componentes usados
 
-`Button`, `IconButton`, `NumberField`, `Page`, `PageHeading`, `Switch`, `TagInput`, `TextField`, `notify`
+—

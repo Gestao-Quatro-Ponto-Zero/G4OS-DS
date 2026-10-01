@@ -15,7 +15,7 @@ Leia `AGENTS.md` (regras) e `docs/guias/contribuir.md` (contratos). Resumo do qu
 5. Página em `showcase/pages/<slug>.tsx` (contrato em `showcase/kit.tsx`: `meta: PageMeta` + `DocPage`/`DocSection`/`Demo code=…`/`PropsTable`/`Rules`). O `code` do `Demo` vira o exemplo em `ai/components/*.md`.
 
 ## Bloco
-`src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order } as const` + `export default function`. Imports só de `@g4os/ds` e `lucide-react`; dados de exemplo realistas em pt-BR no topo; raiz `h-dvh` com rolagem própria (o iframe usa `html.ds-app`).
+`src/blocks/<slug>.tsx` com `export const meta = { title, description, category, height, order } as const` + `export default function`. Imports só de `@g4ai/ds` e `lucide-react`; dados de exemplo realistas em pt-BR no topo; raiz `h-dvh` com rolagem própria (o iframe usa `html.ds-app`).
 
 ## Token ou tema
 - Semântico novo/alterado: `src/styles/tokens.css` (claro **e** escuro) + `src/tokens/index.ts` (`color` e `colorDark`).

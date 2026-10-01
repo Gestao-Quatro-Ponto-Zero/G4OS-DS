@@ -1,5 +1,5 @@
 import { ArrowRight, FileText, Sparkles, Trophy } from "lucide-react";
-import { AchievementCard, Badge, BrandBadge, BrandButton, BrandPanel, Button, cn, useTheme } from "@g4os/ds";
+import { AchievementCard, Badge, BrandBadge, BrandButton, BrandPanel, Button, cn, useTheme } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

@@ -21,7 +21,7 @@ import {
   formatPercent,
   notify,
   type Column,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { budget, type BudgetLine } from "./data/fin";
 import { NexoShell } from "./shells/nexo-shell";
 

@@ -1,6 +1,6 @@
 import { Database, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { AgentComposer, ComposerChip, notify } from "@g4os/ds";
+import { AgentComposer, ComposerChip, notify } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Composer do agente", group: "IA e interação", order: 22, description: "Campo de tarefa com / comandos, + anexos (arquivo, dados do app, link), voz com forma de onda, seletor de agente, chips de contexto e Parar." };

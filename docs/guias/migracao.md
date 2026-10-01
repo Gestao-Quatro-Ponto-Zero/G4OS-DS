@@ -13,12 +13,12 @@ npx g4os-ds doctor
 | React 19 + Tailwind v4 | migre direto |
 | React 18 / Next 14 | atualize antes (React 19, Next 15+) num PR separado |
 | Tailwind v3 (`tailwind.config.js`, `@tailwind base`) | `npx @tailwindcss/upgrade` antes |
-| shadcn/ui | importe `@g4os/ds/shadcn.css` já na fase 1 (tudo herda os tokens); troque por componentes do DS por página |
+| shadcn/ui | importe `@g4ai/ds/shadcn.css` já na fase 1 (tudo herda os tokens); troque por componentes do DS por página |
 | MUI, Chakra, Ant, styled-components | convivem; **reescreva por página** (não há mapeamento 1:1) e remova a lib no fim |
 
 ## 1. Ligar o DS (um PR)
 
-[Instalação](instalacao.md): pacote, `@import "@g4os/ds/styles.css"`, `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript`, fonte, `transpilePackages`, `setLinkComponent`. `doctor` sem ✗ e build verde.
+[Instalação](instalacao.md): pacote, `@import "@g4ai/ds/styles.css"`, `<html lang="pt-BR" className="ds-app" data-theme="system">` + `themeScript`, fonte, `transpilePackages`, `setLinkComponent`. `doctor` sem ✗ e build verde.
 
 ## 2. Linha de base e plano
 

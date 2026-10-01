@@ -14,7 +14,7 @@ import {
   formatCurrency,
   formatPercent,
   notify,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { dre, marginByMonth, type DreLine } from "./data/fin";
 import { NexoShell } from "./shells/nexo-shell";
 

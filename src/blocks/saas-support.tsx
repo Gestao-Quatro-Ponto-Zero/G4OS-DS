@@ -19,7 +19,7 @@ import {
   notify,
   useFilters,
   type FilterField, PageToolbar
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { customerById, personById, priorityLabel, priorityTone, team, ticketLabel, tickets as baseTickets, today, useFrameParam, type Priority, type Ticket, type TicketStatus } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 

@@ -1,4 +1,4 @@
-import { AreaChart, BarList, ChartCard, KpiCard, KpiGrid, formatNumber } from "@g4os/ds";
+import { AreaChart, BarList, ChartCard, KpiCard, KpiGrid, formatNumber } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {

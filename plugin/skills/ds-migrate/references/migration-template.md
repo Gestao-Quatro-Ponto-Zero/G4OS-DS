@@ -3,7 +3,7 @@
 ```markdown
 # Migração para o G4OS-DS
 
-- DS: @g4os/ds <versão> (<caminho ou git>)
+- DS: @g4ai/ds <versão> (<caminho ou git>)
 - Início: <data> · Responsável: <pessoa/agente>
 - Decisões: marca do cliente <sim/não, data-brand="…">; tema escuro no lançamento <sim/não>; libs a remover: <mui, chakra, shadcn…>
 

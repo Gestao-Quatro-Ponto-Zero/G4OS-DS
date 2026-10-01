@@ -1,4 +1,4 @@
-import { FilterBar, SavedViews, TableSearch, useFilters, useSavedViews } from "@g4os/ds";
+import { FilterBar, SavedViews, TableSearch, useFilters, useSavedViews } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { dealFields, dealSearch, dealViews, deals, me, now } from "./_filtros-data";
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AgentTrace, JsonView, ToolCallCard, ToolCallsSection, type TraceStep } from "@g4os/ds";
+import { AgentTrace, JsonView, ToolCallCard, ToolCallsSection, type TraceStep } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { toolCalls, toolCallsFailing, trace } from "./_ia-data";
 

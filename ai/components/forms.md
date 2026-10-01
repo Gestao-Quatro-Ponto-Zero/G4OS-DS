@@ -1,6 +1,6 @@
 # forms
 
-Arquivo: `src/components/forms.tsx` · importe de `@g4os/ds`.
+Arquivo: `src/components/forms.tsx` · importe de `@g4ai/ds`.
 
 Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
 

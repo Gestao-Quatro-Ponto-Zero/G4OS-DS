@@ -63,7 +63,7 @@ const options = {
   outfile: join(out, "app.js"),
   jsx: "automatic",
   minify: !watch,
-  alias: { "@g4os/ds": join(root, "src/index.ts") },
+  alias: { "@g4ai/ds": join(root, "src/index.ts") },
   define: { "process.env.NODE_ENV": watch ? '"development"' : '"production"' },
   plugins: [raw, regen],
   logLevel: "warning",

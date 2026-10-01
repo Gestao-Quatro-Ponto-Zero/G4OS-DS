@@ -8,4 +8,4 @@ Demonstrativo de resultado com grupos expansíveis, realizado × orçado com var
 
 ## Componentes usados
 
-`BulletChart`, `Button`, `ChartCard`, `ComboChart`, `Delta`, `Page`, `PageHeading`, `SegmentedControl`, `WaterfallChart`, `formatCurrency`, `formatPercent`, `notify`
+—

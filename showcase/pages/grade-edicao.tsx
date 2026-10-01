@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Badge, DataGrid, formatDate, notify, type GridColumn } from "@g4os/ds";
+import { Badge, DataGrid, formatDate, notify, type GridColumn } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { brl, donoOptions, makeContas, statusLabel, statusOptions, statusTone, type Conta } from "./_grid-data";
 

@@ -16,7 +16,7 @@ import {
   formatCurrency,
   formatNumber,
   formatPercent,
-} from "@g4os/ds";
+} from "@g4ai/ds";
 import { funnel, lostReasons, monthly, reps } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 

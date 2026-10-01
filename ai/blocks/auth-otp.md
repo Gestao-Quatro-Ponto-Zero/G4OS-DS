@@ -8,4 +8,4 @@ Confirmação por código de 6 dígitos: colar o código inteiro, verificação 
 
 ## Componentes usados
 
-`Button`, `OtpInput`, `Spinner`
+—
