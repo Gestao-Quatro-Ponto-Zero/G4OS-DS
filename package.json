@@ -94,7 +94,8 @@
     "showcase:watch": "node showcase/build.mjs --watch",
     "build": "node scripts/build-lib.mjs",
     "prepublishOnly": "npm run check && npm run build",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "version-packages": "changeset version && npm install --package-lock-only --silent && npm run ai:build"
   },
   "peerDependencies": {
     "@base-ui/react": "^1.8.0",

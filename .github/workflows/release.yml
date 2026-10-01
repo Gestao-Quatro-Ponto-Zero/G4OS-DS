@@ -24,6 +24,7 @@ jobs:
         with:
           title: "Versão de lançamento"
           commit: "chore: versão de lançamento"
+          version: npm run version-packages
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
