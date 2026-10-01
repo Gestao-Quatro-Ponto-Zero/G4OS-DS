@@ -1,5 +1,71 @@
 # Changelog
 
+## 0.5.1
+
+### Patch Changes
+
+- c385a41: Instruções para agentes de IA e lint mais afiados, medidos com um eval de agentes reais.
+
+  - **16 regras novas no `g4os-ds audit` e no `@g4ai/ds/eslint`** (47 no total), nas categorias novas "Anatomia de página" e "Escrita" e em Composição: `page-width-wrapper` (corpo centralizado com `mx-auto max-w-*` fora do eixo do título → `Page width`), `page-heading`, `disabled-wrapper` (opacidade/pointer-events em volta de botão desabilitado → `disabledReason`), `redundant-children`, `field-double-label`, `nested-drawer`, `multiple-primary`, `select-per-row`, `cell-control-label` (com `--fix`), `raw-input`, `raw-table`, `data-states`, `manual-format`, `copy-tone`, `english-copy`, `title-case`. A maioria é aviso: zere os avisos, não só os erros.
+  - **Correção no leitor de código do audit**: `{...} />` seguido de `/` na mesma linha deixava de ver strings (falsos negativos e positivos em várias regras).
+  - **`ai/core.md` reescrito**: fluxo de trabalho, as nove anatomias com esqueleto, tabela "Qual componente" e os 18 erros que agentes mais cometem (errado → certo, com a regra do audit). Componentes ganharam notas "Uso certo / Evite" (`Page`, `Button`, `Checkbox`, `CheckboxGroup`, `MultiSelect`, `FieldBlock`, `DataTable`, `BulkBar`, `DatePicker`…).
+  - **MCP: ferramenta `plan_screen`** (pedido → anatomia, blocos de referência, componente certo por necessidade e checklist).
+  - Skills (`g4os-ds`, `ds-create`, `ds-migrate`, `ds-review`) e `templates/AGENTS.snippet.md` com o laço "audit até 0 erros e 0 avisos" e as armadilhas de migração.
+  - **Novo starter `templates/vite-app`** (Vite + React + Tailwind v4 + DS, roteador mínimo, ESLint e config do audit).
+
+- c385a41: Revisão geral de componentes, guiada por uma varredura automática (`npm run qa:sweep`) de todas as páginas e blocos em 1440/390 px, claro e escuro.
+
+  **Corrigido na causa (componente/token, não na tela)**
+
+  - Contraste AA: `muted` (#63666e), `accent-deep` (#7d5e33) e `amber` (#b54500) agora passam em branco, `soft`, seleção e fundos `-soft`. Texto nunca mais com opacidade (`text-muted/80` etc. removidos dos componentes).
+  - Heatmap, Treemap e barras divergentes escolhem a cor do rótulo pelo fundo real (`useReadableFills` + `data-fill`) e as rampas pulam a faixa sem contraste.
+  - `Avatar`, avatar de agente e seletor de agentes: `tintFill` escurece tints claros até AA. `AppIcon variant="soft"` com texto legível.
+  - Rótulos que somem no celular passam a `max-sm:sr-only` (botões continuam com nome). `aria-label` em `span`/`div` ganhou `role` (Rating, AnimatedNumber, KeyCombo, BoxPlot, AvatarGroup "+N"). `Meter`/`ProgressRing` com nome padrão. `ItemGroup` com `listitem`. Abas de artefatos: tablist válido, Delete fecha a aba.
+  - `.linked-card` com primário `<button>`: o card inteiro volta a ser clicável (o `::after` do link esticado era anulado).
+  - Folha inferior (Select/DatePicker no celular): só a lista rola; nada cortado no rodapé.
+  - Área de toque mínima: classe `ds-hit` (28 px) em checkbox, remover etiqueta, ícones de 16–20 px e pontos do carrossel.
+  - `StagePath`, blocos de código e tabelas largas da documentação roláveis pelo teclado.
+  - Campos de `inputs.tsx` (TextField, NumberField, CurrencyField…) ganharam `hideLabel` e respeitam `FieldBlock` (sem rótulo duplicado).
+  - Calendário: dias fora do mês e números de semana legíveis.
+
+  **Novos componentes**
+
+  - `SaveBar`: alterações não salvas (⌘S, aviso ao sair, `saveDisabledReason`, erro com a barra aberta).
+  - `FormWizard`: formulário em etapas com validação (síncrona ou assíncrona) por etapa.
+  - `Tour` + `useTour`: tour guiado ancorado a elementos reais.
+  - `NotificationCenter`: sino com caixa de notificações.
+  - `Announcement`: pílula de novidade.
+  - `AudioPlayer`: gravação de ligação/entrevista e mensagem de voz, navegável por teclado.
+  - Utilitários: `useReadableFills`, `surfaceTone`, `effectiveBackground`, `tintFill`.
+
+  **Ferramenta**
+
+  - `npm run qa:sweep` (scripts/qa/sweep.mjs): overflow, elemento cortado, axe-core, console, popup fora da tela, alvo de toque e foco, com relatório agrupado por causa.
+
+- c385a41: Dados e filtros: `useDataView` (busca, filtros, ordenação, paginação, seleção e URL num hook só) e `useUrlState`.
+
+  - **DataTable**: `label`, `sort` + `Column.sortKey` (cabeçalho ordenável com `aria-sort`), `loading` (esqueleto no primeiro carregamento; com linhas, mantém as linhas e mostra barra de progresso), `error`, `maxHeight` com cabeçalho fixo, `Column.footer` (totais), `rowSelected`, `rowTone`, `Column.width` e `align: "center"`.
+  - **Seleção no celular**: `selectionColumn` agora aparece ao lado do título nos blocos rotulados (antes sumia abaixo de 1024 px). `useSelection` ganhou `visibleCount`, `hiddenCount`, `keepOnly` e `set`.
+  - **Paginação**: `usePagination(rows, size, { resetKey })` volta à página 1 quando o filtro/ordenação muda e ganhou `setPageSize`; `Pagination` ganhou "Por página" (`pageSizeOptions` + `onPageSizeChange`), `noun` e "2 de 9" no celular.
+  - **useSort**: números dentro do texto em ordem natural ("Pedido 2" antes de "Pedido 10").
+  - **DataGrid**: menu em cada cabeçalho (ordenar, mover, fixar à esquerda, ocultar; salvo com `storageKey`), `columns[].validate` na edição inline (erro visível, antes a mensagem ficava cortada pela célula), `loading` com linhas mantém as linhas, `filtered` + `onClearFilters` para o vazio por filtro com concordância de gênero.
+  - **Filtros**: E/OU (`state.match`, `MatchToggle`, `m=or` na URL); "Limpar tudo" aparece também quando só atalhos de faceta estão ativos e no celular; `EmptyFilterResult` com `gender`.
+  - **FacetFilter**: opções com `value` ou `id`, `count` por opção, ícone, busca sem acento a partir de 8 opções, nome acessível com os valores escolhidos.
+
+- c385a41: Paridade de recursos com os componentes base do shadcn/ui:
+
+  - **Attachment** (novo, componível): `Attachment`, `AttachmentMedia`, `AttachmentContent`, `AttachmentTitle`, `AttachmentDescription`, `AttachmentActions`, `AttachmentAction`, `AttachmentTrigger`, `AttachmentGroup`. Estados idle/uploading (com `progress`)/processing/error/done, tamanhos default/sm/xs, orientação vertical para miniaturas.
+  - **Command componível** (novo): `CommandMenu`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandLoading`, `CommandGroup`, `CommandItem`, `CommandSeparator`, `CommandShortcut`, `CommandDialog`. Busca sem acento com `keywords`, tolerância a erro de digitação, `filter={false}` para busca no servidor. A raiz se chama `CommandMenu` porque `Command` já é o tipo da `CommandPalette`.
+  - **Bubble** (novo): `Bubble`, `BubbleContent`, `BubbleGroup`, `BubbleReactions`, `BubbleReaction`. 7 variantes, alinhamento, grupo com cantos encaixados, status de envio com “Tentar de novo”, `clamp` (Ver mais) e `tooltip`.
+  - **Marker** (novo): `Marker`, `MarkerIcon`, `MarkerContent`. Variantes default/border/separator, `tone`, `shimmer`, `render`.
+  - **MessageScroller** (novo): `MessageScrollerProvider`, `MessageScroller`, `MessageScrollerViewport`, `MessageScrollerContent`, `MessageScrollerItem`, `MessageScrollerButton` e os ganchos `useMessageScroller`, `useMessageScrollerVisibility`, `useMessageScrollerScrollable`. Acompanha o fim, ancora o turno novo no topo, mantém a posição ao carregar o histórico (`onReachStart`) e conta as mensagens novas.
+  - **Menu**: `triggerVariant` (button/ghost/icon/bare, para avatar como gatilho), `width`, `open`/`onOpenChange`, entrada `header`, `description` nos itens, ícones e `disabled` na escolha única e nas marcações, `shortcut` com teclas por plataforma (`["mod", "K"]`). Item desabilitado fica legível em vez de 40 % de opacidade.
+  - **Avatar**: `src` (foto, com iniciais de reserva), `initials` opcional (calculadas do nome), tamanhos `xs` e `xl`, `status` (presença), `badge`, `shape`. **AvatarGroup**: `stacked`, `size`, `total`, `action`.
+  - **Kbd**: `size`; novo `KbdGroup` com `keys` que vira ⌘/Ctrl, ⇧/Shift, ⌥/Alt conforme a plataforma; `useIsMac` e `keyLabel`. `KeyCombo` passa a usar o KbdGroup.
+  - **Carousel**: `orientation="vertical"` (com `height`), `loop`, `index`/`onIndexChange`, `setApi`, `thumbnails`, `counter`; ocupa a largura do contêiner.
+  - **Collapsible**: `variant` inline/row/card, `description`, `meta`, `actions`, `icon`, `disabled`; partes componíveis `CollapsibleRoot`, `CollapsibleTrigger`, `CollapsibleContent`.
+  - **NavigationMenu**: `icon` nos itens, `indicator` (seta) e `mobile="menu"` (padrão: abaixo de 768 px vira um botão Menu com todos os links); `navigationMenuTriggerClass`.
+
 ## 0.5.0
 
 ### Minor Changes
