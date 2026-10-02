@@ -1,4 +1,4 @@
-import { Bell, Database, FileText, FolderOpen, Home, Inbox, Presentation, Search, Settings, Sparkles, Activity } from "lucide-react";
+import { Bell, Database, FileText, FolderOpen, Home, Inbox, LifeBuoy, Presentation, Search, Settings, Sparkles, Activity } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppShell, IconButton, Sidebar, type NavGroup, type NavItem } from "@g4ai/ds";
 import { me, org } from "../data/workspace";
@@ -25,6 +25,8 @@ export const atlasRoutes = {
   assistant: frameHref("ai-chat"),
   settings: frameHref("settings-profile"),
   status: frameHref("app-error-pages"),
+  help: frameHref("app-help-center"),
+  legal: frameHref("app-legal"),
 } as const;
 
 /** Contador de não lidas mostrado no menu (o mesmo da central de notificações). */
@@ -61,6 +63,7 @@ const groups: NavGroup[] = [
     label: "Conta",
     items: [
       { href: atlasRoutes.settings, label: "Configurações", icon: Settings },
+      { href: atlasRoutes.help, label: "Ajuda", icon: LifeBuoy },
       { href: atlasRoutes.status, label: "Status do sistema", icon: Activity },
     ],
   },

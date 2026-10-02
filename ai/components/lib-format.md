@@ -20,10 +20,10 @@ formatCompact(n): string
 formatCurrency(n, options?): string
 ```
 
-Exemplo (showcase `#/p/graficos-composicao`):
+Exemplo (showcase `#/p/dash-progresso-e-presenca`):
 
 ```tsx
-<Treemap items={estoquePorCategoria} format={(n) => formatCurrency(n, { compact: true })} />
+<MiniBarChart label="Custo por dia" format={(n) => formatCurrency(n)} data={…} />
 ```
 
 ## formatDate (function)

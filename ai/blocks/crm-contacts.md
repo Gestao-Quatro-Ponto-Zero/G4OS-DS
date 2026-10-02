@@ -16,6 +16,9 @@ Base de contas em DataGrid: rolagem interna com cabeçalho e total fixos, empres
 - Estágio e responsável editáveis na célula com desfazer
 - Ações rápidas na linha (ligar, e-mail, ⋯ e clique direito)
 - Seleção em massa; colunas configuráveis; CSV; cards no celular
+- Importar planilha em gaveta: arquivo → mapear colunas → revisar (linhas com erro antes de gravar)
+- E-mail pela linha abre o compositor com o contato principal
+- Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros
 
 **Quando usar e o que adaptar**
 
@@ -27,4 +30,4 @@ Base de contas em DataGrid: rolagem interna com cabeçalho e total fixos, empres
 
 ## Componentes usados
 
-`Avatar`, `AvatarGroup`, `Badge`, `Button`, `DataGrid`, `EmptyFilterResult`, `EntityMark`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Modal`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `Select`, `TableSearch`, `Tabs`, `TextField`, `downloadCsv`, `formatCurrency`, `gridToCsv`, `matchesQuery`, `notify`, `useFilters`, `useSavedViews`
+`AlertCard`, `Avatar`, `AvatarGroup`, `Badge`, `Button`, `Checkbox`, `ComposeEmailDialog`, `DataGrid`, `Drawer`, `Empty`, `EmptyFilterResult`, `EntityMark`, `ErrorState`, `FieldBlock`, `FieldGrid`, `FileDropzone`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Modal`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `Person`, `SavedView`, `SavedViews`, `Select`, `Skeleton`, `Stepper`, `TableSearch`, `Tabs`, `TextField`, `UploadItem`, `downloadCsv`, `formatCurrency`, `formatNumber`, `gridToCsv`, `matchesQuery`, `notify`, `useFilters`, `useOperation`, `useSavedViews`

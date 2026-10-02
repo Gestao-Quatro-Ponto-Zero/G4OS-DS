@@ -27,4 +27,4 @@ Detalhe do pedido: etapas, itens com estoque, cliente, pagamento e ações que m
 
 ## Componentes usados
 
-`Badge`, `Button`, `Callout`, `Combobox`, `ConfirmDialog`, `EntityMark`, `FieldBlock`, `IconButton`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `Stepper`, `formatCurrency`, `notify`
+`Badge`, `Button`, `Callout`, `Combobox`, `ConfirmDialog`, `EntityMark`, `FieldBlock`, `IconButton`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `Stepper`, `Table`, `TableBody`, `TableCell`, `TableFooter`, `TableHead`, `TableHeader`, `TableRow`, `formatCurrency`, `notify`

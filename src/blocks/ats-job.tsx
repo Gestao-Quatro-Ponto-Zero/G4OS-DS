@@ -110,7 +110,8 @@ function NewJob() {
     setTried(true);
     if (errors.title || errors.salary || weights !== 100) return;
     notify(`Vaga “${title}” enviada para aprovação de ${person(manager).name}`);
-    go("ats-jobs");
+    // a requisição entra na fila de aprovação (Requisições), já selecionada
+    go("ats-requisitions", { nova: title.trim(), id: "r-nova" });
   };
   return (
     <TalentosShell section="vagas">

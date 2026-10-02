@@ -46,7 +46,7 @@ import {
   ChartLine,
   type LucideIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type KeyboardEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ComponentType, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber, formatPercent } from "../lib/format";
 import { formatDuration } from "./ai";
@@ -1230,41 +1230,164 @@ export function ApprovalRequest({
 /* AgentPlan                                                           */
 /* ================================================================== */
 
-export type PlanStep = { id: string; label: string; status: "pending" | "active" | "done" | "error" | "skipped"; detail?: ReactNode };
+export type PlanStep = {
+  id: string;
+  label: ReactNode;
+  status: "pending" | "active" | "done" | "error" | "skipped";
+  /** Linha curta abaixo do rótulo (sempre visível). */
+  detail?: ReactNode;
+  /** Conteúdo rico (ferramenta chamada, trecho, aviso). Com ele, o passo vira expansível. */
+  content?: ReactNode;
+  /** Abre o conteúdo de início (ex.: o passo em andamento ou o que falhou). */
+  defaultOpen?: boolean;
+  /** Duração em ms (formatDuration). */
+  durationMs?: number;
+  /** Ícone do tipo de passo (busca, código, arquivo). Só aparece em passos pendentes. */
+  icon?: ReactNode;
+};
 
-/** Plano do agente antes/durante a execução: o que vai fazer, em que ordem, onde está. */
-export function AgentPlan({ steps, title = "Plano", className }: { steps: PlanStep[]; title?: string; className?: string }) {
+const planStatusLabel = { pending: "a fazer", active: "em andamento", done: "feito", error: "falhou", skipped: "pulado" } as const;
+
+function PlanGlyph({ status, icon, timeline }: { status: PlanStep["status"]; icon?: ReactNode; timeline?: boolean }) {
+  if (status === "done") return <CircleCheck className="h-4 w-4 text-ok" />;
+  if (status === "active") return <LoaderCircle className="h-4 w-4 text-primary motion-safe:animate-spin" />;
+  if (status === "error") return <CircleX className="h-4 w-4 text-rose" />;
+  if (timeline && icon) return <span className="inline-flex text-muted [&_svg]:h-3.5 [&_svg]:w-3.5">{icon}</span>;
+  return <span className={cn("h-3 w-3 rounded-full border border-line-strong", status === "skipped" && "border-dashed")} />;
+}
+
+/**
+ * Plano do agente antes/durante a execução: o que vai fazer, em que ordem, onde está.
+ * Simples: lista de passos. Com `collapsible` vira um cartão recolhível com status
+ * geral no cabeçalho; passos com `content` abrem o detalhe (ferramenta, trecho, aviso).
+ */
+export function AgentPlan({
+  steps,
+  title = "Plano",
+  collapsible = false,
+  defaultOpen = true,
+  className,
+}: {
+  steps: PlanStep[];
+  title?: ReactNode;
+  /** Cabeçalho clicável que recolhe o plano; ícone mostra o status geral. */
+  collapsible?: boolean;
+  defaultOpen?: boolean;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const [openSteps, setOpenSteps] = useState<Record<string, boolean>>({});
+  const bodyId = useId();
   const done = steps.filter((s) => s.status === "done").length;
-  return (
-    <div className={cn("rounded-xl border border-line bg-surface p-3.5", className)}>
-      <div className="mb-2 flex items-center justify-between text-[12.5px]">
-        <span className="font-medium">{title}</span>
-        <span className="tabular-nums text-muted">
-          {done} de {steps.length}
-        </span>
+  const overall: PlanStep["status"] = steps.some((s) => s.status === "error") ? "error" : steps.some((s) => s.status === "active") ? "active" : done === steps.length ? "done" : "pending";
+  const rich = collapsible || steps.some((s) => s.content || s.durationMs != null);
+  const count = (
+    <span className="tabular-nums text-muted">
+      {done} de {steps.length}
+    </span>
+  );
+
+  if (!rich) {
+    return (
+      <div className={cn("rounded-xl border border-line bg-surface p-3.5", className)}>
+        <div className="mb-2 flex items-center justify-between text-[12.5px]">
+          <span className="font-medium">{title}</span>
+          {count}
+        </div>
+        <ol className="list-none space-y-1.5 p-0">
+          {steps.map((s) => (
+            <li key={s.id} className="flex items-start gap-2 text-[13px]">
+              <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center" aria-hidden>
+                <PlanGlyph status={s.status} />
+              </span>
+              <span className="min-w-0">
+                <span className={cn(s.status === "done" ? "text-muted" : s.status === "active" ? "font-medium text-ink ds-shimmer" : s.status === "skipped" ? "text-muted line-through" : "text-ink-soft")}>{s.label}</span>
+                {s.detail && <span className="block text-[11.5px] text-muted">{s.detail}</span>}
+              </span>
+              <span className="sr-only">{planStatusLabel[s.status]}</span>
+            </li>
+          ))}
+        </ol>
       </div>
-      <ol className="list-none space-y-1.5 p-0">
-        {steps.map((s) => (
-          <li key={s.id} className="flex items-start gap-2 text-[13px]">
-            <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center" aria-hidden>
-              {s.status === "done" ? (
-                <CircleCheck className="h-4 w-4 text-ok" />
-              ) : s.status === "active" ? (
-                <LoaderCircle className="h-4 w-4 animate-spin text-primary" />
-              ) : s.status === "error" ? (
-                <CircleX className="h-4 w-4 text-rose" />
-              ) : (
-                <span className="h-3 w-3 rounded-full border border-line-strong" />
-              )}
-            </span>
-            <span className="min-w-0">
-              <span className={cn(s.status === "done" ? "text-muted" : s.status === "active" ? "font-medium text-ink ds-shimmer" : s.status === "skipped" ? "text-muted line-through" : "text-ink-soft")}>{s.label}</span>
-              {s.detail && <span className="block text-[11.5px] text-muted">{s.detail}</span>}
-            </span>
-            <span className="sr-only">{{ pending: "a fazer", active: "em andamento", done: "feito", error: "falhou", skipped: "pulado" }[s.status]}</span>
-          </li>
-        ))}
-      </ol>
+    );
+  }
+
+  const header = (
+    <>
+      <span className="grid h-5 w-5 shrink-0 place-items-center" aria-hidden>
+        {overall === "pending" ? <Brain className="h-4 w-4 text-muted" /> : <PlanGlyph status={overall} />}
+      </span>
+      <span className={cn("min-w-0 flex-1 truncate text-[13.5px] font-medium", overall === "active" && "ds-shimmer")}>{title}</span>
+      <span className="text-[12px]">{count}</span>
+    </>
+  );
+
+  return (
+    <div className={cn("overflow-hidden rounded-xl border border-line bg-surface", className)}>
+      {collapsible ? (
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={open ? bodyId : undefined}
+          onClick={() => setOpen((o) => !o)}
+          className={cn("flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left outline-none hover:bg-soft focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40", open && "border-b border-line")}
+        >
+          {header}
+          <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted transition-transform duration-200 motion-reduce:transition-none", !open && "-rotate-90")} aria-hidden />
+        </button>
+      ) : (
+        <div className="flex items-center gap-2.5 border-b border-line px-3.5 py-2.5">{header}</div>
+      )}
+      {open && (
+        <ol id={bodyId} className="list-none p-3.5 pl-3">
+          {steps.map((s, i) => {
+            const last = i === steps.length - 1;
+            // Passos que chegam depois (streaming) também respeitam defaultOpen.
+            const isOpen = openSteps[s.id] ?? !!s.defaultOpen;
+            const panelId = `${bodyId}-${s.id}`;
+            const labelCls = cn(
+              "min-w-0 flex-1 text-[13px]",
+              s.status === "active" ? "font-medium text-ink" : s.status === "error" ? "font-medium text-rose" : s.status === "skipped" ? "text-muted line-through" : s.status === "pending" ? "text-muted" : "text-ink-soft",
+            );
+            const meta = s.durationMs != null && <span className="shrink-0 text-[11px] tabular-nums text-muted">{formatDuration(s.durationMs)}</span>;
+            return (
+              <li key={s.id} className="relative flex gap-2.5">
+                {!last && <span aria-hidden className="absolute bottom-0 left-[9.5px] top-6 w-px bg-line" />}
+                <span className="relative z-[1] mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-surface" aria-hidden>
+                  <PlanGlyph status={s.status} icon={s.icon} timeline />
+                </span>
+                <div className={cn("min-w-0 flex-1", !last && "pb-3")}>
+                  {s.content ? (
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={isOpen ? panelId : undefined}
+                      onClick={() => setOpenSteps((o) => ({ ...o, [s.id]: !isOpen }))}
+                      className="group -mx-1.5 flex w-[calc(100%+12px)] items-center gap-2 rounded-md px-1.5 py-1 text-left outline-none hover:bg-soft focus-visible:ring-2 focus-visible:ring-accent/40"
+                    >
+                      <span className={labelCls}>{s.label}</span>
+                      {meta}
+                      <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200 motion-reduce:transition-none", isOpen && "rotate-90")} aria-hidden />
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2 py-1">
+                      <span className={labelCls}>{s.label}</span>
+                      {meta}
+                    </div>
+                  )}
+                  <span className="sr-only">{planStatusLabel[s.status]}</span>
+                  {s.detail && <div className="text-[11.5px] text-muted">{s.detail}</div>}
+                  {s.content && isOpen && (
+                    <div id={panelId} className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft">
+                      {s.content}
+                    </div>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </div>
   );
 }

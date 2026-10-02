@@ -7,10 +7,12 @@ import {
   Badge,
   Button,
   Checkbox,
+  Combobox,
   ConfirmDialog,
   CurrencyField,
   DatePicker,
   Drawer,
+  Empty,
   EntityMark,
   FieldBlock,
   Modal,
@@ -29,7 +31,7 @@ import {
   notify,
   type ActivityItem,
 } from "@g4ai/ds";
-import { activities, companyById, contactById, daysFromToday, dealById, go, iso, lostReasons, me, repById, reps, stageById, stages, useFrameParam, type Activity, type Deal } from "./data/crm";
+import { activities, addDeal, companyById, contactById, contacts, daysFromToday, dealById, go, iso, lostReasons, me, repById, reps, stageById, stages, useFrameParam, type Activity, type Deal } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -46,6 +48,7 @@ export const meta = {
       "StagePath clicável; perda pede motivo",
       "Nota rápida alimenta o feed de atividade",
       "Edição longa em gaveta (Drawer)",
+      "Duplicar cria a cópia em Qualificação e abre o novo registro; vincular contato com busca",
     ],
     adapt: [
       "Proposta (ATS), pedido (ERP), chamado (suporte)",
@@ -96,6 +99,8 @@ export default function CrmDeal() {
   const [editOpen, setEditOpen] = useState(false);
   const [draft, setDraft] = useState(base);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [linking, setLinking] = useState(false);
+  const [linkId, setLinkId] = useState("");
 
   // Outro ?id= na mesma tela (ex.: busca ⌘K): recarrega o registro.
   useEffect(() => {
@@ -110,6 +115,26 @@ export default function CrmDeal() {
   const owner = repById(deal.owner);
   const people = useMemo(() => deal.contactIds.map(contactById), [deal]);
   const overdue = tasks.filter((t) => !t.done && daysFromToday(t.due) < 0).length;
+  // Contatos da mesma empresa primeiro; os demais depois (consultor, parceiro).
+  const linkOptions = contacts
+    .filter((c) => !deal.contactIds.includes(c.id))
+    .sort((a, b) => Number(b.companyId === deal.companyId) - Number(a.companyId === deal.companyId))
+    .map((c) => ({ value: c.id, label: c.name, description: `${c.role} · ${companyById(c.companyId).name}` }));
+
+  const duplicate = () => {
+    const copy = addDeal({ ...deal, id: `d${Date.now()}`, title: `${deal.title} (cópia)`, stage: "qualificacao", age: 0, created: iso(0), close: iso(30), hot: false });
+    notify(`Cópia criada em Qualificação: ${copy.title}`);
+    go("crm-deal", copy.id);
+  };
+  const link = () => {
+    const p = contactById(linkId);
+    if (!linkId) return;
+    setDeal((d) => ({ ...d, contactIds: [...d.contactIds, p.id] }));
+    log({ action: "vinculou o contato", target: p.name, icon: <Plus /> });
+    setLinking(false);
+    setLinkId("");
+    notify(`${p.name} vinculado ao negócio`, () => setDeal((d) => ({ ...d, contactIds: d.contactIds.filter((x) => x !== p.id) })));
+  };
 
   const log = (item: Omit<ActivityItem, "id" | "actor" | "time">) => setFeed((f) => [{ id: `n${Date.now()}`, actor: repById(me), time: "Agora", ...item }, ...f]);
   const addNote = () => {
@@ -158,7 +183,8 @@ export default function CrmDeal() {
               <ActionMenu
                 actions={[
                   { label: "Editar negócio", onSelect: () => setEditOpen(true) },
-                  { label: "Duplicar", onSelect: () => notify("Exemplo: cria uma cópia em Qualificação.", undefined, "info") },
+                  { label: "Criar proposta", onSelect: () => (location.hash = `/frame/crm-quotes?novo=1&negocio=${deal.id}`) },
+                  { label: "Duplicar", onSelect: duplicate },
                   { label: "Excluir negócio", tone: "danger", separator: true, onSelect: () => setConfirmDelete(true) },
                 ]}
               />
@@ -212,7 +238,11 @@ export default function CrmDeal() {
                             </li>
                           );
                         })}
-                        {!tasks.length && <li className="px-4 py-8 text-center text-[13px] text-muted">Nenhuma tarefa. Crie o próximo passo acima.</li>}
+                        {!tasks.length && (
+                          <li>
+                            <Empty framed={false} title="Nenhuma tarefa" hint="Negócio sem próximo passo esfria. Crie a próxima tarefa no campo acima." />
+                          </li>
+                        )}
                       </ul>
                     </div>
                   ) : tab === "arquivos" ? (
@@ -299,7 +329,7 @@ export default function CrmDeal() {
                 <section className="rounded-xl border border-line bg-surface px-4 py-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h2 className="m-0 text-[13px] font-medium">Contatos</h2>
-                    <Button size="sm" variant="quiet" onClick={() => notify("Exemplo: busca contatos da empresa para vincular.", undefined, "info")}>
+                    <Button size="sm" variant="quiet" onClick={() => setLinking(true)}>
                       <Plus /> Adicionar
                     </Button>
                   </div>
@@ -316,7 +346,11 @@ export default function CrmDeal() {
                         </a>
                       </li>
                     ))}
-                    {!people.length && <li className="text-[12.5px] text-muted">Nenhum contato vinculado.</li>}
+                    {!people.length && (
+                      <li>
+                        <Empty framed={false} title="Nenhum contato vinculado" hint="Vincule quem decide e quem influencia." action={<Button size="sm" variant="ghost" onClick={() => setLinking(true)}><Plus /> Vincular contato</Button>} />
+                      </li>
+                    )}
                   </ul>
                 </section>
                 <section className="rounded-xl border border-line bg-surface px-4 py-4">
@@ -403,6 +437,26 @@ export default function CrmDeal() {
           <TextField label="Concorrente" optional value={draft.competitor ?? ""} onChange={(v) => setDraft((d) => ({ ...d, competitor: v || undefined }))} />
         </div>
       </Drawer>
+
+      <Modal
+        open={linking}
+        onClose={() => setLinking(false)}
+        size="sm"
+        title="Vincular contato"
+        description={`Contatos de ${company.name} aparecem primeiro. O papel na decisão vem do cadastro do contato.`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setLinking(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={link} disabled={!linkId} disabledReason="Escolha um contato.">
+              Vincular contato
+            </Button>
+          </>
+        }
+      >
+        <Combobox label="Contato" value={linkId} onValueChange={(v: string) => setLinkId(v)} placeholder="Buscar por nome, cargo ou empresa…" options={linkOptions} />
+      </Modal>
 
       <ConfirmDialog
         open={confirmDelete}

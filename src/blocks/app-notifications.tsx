@@ -8,12 +8,13 @@ import {
   Empty,
   Page,
   PageHeading,
+  Skeleton,
   Tabs,
   Tooltip,
   cn,
   notify } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
-import { frameHref } from "./shells/frame-route";
+import { frameHref, setFrameQuery, useFrameParam } from "./shells/frame-route";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -68,13 +69,20 @@ const initial: Note[] = [
 /* ------------------------------------------------------------------ */
 
 export default function NotificationsBlock() {
-  const [notes, setNotes] = useState(initial);
+  // ?estado=carregando|vazio|erro simula os estados da lista.
+  const estado = useFrameParam("estado");
+  const [notes, setNotes] = useState(() => (estado === "vazio" ? [] : initial));
   const [tab, setTab] = useState("todas");
   const unread = notes.filter((n) => n.unread).length;
   const mentions = notes.filter((n) => n.kind === "mencao" && n.unread).length;
   const shown = useMemo(() => notes.filter((n) => (tab === "nao-lidas" ? n.unread : tab === "mencoes" ? n.kind === "mencao" : true)), [notes, tab]);
   const days = ["Hoje", "Ontem", "Esta semana"] as const;
   const toggleRead = (id: string) => setNotes((ns) => ns.map((n) => (n.id === id ? { ...n, unread: !n.unread } : n)));
+  const mute = (n: Note) => {
+    const before = notes;
+    setNotes((ns) => ns.filter((x) => x.context !== n.context));
+    notify(`Avisos de ${n.context} silenciados`, () => setNotes(before));
+  };
   const archive = (id: string) => {
     const before = notes;
     setNotes((ns) => ns.filter((n) => n.id !== id));
@@ -83,8 +91,8 @@ export default function NotificationsBlock() {
 
   return (
     <AtlasShell current={atlasRoutes.notifications}>
-      <Page>
-        <div className="mx-auto max-w-[760px]">
+      <Page width="reading">
+        <div>
           <PageHeading
             title="Notificações"
             description="O que pede sua atenção nos negócios, pedidos e recrutamento."
@@ -110,9 +118,34 @@ export default function NotificationsBlock() {
               { id: "mencoes", label: "Menções", count: mentions },
             ]}
           />
-          {shown.length === 0 ? (
+          {estado === "carregando" ? (
+            <div className="mt-6 overflow-hidden rounded-xl border border-line bg-surface" aria-busy aria-label="Carregando notificações">
+              {Array.from({ length: 6 }, (_, i) => (
+                <div key={i} className="flex gap-3 border-b border-line px-4 py-3.5 last:border-b-0">
+                  <Skeleton className="h-7 w-7 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-3.5 w-4/5" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : estado === "erro" ? (
             <div className="mt-6">
-              <Empty icon={<Inbox strokeWidth={1.5} />} title="Tudo em dia" hint="Nenhuma notificação neste filtro. Avisamos quando algo precisar de você." />
+              <Empty title="Não foi possível carregar as notificações" hint="Tente de novo em instantes. Nenhum aviso foi perdido." action={<Button size="sm" onClick={() => setFrameQuery({ estado: undefined })}>Tentar novamente</Button>} />
+            </div>
+          ) : notes.length === 0 ? (
+            <div className="mt-6">
+              <Empty icon={<Inbox strokeWidth={1.5} />} title="Nenhuma notificação ainda" hint="Menções, atribuições e pagamentos aparecem aqui. Escolha o que quer receber nas preferências." action={<Button size="sm" variant="ghost" href={frameHref("settings-notifications")}><Settings /> Ajustar preferências</Button>} />
+            </div>
+          ) : shown.length === 0 ? (
+            <div className="mt-6">
+              <Empty
+                icon={<Inbox strokeWidth={1.5} />}
+                title={tab === "nao-lidas" ? "Tudo lido" : "Nenhuma menção"}
+                hint={`Nenhuma notificação neste filtro. Há ${notes.length} no total.`}
+                action={<Button size="sm" variant="ghost" onClick={() => setTab("todas")}>Limpar filtro</Button>}
+              />
             </div>
           ) : (
             days.map((day) => {
@@ -151,7 +184,7 @@ export default function NotificationsBlock() {
                               <Check className="h-3.5 w-3.5" />
                             </button>
                           </Tooltip>
-                          <ActionMenu actions={[{ label: n.unread ? "Marcar como lida" : "Marcar como não lida", onSelect: () => toggleRead(n.id) }, { label: "Silenciar este assunto", onSelect: () => notify("Assunto silenciado", undefined, "info") }, { label: "Arquivar", onSelect: () => archive(n.id), separator: true }]} />
+                          <ActionMenu actions={[{ label: n.unread ? "Marcar como lida" : "Marcar como não lida", onSelect: () => toggleRead(n.id) }, { label: `Silenciar avisos de ${n.context}`, onSelect: () => mute(n) }, { label: "Arquivar", onSelect: () => archive(n.id), separator: true }]} />
                           <span role={n.unread ? "img" : undefined} aria-label={n.unread ? "Não lida" : undefined} className={cn("mt-2.5 h-2 w-2 rounded-full", n.unread ? "bg-blue" : "bg-transparent")} />
                         </div>
                       </li>

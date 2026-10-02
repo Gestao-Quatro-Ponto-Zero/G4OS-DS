@@ -8,6 +8,7 @@ import {
   DataGrid,
   DatePicker,
   Drawer,
+  Empty,
   EmptyFilterResult,
   EntityMark,
   FieldBlock,
@@ -28,7 +29,8 @@ import {
   type GridColumn,
 } from "@g4ai/ds";
 import { agingBuckets, br, customerById, iso, lateDays, receivables as seed, today, type Receivable } from "./data/fin";
-import { NexoShell } from "./shells/nexo-shell";
+import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
+import { NexoShell, demoError, useDemoState } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -66,9 +68,19 @@ const fields: FilterField<Receivable>[] = [
 ];
 
 export default function FinReceivables() {
-  const [list, setList] = useState(seed);
-  const [tab, setTab] = useState<"vencidos" | "vencer">("vencidos");
-  const [open, setOpen] = useState<Receivable | null>(null);
+  const demo = useDemoState();
+  const [list, setList] = useState<Receivable[]>(() => (demo === "vazio" ? [] : [...seed]));
+  // O título aberto vem da URL (?id=): ⌘K, cliente e painel abrem a gaveta certa.
+  const openId = useFrameParam("id");
+  const open = openId ? list.find((r) => r.id === openId) ?? null : null;
+  const setOpen = (r: Receivable | null) => setFrameQuery({ id: r?.id });
+  const tabOf = (r: Receivable) => (lateDays(r) > 0 ? "vencidos" : "vencer");
+  const [tab, setTab] = useState<"vencidos" | "vencer">(() => (open ? tabOf(open) : "vencidos"));
+  const [lastOpen, setLastOpen] = useState(openId);
+  if (openId !== lastOpen) {
+    setLastOpen(openId);
+    if (open && tabOf(open) !== tab) setTab(tabOf(open));
+  }
   const [promise, setPromise] = useState(iso(3));
   const inTab = useMemo(() => list.filter((r) => (tab === "vencidos" ? lateDays(r) > 0 : lateDays(r) === 0)), [list, tab]);
   const filters = useFilters(inTab, { fields, search: (r) => [r.doc, customerById(r.customerId).name, customerById(r.customerId).cnpj.replace(/\D/g, "")], now: today, url: "r_" });
@@ -158,7 +170,7 @@ export default function FinReceivables() {
           <KpiGrid>
             <KpiCard label="Total a receber" value={money(totalOpen)} hint={`${list.length} títulos em aberto`} />
             <KpiCard label="Vencido" value={money(overdue.reduce((s, r) => s + r.value, 0))} delta={0.092} goodWhen="down" period="vs. 31/08" />
-            <KpiCard label="Inadimplência (90+ dias)" value={formatPercent(overdue.filter((r) => lateDays(r) > 90).reduce((s, r) => s + r.value, 0) / totalOpen)} delta={-0.011} goodWhen="down" period="vs. 31/08" />
+            <KpiCard label="Inadimplência (90+ dias)" value={formatPercent(overdue.filter((r) => lateDays(r) > 90).reduce((s, r) => s + r.value, 0) / (totalOpen || 1))} delta={-0.011} goodWhen="down" period="vs. 31/08" />
             <KpiCard label="Prazo médio de recebimento" value="38 dias" delta={0.05} goodWhen="down" period="vs. média do semestre" />
           </KpiGrid>
 
@@ -212,7 +224,15 @@ export default function FinReceivables() {
                   </button>
                 </>
               )}
-              empty={<EmptyFilterResult filters={filters} noun="título" />}
+              loading={demo === "carregando"}
+              error={demoError(demo, "os títulos a receber")}
+              empty={
+                inTab.length === 0 ? (
+                  <Empty framed={false} icon={<CheckCircle2 />} title={tab === "vencidos" ? "Nenhum título vencido" : "Nenhum título a vencer"} hint={tab === "vencidos" ? "Carteira em dia: nada para cobrar agora." : "Os títulos nascem quando a NF-e do pedido é autorizada."} action={tab === "vencer" ? <Button size="sm" variant="ghost" onClick={() => go("erp-invoices")}>Ver notas fiscais</Button> : undefined} />
+                ) : (
+                  <EmptyFilterResult filters={filters} noun="título" />
+                )
+              }
               mobile="cards"
             />
           </section>

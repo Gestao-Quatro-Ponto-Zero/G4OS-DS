@@ -1,10 +1,11 @@
 import { Archive, ArrowRightLeft, CalendarPlus, Mail, Star, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Avatar,
   Badge,
   Button,
   DataGrid,
+  Empty,
   EmptyFilterResult,
   FilterBar,
   Highlight,
@@ -26,8 +27,8 @@ import {
   type SavedView,
 } from "@g4ai/ds";
 import { candidates as seed, iso, jobById, jobs, me, shortDate, stageLabel, stages, today, type Candidate, type StageId } from "./data/ats";
-import { go, useFrameParam } from "./shells/frame-route";
-import { TalentosShell } from "./shells/talentos-shell";
+import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
+import { LoadError, LoadingRows, TalentosShell, useListState } from "./shells/talentos-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -43,6 +44,7 @@ export const meta = {
       "Visões salvas, filtros e busca local (/) na barra da grade",
       "Seleção em massa com BulkBar (mover etapa, e-mail)",
       "Ações rápidas na linha; colunas configuráveis; CSV",
+      "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar",
     ],
     adapt: [
       "Base de contatos (CRM), clientes B2B (ERP), leads de marketing",
@@ -81,9 +83,21 @@ const views: SavedView[] = [
 
 export default function AtsCandidates() {
   const novo = useFrameParam("novo");
+  const nome = useFrameParam("nome");
+  const estado = useListState();
   const [rows, setRows] = useState(seed);
   const [adding, setAdding] = useState(!!novo);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(nome ?? "");
+  // ⌘K "Adicionar “…” como candidato" na própria tela: reabre o cadastro com o nome.
+  useEffect(() => {
+    if (!novo) return;
+    setAdding(true);
+    if (nome) setName(nome);
+  }, [novo, nome]);
+  const closeAdd = () => {
+    setAdding(false);
+    setFrameQuery({ novo: undefined, nome: undefined });
+  };
   const [email, setEmail] = useState("");
   const [job, setJob] = useState("j1");
   const filters = useFilters(rows, { fields, search: (c) => [c.name, c.email, c.headline, c.city, ...c.skills], me: me.id, now: today, url: "c_" });
@@ -174,6 +188,22 @@ export default function AtsCandidates() {
           }
         />
         <div className="mt-5 space-y-4">
+          {estado === "carregando" ? (
+            <LoadingRows rows={8} label="Carregando candidatos" />
+          ) : estado === "erro" ? (
+            <LoadError what="os candidatos" />
+          ) : estado === "vazio" ? (
+            <Empty
+              title="Nenhum candidato ainda"
+              hint="Publique uma vaga na página de carreiras ou cadastre uma indicação. As candidaturas aparecem aqui."
+              action={
+                <Button onClick={() => setAdding(true)}>
+                  <UserPlus /> Adicionar candidato
+                </Button>
+              }
+            />
+          ) : (
+          <>
           <SavedViews views={saved} counts={counts} />
           <DataGrid
             label="Candidatos"
@@ -194,7 +224,7 @@ export default function AtsCandidates() {
             onRowOpen={(c) => go("ats-candidate", c.id)}
             rowActions={(c) => [
               { label: "Enviar e-mail", icon: <Mail />, inline: true, onSelect: () => notify(`Rascunho para ${c.email}`, undefined, "info") },
-              { label: "Agendar entrevista", icon: <CalendarPlus />, inline: true, onSelect: () => go("ats-interviews", c.id) },
+              { label: "Agendar entrevista", icon: <CalendarPlus />, inline: true, onSelect: () => go("ats-interviews", { candidato: c.id }) },
               { label: "Avançar etapa", icon: <ArrowRightLeft />, disabled: c.status !== "ativo", onSelect: () => { const i = stages.findIndex((s) => s.id === c.stage); if (stages[i + 1]) moveTo([c], stages[i + 1].id); } },
               { label: "Mover para o banco", icon: <Archive />, separator: true, disabled: c.status === "banco", onSelect: () => archive([c]) },
             ]}
@@ -222,16 +252,18 @@ export default function AtsCandidates() {
             empty={<EmptyFilterResult filters={filters} noun="candidato" />}
             mobile="cards"
           />
+          </>
+          )}
         </div>
       </Page>
       <Modal
         open={adding}
-        onClose={() => setAdding(false)}
+        onClose={closeAdd}
         title="Adicionar candidato"
         description="Cadastro manual: indicação, hunting ou currículo recebido por e-mail."
         footer={
           <>
-            <Button variant="ghost" onClick={() => setAdding(false)}>
+            <Button variant="ghost" onClick={closeAdd}>
               Cancelar
             </Button>
             <Button
@@ -239,7 +271,7 @@ export default function AtsCandidates() {
               onClick={() => {
                 const c: Candidate = { ...seed[0], id: `n${Date.now()}`, name, email, jobId: job, stage: "triagem", status: "ativo", rating: null, source: "Indicação", headline: "Cadastro manual", appliedAt: iso(0), initials: name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase(), referral: undefined };
                 setRows((all) => [c, ...all]);
-                setAdding(false);
+                closeAdd();
                 setName("");
                 setEmail("");
                 notify(`${name} adicionado(a) à triagem de ${jobById(job).short}`);

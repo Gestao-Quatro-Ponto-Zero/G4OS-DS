@@ -69,3 +69,6 @@ export * from "./components/command";
 export * from "./components/conversation";
 // front AD: navegação com subitens (Sidebar items/flyout, WorkspaceMenu, menu da pessoa, SectionNav)
 export * from "./components/nav-tree";
+// front AE: histórico, progresso e presença (RevisionTimeline, ProjectProgressCard, StackedList, LocationTag)
+export * from "./components/history";
+export * from "./components/presence";

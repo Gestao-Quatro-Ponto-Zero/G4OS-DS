@@ -1,4 +1,4 @@
-import { Archive, CheckCircle2, Clock, Ellipsis, FolderClosed, GitCommitHorizontal, GitPullRequest, Globe, House, Inbox, Pencil, Rocket, Settings, SquarePen, Trash2 } from "lucide-react";
+import { Archive, CheckCircle2, Ellipsis, FolderClosed, GitCommitHorizontal, GitPullRequest, Globe, Pencil, Rocket, SquarePen, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   AgentAppLayout,
@@ -6,20 +6,17 @@ import {
   AnswerCard,
   BottomNav,
   Disclaimer,
-  IconRail,
   InputModal,
   ListToggle,
   MessageActions,
   ModelPicker,
   PermissionModeChip,
-  ProductMark,
   RunSummary,
   SessionQuickSwitcher,
   SessionSidebar,
   StepGroup,
   ThreadHeader,
   ThreadView,
-  Tooltip,
   UserBubble,
   VoiceModeButton,
   VoiceOverlay,
@@ -28,13 +25,12 @@ import {
   notify,
   type MenuEntry,
   type ModelEffort,
-  type NavItem,
   type PermissionMode,
-  type RailItem,
   type StepItem,
 } from "@g4ai/ds";
 import { codexModels, codexProjects, codexRun, codexSessions, type CodexEntry, type CodexResult, type CodexSession } from "./data/codex";
 import { frameHref, useFrameParam } from "./shells/frame-route";
+import { OsRail, osTabs } from "./shells/os-shell";
 
 export const meta = {
   title: "Agente de código (tarefas longas)",
@@ -62,21 +58,6 @@ export const meta = {
 } as const;
 
 const here = frameHref("ai-codex");
-const rail: RailItem[][] = [
-  [
-    { href: here, label: "Sessões", icon: Inbox },
-    { href: frameHref("ai-sessions-empty"), label: "Início", icon: House },
-    { href: frameHref("ai-agent-run"), label: "Execuções", icon: Clock },
-    { href: frameHref("ai-projects"), label: "Projetos", icon: FolderClosed },
-  ],
-];
-const tabs: NavItem[] = [
-  { href: here, label: "Sessões", icon: Inbox },
-  { href: frameHref("ai-sessions-empty"), label: "Início", icon: House },
-  { href: frameHref("ai-agent-run"), label: "Execuções", icon: Clock },
-  { href: frameHref("ai-projects"), label: "Projetos", icon: FolderClosed },
-];
-
 let seq = 0;
 const uid = (p: string) => `${p}-${Date.now().toString(36)}-${++seq}`;
 const isMobile = () => typeof window !== "undefined" && window.matchMedia("(max-width: 767.98px)").matches;
@@ -417,24 +398,11 @@ export default function AiCodex() {
     <>
       <AgentAppLayout
         storageKey="ai-codex"
-        rail={
-          <IconRail
-            groups={rail}
-            currentPath={here}
-            mark={<ProductMark size={30} />}
-            footer={
-              <Tooltip content="Configurações" side="right">
-                <a href={frameHref("settings-profile")} aria-label="Configurações" className="grid h-9 w-9 place-items-center rounded-lg text-muted hover:bg-ink/[0.05] hover:text-ink">
-                  <Settings className="h-[17px] w-[17px]" />
-                </a>
-              </Tooltip>
-            }
-          />
-        }
+        rail={<OsRail current={here} sessions={here} />}
         list={sessionList}
         main={main}
         mobileView={mobileView}
-        mobileNav={<BottomNav items={tabs} currentPath={here} />}
+        mobileNav={<BottomNav items={osTabs(here)} currentPath={here} />}
       />
       <InputModal
         open={!!renaming}

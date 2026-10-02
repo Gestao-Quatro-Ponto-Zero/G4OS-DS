@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import type { DragEvent, ReactNode } from "react";
+import { useEffect, useRef, type DragEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Avatar } from "./primitives";
 
@@ -35,21 +35,30 @@ export function StagePath({
   className?: string;
 }) {
   const idx = stages.findIndex((s) => s.id === current);
+  const listRef = useRef<HTMLOListElement>(null);
+  // Celular: a lista rola na horizontal; leva a etapa atual para a vista (sem rolar a página).
+  useEffect(() => {
+    const ol = listRef.current;
+    const cur = ol?.querySelector<HTMLElement>('[aria-current="step"]');
+    if (!ol || !cur || ol.scrollWidth <= ol.clientWidth) return;
+    ol.scrollLeft = Math.max(0, cur.offsetLeft - ol.offsetLeft - 8);
+  }, [current]);
   return (
-    <ol aria-label={label} tabIndex={onSelect ? undefined : 0} className={cn("flex min-w-0 list-none gap-1 overflow-x-auto p-0 outline-none focus-visible:ring-2 focus-visible:ring-muted/50", className)}>
+    <ol ref={listRef} aria-label={label} tabIndex={onSelect ? undefined : 0} className={cn("flex min-w-0 list-none gap-1 overflow-x-auto p-0 outline-none focus-visible:ring-2 focus-visible:ring-muted/50", className)}>
       {stages.map((s, i) => {
         const state = outcome ? (i <= idx ? "done" : "skipped") : i < idx ? "done" : i === idx ? "current" : "upcoming";
         const inner = (
           <>
             {state === "done" && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} aria-hidden />}
-            <span className="truncate">{s.label}</span>
+            {/* Concluídas viram só ✓ no celular: sobra espaço para a etapa atual. */}
+            <span className={cn("truncate", state === "done" && "max-sm:sr-only")}>{s.label}</span>
           </>
         );
         const cls = cn(
-          "flex h-9 min-w-[96px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap px-3 text-[12.5px] transition-colors",
+          "flex h-9 flex-1 items-center justify-center gap-1.5 whitespace-nowrap px-3 text-[12.5px] transition-colors",
           i === 0 ? "rounded-l-lg" : "",
           i === stages.length - 1 && !outcome ? "rounded-r-lg" : "",
-          state === "done" && "bg-primary font-medium text-on-primary",
+          state === "done" ? "min-w-10 bg-primary font-medium text-on-primary sm:min-w-[96px]" : "min-w-[96px]",
           state === "current" && "bg-accent-soft font-medium text-accent-deep ring-1 ring-inset ring-accent/50",
           state === "upcoming" && "bg-soft text-muted",
           state === "skipped" && "bg-soft text-muted",

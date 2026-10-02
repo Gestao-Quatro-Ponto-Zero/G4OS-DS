@@ -26,4 +26,4 @@ Vendas do dia contra a meta, OTIF por semana, causas de atraso (Pareto), maiores
 
 ## Componentes usados
 
-`AreaChart`, `Badge`, `BarList`, `ChartCard`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCompact`, `formatCurrency`, `formatNumber`
+`AreaChart`, `Badge`, `BarList`, `ChartCard`, `Empty`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCompact`, `formatCurrency`, `formatNumber`

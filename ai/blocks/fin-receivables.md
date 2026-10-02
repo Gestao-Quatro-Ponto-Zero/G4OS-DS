@@ -27,4 +27,4 @@ Vencidos e a vencer em abas, aging em barras, DataGrid com tom por atraso, total
 
 ## Componentes usados
 
-`Badge`, `BarChart`, `Button`, `ChartCard`, `DataGrid`, `DatePicker`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FieldBlock`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PropertyList`, `TableSearch`, `Tabs`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`
+`Badge`, `BarChart`, `Button`, `ChartCard`, `DataGrid`, `DatePicker`, `Drawer`, `Empty`, `EmptyFilterResult`, `EntityMark`, `FieldBlock`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PropertyList`, `TableSearch`, `Tabs`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`

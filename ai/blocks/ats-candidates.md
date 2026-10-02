@@ -16,6 +16,7 @@ Todos os candidatos em DataGrid: visões salvas, filtros, busca local (/), sele�
 - Visões salvas, filtros e busca local (/) na barra da grade
 - Seleção em massa com BulkBar (mover etapa, e-mail)
 - Ações rápidas na linha; colunas configuráveis; CSV
+- Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar
 
 **Quando usar e o que adaptar**
 
@@ -27,4 +28,4 @@ Todos os candidatos em DataGrid: visões salvas, filtros, busca local (/), sele�
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `DataGrid`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Menu`, `Modal`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `Select`, `TableSearch`, `TextField`, `formatCurrency`, `notify`, `plural`, `useFilters`, `useSavedViews`
+`Avatar`, `Badge`, `Button`, `DataGrid`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Menu`, `Modal`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `Select`, `TableSearch`, `TextField`, `formatCurrency`, `notify`, `plural`, `useFilters`, `useSavedViews`

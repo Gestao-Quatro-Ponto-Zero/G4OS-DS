@@ -31,4 +31,4 @@ Documentação com muitas páginas: SectionNav na sidebar com seções, subitens
 
 ## Componentes usados
 
-`AppShell`, `Callout`, `IconButton`, `NavSection`, `NavSubItem`, `Page`, `PageHeading`, `SectionNav`, `Sidebar`, `notify`
+`AppShell`, `Callout`, `Command`, `CommandPalette`, `IconButton`, `NavSection`, `NavSubItem`, `Page`, `PageHeading`, `SectionNav`, `Sidebar`, `useCommandShortcut`

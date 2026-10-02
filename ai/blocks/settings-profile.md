@@ -27,4 +27,4 @@ Configurações com subnavegação lateral (vira abas roláveis no celular), se�
 
 ## Componentes usados
 
-`Avatar`, `Button`, `ConfirmDialog`, `MaskedField`, `Select`, `SettingsSection`, `TextField`, `TextareaField`, `masks`, `notify`
+`Avatar`, `Button`, `Callout`, `ConfirmDialog`, `MaskedField`, `Modal`, `Select`, `SettingsSection`, `TextField`, `TextareaField`, `masks`, `notify`

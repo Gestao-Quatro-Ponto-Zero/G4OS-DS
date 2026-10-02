@@ -1,15 +1,23 @@
-import { Check, CreditCard, Download } from "lucide-react";
+import { Check, CreditCard, Download, FileText } from "lucide-react";
 import { useState } from "react";
 import {
   Badge,
   Button,
+  ChoiceCards,
   ConfirmDialog,
   DataTable,
+  Drawer,
   Meter,
+  OperationButton,
+  OperationFeedback,
+  RadioGroup,
   SegmentedControl,
+  TextField,
+  TextareaField,
   cn,
   formatCurrency,
   notify,
+  useOperation,
   type Column } from "@g4ai/ds";
 import { plans as sharedPlans, type PlanId } from "./data/plans";
 import { org } from "./data/workspace";
@@ -82,6 +90,113 @@ function UsageMeter({ label, value, limit, format = (n: number) => n.toLocaleStr
   );
 }
 
+type PayMethod = { kind: "cartao"; brand: string; last4: string; exp: string } | { kind: "boleto"; email: string; cnpj: string };
+const cancelReasons = [
+  { value: "preco", label: "Ficou caro para o time" },
+  { value: "uso", label: "O time não usou o suficiente" },
+  { value: "falta", label: "Falta um recurso que precisamos" },
+  { value: "troca", label: "Vamos usar outra ferramenta" },
+  { value: "outro", label: "Outro motivo" },
+] as const;
+type CancelReason = (typeof cancelReasons)[number]["value"];
+const digits = (v: string) => v.replace(/\D/g, "");
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Troca da forma de pagamento: cartão ou boleto, num Drawer (a página continua atrás). */
+function PaymentDrawer({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: (m: PayMethod) => void }) {
+  const [kind, setKind] = useState<"cartao" | "boleto">("cartao");
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [exp, setExp] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [email, setEmail] = useState("financeiro@acme.com.br");
+  const [cnpj, setCnpj] = useState("12.345.678/0001-90");
+  const [tried, setTried] = useState(false);
+  const op = useOperation({ busyLabel: "Salvando…" });
+
+  const errors =
+    kind === "cartao"
+      ? {
+          name: !name.trim() ? "Escreva o nome como está no cartão." : undefined,
+          number: digits(number).length < 13 ? "O número do cartão tem de 13 a 16 dígitos." : undefined,
+          exp: !/^(0[1-9]|1[0-2])\/\d{2}$/.test(exp) ? "Use o formato MM/AA, por exemplo 08/29." : undefined,
+          cvv: digits(cvv).length < 3 ? "O código tem 3 ou 4 dígitos, no verso do cartão." : undefined,
+        }
+      : {
+          email: !/.+@.+\..+/.test(email) ? "Escreva um e-mail válido para receber os boletos." : undefined,
+          cnpj: digits(cnpj).length !== 14 ? "O CNPJ tem 14 dígitos." : undefined,
+        };
+  const invalid = Object.values(errors).some(Boolean);
+  const show = (k: string) => (tried ? (errors as Record<string, string | undefined>)[k] : undefined);
+
+  const save = () => {
+    setTried(true);
+    if (invalid) return;
+    const method: PayMethod = kind === "cartao" ? { kind, brand: digits(number).startsWith("5") ? "Mastercard" : "Visa", last4: digits(number).slice(-4), exp } : { kind, email, cnpj };
+    void op.run(() => wait(700), kind === "cartao" ? `Cartão terminado em ${method.kind === "cartao" ? method.last4 : ""} salvo` : "Cobrança por boleto ativada").then((err) => {
+      if (err) return;
+      onSaved(method);
+      setTried(false);
+      setNumber("");
+      setCvv("");
+      onClose();
+    });
+  };
+
+  return (
+    <Drawer
+      open={open}
+      onClose={onClose}
+      kicker="Plano e cobrança"
+      title="Trocar forma de pagamento"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <OperationButton operation={op} onClick={save}>
+            Salvar forma de pagamento
+          </OperationButton>
+        </>
+      }
+    >
+      <div className="space-y-5">
+        <OperationFeedback operation={op} />
+        <ChoiceCards<"cartao" | "boleto">
+          label="Como você quer pagar"
+          columns={2}
+          value={kind}
+          onChange={(v) => {
+            setKind(v);
+            setTried(false);
+          }}
+          options={[
+            { value: "cartao", label: "Cartão de crédito", description: "Cobrança automática na renovação" },
+            { value: "boleto", label: "Boleto", description: "Enviado por e-mail 10 dias antes" },
+          ]}
+        />
+        {kind === "cartao" ? (
+          <>
+            <TextField label="Nome no cartão" value={name} onChange={setName} placeholder="Ex.: Joana R Silva" autoComplete="cc-name" error={show("name")} />
+            <TextField label="Número do cartão" value={number} onChange={(v) => setNumber(v.replace(/[^\d ]/g, "").slice(0, 19))} placeholder="0000 0000 0000 0000" inputMode="numeric" autoComplete="cc-number" error={show("number")} />
+            <div className="grid grid-cols-2 gap-3">
+              <TextField label="Validade" value={exp} onChange={(v) => setExp(v.slice(0, 5))} placeholder="MM/AA" inputMode="numeric" autoComplete="cc-exp" error={show("exp")} />
+              <TextField label="Código de segurança" value={cvv} onChange={(v) => setCvv(digits(v).slice(0, 4))} placeholder="123" inputMode="numeric" autoComplete="cc-csc" error={show("cvv")} />
+            </div>
+            <p className="m-0 text-[12px] leading-relaxed text-muted">Os dados do cartão vão direto para o provedor de pagamento. Nós guardamos só a bandeira e os 4 últimos dígitos.</p>
+          </>
+        ) : (
+          <>
+            <TextField label="E-mail para os boletos" type="email" value={email} onChange={setEmail} error={show("email")} />
+            <TextField label="CNPJ do pagador" value={cnpj} onChange={setCnpj} inputMode="numeric" error={show("cnpj")} />
+            <p className="m-0 text-[12px] leading-relaxed text-muted">Boleto compensa em até 3 dias úteis. Se vencer sem pagamento, o acesso continua por mais 7 dias.</p>
+          </>
+        )}
+      </div>
+    </Drawer>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Tela                                                                */
 /* ------------------------------------------------------------------ */
@@ -90,6 +205,12 @@ export default function SettingsBillingBlock() {
   const [cycle, setCycle] = useState<"mensal" | "anual">("mensal");
   const [pending, setPending] = useState<Plan | null>(null);
   const [plan, setPlan] = useState<PlanId>(current);
+  const [payOpen, setPayOpen] = useState(false);
+  const [method, setMethod] = useState<PayMethod>({ kind: "cartao", brand: "Visa", last4: "4821", exp: "08/28" });
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [reason, setReason] = useState<CancelReason | null>(null);
+  const [reasonText, setReasonText] = useState("");
+  const [canceled, setCanceled] = useState(false);
   const price = (p: Plan) => (p.monthly == null ? null : cycle === "anual" ? p.monthly * 0.83 : p.monthly);
   const active = plans.find((p) => p.id === plan)!;
 
@@ -126,13 +247,26 @@ export default function SettingsBillingBlock() {
               {active.name} <Badge tone="accent">Mensal</Badge>
             </p>
             <p className="m-0 mt-1 text-[13px] text-muted">
-              {active.monthly != null ? `${formatCurrency(active.monthly)}/mês` : "Sob contrato"} · renova em {renewal}
+              {active.monthly != null ? `${formatCurrency(active.monthly)}/mês` : "Sob contrato"} · {canceled ? `acesso até ${renewal}, sem renovação` : `renova em ${renewal}`}
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={() => notify("Pedido de cancelamento aberto: nosso time entra em contato em até 1 dia útil", undefined, "info")}>
-              Cancelar assinatura
-            </Button>
+            {canceled ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setCanceled(false);
+                  notify("Assinatura reativada");
+                }}
+              >
+                Reativar assinatura
+              </Button>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => setCancelOpen(true)}>
+                Cancelar assinatura
+              </Button>
+            )}
             <Button size="sm" onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}>
               Mudar plano
             </Button>
@@ -146,13 +280,31 @@ export default function SettingsBillingBlock() {
       </section>
 
       <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3">
-        <span className="grid h-9 w-12 place-items-center rounded-md border border-line bg-soft text-[10px] font-bold tracking-wider text-blue">VISA</span>
-        <div className="min-w-0 flex-1">
-          <p className="m-0 text-[13.5px] font-medium">Visa terminado em 4821</p>
-          <p className="m-0 text-[12px] text-muted">Vence em 08/2028 · cobrança para financeiro@acme.com.br</p>
-        </div>
-        <Button size="sm" variant="ghost" onClick={() => notify("Abrimos o formulário seguro do provedor de pagamento", undefined, "info")}>
-          <CreditCard /> Trocar cartão
+        {method.kind === "cartao" ? (
+          <>
+            <span className="grid h-9 w-12 place-items-center rounded-md border border-line bg-soft text-[10px] font-bold uppercase tracking-wider text-blue">{method.brand === "Visa" ? "VISA" : "MC"}</span>
+            <div className="min-w-0 flex-1">
+              <p className="m-0 text-[13.5px] font-medium">
+                {method.brand} terminado em {method.last4}
+              </p>
+              <p className="m-0 text-[12px] text-muted">Vence em {method.exp} · cobrança para financeiro@acme.com.br</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <span className="grid h-9 w-12 place-items-center rounded-md border border-line bg-soft text-muted">
+              <FileText className="h-4 w-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="m-0 text-[13.5px] font-medium">Boleto bancário</p>
+              <p className="m-0 text-[12px] text-muted">
+                Enviado para {method.email} · CNPJ {method.cnpj}
+              </p>
+            </div>
+          </>
+        )}
+        <Button size="sm" variant="ghost" onClick={() => setPayOpen(true)}>
+          <CreditCard /> Trocar forma de pagamento
         </Button>
       </div>
 
@@ -208,6 +360,31 @@ export default function SettingsBillingBlock() {
         <h3 className="m-0 mb-3 text-[14px] font-medium">Faturas</h3>
         <DataTable rows={invoices} columns={columns} rowKey={(i) => i.id} />
       </section>
+
+      <PaymentDrawer open={payOpen} onClose={() => setPayOpen(false)} onSaved={setMethod} />
+
+      <ConfirmDialog
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+        tone="danger"
+        title="Cancelar a assinatura?"
+        description={`O workspace continua ativo até ${renewal}. Depois disso, fica só leitura por 30 dias e os dados podem ser exportados em Dados e privacidade.`}
+        confirmLabel="Cancelar assinatura"
+        cancelLabel="Manter assinatura"
+        onConfirm={() => {
+          // O motivo é opcional: o ConfirmDialog fecha ao confirmar; registre-o junto (reason, reasonText).
+          setCanceled(true);
+          setCancelOpen(false);
+          setReason(null);
+          setReasonText("");
+          notify(`Assinatura cancelada · acesso até ${renewal}`, () => setCanceled(false));
+        }}
+      >
+        <div className="space-y-4">
+          <RadioGroup<CancelReason> label="Por que você está cancelando?" options={cancelReasons.map((r) => ({ value: r.value, label: r.label }))} value={reason} onChange={setReason} optional />
+          <TextareaField label="Quer contar mais?" optional value={reasonText} onChange={setReasonText} placeholder="Ex.: precisamos de integração com o nosso ERP" minRows={2} />
+        </div>
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={!!pending}

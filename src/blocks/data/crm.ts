@@ -221,3 +221,111 @@ export const funnel = [
   { label: "Negociação", value: 118 },
   { label: "Ganho", value: 71 },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Registros criados nesta sessão (duplicar negócio, qualificar lead)  */
+/* ------------------------------------------------------------------ */
+
+/** Guarda o negócio na base em memória para que outra tela (?id=) o encontre. Troque por POST na sua API. */
+export const addDeal = (d: Deal) => {
+  deals.push(d);
+  return d;
+};
+export const addCompany = (c: Company) => {
+  companies.push(c);
+  return c;
+};
+export const addContact = (p: Contact) => {
+  contacts.push(p);
+  return p;
+};
+
+/* ------------------------------------------------------------------ */
+/* Propostas comerciais (cotações)                                     */
+/* ------------------------------------------------------------------ */
+
+export type QuoteStatus = "rascunho" | "enviada" | "aceita" | "recusada";
+export type QuoteItem = { id: string; description: string; qty: number; price: number };
+export type Quote = {
+  id: string;
+  number: string;
+  dealId: string;
+  companyId: string;
+  contactId?: string;
+  owner: string;
+  status: QuoteStatus;
+  created: string;
+  validUntil: string;
+  sentAt?: string;
+  viewed?: number;
+  discount: number;
+  items: QuoteItem[];
+  terms: string;
+  lostReason?: string;
+};
+export const quoteStatus: Record<QuoteStatus, { label: string; tone: "neutral" | "info" | "ok" | "bad" }> = {
+  rascunho: { label: "Rascunho", tone: "neutral" },
+  enviada: { label: "Enviada", tone: "info" },
+  aceita: { label: "Aceita", tone: "ok" },
+  recusada: { label: "Recusada", tone: "bad" },
+};
+export const quoteTotal = (q: Pick<Quote, "items" | "discount">) => q.items.reduce((s, i) => s + i.qty * i.price, 0) * (1 - q.discount);
+export const products = [
+  { id: "lic", label: "Licença anual por usuário", price: 1_920 },
+  { id: "impl", label: "Implantação e configuração", price: 24_000 },
+  { id: "trein", label: "Treinamento de times (turma)", price: 4_800 },
+  { id: "int", label: "Integração com ERP", price: 18_000 },
+  { id: "sup", label: "Suporte premium (anual)", price: 12_000 },
+];
+const item = (id: string, productId: string, qty: number, price?: number): QuoteItem => {
+  const p = products.find((x) => x.id === productId) ?? products[0];
+  return { id, description: p.label, qty, price: price ?? p.price };
+};
+export const quotes: Quote[] = [
+  { id: "q1", number: "PRP-2026-041", dealId: "d1", companyId: "c1", contactId: "p1", owner: "ana", status: "enviada", created: iso(-6), validUntil: iso(9), sentAt: iso(-5), viewed: 4, discount: 0.05, items: [item("i1", "lic", 240), item("i2", "impl", 1)], terms: "Pagamento mensal · 12 meses · reajuste IPCA" },
+  { id: "q2", number: "PRP-2026-040", dealId: "d2", companyId: "c2", contactId: "p4", owner: "bruno", status: "enviada", created: iso(-14), validUntil: iso(1), sentAt: iso(-13), viewed: 1, discount: 0, items: [item("i1", "lic", 60), item("i2", "int", 1)], terms: "Pagamento em 3 parcelas" },
+  { id: "q3", number: "PRP-2026-039", dealId: "d6", companyId: "c6", contactId: "p9", owner: "carla", status: "rascunho", created: iso(-1), validUntil: iso(29), discount: 0.08, items: [item("i1", "lic", 120), item("i2", "impl", 1), item("i3", "trein", 4)], terms: "Pagamento anual antecipado" },
+  { id: "q4", number: "PRP-2026-037", dealId: "d4", companyId: "c4", contactId: "p6", owner: "ana", status: "aceita", created: iso(-20), validUntil: iso(-5), sentAt: iso(-19), viewed: 6, discount: 0.1, items: [item("i1", "lic", 50), item("i2", "sup", 1)], terms: "Renovação · pagamento mensal" },
+  { id: "q5", number: "PRP-2026-035", dealId: "d12", companyId: "c12", contactId: "p16", owner: "diego", status: "recusada", created: iso(-25), validUntil: iso(-10), sentAt: iso(-24), viewed: 2, discount: 0, items: [item("i1", "lic", 20)], terms: "Pagamento mensal", lostReason: "Preço acima do orçamento" },
+  { id: "q6", number: "PRP-2026-042", dealId: "d9", companyId: "c9", contactId: "p12", owner: "ana", status: "rascunho", created: iso(0), validUntil: iso(30), discount: 0.12, items: [item("i1", "lic", 300, 1_800), item("i2", "impl", 1), item("i3", "sup", 2)], terms: "Contrato 24 meses · pagamento mensal" },
+  { id: "q7", number: "PRP-2026-038", dealId: "d10", companyId: "c10", contactId: "p14", owner: "bruno", status: "enviada", created: iso(-9), validUntil: iso(-1), sentAt: iso(-8), viewed: 0, discount: 0.05, items: [item("i1", "lic", 40), item("i2", "trein", 2)], terms: "Pagamento mensal" },
+];
+
+/* ------------------------------------------------------------------ */
+/* Leads para qualificar (formulário do site, eventos, indicação)      */
+/* ------------------------------------------------------------------ */
+
+export type LeadStatus = "novo" | "em-contato" | "desqualificado";
+export type Lead = {
+  id: string;
+  name: string;
+  initials: string;
+  tint: string;
+  role: string;
+  email: string;
+  phone: string;
+  company: string;
+  domain: string;
+  /** Empresa já existente na base (lead de conta conhecida). */
+  companyId?: string;
+  size: string;
+  city: string;
+  source: string;
+  received: string;
+  receivedTime: string;
+  score: number;
+  signals: { label: string; points: number }[];
+  message: string;
+  interest: string;
+  estimate: number;
+  status: LeadStatus;
+};
+export const leads: Lead[] = [
+  { id: "l1", name: "Priscila Antunes", initials: "PA", tint: tints[0], role: "Gerente de Operações", email: "priscila.antunes@lumen.com.br", phone: "(11) 98122-4410", company: "Lumen Energia", domain: "lumen.com.br", size: "501–1.000", city: "São Paulo, SP", source: "Formulário do site", received: iso(0), receivedTime: "08:42", score: 86, signals: [{ label: "Pediu demonstração", points: 30 }, { label: "Porte dentro do perfil ideal", points: 25 }, { label: "Visitou a página de preços 3 vezes", points: 18 }, { label: "Cargo com poder de decisão", points: 13 }], message: "Somos 600 pessoas em 4 unidades e queremos centralizar o acompanhamento comercial. Hoje usamos planilhas. Dá para ver uma demonstração esta semana?", interest: "Licenças para 80 usuários", estimate: 153_600, status: "novo" },
+  { id: "l2", name: "Otávio Lins", initials: "OL", tint: tints[1], role: "Diretor Financeiro", email: "otavio.lins@vidaplena.com.br", phone: "(81) 99641-2203", company: "Farmácias Vida Plena", domain: "vidaplena.com.br", companyId: "c7", size: "1.000+", city: "Recife, PE", source: "Evento", received: iso(0), receivedTime: "07:15", score: 72, signals: [{ label: "Conta já em negociação", points: 25 }, { label: "Cargo com poder de decisão", points: 20 }, { label: "Conversou no estande", points: 15 }, { label: "Porte dentro do perfil ideal", points: 12 }], message: "Conversamos no Fórum Varejo. Quero entender o módulo financeiro para as 120 lojas.", interest: "Módulo financeiro", estimate: 96_000, status: "novo" },
+  { id: "l3", name: "Sérgio Matos", initials: "SM", tint: tints[2], role: "Sócio", email: "sergio@padariaboapao.com.br", phone: "(31) 98877-1902", company: "Padaria Boa Pão", domain: "padariaboapao.com.br", size: "11–50", city: "Contagem, MG", source: "Formulário do site", received: iso(-1), receivedTime: "19:30", score: 34, signals: [{ label: "Pediu orçamento", points: 20 }, { label: "Porte abaixo do perfil ideal", points: -10 }, { label: "Primeira visita ao site", points: 4 }, { label: "Cargo com poder de decisão", points: 20 }], message: "Quanto custa para 5 pessoas?", interest: "Plano para 5 usuários", estimate: 9_600, status: "novo" },
+  { id: "l4", name: "Larissa Freire", initials: "LF", tint: tints[3], role: "Coordenadora de TI", email: "larissa.freire@unimetro.edu.br", phone: "(21) 99210-5531", company: "Universidade Metropolitana", domain: "unimetro.edu.br", size: "1.000+", city: "Rio de Janeiro, RJ", source: "Indicação", received: iso(-1), receivedTime: "14:05", score: 64, signals: [{ label: "Indicação de cliente (Rede Horizonte)", points: 30 }, { label: "Porte dentro do perfil ideal", points: 25 }, { label: "Cargo sem poder de decisão", points: 9 }], message: "A Rede Horizonte nos indicou. Precisamos integrar com o nosso ERP acadêmico.", interest: "Integração com ERP", estimate: 72_000, status: "em-contato" },
+  { id: "l5", name: "Fábio Reis", initials: "FR", tint: tints[4], role: "Analista de Compras", email: "fabio.reis@transvale.com.br", phone: "(12) 99104-7788", company: "Transvale Cargas", domain: "transvale.com.br", size: "201–500", city: "São José dos Campos, SP", source: "LinkedIn", received: iso(-2), receivedTime: "10:20", score: 48, signals: [{ label: "Baixou o e-book de logística", points: 15 }, { label: "Porte dentro do perfil ideal", points: 25 }, { label: "Cargo de compras (precisa do decisor)", points: 8 }], message: "Estamos cotando sistemas para o time comercial. Podem mandar material?", interest: "Licenças para 25 usuários", estimate: 48_000, status: "em-contato" },
+  { id: "l6", name: "Bruna Teixeira", initials: "BT", tint: tints[5], role: "Estudante", email: "bruna.t@email.com", phone: "(48) 99812-0034", company: "—", domain: "email.com", size: "—", city: "Florianópolis, SC", source: "Formulário do site", received: iso(-3), receivedTime: "22:10", score: 6, signals: [{ label: "E-mail pessoal", points: -10 }, { label: "Sem empresa informada", points: -10 }, { label: "Baixou material", points: 26 }], message: "Estou fazendo um TCC sobre CRMs. Vocês têm material sobre o produto?", interest: "Material acadêmico", estimate: 0, status: "desqualificado" },
+];
+export const disqualifyReasons = ["Fora do perfil (porte ou setor)", "Sem orçamento", "Sem intenção de compra", "Contato inválido ou duplicado", "Concorrente ou pesquisa"];

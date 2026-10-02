@@ -19,6 +19,8 @@ export const authRoutes = {
   forgot: frameHref("auth-forgot-password"),
   otp: (next: "entrar" | "cadastro", email?: string) => frameHref("auth-otp", { next, email }),
   wizard: frameHref("onboarding-wizard"),
+  terms: frameHref("app-legal", { p: "termos" }),
+  privacy: frameHref("app-legal", { p: "privacidade" }),
   home: atlasRoutes.home,
 } as const;
 
@@ -32,16 +34,16 @@ export function AuthBrand({ className }: { className?: string }) {
   );
 }
 
-/** Rodapé legal padrão (termos e privacidade levam ao site). */
+/** Rodapé legal padrão (termos e privacidade levam à página legal). */
 export function AuthLegal() {
   return (
     <>
       Ao continuar você aceita os{" "}
-      <a href={authRoutes.landing} className="underline underline-offset-2 hover:text-ink">
+      <a href={authRoutes.terms} className="underline underline-offset-2 hover:text-ink">
         Termos
       </a>{" "}
       e a{" "}
-      <a href={authRoutes.landing} className="underline underline-offset-2 hover:text-ink">
+      <a href={authRoutes.privacy} className="underline underline-offset-2 hover:text-ink">
         Política de privacidade
       </a>
       .

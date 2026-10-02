@@ -111,17 +111,24 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 
 ## Qual bloco usar
 
-Os blocos estão em `src/blocks/` e no site em **Blocos**. Categorias: SaaS, CRM, ATS, ERP, Financeiro, Autenticação, Configurações, Onboarding, Aplicação.
+Os blocos estão em `src/blocks/` e no site em **Blocos**. Categorias: SaaS, CRM, ATS, ERP, Serviços, Financeiro, Contratos, Comunicação, IA, Autenticação, Configurações, Onboarding, Aplicação. Cada categoria é um produto de exemplo navegável (casca em `src/blocks/shells/`), não telas soltas.
 
 | Tipo de app | Início | Lista / quadro | Registro | Também |
 | --- | --- | --- | --- | --- |
-| **CRM** | `crm-sales-dashboard` | `crm-pipeline`, `crm-contacts` | `crm-deal` | `auth-login`, `settings-team`, `app-command-palette` |
-| **ATS** | `ats-dashboard` | `ats-jobs`, `ats-pipeline` | `ats-candidate` | `onboarding-wizard`, `app-notifications` |
-| **ERP** | `saas-dashboard` adaptado + `erp-inventory` | `erp-orders`, `erp-inventory`, `erp-purchase-requests` | `erp-invoice` (documento) | `fin-*`, `app-file-manager` |
-| **Financeiro** | `fin-cashflow` | `fin-receivables` | lançamento em `Drawer` | `fin-dre` |
-| **SaaS / produto** | `saas-dashboard` | `saas-customers` | detalhe em drawer (`saas-customers`) | `saas-analytics`, `settings-*`, `onboarding-*` |
+| **CRM** | `crm-sales-dashboard` | `crm-pipeline`, `crm-contacts`, `crm-leads`, `crm-quotes` | `crm-deal`, `crm-company` | `auth-login`, `settings-team`, `app-command-palette` |
+| **ATS** | `ats-dashboard` | `ats-jobs`, `ats-pipeline`, `ats-requisitions` | `ats-candidate` | `ats-admission`, `ats-reports`, `onboarding-wizard` |
+| **ERP (produtos)** | `erp-dashboard` | `erp-orders`, `erp-products`, `erp-purchase-orders`, `erp-stock-movements`, `erp-shipping` | `erp-order`, `erp-purchase-order`, `erp-invoice` (documento) | `erp-receiving`, `fin-*`, `app-file-manager` |
+| **ERP de serviços** (Conta Azul, Omie) | `srv-dashboard` | `srv-work-orders` (quadro), `srv-quotes`, `srv-contracts`, `srv-invoices` | `srv-work-order`, `srv-client` | `srv-billing`, `srv-schedule` |
+| **Financeiro** | `fin-dashboard`, `fin-cashflow` | `fin-receivables`, `fin-payables` | lançamento em `Drawer` | `fin-dre`, `fin-reconciliation`, `fin-bank-accounts` |
+| **Contratos** (CLM) | `clm-dashboard` | `clm-contracts`, `clm-obligations` | `clm-contract` | `clm-request` (assistente), `clm-approvals`, `clm-templates` |
+| **Comunicação interna** | `comms-home` | `comms-people`, `comms-events`, `comms-surveys` | `comms-announcement` | `comms-compose`, `comms-channels`, `comms-analytics` |
+| **Gestão de agentes de IA** | `ai-agents-dashboard` | `ai-agents`, `ai-runs`, `ai-approvals` | `ai-agent`, `ai-agent-run` | `ai-agent-builder`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-templates` |
+| **Assistente / chat de IA** | `ai-workspace` | `ai-sessions`, `ai-projects` | `ai-trace` | `ai-chat`, `ai-conversation`, `ai-assistant` |
+| **SaaS / produto** | `saas-dashboard` | `saas-customers`, `saas-plans`, `saas-usage` | `saas-customer` | `saas-analytics`, `settings-*`, `onboarding-*` |
 | **Portal do cliente** | `onboarding-checklist` + `NextStep` | lista simples | — | `auth-login`, `auth-otp`, `app-file-manager` |
-| **Qualquer app** | — | — | — | `auth-*`, `settings-profile`/`-billing`/`-notifications`/`-team`, `app-error-pages`, `app-presentation` |
+| **Qualquer app** | — | — | — | `auth-*`, `settings-profile`/`-organization`/`-roles`/`-billing`/`-notifications`/`-team`/`-webhooks`/`-data`, `app-error-pages`, `app-legal`, `app-presentation` |
+
+Receitas por tipo de app (entidades, mapa de navegação, telas): `docs/receitas/` (CRM, ATS, ERP, ERP de serviços, financeiro, contratos, comunicação interna, agentes de IA, portal).
 
 Catálogo completo com descrições no [README](README.md#blocos).
 

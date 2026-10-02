@@ -13,7 +13,9 @@ Meta do trimestre com ritmo esperado, receita por mês contra a meta, funil de c
 **Padrões aplicados**
 
 - Anatomia B · Painel: cabeçalho fixo com seletor de time
-- Meta com ritmo esperado (GoalMeter) antes de tudo
+- KPIs levam à lista já filtrada (drill-down)
+- “Precisa de você” logo abaixo dos KPIs: negócios parados, atividades atrasadas, leads e propostas vencendo
+- Meta com ritmo esperado (GoalMeter)
 - Receita × meta, funil, ranking e motivos de perda (Pareto)
 
 **Quando usar e o que adaptar**
@@ -26,4 +28,4 @@ Meta do trimestre com ritmo esperado, receita por mês contra a meta, funil de c
 
 ## Componentes usados
 
-`BarChart`, `ChartCard`, `CompareStat`, `FunnelChart`, `GaugeChart`, `GoalMeter`, `KpiCard`, `KpiGrid`, `Leaderboard`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCurrency`, `formatNumber`, `formatPercent`
+`BarChart`, `ChartCard`, `CompareStat`, `FunnelChart`, `GaugeChart`, `GoalMeter`, `KpiCard`, `KpiGrid`, `Leaderboard`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCurrency`, `formatNumber`, `formatPercent`

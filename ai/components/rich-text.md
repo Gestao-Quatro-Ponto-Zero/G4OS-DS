@@ -64,3 +64,20 @@ Exemplo (showcase `#/p/editor-de-texto`):
 ```tsx
 <RichTextToolbar onCommand={(t, v) => editor.chain().focus().run(t, v)} active={{ bold: editor.isActive("bold") }} />
 ```
+
+## RichTextView
+
+Mostra texto rico (HTML do RichTextEditor, comentário, comunicado) só para leitura, com o mesmo estilo do editor.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `value` * | `string` |  |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/editor-de-texto`):
+
+```tsx
+<RichTextView value={comunicado.html} />
+```

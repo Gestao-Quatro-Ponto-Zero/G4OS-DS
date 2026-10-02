@@ -7,6 +7,7 @@ import {
   ChartCard,
   DataTable,
   Drawer,
+  Empty,
   EmptyFilterResult,
   EntityMark,
   FilterBar,
@@ -21,8 +22,11 @@ import {
   SortHeader,
   TableSearch,
   WaterfallChart,
+  downloadCsv,
   formatCurrency,
   formatDate,
+  formatNumber,
+  gridToCsv,
   notify,
   selectionColumn,
   useFilters,
@@ -31,9 +35,11 @@ import {
   useSort,
   type Column,
   type FilterField,
+  type GridColumn,
+  PageToolbar,
 } from "@g4ai/ds";
-import { customerById, daysFromToday, go, invoiceLabel, invoices as baseInvoices, invoiceTone, mrrMovements, today, totalMrr, useFrameParam, type Invoice, type InvoiceStatus } from "./data/saas";
-import { SaasShell } from "./shells/saas-shell";
+import { customerById, daysFromToday, go, iso, invoiceLabel, invoices as baseInvoices, invoiceTone, mrrMovements, today, totalMrr, useFrameParam, type Invoice, type InvoiceStatus } from "./data/saas";
+import { ListError, ListSkeleton, SaasShell, useDemoState } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -69,15 +75,28 @@ const fields: FilterField<Invoice>[] = [
   { key: "issued", label: "Emissão", type: "date", accessor: (i) => i.issued },
 ];
 
+/** Arquivo para a contabilidade: uma linha por fatura (separador ";", decimal ","). */
+const csvColumns: GridColumn<Invoice>[] = [
+  { key: "number", header: "Nota", value: (i) => i.number },
+  { key: "customer", header: "Cliente", value: (i) => customerById(i.customerId).name },
+  { key: "cnpj", header: "CNPJ", value: (i) => customerById(i.customerId).cnpj },
+  { key: "issued", header: "Emissão", value: (i) => formatDate(i.issued) },
+  { key: "due", header: "Vencimento", value: (i) => formatDate(i.due) },
+  { key: "method", header: "Forma", value: (i) => i.method },
+  { key: "status", header: "Situação", value: (i) => invoiceLabel[i.status] },
+  { key: "amount", header: "Valor (R$)", value: (i) => i.amount },
+];
+
 export default function SaasBilling() {
   const [invoices, setInvoices] = useState(baseInvoices);
+  const estado = useDemoState();
   const id = useFrameParam("id");
   const [open, setOpen] = useState<Invoice | null>(null);
   useEffect(() => {
     if (id) setOpen(baseInvoices.find((i) => i.id === id) ?? null);
   }, [id]);
 
-  const filters = useFilters(invoices, {
+  const filters = useFilters(estado === "vazio" ? [] : invoices, {
     fields,
     search: (i) => [i.number, customerById(i.customerId).name],
     now: today,
@@ -85,6 +104,17 @@ export default function SaasBilling() {
     initial: { query: "", conditions: [{ id: "pend", field: "status", op: "is", value: ["falhou", "vencida", "aberta"] }] },
   });
   const q = filters.state.query;
+  // Busca vinda do ⌘K ("Ver todos"): procura em todas as situações.
+  const hashQuery = useFrameParam("q");
+  const { setState } = filters;
+  useEffect(() => {
+    if (hashQuery) setState({ query: hashQuery, conditions: [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hashQuery]);
+  const exportCsv = () => {
+    downloadCsv(`faturas-pulso-${iso(0)}`, gridToCsv(sort.rows, csvColumns));
+    notify(`${formatNumber(sort.rows.length)} ${sort.rows.length === 1 ? "fatura exportada" : "faturas exportadas"} para a contabilidade (CSV)`);
+  };
   const sort = useSort(filters.rows, { valor: (i) => i.amount, venc: (i) => i.due }, { key: "venc", dir: "asc" });
   const pages = usePagination(sort.rows, 10, { resetKey: [filters.state, sort.sort] });
   const sel = useSelection(pages.rows.map((i) => i.id));
@@ -141,7 +171,7 @@ export default function SaasBilling() {
           title="Cobrança"
           description="Receita recorrente, faturas e a régua de cobrança automática (4 tentativas em 10 dias)."
           actions={
-            <Button variant="ghost" onClick={() => notify("Exemplo: exporta as faturas do período para o contador (XML + PDF).", undefined, "info")}>
+            <Button variant="ghost" disabled={!filters.shown} disabledReason="Nenhuma fatura no recorte atual" onClick={exportCsv}>
               <Download /> Exportar para contabilidade
             </Button>
           }
@@ -178,9 +208,22 @@ export default function SaasBilling() {
           </div>
 
           <section className="space-y-4">
-            <FilterBar filters={filters} noun="fatura" search={<TableSearch value={q} onChange={filters.setQuery} total={invoices.length} noun="fatura" searchIn="cliente e número da nota" />} />
-            <DataTable rows={pages.rows} columns={columns} rowKey={(i) => i.id} onRowClick={setOpen} rowLabel={(i) => `Abrir ${i.number}`} empty={<EmptyFilterResult filters={filters} noun="fatura" />} />
-            <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
+            <h2 className="m-0 text-[14px] font-medium">Faturas</h2>
+            <PageToolbar>
+              <FilterBar filters={filters} noun="fatura" search={<TableSearch value={q} onChange={filters.setQuery} total={filters.total} noun="fatura" searchIn="cliente e número da nota" />} />
+            </PageToolbar>
+            {estado === "carregando" ? (
+              <ListSkeleton label="Carregando faturas" />
+            ) : estado === "erro" ? (
+              <ListError noun="as faturas" />
+            ) : !filters.total ? (
+              <Empty title="Nenhuma fatura emitida ainda" hint="As faturas aparecem aqui quando o primeiro cliente sai do trial. Conecte o Stripe ou o Pagar.me para cobrar automaticamente." action={<Button href="#/frame/saas-integrations">Conectar meio de pagamento</Button>} />
+            ) : (
+              <>
+                <DataTable rows={pages.rows} columns={columns} rowKey={(i) => i.id} onRowClick={setOpen} rowLabel={(i) => `Abrir ${i.number}`} empty={<EmptyFilterResult filters={filters} noun="fatura" gender="f" />} />
+                <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
+              </>
+            )}
           </section>
         </div>
         <BulkBar count={sel.count} noun="fatura" onClear={sel.clear}>

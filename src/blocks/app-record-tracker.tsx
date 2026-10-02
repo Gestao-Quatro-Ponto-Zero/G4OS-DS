@@ -1,13 +1,18 @@
-import { CalendarDays, Check, ChevronDown, Database, Filter, Kanban, Plus, Redo2, Table2, Tag, Undo2, Users } from "lucide-react";
+import { Check, ChevronDown, Database, Download, Filter, Kanban, Plus, Redo2, Table2, Tag, Undo2, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivitySection,
   Avatar,
+  Button,
   Checkbox,
   DataGrid,
+  DueDatePicker,
+  Empty,
+  FileDropzone,
   FilesList,
   KanbanBoard,
   KanbanColumn,
+  Modal,
   NotesTable,
   PriorityIcon,
   PriorityPill,
@@ -18,6 +23,7 @@ import {
   RecordSection,
   SectionAddButton,
   SegmentedControl,
+  Skeleton,
   StatusPill,
   TableSearch,
   TagPill,
@@ -29,11 +35,12 @@ import {
   type GridColumn,
   type Priority,
   type RecordFile,
+  type RecordFileKind,
   type TaskStatus,
 } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { setFrameQuery, useFrameParam } from "./shells/frame-route";
-import { cases as initial, categories, categoryColor, notes, personOf, statuses, type QaCase } from "./data/qa-tracker";
+import { cases as initial, categories, categoryColor, notes, personOf, qaLabels, sharingLabel, statuses, type QaCase, type QaSharing } from "./data/qa-tracker";
 import { people } from "./data/workspace";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -69,8 +76,20 @@ const statusColorVar: Record<TaskStatus, string> = {
   "sem-status": "var(--ds-tag-gray-fg)",
 };
 
+/** "30/10/2026" ↔ "2026-10-30" (o DueDatePicker trabalha em ISO). */
+const toIso = (br: string) => (br ? br.split("/").reverse().join("-") : "");
+const toBr = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "");
+const kindOf = (name: string): RecordFileKind => (/\.(png|jpe?g|gif|webp|mp4|mov)$/i.test(name) ? "image" : /\.pdf$/i.test(name) ? "pdf" : /\.(xlsx?|csv)$/i.test(name) ? "sheet" : "doc");
+const sizeOf = (b: number) => (b >= 1_048_576 ? `${(b / 1_048_576).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
+
 export default function RecordTracker() {
-  const [rows, setRows] = useState<QaCase[]>(initial);
+  // ?estado=carregando|vazio|erro simula os estados da lista.
+  const estado = useFrameParam("estado");
+  const [rows, setRows] = useState<QaCase[]>(() => (estado === "vazio" ? [] : initial));
+  const [attachOpen, setAttachOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [preview, setPreview] = useState<RecordFile | null>(null);
+  const [onlyComments, setOnlyComments] = useState(false);
   const [past, setPast] = useState<QaCase[][]>([]);
   const [future, setFuture] = useState<QaCase[][]>([]);
   const [saved, setSaved] = useState(true);
@@ -311,50 +330,143 @@ export default function RecordTracker() {
             className="pl-1"
             items={people.filter((p) => p.status === "ativo").map((p) => ({ label: p.name, onSelect: () => patch(open.id, { owner: p.id }) }))}
           />
-          <PropertyPill icon={<Tag className="text-muted" />} placeholder="Rótulos" onClick={() => notify("Exemplo: abriria o seletor de rótulos", undefined, "info")} />
-          <PropertyPill icon={<CalendarDays className="text-muted" />} value={open.due} placeholder="Prazo" onClick={() => notify("Exemplo: abriria o DatePicker", undefined, "info")} />
-          <PropertyPill icon={<Users className="text-muted" />} value="Compartilhado" placeholder="Compartilhar" onClick={() => notify("Visível para o time de Produto", undefined, "info")} />
+          <PropertyPill
+            icon={<Tag className="text-muted" />}
+            value={open.labels?.length ? open.labels.join(", ") : undefined}
+            placeholder="Rótulos"
+            items={qaLabels.map((l) => ({
+              type: "checkbox" as const,
+              label: l,
+              checked: !!open.labels?.includes(l),
+              onCheckedChange: (c: boolean) => patch(open.id, { labels: c ? [...(open.labels ?? []), l] : (open.labels ?? []).filter((x) => x !== l) }),
+            }))}
+          />
+          <DueDatePicker label="Prazo" value={toIso(open.due)} onChange={(iso) => patch(open.id, { due: toBr(iso) })} now="2026-09-30" />
+          <PropertyPill
+            icon={<Users className="text-muted" />}
+            value={sharingLabel[open.sharing ?? "time"]}
+            placeholder="Compartilhar"
+            items={(Object.keys(sharingLabel) as QaSharing[]).map((k) => ({
+              type: "checkbox" as const,
+              label: sharingLabel[k],
+              checked: (open.sharing ?? "time") === k,
+              onCheckedChange: () => {
+                patch(open.id, { sharing: k });
+                notify(`Caso ${open.code} visível para: ${sharingLabel[k].toLowerCase()}`);
+              },
+            }))}
+          />
         </PropertyPills>
       }
     >
       <RecordSection
         title="Arquivos"
         action={
-          <SectionAddButton
-            onClick={() => {
-              const f: RecordFile = { id: `f${Date.now()}`, name: `evidencia-${open.code}-${open.files.length + 1}.png`, kind: "image", meta: "agora" };
-              patch(open.id, { files: [...open.files, f] });
-              notify("Arquivo anexado");
-            }}
-          />
+          <SectionAddButton onClick={() => setAttachOpen(true)} />
         }
       >
         <FilesList
           files={open.files}
           empty="Nenhum arquivo. Anexe vídeo ou print da evidência."
           rowMenu={(f) => [
-            { label: "Abrir", onSelect: () => notify(`Abrindo ${f.name}`, undefined, "info") },
+            { label: "Abrir", onSelect: () => setPreview(f) },
             { label: "Remover", tone: "danger", onSelect: () => patch(open.id, { files: open.files.filter((x) => x.id !== f.id) }) },
           ]}
         />
       </RecordSection>
-      <RecordSection title="Notas do documento" action={<button type="button" onClick={() => notify("Exemplo: abriria o documento completo", undefined, "info")}>Ver tudo</button>}>
+      <RecordSection title="Notas do documento" action={<button type="button" onClick={() => setNotesOpen(true)}>Ver tudo</button>}>
         <NotesTable columns={notes.columns} rows={notes.rows} />
       </RecordSection>
       <ActivitySection
         action={
-          <button type="button" onClick={() => notify("Filtro: só comentários", undefined, "info")}>
-            <Filter className="h-3.5 w-3.5" /> Filtro
+          <button type="button" aria-pressed={onlyComments} onClick={() => setOnlyComments((v) => !v)}>
+            <Filter className="h-3.5 w-3.5" /> {onlyComments ? "Mostrar tudo" : "Só comentários"}
           </button>
         }
         items={[
           { id: "a1", actor: owner, action: "mudou o status para", target: taskStatusLabel[open.status], time: "há 2 h" },
           { id: "a2", actor: personOf("carla"), action: "comentou", time: "ontem, 17:20", quote: "Reproduzi no Safari também. Anexei o vídeo." },
           { id: "a3", actor: personOf("joana"), action: "criou o caso", time: "28/09" },
-        ]}
+        ].filter((a) => !onlyComments || a.quote)}
       />
     </RecordPanel>
   );
+
+  const dialogs = open && (
+    <>
+      <Modal open={attachOpen} onClose={() => setAttachOpen(false)} title={`Anexar evidência ao caso ${open.code}`} description="Vídeo, print ou planilha do teste. Até 50 MB por arquivo.">
+        <FileDropzone
+          label="Arquivos"
+          accept="image/*,video/*,.pdf,.csv,.xlsx,.doc,.docx,.txt"
+          maxSize={50 * 1_048_576}
+          onFiles={(files) => {
+            const added: RecordFile[] = files.map((f, k) => ({ id: `f${Date.now()}${k}`, name: f.name, kind: kindOf(f.name), meta: sizeOf(f.size) }));
+            patch(open.id, { files: [...open.files, ...added] });
+            setAttachOpen(false);
+            notify(added.length === 1 ? `${added[0].name} anexado` : `${added.length} arquivos anexados`);
+          }}
+        />
+      </Modal>
+      <Modal open={notesOpen} onClose={() => setNotesOpen(false)} size="lg" kicker={`Caso ${open.code}`} title="Notas do documento" description={open.description || undefined}>
+        <NotesTable columns={notes.columns} rows={notes.rows} />
+      </Modal>
+      <Modal
+        open={!!preview}
+        onClose={() => setPreview(null)}
+        title={preview?.name ?? ""}
+        description={preview?.meta ? `Anexado ao caso ${open.code} · ${preview.meta}` : `Anexado ao caso ${open.code}`}
+        footer={
+          <Button
+            variant="ghost"
+            onClick={() => {
+              notify(`${preview?.name} baixado`);
+              setPreview(null);
+            }}
+          >
+            <Download /> Baixar
+          </Button>
+        }
+      >
+        <div className="grid aspect-video place-items-center rounded-xl border border-line bg-soft text-[13px] text-muted">Pré-visualização de {preview?.name}</div>
+      </Modal>
+    </>
+  );
+
+  const listState =
+    estado === "carregando" ? (
+      <div className="space-y-2 rounded-xl border border-line bg-surface p-4" aria-busy aria-label="Carregando casos">
+        {Array.from({ length: 8 }, (_, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="h-5 w-24 max-sm:hidden" />
+            <Skeleton className="h-6 w-6 rounded-full" />
+          </div>
+        ))}
+      </div>
+    ) : estado === "erro" ? (
+      <Empty title="Não foi possível carregar os casos" hint="A conexão com o banco de registros caiu. Nada do que você editou foi perdido." action={<Button size="sm" onClick={() => setFrameQuery({ estado: undefined })}>Tentar novamente</Button>} />
+    ) : rows.length === 0 ? (
+      <Empty icon={<Database />} title="Nenhum caso de teste ainda" hint="Crie o primeiro caso para acompanhar o QA desta versão: título, responsável, prazo e evidências." action={<Button size="sm" onClick={add}><Plus /> Novo caso</Button>} />
+    ) : visible.length === 0 ? (
+      <Empty
+        title="Nenhum caso com esse recorte"
+        hint={`${query ? `Busca “${query}”. ` : ""}${statusFilter.length ? `${statusFilter.length} status selecionado(s). ` : ""}Há ${rows.length} casos no total.`}
+        action={
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setQuery("");
+              setStatusFilter([]);
+            }}
+          >
+            Limpar busca e filtros
+          </Button>
+        }
+      />
+    ) : null;
 
   return (
     <AtlasShell current={atlasRoutes.tracker}>
@@ -399,7 +511,12 @@ export default function RecordTracker() {
         </header>
         <div className="flex min-h-0 flex-1 gap-4 p-3 sm:p-5">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            {view === "tabela" ? (
+            {listState ? (
+              <>
+                {rows.length > 0 && estado !== "carregando" && estado !== "erro" && toolbar}
+                {listState}
+              </>
+            ) : view === "tabela" ? (
               <DataGrid
                 label="Casos de teste"
                 rows={visible}
@@ -442,6 +559,7 @@ export default function RecordTracker() {
           {/* Desktop: coluna ao lado da lista. Celular: o próprio RecordPanel abre como folha. */}
           {panel}
         </div>
+        {dialogs}
       </div>
     </AtlasShell>
   );

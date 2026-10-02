@@ -4,18 +4,19 @@
 - Categoria: IA
 - Preview: showcase `#/frame/ai-agent-run` (`?theme=dark` para o escuro)
 
-Detalhe de uma execução: trace em cascata com replay, passo selecionado com entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar e tentar de novo.
+Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado.
 
 ## Conceito
 
-**Objetivo:** Explicar uma execução do agente passo a passo para quem precisa auditar ou aprovar o resultado antes de usar.
+**Objetivo:** Explicar uma execução do agente passo a passo para quem precisa auditar, aprovar o resultado ou corrigir o agente.
 
 **Padrões aplicados**
 
-- Anatomia C · Registro: trilha + título fixos, trace em cascata no conteúdo
-- Passo selecionado mostra entrada e saída lado a lado
+- Anatomia C · Registro: trilha (Execuções › agente) + título fixos, trace em cascata no conteúdo
+- Passo selecionado mostra entrada e saída lado a lado; falha com mensagem em linguagem de gente
 - Custo, tokens e tempo sempre visíveis
-- Saída que pede aprovação humana antes de agir; tentar de novo por passo
+- Executar de novo com useOperation (o botão informa enquanto roda)
+- Fim da execução: 'O que você quer fazer agora?' com 3 opções numeradas (↑ ↓ Enter, 1–3, Esc) e campo livre
 
 **Quando usar e o que adaptar**
 
@@ -25,7 +26,8 @@ Detalhe de uma execução: trace em cascata com replay, passo selecionado com en
 **Evite**
 
 - Mostrar só o resultado final sem como chegou nele
+- Terminar a execução sem próximo passo (o usuário volta para a lista sem saber o que fazer)
 
 ## Componentes usados
 
-`AgentTrace`, `AiBadge`, `Badge`, `Button`, `JsonView`, `Page`, `PageHeading`, `PropertyList`, `StatCell`, `StatGrid`, `SystemMessage`, `Tabs`, `TokenUsageMeter`, `ToolCall`, `ToolCallsSection`, `TraceStep`, `formatCurrency`, `formatDuration`, `formatNumber`, `notify`
+`AgentTrace`, `AiBadge`, `Badge`, `Button`, `CommandGroup`, `CommandInput`, `CommandItem`, `CommandList`, `CommandMenu`, `IconButton`, `JsonView`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `StatCell`, `StatGrid`, `SystemMessage`, `Tabs`, `TokenUsageMeter`, `ToolCall`, `ToolCallsSection`, `TraceStep`, `formatCurrency`, `formatDuration`, `formatNumber`, `useOperation`

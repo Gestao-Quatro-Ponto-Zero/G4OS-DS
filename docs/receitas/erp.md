@@ -17,14 +17,23 @@ Pedidos de venda, produtos e estoque, compras, fornecedores, notas fiscais.
 
 ```
 Sidebar
-├─ Início        painel de operação
-├─ Pedidos       lista (padrão) | quadro por status → Pedido (página de registro)
-├─ Produtos      lista com estoque                  → Produto (entidade: Visão | Movimentações | Fornecedores)
-├─ Estoque       posição e movimentações
-├─ Compras       lista | quadro                      → Pedido de compra
-├─ Notas fiscais lista
-└─ Cadastros     clientes, fornecedores
-   Configurações empresa, impostos, integrações (SEFAZ, e-commerce)
+├─ Painel             painel de operação
+├─ Vendas             (subitens)
+│  ├─ Pedidos de venda  lista com abas por situação → Pedido (página de registro)
+│  └─ Notas fiscais     lista → Nota fiscal (documento)
+├─ Compras            (subitens)
+│  ├─ Requisições       mestre-detalhe com aprovação
+│  ├─ Pedidos de compra lista → Pedido de compra (página de registro)
+│  └─ Recebimento       conferência contra o pedido
+├─ Estoque            (subitens)
+│  ├─ Posição de estoque  saldo × mínimo → Produto
+│  ├─ Movimentações       kardex
+│  └─ Expedição           quadro do separar à entrega
+└─ Cadastros          (subitens)
+   ├─ Clientes, Fornecedores  lista → detalhe em drawer
+   └─ Produtos                catálogo → Produto (página com projeção e movimentações)
+   Financeiro         contas bancárias, fluxo de caixa, conciliação, receber/pagar (blocos fin-*)
+   Configurações      empresa, impostos, integrações (SEFAZ, e-commerce)
 ```
 
 ## Telas e componentes
@@ -38,7 +47,7 @@ Sidebar
 | Ajuste de estoque | `Modal sm`: `NumberField`, `Select` motivo, `TextareaField` |
 | Notas fiscais | `DataTable`; status rejeitada em `bad` com motivo da SEFAZ e "Corrigir e reenviar" |
 
-Blocos: `erp-orders` (pedidos de venda), `erp-inventory` (estoque), `erp-purchase-requests` (requisições de compra com aprovação e cotações), `erp-invoice` (NF-e em formato de leitura/impressão). Categoria **ERP** no showcase.
+Blocos: `erp-dashboard` (painel de operação), `erp-orders` e `erp-order` (pedidos de venda), `erp-invoices` e `erp-invoice` (NF-e em lista e em formato de leitura/impressão), `erp-purchase-requests` (requisições com aprovação e cotações), `erp-purchase-orders` e `erp-purchase-order` (pedidos de compra), `erp-receiving` (recebimento com NF-e de entrada e divergências), `erp-inventory` (posição de estoque), `erp-stock-movements` (kardex e ajuste de inventário), `erp-shipping` (expedição em quadro com rastreio), `erp-products` e `erp-product` (catálogo e página do produto), `erp-customers` e `erp-suppliers` (cadastros), `fin-bank-accounts` (contas bancárias, no módulo financeiro). Casca: `shells/nexo-shell.tsx`. Categoria **ERP** no showcase. Para empresa que vende serviço (OS, NFS-e, contratos recorrentes), veja a [receita de ERP de serviços](erp-servicos.md).
 
 ## Regras específicas
 

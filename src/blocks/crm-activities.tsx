@@ -7,7 +7,9 @@ import {
   Checkbox,
   Combobox,
   DatePicker,
+  Empty,
   EmptyFilterResult,
+  ErrorState,
   FieldBlock,
   FieldGrid,
   FilterBar,
@@ -17,6 +19,7 @@ import {
   PageHeading,
   SegmentedControl,
   Select,
+  Skeleton,
   TableSearch,
   TextField,
   cn,
@@ -26,6 +29,7 @@ import {
   type FilterField, PageToolbar
 } from "@g4ai/ds";
 import { activities as initial, activityLabel, companies, companyById, daysFromToday, dealById, iso, me, repById, reps, today, useFrameParam, type Activity, type ActivityType } from "./data/crm";
+import { setFrameQuery } from "./shells/frame-route";
 import { CrmShell } from "./shells/crm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -41,6 +45,7 @@ export const meta = {
       "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
       "Agrupado por prazo (atrasadas primeiro) ou por semana",
       "Conclusão rápida na linha; nova atividade em modal",
+      "Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros",
     ],
     adapt: [
       "Tarefas do ATS (entrevistas, retornos), cobranças do financeiro",
@@ -74,6 +79,7 @@ export default function CrmActivities() {
   const [view, setView] = useState<"lista" | "semana">("lista");
   const [creating, setCreating] = useState(false);
   const novo = useFrameParam("novo");
+  const estado = useFrameParam("estado");
   useEffect(() => {
     if (novo) setCreating(true);
   }, [novo]);
@@ -171,7 +177,31 @@ export default function CrmActivities() {
           <PageToolbar>
             <FilterBar filters={filters} noun="atividade" search={<TableSearch value={q} onChange={filters.setQuery} total={items.length} noun="atividade" searchIn="título, empresa e responsável" />} />
           </PageToolbar>
-          {view === "lista" ? (
+          {estado === "carregando" ? (
+            <div className="space-y-2" aria-busy="true" aria-label="Carregando atividades">
+              <Skeleton className="h-4 w-24" />
+              {Array.from({ length: 6 }, (_, i) => (
+                <div key={i} className="flex items-center gap-3 rounded-lg px-2 py-2">
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-3.5 w-64" />
+                  <Skeleton className="ml-auto h-5 w-20 rounded-full" />
+                </div>
+              ))}
+            </div>
+          ) : estado === "erro" ? (
+            <ErrorState size="md" title="Não foi possível carregar as atividades" description="Nenhuma tarefa foi perdida. Tente de novo em alguns segundos." onRetry={() => setFrameQuery({ estado: undefined })} />
+          ) : estado === "vazio" ? (
+            <Empty
+              icon={<CheckSquare />}
+              title="Nenhuma atividade agendada"
+              hint="Negócio sem próximo passo esfria. Agende a próxima ligação, reunião ou tarefa."
+              action={
+                <Button onClick={() => setCreating(true)}>
+                  <Plus /> Agendar atividade
+                </Button>
+              }
+            />
+          ) : view === "lista" ? (
             groups.length ? (
               groups.map((g) => (
                 <section key={g.label}>

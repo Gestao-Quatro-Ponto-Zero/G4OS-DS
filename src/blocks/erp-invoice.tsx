@@ -15,7 +15,7 @@ import {
   notify,
 } from "@g4ai/ds";
 import { br, company, customerById, invoiceById, invoiceStatus, orderById, productBySku, type Invoice } from "./data/erp";
-import { useFrameParam } from "./shells/frame-route";
+import { go, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -109,7 +109,15 @@ function InvoiceDoc({ invoice }: { invoice: Invoice }) {
           />
           {status === "rejeitada" && invoice.reason && (
             <div className="mt-5">
-              <Callout tone="bad" title="Rejeitada pela SEFAZ">
+              <Callout
+                tone="bad"
+                title="Rejeitada pela SEFAZ"
+                action={
+                  <Button size="sm" variant="ghost" onClick={() => go("erp-invoices", { corrigir: invoice.id })}>
+                    Corrigir e reenviar
+                  </Button>
+                }
+              >
                 {invoice.reason}
               </Callout>
             </div>

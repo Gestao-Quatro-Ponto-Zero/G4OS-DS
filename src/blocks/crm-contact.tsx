@@ -1,4 +1,4 @@
-import { Mail, MessageSquare, Phone } from "lucide-react";
+import { Briefcase, Mail, MessageSquare, Phone } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   ActionMenu,
@@ -6,20 +6,29 @@ import {
   Avatar,
   Badge,
   Button,
+  Combobox,
+  Drawer,
+  Empty,
   EntityMark,
+  FieldBlock,
+  FieldGrid,
   Modal,
+  OperationButton,
+  OperationFeedback,
   Page,
   PageHeading,
   PropertyList,
+  Select,
   SplitLayout,
   TextField,
   TextareaField,
   formatCurrency,
   formatDate,
   notify,
+  useOperation,
   type ActivityItem,
 } from "@g4ai/ds";
-import { activities, activityLabel, companyById, contactById, deals, me, repById, stageById, useFrameParam, type Contact } from "./data/crm";
+import { activities, activityLabel, companies, companyById, contactById, deals, me, repById, stageById, useFrameParam, type Contact } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -35,6 +44,7 @@ export const meta = {
       "Anatomia C · Registro: propriedades fixas à direita",
       "Papel na decisão (decisora, influenciadora) em destaque",
       "Histórico em feed; e-mail com modelo em modal",
+      "Editar em gaveta (Drawer); mover de empresa com busca (Combobox) em modal curto",
     ],
     adapt: [
       "Candidato (ATS), contato de fornecedor, usuário de conta SaaS",
@@ -46,6 +56,9 @@ export const meta = {
 } as const;
 
 const here = "#/frame/crm-contacts";
+const tags: NonNullable<Contact["tag"]>[] = ["Decisora", "Decisor", "Influenciador", "Compras", "Usuário"];
+/** Simula a chamada à API (troque pelo seu fetch). */
+const save = () => new Promise<void>((resolve) => setTimeout(resolve, 600));
 
 const historyFor = (p: Contact): ActivityItem[] =>
   activities
@@ -61,14 +74,45 @@ const historyFor = (p: Contact): ActivityItem[] =>
 
 export default function CrmContact() {
   const id = useFrameParam("id");
-  const person = contactById(id);
+  const base = contactById(id);
+  const [person, setPerson] = useState<Contact>(base);
   const company = companyById(person.companyId);
   const related = deals.filter((d) => d.contactIds.includes(person.id));
-  const [feed, setFeed] = useState(() => historyFor(person));
+  const [feed, setFeed] = useState(() => historyFor(base));
   const [compose, setCompose] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  useEffect(() => setFeed(historyFor(person)), [person]);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Contact>(base);
+  const [tried, setTried] = useState(false);
+  const [moving, setMoving] = useState(false);
+  const [target, setTarget] = useState("");
+  const editOp = useOperation();
+  const moveOp = useOperation({ busyLabel: "Movendo…" });
+  useEffect(() => {
+    setPerson(base);
+    setFeed(historyFor(base));
+  }, [base]);
+
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email);
+  const submitEdit = async () => {
+    setTried(true);
+    if (!draft.name.trim() || !emailOk) return;
+    const before = person;
+    const next = { ...draft, name: draft.name.trim(), initials: draft.name.trim().split(/\s+/).map((w) => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("").toUpperCase() };
+    const failed = await editOp.run(save, { message: `Contato ${next.name} atualizado`, undo: () => setPerson(before) }, { apply: () => setPerson(next), revert: () => setPerson(before) });
+    if (!failed) setEditing(false);
+  };
+  const submitMove = async () => {
+    if (!target || target === person.companyId) return;
+    const before = person;
+    const to = companyById(target);
+    const failed = await moveOp.run(save, { message: `${person.name} agora está em ${to.name}`, undo: () => setPerson(before) }, { apply: () => setPerson((p) => ({ ...p, companyId: target })), revert: () => setPerson(before) });
+    if (!failed) {
+      setMoving(false);
+      setFeed((f) => [{ id: `m${Date.now()}`, actor: repById(me), action: "moveu para", target: to.name, time: "Agora", icon: <Briefcase /> }, ...f]);
+    }
+  };
 
   const first = person.name.split(" ")[0];
   const log = (action: string, icon: ReactNode, quote?: string) => setFeed((f) => [{ id: `n${Date.now()}`, actor: repById(me), action, target: person.name, time: "Agora", icon, quote }, ...f]);
@@ -100,8 +144,23 @@ export default function CrmContact() {
               </Button>
               <ActionMenu
                 actions={[
-                  { label: "Editar contato", onSelect: () => notify("Exemplo: abre a gaveta de edição.", undefined, "info") },
-                  { label: "Mover para outra empresa", onSelect: () => notify("Exemplo: escolhe a nova empresa numa lista com busca.", undefined, "info") },
+                  {
+                    label: "Editar contato",
+                    onSelect: () => {
+                      setDraft(person);
+                      setTried(false);
+                      editOp.reset();
+                      setEditing(true);
+                    },
+                  },
+                  {
+                    label: "Mover para outra empresa",
+                    onSelect: () => {
+                      setTarget("");
+                      moveOp.reset();
+                      setMoving(true);
+                    },
+                  },
                   { label: "Remover contato", tone: "danger", separator: true, onSelect: () => notify(`${person.name} removido`, () => notify("Remoção desfeita", undefined, "info")) },
                 ]}
               />
@@ -130,12 +189,16 @@ export default function CrmContact() {
                         </a>
                       </li>
                     ))}
-                    {!related.length && <li className="rounded-xl border border-dashed border-line px-4 py-6 text-center text-[13px] text-muted">Não está em nenhum negócio aberto.</li>}
+                    {!related.length && (
+                      <li>
+                        <Empty title="Não participa de nenhum negócio aberto" hint={`Vincule ${first} na página do negócio ou crie um negócio para ${company.name}.`} action={<Button variant="ghost" href={`#/frame/crm-company?id=${company.id}`}>Abrir {company.name}</Button>} />
+                      </li>
+                    )}
                   </ul>
                 </section>
                 <section>
                   <h2 className="m-0 mb-3 text-[14px] font-medium">Histórico</h2>
-                  {feed.length ? <ActivityFeed items={feed} /> : <p className="m-0 text-[13px] text-muted">Sem interações registradas.</p>}
+                  {feed.length ? <ActivityFeed items={feed} /> : <Empty title="Sem interações registradas" hint="Ligações, e-mails e reuniões com esta pessoa aparecem aqui." />}
                 </section>
               </div>
             }
@@ -199,6 +262,65 @@ export default function CrmContact() {
         <div className="space-y-4">
           <TextField label="Assunto" value={subject} onChange={setSubject} />
           <TextareaField label="Mensagem" value={body} onChange={setBody} rows={8} />
+        </div>
+      </Modal>
+
+      <Drawer
+        open={editing}
+        onClose={() => setEditing(false)}
+        kicker={company.name}
+        title="Editar contato"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setEditing(false)}>
+              Cancelar
+            </Button>
+            <OperationButton operation={editOp} onClick={submitEdit}>
+              Salvar alterações
+            </OperationButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <OperationFeedback operation={editOp} />
+          <TextField label="Nome" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} error={tried && !draft.name.trim() ? "Informe o nome." : undefined} autoFocus />
+          <TextField label="Cargo" value={draft.role} onChange={(v) => setDraft((d) => ({ ...d, role: v }))} placeholder="Ex.: Diretora de Operações" />
+          <FieldGrid>
+            <TextField label="E-mail" type="email" value={draft.email} onChange={(v) => setDraft((d) => ({ ...d, email: v }))} error={tried && !emailOk ? "Use um e-mail válido, como nome@empresa.com.br." : undefined} />
+            <TextField label="Telefone" value={draft.phone} onChange={(v) => setDraft((d) => ({ ...d, phone: v }))} placeholder="(11) 91234-5678" />
+          </FieldGrid>
+          <FieldBlock label="Papel na decisão" hint="Quem decide, quem influencia e quem compra. Usado no mapa de decisores do negócio.">
+            <Select label="Papel na decisão" value={draft.tag ?? ""} onValueChange={(v) => setDraft((d) => ({ ...d, tag: (v || undefined) as Contact["tag"] }))} options={[{ value: "", label: "Não definido" }, ...tags.map((t) => ({ value: t, label: t }))]} />
+          </FieldBlock>
+        </div>
+      </Drawer>
+
+      <Modal
+        open={moving}
+        onClose={() => setMoving(false)}
+        size="sm"
+        title={`Mover ${first} para outra empresa`}
+        description="Os negócios em que a pessoa participa continuam vinculados. O histórico vai junto."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setMoving(false)}>
+              Cancelar
+            </Button>
+            <OperationButton operation={moveOp} onClick={submitMove} disabled={!target || target === person.companyId} disabledReason="Escolha a nova empresa.">
+              Mover contato
+            </OperationButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <OperationFeedback operation={moveOp} />
+          <Combobox
+            label="Nova empresa"
+            value={target}
+            onValueChange={(v: string) => setTarget(v)}
+            placeholder="Buscar empresa…"
+            options={companies.filter((c) => c.id !== person.companyId).map((c) => ({ value: c.id, label: c.name, description: `${c.industry} · ${c.city}` }))}
+          />
         </div>
       </Modal>
     </CrmShell>

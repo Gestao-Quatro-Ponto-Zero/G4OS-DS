@@ -1,5 +1,5 @@
 import { Ban, CheckCircle2, FileText, PackageCheck, Plus, Printer, Trash2, Truck, Unlock } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -15,12 +15,19 @@ import {
   PropertyList,
   Select,
   SplitLayout,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
   Stepper,
   formatCurrency,
   notify,
 } from "@g4ai/ds";
-import { br, customerById, customers, orderById, orderFlow, orderStatus, orderTotal, productBySku, products, qtyOf, user, warehouses, type Order, type OrderStatus, type Payment, type WarehouseId } from "./data/erp";
-import { go, useFrameParam } from "./shells/frame-route";
+import { addOrder, br, customerById, customers, iso, orderById, orderFlow, updateOrder, orderStatus, orderTotal, productBySku, products, qtyOf, user, warehouses, type Order, type OrderStatus, type Payment, type WarehouseId } from "./data/erp";
+import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -57,72 +64,72 @@ export default function ErpOrder() {
 function ItemsTable({ order, onRemove }: { order: Pick<Order, "items" | "freight" | "warehouse">; onRemove?: (sku: string) => void }) {
   const subtotal = order.items.reduce((s, it) => s + it.qty * it.price, 0);
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-      <table className="w-full min-w-[560px] text-[13px]">
-        <thead className="border-b border-line bg-soft/60 text-[12px] text-muted">
-          <tr>
-            <th className="px-4 py-2.5 text-left font-medium">Item</th>
-            <th className="px-4 py-2.5 text-right font-medium">Qtd.</th>
-            <th className="px-4 py-2.5 text-right font-medium">Preço un.</th>
-            <th className="px-4 py-2.5 text-right font-medium">Subtotal</th>
-            {onRemove && <th className="w-10" />}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-line">
-          {order.items.map((it) => {
-            const p = productBySku(it.sku);
-            const available = p.stock[order.warehouse];
-            return (
-              <tr key={it.sku}>
-                <td className="px-4 py-2.5">
-                  <a href={`#/frame/erp-product?id=${p.sku}`} className="hover:underline">
-                    {p.name}
-                  </a>
-                  <div className="font-mono text-[11px] text-muted">
-                    {p.sku} · {available >= it.qty ? `${available} ${p.unit} disponíveis` : <span className="font-sans font-medium text-amber">só {available} {p.unit} no {warehouses.find((w) => w.id === order.warehouse)?.name}</span>}
-                  </div>
-                </td>
-                <td className="px-4 py-2.5 text-right tabular-nums">
-                  {it.qty} {p.unit}
-                </td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{money(it.price)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{money(it.qty * it.price)}</td>
-                {onRemove && (
-                  <td className="pr-2 text-right">
-                    <IconButton size="sm" label={`Remover ${p.name}`} onClick={() => onRemove(it.sku)}>
-                      <Trash2 />
-                    </IconButton>
-                  </td>
-                )}
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot className="border-t border-line bg-soft/40 text-[13px]">
-          <tr>
-            <td className="px-4 pt-2.5 text-muted" colSpan={3}>
-              Subtotal
-            </td>
-            <td className="px-4 pt-2.5 text-right tabular-nums">{money(subtotal)}</td>
-            {onRemove && <td />}
-          </tr>
-          <tr>
-            <td className="px-4 text-muted" colSpan={3}>
-              Frete
-            </td>
-            <td className="px-4 text-right tabular-nums">{order.freight ? money(order.freight) : "Grátis (CIF)"}</td>
-            {onRemove && <td />}
-          </tr>
-          <tr>
-            <td className="px-4 pb-2.5 font-medium" colSpan={3}>
-              Total
-            </td>
-            <td className="px-4 pb-2.5 text-right font-semibold tabular-nums">{money(subtotal + order.freight)}</td>
-            {onRemove && <td />}
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+    <Table label="Itens do pedido" className="[&_table]:min-w-[560px]">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Item</TableHead>
+          <TableHead numeric>Qtd.</TableHead>
+          <TableHead numeric>Preço un.</TableHead>
+          <TableHead numeric>Subtotal</TableHead>
+          {onRemove && <TableHead className="w-10"><span className="sr-only">Ações</span></TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {order.items.map((it) => {
+          const p = productBySku(it.sku);
+          const available = p.stock[order.warehouse];
+          return (
+            <TableRow key={it.sku}>
+              <TableCell>
+                <a href={`#/frame/erp-product?id=${p.sku}`} className="hover:underline">
+                  {p.name}
+                </a>
+                <div className="font-mono text-[11px] text-muted">
+                  {p.sku} · {available >= it.qty ? `${available} ${p.unit} disponíveis` : <span className="font-sans font-medium text-amber">só {available} {p.unit} no {warehouses.find((w) => w.id === order.warehouse)?.name}</span>}
+                </div>
+              </TableCell>
+              <TableCell numeric>
+                {it.qty} {p.unit}
+              </TableCell>
+              <TableCell numeric>{money(it.price)}</TableCell>
+              <TableCell numeric>{money(it.qty * it.price)}</TableCell>
+              {onRemove && (
+                <TableCell className="pr-2 text-right">
+                  <IconButton size="sm" label={`Remover ${p.name}`} onClick={() => onRemove(it.sku)}>
+                    <Trash2 />
+                  </IconButton>
+                </TableCell>
+              )}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell className="text-muted" colSpan={3}>
+            Subtotal
+          </TableCell>
+          <TableCell numeric>{money(subtotal)}</TableCell>
+          {onRemove && <TableCell />}
+        </TableRow>
+        <TableRow>
+          <TableCell className="text-muted" colSpan={3}>
+            Frete
+          </TableCell>
+          <TableCell numeric>{order.freight ? money(order.freight) : "Grátis (CIF)"}</TableCell>
+          {onRemove && <TableCell />}
+        </TableRow>
+        <TableRow>
+          <TableCell className="font-medium" colSpan={3}>
+            Total
+          </TableCell>
+          <TableCell numeric className="font-semibold">
+            {money(subtotal + order.freight)}
+          </TableCell>
+          {onRemove && <TableCell />}
+        </TableRow>
+      </TableFooter>
+    </Table>
   );
 }
 
@@ -136,9 +143,21 @@ function OrderDetail({ order }: { order: Order }) {
   const set = (next: OrderStatus, msg: string, patch?: () => void) => {
     const before = status;
     setStatus(next);
+    updateOrder(order.id, { status: next });
     patch?.();
-    notify(msg, () => setStatus(before));
+    notify(msg, () => {
+      setStatus(before);
+      updateOrder(order.id, { status: before });
+    });
   };
+  // ?imprimir=1 (ação "Imprimir" da lista): abre a impressão do espelho ao chegar.
+  const autoPrint = useFrameParam("imprimir") === "1";
+  useEffect(() => {
+    if (!autoPrint) return;
+    setFrameQuery({ imprimir: undefined });
+    const t = setTimeout(() => window.print(), 400);
+    return () => clearTimeout(t);
+  }, [autoPrint]);
   const action = () => {
     switch (status) {
       case "orcamento":
@@ -171,7 +190,10 @@ function OrderDetail({ order }: { order: Order }) {
   };
   return (
     <NexoShell section="pedidos">
+      {/* Impressão: só o espelho do pedido. */}
+      <style>{`@media print { aside[aria-label="Menu principal"], nav[aria-label="Navegação principal"], .no-print { display: none !important; } }`}</style>
       <Page>
+        <div className="no-print contents">
         <PageHeading
           crumbs={[{ label: "Pedidos de venda", href: "#/frame/erp-orders" }]}
           title={`Pedido ${order.number}`}
@@ -183,13 +205,14 @@ function OrderDetail({ order }: { order: Order }) {
                   <Ban /> Cancelar
                 </Button>
               )}
-              <Button variant="ghost" onClick={() => notify("Espelho do pedido enviado para impressão", undefined, "info")}>
+              <Button variant="ghost" onClick={() => window.print()}>
                 <Printer /> Imprimir
               </Button>
               {action()}
             </>
           }
         />
+        </div>
         <div className="mt-6">{status === "cancelado" ? <Badge tone="bad">Pedido cancelado</Badge> : <Stepper steps={orderFlow.map((s, i) => ({ id: s, label: orderStatus[s].label, state: i < idx ? "done" : i === idx ? "current" : "upcoming" }))} label="Etapas do pedido" />}</div>
         {blocked && status === "orcamento" && (
           <div className="mt-6">
@@ -283,9 +306,12 @@ function NewOrder() {
   };
   const draft = { items, freight: items.length ? 280 : 0, warehouse };
   const total = orderTotal({ ...draft, id: "", number: "", customerId: "", date: "", payment, status: "orcamento", seller: "ana" });
+  // Grava no "banco" de exemplo e abre o pedido criado (no SEU app: POST /pedidos → id).
   const save = (status: OrderStatus) => {
-    notify(status === "orcamento" ? "Orçamento salvo · PV-024871" : "Pedido PV-024871 criado e aprovado");
-    go("erp-order", "24870");
+    if (!c) return;
+    const created = addOrder({ customerId: c.id, date: iso(0), items, payment, status, seller: c.seller, warehouse, freight: draft.freight });
+    notify(status === "orcamento" ? `Orçamento ${created.number} salvo` : `Pedido ${created.number} criado e aprovado`);
+    go("erp-order", created.id);
   };
   return (
     <NexoShell section="pedidos">

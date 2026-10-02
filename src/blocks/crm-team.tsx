@@ -129,7 +129,7 @@ export default function CrmTeam() {
                   { value: "PME", label: "PME" },
                 ]}
               />
-              <Button variant="ghost" onClick={() => notify("Exemplo: o convite é feito em Configurações › Membros do app.", undefined, "info")}>
+              <Button variant="ghost" href="#/frame/settings-team">
                 <UserPlus /> Convidar
               </Button>
             </>

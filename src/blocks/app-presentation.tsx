@@ -139,10 +139,17 @@ export default function PresentationBlock() {
           description="Editada por Joana Ribeiro há 2 horas · 6 slides"
           actions={
             <>
-              <Button size="sm" variant="ghost" onClick={() => notify("Link copiado")}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  void navigator.clipboard?.writeText(location.href).catch(() => undefined);
+                  notify("Link da apresentação copiado");
+                }}
+              >
                 <Share2 /> Compartilhar
               </Button>
-              <Button size="sm" onClick={() => notify("Gerando PDF…", undefined, "info")}>
+              <Button size="sm" onClick={() => window.print()}>
                 <Download /> Baixar PDF
               </Button>
             </>

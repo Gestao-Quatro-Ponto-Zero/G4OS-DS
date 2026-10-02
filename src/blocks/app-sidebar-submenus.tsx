@@ -17,24 +17,30 @@ import {
   Share2,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   AppShell,
   Button,
   Card,
+  CommandPalette,
   IconButton,
+  Modal,
+  TextField,
   Page,
   PageHeading,
   Sidebar,
   WorkspaceMenu,
   navActiveDeep,
   notify,
+  useCommandShortcut,
+  type Command,
   type MenuEntry,
   type NavGroup,
   type NavSubItem,
   type Workspace,
 } from "@g4ai/ds";
-import { frameHref, useFrameParam } from "./shells/frame-route";
+import { frameHref, goTo, useFrameParam } from "./shells/frame-route";
 
 export const meta = {
   title: "Sidebar com subitens",
@@ -73,63 +79,56 @@ const SLUG = "app-sidebar-submenus";
 const r = (path: string) => ({ href: frameHref(SLUG, path ? { p: path } : undefined), match: `/${path}` });
 const sub = (path: string, label: string, extra: Partial<NavSubItem> = {}): NavSubItem => ({ ...r(path), label, ...extra });
 
-const projectActions = (name: string): MenuEntry[] => [
-  { label: "Abrir", icon: <FolderKanban />, onSelect: () => notify(`Projeto ${name} aberto`) },
-  { label: "Compartilhar", icon: <Share2 />, onSelect: () => notify(`Link de ${name} copiado`) },
-  { label: "Renomear", icon: <Pencil />, onSelect: () => notify(`Projeto ${name} renomeado`) },
-  { type: "separator" },
-  { label: "Arquivar", icon: <Archive />, tone: "danger", onSelect: () => notify(`${name} arquivado`, () => notify(`${name} restaurado`)) },
+type Project = { slug: string; label: string; icon: LucideIcon };
+const initialProjects: Project[] = [
+  { slug: "expansao-sul", label: "Expansão Sul", icon: MapIcon },
+  { slug: "renovacao", label: "Renovação Enterprise", icon: Flag },
+  { slug: "lancamento-q4", label: "Lançamento Q4", icon: Rocket },
+  { slug: "parcerias", label: "Parcerias", icon: Handshake },
+  { slug: "migracao", label: "Migração do CRM", icon: FolderKanban },
 ];
+const slugify = (t: string) =>
+  t
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
-const groups: NavGroup[] = [
-  {
-    label: "Plataforma",
-    items: [
-      { ...r(""), match: "/", label: "Início", icon: Home },
-      {
-        ...r("vendas"),
-        label: "Vendas",
-        icon: Handshake,
-        items: [sub("vendas/negocios", "Negócios", { badge: 3 }), sub("vendas/propostas", "Propostas"), sub("vendas/metas", "Metas")],
-      },
-      {
-        label: "Cadastros",
-        icon: Building2,
-        items: [
-          sub("cadastros/empresas", "Empresas"),
-          sub("cadastros/contatos", "Contatos"),
-          sub("cadastros/produtos", "Produtos", { items: [sub("cadastros/produtos/categorias", "Categorias"), sub("cadastros/produtos/precos", "Tabelas de preço")] }),
-        ],
-      },
-      {
-        ...r("relatorios"),
-        label: "Relatórios",
-        icon: BarChart3,
-        items: [sub("relatorios/receita", "Receita"), sub("relatorios/funil", "Funil"), sub("relatorios/atividades", "Atividades")],
-      },
-      {
-        label: "Configurações",
-        icon: Settings,
-        items: [sub("config/geral", "Geral"), sub("config/equipe", "Equipe"), sub("config/faturamento", "Faturamento"), sub("config/integracoes", "Integrações")],
-      },
-    ],
-  },
-  {
-    label: "Projetos",
-    collapsible: true,
-    action: { label: "Novo projeto", onSelect: () => notify("Projeto criado") },
-    limit: 3,
-    items: [
-      { ...r("projetos/expansao-sul"), label: "Expansão Sul", icon: MapIcon, actions: projectActions("Expansão Sul") },
-      { ...r("projetos/renovacao"), label: "Renovação Enterprise", icon: Flag, actions: projectActions("Renovação Enterprise") },
-      { ...r("projetos/lancamento-q4"), label: "Lançamento Q4", icon: Rocket, actions: projectActions("Lançamento Q4") },
-      { ...r("projetos/parcerias"), label: "Parcerias", icon: Handshake, actions: projectActions("Parcerias") },
-      { ...r("projetos/migracao"), label: "Migração do CRM", icon: FolderKanban, actions: projectActions("Migração do CRM") },
-    ],
-  },
-];
+const platform: NavGroup = {
+  label: "Plataforma",
+  items: [
+    { ...r(""), match: "/", label: "Início", icon: Home },
+    {
+      ...r("vendas"),
+      label: "Vendas",
+      icon: Handshake,
+      items: [sub("vendas/negocios", "Negócios", { badge: 3 }), sub("vendas/propostas", "Propostas"), sub("vendas/metas", "Metas")],
+    },
+    {
+      label: "Cadastros",
+      icon: Building2,
+      items: [
+        sub("cadastros/empresas", "Empresas"),
+        sub("cadastros/contatos", "Contatos"),
+        sub("cadastros/produtos", "Produtos", { items: [sub("cadastros/produtos/categorias", "Categorias"), sub("cadastros/produtos/precos", "Tabelas de preço")] }),
+      ],
+    },
+    {
+      ...r("relatorios"),
+      label: "Relatórios",
+      icon: BarChart3,
+      items: [sub("relatorios/receita", "Receita"), sub("relatorios/funil", "Funil"), sub("relatorios/atividades", "Atividades")],
+    },
+    {
+      label: "Configurações",
+      icon: Settings,
+      items: [sub("config/geral", "Geral"), sub("config/equipe", "Equipe"), sub("config/faturamento", "Faturamento"), sub("config/integracoes", "Integrações")],
+    },
+  ],
+};
 
-const workspaces: Workspace[] = [
+const initialWorkspaces: Workspace[] = [
   { id: "acme", name: "Acme Comercial", plan: "Enterprise" },
   { id: "logistica", name: "Acme Logística", plan: "Pro" },
   { id: "norte", name: "Estúdio Norte", plan: "Starter" },
@@ -140,11 +139,11 @@ const userMenu: MenuEntry[] = [
   { label: "Faturamento", icon: <CreditCard />, href: r("config/faturamento").href },
   { label: "Notificações", icon: <Bell />, href: r("conta/notificacoes").href },
   { type: "separator" },
-  { label: "Sair", icon: <LogOut />, onSelect: () => notify("Sessão encerrada") },
+  { label: "Sair", icon: <LogOut />, onSelect: () => goTo(frameHref("auth-login")) },
 ];
 
 /** Rótulo e caminho (trilha) da rota atual, procurando na árvore. */
-function findTrail(path: string): string[] {
+function findTrail(path: string, groups: NavGroup[]): string[] {
   const walk = (list: { label: string; match?: string; items?: NavSubItem[] }[], trail: string[]): string[] | null => {
     for (const it of list) {
       if (it.match === path) return [...trail, it.label];
@@ -165,7 +164,83 @@ export default function SidebarSubmenusBlock() {
   const path = `/${p}`;
   const [collapsed, setCollapsed] = useState(false);
   const [ws, setWs] = useState("acme");
-  const trail = findTrail(path);
+  const [workspaces, setWorkspaces] = useState(initialWorkspaces);
+  const [projects, setProjects] = useState(initialProjects);
+  const [searchOpen, setSearchOpen] = useState(false);
+  useCommandShortcut(() => setSearchOpen(true));
+  // Um formulário curto para três gestos: novo projeto, renomear projeto, novo workspace.
+  const [form, setForm] = useState<null | { kind: "projeto" | "renomear" | "workspace"; slug?: string; value: string; tried?: boolean }>(null);
+
+  const projectActions = (pr: Project): MenuEntry[] => [
+    { label: "Abrir", icon: <FolderKanban />, onSelect: () => goTo(r(`projetos/${pr.slug}`).href) },
+    {
+      label: "Copiar link",
+      icon: <Share2 />,
+      onSelect: () => {
+        void navigator.clipboard?.writeText(`${location.origin}${location.pathname}${r(`projetos/${pr.slug}`).href}`).catch(() => undefined);
+        notify(`Link de ${pr.label} copiado`);
+      },
+    },
+    { label: "Renomear", icon: <Pencil />, onSelect: () => setForm({ kind: "renomear", slug: pr.slug, value: pr.label }) },
+    { type: "separator" },
+    {
+      label: "Arquivar",
+      icon: <Archive />,
+      tone: "danger",
+      onSelect: () => {
+        const before = projects;
+        setProjects((xs) => xs.filter((x) => x.slug !== pr.slug));
+        if (path === `/projetos/${pr.slug}`) goTo(r("").href);
+        notify(`${pr.label} arquivado`, () => setProjects(before));
+      },
+    },
+  ];
+
+  const groups: NavGroup[] = [
+    platform,
+    {
+      label: "Projetos",
+      collapsible: true,
+      action: { label: "Novo projeto", onSelect: () => setForm({ kind: "projeto", value: "" }) },
+      limit: 3,
+      items: projects.map((pr) => ({ ...r(`projetos/${pr.slug}`), label: pr.label, icon: pr.icon, actions: projectActions(pr) })),
+    },
+  ];
+
+  const commands = useMemo<Command[]>(() => {
+    const out: Command[] = [];
+    const add = (list: { label: string; href?: string; items?: NavSubItem[] }[], group: string, trail: string[]) =>
+      list.forEach((it) => {
+        if (it.href) out.push({ id: it.href, group, label: [...trail, it.label].join(" › "), onSelect: () => goTo(it.href!) });
+        if (it.items) add(it.items, group, [...trail, it.label]);
+      });
+    add(platform.items, "Páginas", []);
+    add(projects.map((pr) => ({ label: pr.label, href: r(`projetos/${pr.slug}`).href })), "Projetos", []);
+    return out;
+  }, [projects]);
+
+  const submitForm = () => {
+    if (!form) return;
+    const name = form.value.trim();
+    if (!name) return setForm({ ...form, tried: true });
+    if (form.kind === "projeto") {
+      const slug = slugify(name) || `projeto-${projects.length + 1}`;
+      setProjects((xs) => [{ slug, label: name, icon: FolderKanban }, ...xs]);
+      goTo(r(`projetos/${slug}`).href);
+      notify(`Projeto ${name} criado`);
+    } else if (form.kind === "renomear") {
+      setProjects((xs) => xs.map((x) => (x.slug === form.slug ? { ...x, label: name } : x)));
+      notify(`Projeto renomeado para ${name}`);
+    } else {
+      const id = slugify(name) || `ws-${workspaces.length + 1}`;
+      setWorkspaces((xs) => [...xs, { id, name, plan: "Starter" }]);
+      setWs(id);
+      notify(`Workspace ${name} criado`);
+    }
+    setForm(null);
+  };
+
+  const trail = findTrail(path, groups);
   const title = trail[trail.length - 1];
   const parent = groups.flatMap((g) => g.items).find((it) => it.items && navActiveDeep(it, path));
   const siblings = parent?.items ?? [];
@@ -175,20 +250,21 @@ export default function SidebarSubmenusBlock() {
       workspace={workspaces.find((w) => w.id === ws)?.name}
       currentPath={path}
       headerActions={
-        <IconButton label="Buscar" onClick={() => notify("Busca aberta")}>
+        <IconButton label="Buscar" onClick={() => setSearchOpen(true)}>
           <Search />
         </IconButton>
       }
       sidebar={({ mobileOpen, close }) => (
         <Sidebar
           product="Acme"
-          header={<WorkspaceMenu workspaces={workspaces} value={ws} onValueChange={setWs} onAdd={() => notify("Workspace criado")} collapsed={collapsed && !mobileOpen} />}
+          header={<WorkspaceMenu workspaces={workspaces} value={ws} onValueChange={setWs} onAdd={() => setForm({ kind: "workspace", value: "" })} collapsed={collapsed && !mobileOpen} />}
           groups={groups}
           currentPath={path}
           collapsed={collapsed}
           onToggle={() => setCollapsed((c) => !c)}
           mobileOpen={mobileOpen}
           onNavigate={close}
+          onSearch={() => setSearchOpen(true)}
           storageKey="g4os-ds:demo-sidebar-submenus"
           user={{ name: "Ana Lopes", email: "ana.lopes@acme.com.br", menu: userMenu }}
         />
@@ -233,6 +309,37 @@ export default function SidebarSubmenusBlock() {
           </Card>
         </div>
       </Page>
+      <CommandPalette open={searchOpen} onClose={() => setSearchOpen(false)} commands={commands} placeholder="Ir para uma página ou projeto…" />
+      <Modal
+        open={!!form}
+        onClose={() => setForm(null)}
+        title={form?.kind === "projeto" ? "Novo projeto" : form?.kind === "renomear" ? "Renomear projeto" : "Novo workspace"}
+        description={form?.kind === "workspace" ? "Um espaço separado, com equipe e dados próprios. Dá para trocar com ⌘1…⌘9." : undefined}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setForm(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={submitForm}>{form?.kind === "projeto" ? "Criar projeto" : form?.kind === "renomear" ? "Salvar nome" : "Criar workspace"}</Button>
+          </>
+        }
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitForm();
+          }}
+        >
+          <TextField
+            label="Nome"
+            value={form?.value ?? ""}
+            onChange={(v) => form && setForm({ ...form, value: v })}
+            placeholder={form?.kind === "workspace" ? "Ex.: Acme Varejo" : "Ex.: Expansão Nordeste"}
+            error={form?.tried && !form.value.trim() ? "Dê um nome para continuar." : undefined}
+            autoFocus
+          />
+        </form>
+      </Modal>
     </AppShell>
   );
 }

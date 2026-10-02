@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   DataTable,
+  Empty,
   FieldBlock,
   FieldGrid,
   Modal,
@@ -21,7 +22,7 @@ import {
   type Column,
 } from "@g4ai/ds";
 import { me, personById, reports as baseReports, today, useFrameParam, type Report } from "./data/saas";
-import { SaasShell } from "./shells/saas-shell";
+import { ListError, ListSkeleton, SaasShell, useDemoState } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -63,6 +64,8 @@ export default function SaasReports() {
   const [time, setTime] = useState("08:00");
   const [to, setTo] = useState<string[]>(["diretoria@pulso.com.br"]);
   const novo = useFrameParam("novo");
+  const estado = useDemoState();
+  const rows = estado === "vazio" ? [] : reports;
   useEffect(() => {
     if (novo) setEditing({ name: "", format: "PDF" });
   }, [novo]);
@@ -168,8 +171,24 @@ export default function SaasReports() {
           </div>
         </section>
         <section className="mt-8">
-          <h2 className="m-0 mb-3 text-[14px] font-medium">Salvos · {reports.length}</h2>
-          <DataTable rows={reports} columns={columns} rowKey={(r) => r.id} />
+          <h2 className="m-0 mb-3 text-[14px] font-medium">Salvos{estado ? "" : ` · ${rows.length}`}</h2>
+          {estado === "carregando" ? (
+            <ListSkeleton rows={5} label="Carregando relatórios" />
+          ) : estado === "erro" ? (
+            <ListError noun="os relatórios" />
+          ) : !rows.length ? (
+            <Empty
+              title="Nenhum relatório salvo"
+              hint="Comece de um modelo acima ou crie um do zero. Relatórios agendados chegam por e-mail no horário escolhido."
+              action={
+                <Button variant="ghost" onClick={() => setEditing({ name: "", format: "PDF" })}>
+                  <Plus /> Criar relatório
+                </Button>
+              }
+            />
+          ) : (
+            <DataTable rows={rows} columns={columns} rowKey={(r) => r.id} />
+          )}
         </section>
       </Page>
 

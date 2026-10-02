@@ -1,21 +1,18 @@
 import {
   BarChart3,
   Bell,
-  Code2,
+  History,
   House,
   LayoutGrid,
   Mail,
   MessageSquare,
   MessagesSquare,
   NotebookPen,
-  PanelLeft,
-  PenTool,
   Pin,
   Rocket,
   Search,
   Sparkles,
   UserPlus,
-  Workflow,
   type LucideIcon,
 } from "lucide-react";
 import { useState, type ComponentType, type ReactNode } from "react";
@@ -29,7 +26,6 @@ import {
   SidebarProgressCard,
   TrialBanner,
   cn,
-  notify,
   useCommandShortcut,
   type Command,
   type NavItem,
@@ -43,7 +39,7 @@ import { frameHref, go, goTo } from "./frame-route";
  * Sidebar com workspace, ações rápidas (⌘K), navegação, ferramentas (glifos
  * coloridos), conversas fixadas e recentes, e no rodapé o progresso de
  * "Primeiros passos" e o teste grátis. Barra superior com os modos
- * (Chat · Agente · Código · Design), busca e convite.
+ * (Chat · Agente), busca, notas do workspace e convite.
  * Celular: pílula com Início · Apps · E-mail · Chat (o resto em "Mais").
  */
 
@@ -59,18 +55,18 @@ export const studioRoutes = {
   chat: frameHref("ai-chat"),
   conversation: frameHref("ai-conversation"),
   onboarding: frameHref("onboarding-checklist"),
+  onboardingWizard: frameHref("onboarding-wizard"),
+  notes: frameHref("app-collab-doc"),
   billing: frameHref("settings-billing"),
   team: frameHref("settings-team"),
   profile: frameHref("settings-profile"),
   notifications: frameHref("app-notifications"),
 } as const;
 
-export type StudioMode = "chat" | "agent" | "code" | "design";
+export type StudioMode = "chat" | "agent";
 const modes: { id: StudioMode; label: string; icon: LucideIcon; href: string }[] = [
   { id: "chat", label: "Chat", icon: MessageSquare, href: studioRoutes.sessions },
   { id: "agent", label: "Agente", icon: Sparkles, href: studioRoutes.home },
-  { id: "code", label: "Código", icon: Code2, href: studioRoutes.trace },
-  { id: "design", label: "Design", icon: PenTool, href: studioRoutes.workspace },
 ];
 
 const nav: (NavItem & { isNew?: boolean })[] = [
@@ -84,7 +80,7 @@ const tools = [
   { label: "E-mails", icon: Mail, color: "#d93025", href: studioRoutes.compose },
   { label: "Análises de mídia", icon: BarChart3, color: "#0866ff", href: studioRoutes.workspace },
   { label: "Sessões", icon: MessagesSquare, color: "#5e8e3e", href: studioRoutes.sessions },
-  { label: "Workflows", icon: Workflow, color: "#7c3aed", href: studioRoutes.trace },
+  { label: "Execuções", icon: History, color: "#7c3aed", href: studioRoutes.trace },
 ];
 // ds-audit-ignore-end
 
@@ -161,15 +157,12 @@ function StudioSidebar({ current, mobileOpen, onQuick }: { current: string; mobi
             }
             items={[
               { type: "label", label: "Workspaces" },
-              { label: `Estúdio ${org.name}`, onSelect: () => notify(`Você já está no Estúdio ${org.name}`, undefined, "info") },
-              { label: "Acme Outlet", onSelect: () => notify("Exemplo: trocaria para o workspace Acme Outlet", undefined, "info") },
+              { type: "checkbox", label: `Estúdio ${org.name}`, checked: true, onCheckedChange: () => undefined },
+              { label: "Criar workspace", onSelect: () => goTo(studioRoutes.onboardingWizard) },
               { type: "separator" },
               { label: "Configurações do workspace", onSelect: () => goTo(studioRoutes.profile) },
             ]}
           />
-          <button type="button" onClick={() => notify("Exemplo: recolhe a barra lateral (⌘\\)", undefined, "info")} aria-label="Recolher menu" className="hidden h-8 w-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-ink/[0.05] hover:text-ink md:grid">
-            <PanelLeft className="h-4 w-4" />
-          </button>
         </div>
         <QuickActionsField onOpen={onQuick} className="mt-3" />
       </div>
@@ -242,9 +235,9 @@ function StudioTopBar({ mode, onQuick }: { mode?: StudioMode; onQuick: () => voi
           <Bell className="h-4 w-4" />
           <span aria-hidden className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-rose ring-2 ring-page" />
         </a>
-        <button type="button" onClick={() => notify("Exemplo: abre o bloco de notas do workspace", undefined, "info")} aria-label="Notas" title="Notas" className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-ink/[0.05] hover:text-ink">
+        <a href={studioRoutes.notes} aria-label="Notas do workspace" title="Notas do workspace" className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-ink/[0.05] hover:text-ink">
           <NotebookPen className="h-4 w-4" />
-        </button>
+        </a>
         <a href={studioRoutes.team} className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px] text-ink-soft hover:bg-ink/[0.05] hover:text-ink">
           <UserPlus className="h-4 w-4" />
           Convidar

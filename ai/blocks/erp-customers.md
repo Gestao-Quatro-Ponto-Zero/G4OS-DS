@@ -4,7 +4,7 @@
 - Categoria: ERP
 - Preview: showcase `#/frame/erp-customers` (`?theme=dark` para o escuro)
 
-Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e títulos vencidos. Detalhe em gaveta com pedidos recentes, bloqueio de crédito e novo pedido.
+Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e títulos vencidos. Detalhe em gaveta (?id=) com pedidos e títulos, bloqueio de crédito, e cadastro com consulta de CNPJ, endereço e condições comerciais.
 
 ## Conceito
 
@@ -14,7 +14,9 @@ Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e 
 
 - Anatomia A · Lista: cabeçalho fixo + PageToolbar colada
 - Uso do limite de crédito e títulos vencidos na linha
-- Detalhe em gaveta com bloqueio de crédito e novo pedido
+- Detalhe em gaveta pela URL (?id=): trocar de cliente no ⌘K troca a gaveta
+- Novo cliente em gaveta: CNPJ com máscara e consulta na Receita, endereço e condições
+- Cinco estados: ?estado=carregando|vazio|erro
 
 **Quando usar e o que adaptar**
 
@@ -23,7 +25,8 @@ Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e 
 **Evite**
 
 - Abrir página nova só para ver o limite de crédito
+- Guardar o registro aberto num estado que não acompanha a URL
 
 ## Componentes usados
 
-`Badge`, `Button`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `ListRow`, `Meter`, `Page`, `PageHeading`, `PageToolbar`, `PropertyList`, `SortHeader`, `TableSearch`, `formatCurrency`, `notify`, `useFilters`, `useSort`
+`Badge`, `Button`, `Column`, `CurrencyField`, `DataTable`, `Drawer`, `Empty`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `Highlight`, `ListRow`, `MaskedField`, `Meter`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PageToolbar`, `PropertyList`, `Select`, `SortHeader`, `TableSearch`, `TextField`, `formatCurrency`, `masks`, `notify`, `useFilters`, `useOperation`, `useSort`

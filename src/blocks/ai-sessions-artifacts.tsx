@@ -2,20 +2,14 @@ import {
   Archive,
   Plus,
   Settings2,
-  Bot,
-  CircleHelp,
   Download,
   FolderOpen,
-  Inbox,
-  LayoutGrid,
   Mic,
   PanelRight,
   Paperclip,
   Pencil,
   Search,
-  Settings,
   Share,
-  Sparkles,
   Star,
   Trash2,
   FileText,
@@ -34,14 +28,12 @@ import {
   ComposerChip,
   ContextView,
   Disclaimer,
-  IconRail,
   InputModal,
   InsightCard,
   ListToggle,
   MessageActions,
   ModelPicker,
   PermissionModeChip,
-  ProductMark,
   PromptSuggestions,
   ReportSection,
   RunSummary,
@@ -53,7 +45,6 @@ import {
   ThreadHeader,
   ThreadView,
   VoiceModeButton,
-  Tooltip,
   UserBubble,
   VoiceOverlay,
   WorkspaceSwitcher,
@@ -66,9 +57,7 @@ import {
   type MenuEntry,
   type MinimapItem,
   type ModelEffort,
-  type NavItem,
   type PermissionMode,
-  type RailItem,
   type RunStatus,
   type SlashCommand,
   type StepItem,
@@ -101,7 +90,7 @@ import {
   type ThreadEntry,
 } from "./data/os-sessions";
 import { frameHref, useFrameParam } from "./shells/frame-route";
-import { osRoutes } from "./shells/os-shell";
+import { OsRail, osRoutes, osTabs } from "./shells/os-shell";
 
 export const meta = {
   title: "Sessões com artefatos",
@@ -131,21 +120,6 @@ export const meta = {
 /* ------------------------------------------------------------------ */
 
 const here = frameHref("ai-sessions-artifacts");
-const rail: RailItem[][] = [
-  [
-    { href: here, label: "Sessões", icon: Inbox, dot: true },
-    { href: osRoutes.home, label: "Nova sessão", icon: LayoutGrid },
-    { href: osRoutes.agents, label: "Agentes e relatórios", icon: Bot },
-    { href: osRoutes.files, label: "Arquivos", icon: FolderOpen },
-  ],
-];
-const tabs: NavItem[] = [
-  { href: here, label: "Sessões", icon: Inbox },
-  { href: osRoutes.home, label: "Nova", icon: Sparkles },
-  { href: osRoutes.agents, label: "Agentes", icon: Bot },
-  { href: osRoutes.files, label: "Arquivos", icon: FolderOpen },
-];
-
 const commands: SlashCommand[] = [
   { id: "relatorio", label: "relatorio", description: "Gera um relatório com os achados" },
   { id: "planilha", label: "planilha", description: "Monta uma planilha a partir dos dados" },
@@ -901,27 +875,7 @@ export default function AiSessionsArtifacts() {
     <>
       <AgentAppLayout
         storageKey="ai-sessions-artifacts"
-        rail={
-          <IconRail
-            groups={rail}
-            currentPath={here}
-            mark={<ProductMark size={30} />}
-            footer={
-              <div className="flex flex-col items-center gap-2">
-                <Tooltip content="Configurações" side="right">
-                  <a href={osRoutes.settings} aria-label="Configurações" className="grid h-9 w-9 place-items-center rounded-lg text-muted hover:bg-ink/[0.05] hover:text-ink">
-                    <Settings className="h-[17px] w-[17px]" />
-                  </a>
-                </Tooltip>
-                <Tooltip content="Ajuda" side="right">
-                  <button type="button" aria-label="Ajuda" onClick={() => notify("Exemplo: abriria a central de ajuda do G4 OS", undefined, "info")} className="grid h-9 w-9 place-items-center rounded-lg text-muted hover:bg-ink/[0.05] hover:text-ink">
-                    <CircleHelp className="h-[17px] w-[17px]" />
-                  </button>
-                </Tooltip>
-              </div>
-            }
-          />
-        }
+        rail={<OsRail current={here} sessions={here} />}
         list={sessionList}
         listOpen={listOpen}
         onListOpenChange={setListOpen}
@@ -930,7 +884,7 @@ export default function AiSessionsArtifacts() {
         panelOpen={panelOpen}
         onPanelOpenChange={setPanelOpen}
         mobileView={mobileView}
-        mobileNav={<BottomNav items={tabs} currentPath={here} />}
+        mobileNav={<BottomNav items={osTabs(here)} currentPath={here} />}
       />
       <InputModal
         open={renaming}

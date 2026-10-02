@@ -7,6 +7,7 @@ import {
   ChartCard,
   CurrencyField,
   DataTable,
+  Empty,
   KpiCard,
   KpiGrid,
   Meter,
@@ -21,7 +22,7 @@ import {
   notify,
   type Column,
 } from "@g4ai/ds";
-import { br, coverageDays, levelInfo, levelOf, movementsOf, productBySku, qtyOf, supplierById, warehouses, type Product } from "./data/erp";
+import { addPurchaseRequest, br, coverageDays, levelInfo, levelOf, moveKind, productBySku, productStatusOf, purchaseOrders, poStatus, qtyOf, stockMoves, suggestedQty, supplierById, warehouses, awaitingReceipt, type Product, type StockMove } from "./data/erp";
 import { go, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
@@ -48,7 +49,6 @@ export const meta = {
   },
 } as const;
 
-type Movement = ReturnType<typeof movementsOf>[number];
 
 export default function ErpProduct() {
   const id = useFrameParam("id", "CHP-2210");
@@ -65,18 +65,28 @@ function ProductPage({ product }: { product: Product }) {
   const supplier = supplierById(p.supplierId);
   const l = levelOf(p);
   const projection = Array.from({ length: 31 }, (_, d) => ({ dia: d === 0 ? "hoje" : `+${d}d`, saldo: Math.max(0, total - p.dailyUse * d) + (d >= supplier.leadTime && total < p.min * 2 ? p.min * 2 : 0), minimo: p.min }));
-  const columns: Column<Movement>[] = [
-    { key: "date", header: "Data", nowrap: true, cell: (m) => <span className="tabular-nums text-muted">{br(m.date)}</span> },
-    { key: "kind", header: "Movimento", primary: true, cell: (m) => m.kind },
+  const moves = stockMoves.filter((m) => m.sku === p.sku).slice(0, 8);
+  const incoming = purchaseOrders.filter((o) => awaitingReceipt(o) && o.items.some((it) => it.sku === p.sku));
+  const whName = (id: string) => warehouses.find((w) => w.id === id)?.name ?? id;
+  const requestPurchase = () => {
+    const qty = suggestedQty(p) || p.min;
+    const r = addPurchaseRequest({ title: `Reposição de ${p.name}`, items: [{ name: p.name, qty, unit: p.unit, sku: p.sku }], urgent: l === "ruptura" });
+    notify(`${r.number} criada com ${formatNumber(qty)} ${p.unit} de ${p.sku} · aguarda o gestor da área`);
+    go("erp-purchase-requests", r.id);
+  };
+  const columns: Column<StockMove>[] = [
+    { key: "date", header: "Data", nowrap: true, cell: (m) => <span className="tabular-nums text-muted">{br(m.date)} {m.time}</span> },
+    { key: "kind", header: "Movimento", primary: true, cell: (m) => <span>{moveKind[m.kind].label}{m.reason ? <span className="block text-[11.5px] font-normal text-muted">{m.reason}</span> : null}</span> },
     { key: "doc", header: "Documento", nowrap: true, mobileHidden: true, cell: (m) => <span className="font-mono text-[12px]">{m.doc}</span> },
-    { key: "wh", header: "Depósito", mobileHidden: true, cell: (m) => m.warehouse },
-    { key: "qty", header: "Quantidade", align: "right", nowrap: true, cell: (m) => <span className={m.qty > 0 ? "font-medium tabular-nums text-ok" : "tabular-nums"}>{m.qty > 0 ? "+" : "−"}{formatNumber(Math.abs(m.qty))} {p.unit}</span> },
+    { key: "wh", header: "Depósito", mobileHidden: true, cell: (m) => (m.to ? `${whName(m.warehouse)} → ${whName(m.to)}` : whName(m.warehouse)) },
+    { key: "qty", header: "Quantidade", align: "right", nowrap: true, cell: (m) => <span className={m.kind === "transferencia" ? "tabular-nums text-muted" : m.qty > 0 ? "font-medium tabular-nums text-ok" : "tabular-nums"}>{m.kind === "transferencia" ? "⇄ " : m.qty > 0 ? "+" : "−"}{formatNumber(Math.abs(m.qty))} {p.unit}</span> },
+    { key: "bal", header: "Saldo", align: "right", nowrap: true, mobileHidden: true, cell: (m) => <span className="tabular-nums text-ink-soft">{formatNumber(m.balance)}</span> },
   ];
   return (
     <NexoShell section="produtos">
       <Page>
         <PageHeading
-          crumbs={[{ label: "Estoque", href: "#/frame/erp-inventory" }, { label: p.category }]}
+          crumbs={[{ label: "Cadastros" }, { label: "Produtos", href: "#/frame/erp-products" }]}
           title={p.name}
           description={`${p.sku} · NCM ${p.ncm} · unidade: ${p.unit}`}
           actions={
@@ -84,20 +94,20 @@ function ProductPage({ product }: { product: Product }) {
               <Button variant="ghost" onClick={() => setEditing(true)}>
                 <Tag /> Ajustar preço
               </Button>
-              <Button
-                onClick={() => {
-                  notify(`Requisição de ${formatNumber(p.min * 3 - total)} ${p.unit} de ${p.sku} enviada para Compras`);
-                  go("erp-purchase-requests");
-                }}
-                disabled={total >= p.min * 3}
-              >
-                <ShoppingBag /> Pedir compra
+              <Button onClick={requestPurchase} disabled={total >= p.min * 3 || productStatusOf(p) === "inativo"} disabledReason={productStatusOf(p) === "inativo" ? "Produto inativo: reative em Produtos para comprar de novo." : "Saldo acima de 3× o mínimo: não há o que repor."}>
+                <ShoppingBag /> Requisição de compra
               </Button>
             </>
           }
         />
-        <div className="mt-3">
+        <div className="mt-3 flex flex-wrap gap-2">
           <Badge tone={levelInfo[l].tone}>{levelInfo[l].label}</Badge>
+          {productStatusOf(p) === "inativo" && <Badge>Inativo · fora do pedido de venda</Badge>}
+          {incoming.map((o) => (
+            <a key={o.id} href={`#/frame/erp-purchase-order?id=${o.id}`} className="rounded-full focus-visible:outline-2">
+              <Badge tone={poStatus[o.status].tone}>{`${o.number} · chega ${br(o.expected).slice(0, 5)}`}</Badge>
+            </a>
+          ))}
         </div>
         <div className="mt-6 space-y-6">
           <KpiGrid>
@@ -114,8 +124,13 @@ function ProductPage({ product }: { product: Product }) {
                   <AreaChart label={`Projeção de saldo de ${p.sku} nos próximos 30 dias`} data={projection} index="dia" series={[{ key: "saldo", label: "Saldo projetado" }]} reference={{ value: p.min, label: `Mínimo ${p.min}` }} height={200} format={(n) => `${formatNumber(n)} ${p.unit}`} />
                 </ChartCard>
                 <section>
-                  <h2 className="mb-3 text-[14px] font-medium">Movimentações recentes</h2>
-                  <DataTable rows={movementsOf(p)} columns={columns} rowKey={(m) => m.id} />
+                  <div className="mb-3 flex items-baseline justify-between gap-3">
+                    <h2 className="m-0 text-[14px] font-medium">Movimentações recentes</h2>
+                    <a className="text-[12.5px] font-medium text-blue hover:underline" href={`#/frame/erp-stock-movements?sku=${p.sku}`}>
+                      Ver kardex completo
+                    </a>
+                  </div>
+                  <DataTable rows={moves} columns={columns} rowKey={(m) => m.id} label={`Movimentações de ${p.sku}`} empty={<Empty framed={false} title="Sem movimentações" hint="O produto ainda não teve entrada nem saída." />} />
                 </section>
               </div>
             }

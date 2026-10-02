@@ -1,5 +1,5 @@
-import { Briefcase, Building2, CalendarClock, Gauge, KanbanSquare, Plus, Settings, Target, User, Users } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { Briefcase, Building2, CalendarClock, FileText, Gauge, Inbox, KanbanSquare, Plus, Settings, Target, User, Users } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AppShell,
   Avatar,
@@ -16,13 +16,13 @@ import {
   SearchPalette,
   Sidebar,
   formatCurrency,
-  notify,
   useCommandShortcut,
   type NavGroup,
   type SearchResult,
   type SearchScope,
 } from "@g4ai/ds";
-import { companies, companyById, contacts, deals, iso, me, overdueCount, repById, reps, stageById, stages, type Deal, type StageId } from "../data/crm";
+import { companies, companyById, contacts, deals, iso, leads, me, overdueCount, quoteStatus, quotes, repById, reps, stageById, stages, type Deal, type StageId } from "../data/crm";
+import { frameHref, goTo } from "./frame-route";
 
 /*
  * Casca do Acme CRM: a mesma sidebar, busca ⌘K e navegação móvel em todas as
@@ -30,16 +30,22 @@ import { companies, companyById, contacts, deals, iso, me, overdueCount, repById
  * páginas de detalhe passam o item-pai (negócio → Pipeline).
  *
  * mobileNav="tabbar": vendedor usa o CRM no celular entre reuniões, sempre nas
- * mesmas 4 telas (Pipeline, Atividades, Empresas, Painel). Time e
- * Configurações ficam em "Mais".
+ * mesmas 4 telas (Pipeline, Atividades, Empresas, Painel). Leads, Propostas,
+ * Time e Configurações ficam em "Mais".
+ *
+ * Contadores só quando pedem ação: leads novos sem dono e atividades atrasadas.
  */
+
+const newLeads = leads.filter((l) => l.status === "novo").length;
 
 export const crmNav: NavGroup[] = [
   {
     label: "Vendas",
     items: [
       { href: "#/frame/crm-sales-dashboard", label: "Painel", icon: Gauge },
+      { href: "#/frame/crm-leads", label: "Leads", icon: Inbox, badge: newLeads },
       { href: "#/frame/crm-pipeline", label: "Pipeline", icon: KanbanSquare },
+      { href: "#/frame/crm-quotes", label: "Propostas", icon: FileText },
       { href: "#/frame/crm-contacts", label: "Empresas e contatos", icon: Building2 },
       { href: "#/frame/crm-activities", label: "Atividades", icon: CalendarClock, badge: overdueCount },
     ],
@@ -53,12 +59,13 @@ export const crmNav: NavGroup[] = [
   },
 ];
 const [vendas] = crmNav;
-const tabs = [vendas.items[1], vendas.items[3], { ...vendas.items[2], label: "Empresas" }, vendas.items[0]];
+const tabs = [vendas.items[2], vendas.items[5], { ...vendas.items[4], label: "Empresas" }, vendas.items[0]];
 
 const scopes: SearchScope[] = [
   { id: "deals", label: "Negócios", icon: <Briefcase />, prefix: "#", noun: "negócios" },
   { id: "companies", label: "Empresas", icon: <Building2 />, noun: "empresas" },
   { id: "contacts", label: "Contatos", icon: <User />, prefix: "@", noun: "contatos" },
+  { id: "quotes", label: "Propostas", icon: <FileText />, noun: "propostas" },
   { id: "actions", label: "Ações", icon: <Plus />, prefix: ">", noun: "ações" },
 ];
 
@@ -108,12 +115,23 @@ function useSearchItems(): SearchResult[] {
       href: `#/frame/crm-contact?id=${x.id}`,
       keywords: [x.email, x.phone],
     }));
+    const q: SearchResult[] = quotes.map((x) => ({
+      id: x.id,
+      scope: "quotes",
+      title: `${x.number} · ${companyById(x.companyId).name}`,
+      subtitle: deals.find((d) => d.id === x.dealId)?.title,
+      icon: <FileText />,
+      meta: quoteStatus[x.status].label,
+      href: frameHref("crm-quotes", x.id),
+    }));
     const a: SearchResult[] = [
       { id: "new-deal", scope: "actions", title: "Novo negócio", icon: <Plus />, href: "#/frame/crm-pipeline?novo=1", shortcut: ["N"] },
+      { id: "new-quote", scope: "actions", title: "Nova proposta", icon: <FileText />, href: frameHref("crm-quotes", { novo: 1 }) },
+      { id: "leads", scope: "actions", title: "Qualificar leads novos", icon: <Inbox />, href: frameHref("crm-leads") },
       { id: "new-task", scope: "actions", title: "Nova atividade", icon: <CalendarClock />, href: "#/frame/crm-activities?novo=1" },
       { id: "goals", scope: "actions", title: "Ver metas do time", icon: <Target />, href: "#/frame/crm-team" },
     ];
-    return [...d, ...c, ...p, ...a];
+    return [...d, ...c, ...p, ...q, ...a];
   }, []);
 }
 
@@ -153,10 +171,14 @@ export function CrmShell({ current, children, headerActions }: { current: string
           if (!newTab && r.href) location.hash = r.href.slice(1);
         }}
         onSeeAll={(scope, q) => {
-          const target = scope.id === "deals" ? "crm-pipeline" : "crm-contacts";
+          const target = scope.id === "deals" ? "crm-pipeline" : scope.id === "quotes" ? "crm-quotes" : "crm-contacts";
           location.href = `?q=${encodeURIComponent(q)}#/frame/${target}`;
         }}
-        onCreate={(q) => notify(`Negócio “${q}” criado em Qualificação`)}
+        onCreate={(q) => {
+          // Abre o formulário de novo negócio no pipeline já com o título digitado.
+          setSearch(false);
+          goTo(frameHref("crm-pipeline", { novo: 1, titulo: q }));
+        }}
         createLabel={(q) => `Criar negócio “${q}”`}
       />
     </AppShell>
@@ -164,8 +186,12 @@ export function CrmShell({ current, children, headerActions }: { current: string
 }
 
 /** Formulário de novo negócio (pipeline, página da empresa, ⌘K). */
-export function NewDealModal({ open, onClose, onCreate, companyId }: { open: boolean; onClose: () => void; onCreate: (deal: Deal) => void; companyId?: string }) {
-  const [title, setTitle] = useState("");
+export function NewDealModal({ open, onClose, onCreate, companyId, defaultTitle }: { open: boolean; onClose: () => void; onCreate: (deal: Deal) => void; companyId?: string; defaultTitle?: string }) {
+  const [title, setTitle] = useState(defaultTitle ?? "");
+  // Título vindo da busca ⌘K ("Criar negócio “…”"): preenche ao abrir.
+  useEffect(() => {
+    if (open && defaultTitle) setTitle(defaultTitle);
+  }, [open, defaultTitle]);
   const [company, setCompany] = useState(companyId ?? "");
   const [value, setValue] = useState<number | null>(null);
   const [stage, setStage] = useState<StageId>("qualificacao");

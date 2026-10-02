@@ -141,7 +141,7 @@ export default function SignupBlock() {
                   </div>
                   <div className="mb-6">
                     <Checkbox label="Aceito os termos" checked={terms} onCheckedChange={setTerms}>
-                      Li e aceito os <a href={authRoutes.landing} className="text-blue underline-offset-2 hover:underline">Termos de uso</a>
+                      Li e aceito os <a href={authRoutes.terms} className="text-blue underline-offset-2 hover:underline">Termos de uso</a> e a <a href={authRoutes.privacy} className="text-blue underline-offset-2 hover:underline">Política de privacidade</a>
                     </Checkbox>
                     {tried && e2.terms && <p className="m-0 mt-1.5 text-[12px] text-rose">{e2.terms}</p>}
                   </div>

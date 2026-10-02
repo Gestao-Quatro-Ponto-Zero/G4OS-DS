@@ -26,4 +26,4 @@ Funil de conversão em colunas, origem do tráfego, dispositivos, taxa de conver
 
 ## Componentes usados
 
-`BarList`, `Button`, `CalendarHeatmap`, `ChartCard`, `DonutChart`, `FunnelChart`, `KpiCard`, `KpiGrid`, `LineChart`, `Page`, `PageHeading`, `SankeyChart`, `SegmentedControl`, `formatNumber`, `formatPercent`, `notify`
+`BarList`, `Button`, `CalendarHeatmap`, `ChartCard`, `DataTable`, `DonutChart`, `FunnelChart`, `KpiCard`, `KpiGrid`, `LineChart`, `Page`, `PageHeading`, `SankeyChart`, `SegmentedControl`, `formatCurrency`, `formatDelta`, `formatNumber`, `formatPercent`

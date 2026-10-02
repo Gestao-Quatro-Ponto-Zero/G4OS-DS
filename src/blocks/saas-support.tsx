@@ -4,6 +4,8 @@ import {
   Avatar,
   Badge,
   Button,
+  Empty,
+  EmptyFilterResult,
   EntityMark,
   FieldBlock,
   FilterBar,
@@ -14,6 +16,7 @@ import {
   PageHeading,
   Select,
   TableSearch,
+  Skeleton,
   TextareaField,
   cn,
   notify,
@@ -21,7 +24,8 @@ import {
   type FilterField, PageToolbar
 } from "@g4ai/ds";
 import { customerById, personById, priorityLabel, priorityTone, team, ticketLabel, tickets as baseTickets, today, useFrameParam, type Priority, type Ticket, type TicketStatus } from "./data/saas";
-import { SaasShell } from "./shells/saas-shell";
+import { setFrameQuery } from "./shells/frame-route";
+import { ListError, SaasShell, useDemoState } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -62,6 +66,7 @@ const slaLeft = (t: Ticket) => t.sla - t.opened;
 
 export default function SaasSupport() {
   const [tickets, setTickets] = useState(baseTickets);
+  const estado = useDemoState();
   const id = useFrameParam("id");
   // Desktop abre o primeiro da fila; no celular a fila vem primeiro.
   const [selected, setSelected] = useState<string | null>(() => id ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches ? baseTickets.find((t) => t.priority === "urgente" && t.status !== "resolvido")?.id ?? null : null));
@@ -69,7 +74,7 @@ export default function SaasSupport() {
   useEffect(() => {
     if (id) setSelected(id);
   }, [id]);
-  const filters = useFilters(tickets, {
+  const filters = useFilters(estado === "vazio" ? [] : tickets, {
     fields,
     search: (t) => [t.subject, t.id, customerById(t.customerId).name],
     now: today,
@@ -77,8 +82,15 @@ export default function SaasSupport() {
     initial: { query: "", conditions: [{ id: "abertos", field: "status", op: "is_not", value: ["resolvido"] }] },
   });
   const q = filters.state.query;
+  // Busca vinda do ⌘K ("Ver todos"): procura também nos resolvidos.
+  const hashQuery = useFrameParam("q");
+  const { setState } = filters;
+  useEffect(() => {
+    if (hashQuery) setState({ query: hashQuery, conditions: [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hashQuery]);
   const list = [...filters.rows].sort((a, b) => priorities.indexOf(b.priority) - priorities.indexOf(a.priority) || slaLeft(a) - slaLeft(b));
-  const current = tickets.find((t) => t.id === selected);
+  const current = estado ? undefined : tickets.find((t) => t.id === selected);
   const update = (patch: Partial<Ticket>, message: string) => {
     if (!current) return;
     const prev = current;
@@ -102,15 +114,37 @@ export default function SaasSupport() {
           {/* Fila */}
           <section className={cn("min-w-0 space-y-3", current && "hidden lg:block")} aria-label="Fila de chamados">
             <PageToolbar>
-              <FilterBar filters={filters} noun="chamado" search={<TableSearch value={q} onChange={filters.setQuery} total={tickets.length} noun="chamado" searchIn="assunto, número e cliente" />} />
+              <FilterBar filters={filters} noun="chamado" search={<TableSearch value={q} onChange={filters.setQuery} total={filters.total} noun="chamado" searchIn="assunto, número e cliente" />} />
             </PageToolbar>
+            {estado === "carregando" ? (
+              <ul role="status" aria-label="Carregando chamados" className="m-0 list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
+                {Array.from({ length: 6 }, (_, i) => (
+                  <li key={i} className="flex gap-3 px-4 py-3">
+                    <Skeleton className="h-7 w-7 rounded-lg" />
+                    <span className="flex-1 space-y-2">
+                      <Skeleton className="h-2.5 w-1/3" />
+                      <Skeleton className="h-3 w-4/5" />
+                      <Skeleton className="h-4 w-24" />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : estado === "erro" ? (
+              <ListError noun="os chamados" />
+            ) : !filters.total ? (
+              <Empty title="Nenhum chamado na fila" hint="Quando um cliente escrever por e-mail, chat ou telefone, o chamado aparece aqui com o prazo de SLA." action={<Button variant="ghost" href="#/frame/saas-integrations">Conectar canal de atendimento</Button>} />
+            ) : !list.length ? (
+              <div className="rounded-xl border border-line bg-surface">
+                <EmptyFilterResult filters={filters} noun="chamado" />
+              </div>
+            ) : (
             <ul className="m-0 list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
               {list.map((t) => {
                 const c = customerById(t.customerId);
                 const left = slaLeft(t);
                 return (
                   <li key={t.id}>
-                    <button type="button" onClick={() => setSelected(t.id)} aria-current={t.id === selected ? "true" : undefined} className={cn("flex w-full gap-3 px-4 py-3 text-left hover:bg-soft/50", t.id === selected && "bg-soft")}>
+                    <button type="button" onClick={() => (setSelected(t.id), setFrameQuery({ id: t.id }))} aria-current={t.id === selected ? "true" : undefined} className={cn("flex w-full gap-3 px-4 py-3 text-left hover:bg-soft/50", t.id === selected && "bg-soft")}>
                       <EntityMark name={c.name} tint={c.tint} className="mt-0.5 h-7 w-7 text-[11px]" />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center justify-between gap-2">
@@ -134,8 +168,8 @@ export default function SaasSupport() {
                   </li>
                 );
               })}
-              {!list.length && <li className="px-4 py-10 text-center text-[13px] text-muted">Nenhum chamado com esses filtros.</li>}
             </ul>
+            )}
           </section>
 
           {/* Conversa */}
@@ -143,7 +177,7 @@ export default function SaasSupport() {
             {current ? (
               <div className="flex h-full flex-col">
                 <header className="border-b border-line px-5 py-4">
-                  <button type="button" onClick={() => setSelected(null)} className="mb-2 inline-flex items-center gap-1 text-[12.5px] text-muted hover:text-ink lg:hidden">
+                  <button type="button" onClick={() => (setSelected(null), setFrameQuery({ id: undefined }))} className="mb-2 inline-flex items-center gap-1 text-[12.5px] text-muted hover:text-ink lg:hidden">
                     <ArrowLeft className="h-3.5 w-3.5" /> Voltar para a fila
                   </button>
                   <div className="text-[12px] text-muted">
@@ -197,7 +231,7 @@ export default function SaasSupport() {
                 </form>
               </div>
             ) : (
-              <p className="m-0 p-10 text-center text-[13px] text-muted">Escolha um chamado na fila para ver a conversa.</p>
+              <p className="m-0 p-10 text-center text-[13px] text-muted">{estado ? "A conversa aparece aqui quando houver chamados." : "Escolha um chamado na fila para ver a conversa."}</p>
             )}
           </section>
         </div>

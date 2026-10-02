@@ -15,6 +15,7 @@ Pessoa (?id=): papel na decisão, dados de contato, negócios em que participa, 
 - Anatomia C · Registro: propriedades fixas à direita
 - Papel na decisão (decisora, influenciadora) em destaque
 - Histórico em feed; e-mail com modelo em modal
+- Editar em gaveta (Drawer); mover de empresa com busca (Combobox) em modal curto
 
 **Quando usar e o que adaptar**
 
@@ -26,4 +27,4 @@ Pessoa (?id=): papel na decisão, dados de contato, negócios em que participa, 
 
 ## Componentes usados
 
-`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `EntityMark`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `SplitLayout`, `TextField`, `TextareaField`, `formatCurrency`, `formatDate`, `notify`
+`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `Combobox`, `Drawer`, `Empty`, `EntityMark`, `FieldBlock`, `FieldGrid`, `Modal`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `TextField`, `TextareaField`, `formatCurrency`, `formatDate`, `notify`, `useOperation`

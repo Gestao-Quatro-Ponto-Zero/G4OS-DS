@@ -17,7 +17,7 @@ import {
   Strikethrough,
   Table2,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Menu, Tooltip } from "./overlays-extra";
 
@@ -502,4 +502,66 @@ export function RichTextEditor({
       />
     </div>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* RichTextView                                                        */
+/* ------------------------------------------------------------------ */
+
+const allowedTags = new Set(["P", "BR", "STRONG", "B", "EM", "I", "U", "S", "DEL", "MARK", "CODE", "PRE", "A", "UL", "OL", "LI", "H1", "H2", "H3", "H4", "BLOCKQUOTE", "HR", "TABLE", "THEAD", "TBODY", "TR", "TH", "TD", "IMG", "SPAN", "DIV", "INPUT"]);
+const allowedAttrs: Record<string, string[]> = { A: ["href", "title"], IMG: ["src", "alt", "width", "height"], TD: ["colspan", "rowspan"], TH: ["colspan", "rowspan"], INPUT: ["type", "checked"], LI: ["data-checked"] };
+const safeUrl = (url: string, img = false) => /^(https?:|mailto:)/i.test(url.trim()) || (img && /^data:image\/(png|jpe?g|gif|webp);/i.test(url.trim()));
+
+/** Higieniza HTML de editor por lista de permissões (tags, atributos e URLs). Roda só no navegador. */
+function sanitizeRichText(html: string) {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+  const root = doc.body.firstElementChild as HTMLElement;
+  const walk = (el: Element) => {
+    for (const child of [...el.children]) {
+      if (!allowedTags.has(child.tagName)) {
+        // Tag desconhecida: some com o conteúdo se for executável; senão, fica só o texto.
+        if (["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE", "SVG", "MATH", "FORM"].includes(child.tagName)) child.remove();
+        else child.replaceWith(doc.createTextNode(child.textContent ?? ""));
+        continue;
+      }
+      for (const attr of [...child.attributes]) {
+        const ok = (allowedAttrs[child.tagName] ?? []).includes(attr.name);
+        if (!ok) child.removeAttribute(attr.name);
+      }
+      if (child.tagName === "A") {
+        const href = child.getAttribute("href") ?? "";
+        if (!safeUrl(href)) child.removeAttribute("href");
+        else if (/^https?:/i.test(href.trim())) {
+          child.setAttribute("rel", "noopener noreferrer");
+          child.setAttribute("target", "_blank");
+        }
+      }
+      if (child.tagName === "IMG" && !safeUrl(child.getAttribute("src") ?? "", true)) child.remove();
+      if (child.tagName === "INPUT") {
+        if (child.getAttribute("type") !== "checkbox") child.remove();
+        else child.setAttribute("disabled", "");
+      }
+      walk(child);
+    }
+  };
+  walk(root);
+  return root.innerHTML;
+}
+
+/**
+ * Mostra texto rico (HTML do RichTextEditor, comentário, comunicado) só para
+ * leitura, com o mesmo estilo do editor. O HTML passa por uma lista de
+ * permissões (tags, atributos e URLs) antes de entrar na página: use no lugar
+ * de `dangerouslySetInnerHTML` para conteúdo vindo de usuário.
+ */
+export function RichTextView({ value, className }: { value: string; className?: string }) {
+  // Servidor e 1º quadro: só o texto (React escapa), para leitores, busca e impressão.
+  // Depois de montar, o HTML higienizado no navegador (DOMParser só existe lá).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const html = useMemo(() => (mounted ? sanitizeRichText(value) : null), [mounted, value]);
+  const cls = cn(richTextContentClass, "min-w-0", className);
+  if (html == null) return <div className={cn(cls, "whitespace-pre-line")}>{value.replace(/<(br|\/p|\/li|\/h\d)>/gi, "\n").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").trim()}</div>;
+  // g4os-ds-disable-next-line dangerous-html -- HTML passou por sanitizeRichText (lista de permissões de tags, atributos e URLs)
+  return <div className={cls} dangerouslySetInnerHTML={{ __html: html }} />;
 }

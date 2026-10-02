@@ -1,3 +1,4 @@
+import { CalendarClock, FileText, Inbox, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import {
   BarChart,
@@ -9,6 +10,8 @@ import {
   KpiCard,
   KpiGrid,
   Leaderboard,
+  ListPanel,
+  ListRow,
   Page,
   PageHeading,
   ParetoChart,
@@ -17,7 +20,7 @@ import {
   formatNumber,
   formatPercent,
 } from "@g4ai/ds";
-import { funnel, lostReasons, monthly, reps } from "./data/crm";
+import { activities, activityLabel, companyById, daysFromToday, deals, funnel, leads, lostReasons, me, monthly, quotes, repById, reps } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -31,7 +34,9 @@ export const meta = {
     goal: "Responder se o time vai bater a meta do trimestre e onde está perdendo negócios.",
     patterns: [
       "Anatomia B · Painel: cabeçalho fixo com seletor de time",
-      "Meta com ritmo esperado (GoalMeter) antes de tudo",
+      "KPIs levam à lista já filtrada (drill-down)",
+      "“Precisa de você” logo abaixo dos KPIs: negócios parados, atividades atrasadas, leads e propostas vencendo",
+      "Meta com ritmo esperado (GoalMeter)",
       "Receita × meta, funil, ranking e motivos de perda (Pareto)",
     ],
     adapt: [
@@ -46,6 +51,12 @@ export const meta = {
 // Dados de exemplo em ./data/crm (os mesmos do pipeline e de Time e metas).
 const money = (n: number) => formatCurrency(n, { compact: true });
 const here = "#/frame/crm-sales-dashboard";
+// Links com filtro na URL (useFilters url: true lê ?f=campo~op~valor).
+const stalledHref = `?f=${encodeURIComponent("age~gt~30")}#/frame/crm-pipeline`;
+const stalled = deals.filter((d) => d.age > 30).sort((a, b) => b.age - a.age);
+const overdue = activities.filter((a) => !a.done && daysFromToday(a.due) < 0).sort((a, b) => a.due.localeCompare(b.due));
+const newLeads = leads.filter((l) => l.status === "novo");
+const expiring = quotes.filter((q) => q.status === "enviada" && daysFromToday(q.validUntil) <= 3);
 
 export default function CrmSalesDashboard() {
   const [team, setTeam] = useState<"todos" | "enterprise" | "pme">("todos");
@@ -75,11 +86,67 @@ export default function CrmSalesDashboard() {
         />
         <div className="mt-6 space-y-6">
           <KpiGrid>
-            <KpiCard label="Receita fechada no trimestre" value={money(won)} delta={won / prev - 1} period="vs. 2º trimestre" size="lg" />
-            <KpiCard label="Taxa de ganho" value={formatPercent(71 / 212)} delta={0.021} period="propostas → ganho" />
-            <KpiCard label="Ticket médio" value={money(50_845)} delta={-0.063} period="vs. 2º trimestre" />
-            <KpiCard label="Ciclo de venda" value="41 dias" delta={-0.09} goodWhen="down" period="da qualificação ao ganho" />
+            <KpiCard label="Receita fechada no trimestre" value={money(won)} delta={won / prev - 1} period="vs. 2º trimestre" size="lg" href="#/frame/crm-team" />
+            <KpiCard label="Taxa de ganho" value={formatPercent(71 / 212)} delta={0.021} period="propostas → ganho" href="#/frame/crm-quotes" />
+            <KpiCard label="Ticket médio" value={money(50_845)} delta={-0.063} period="vs. 2º trimestre" href="#/frame/crm-pipeline" />
+            <KpiCard label="Ciclo de venda" value="41 dias" delta={-0.09} goodWhen="down" period="da qualificação ao ganho" href={stalledHref} hint={`${stalled.length} negócios parados há mais de 30 dias`} />
           </KpiGrid>
+
+          <section aria-labelledby="precisa-de-voce">
+            <h2 id="precisa-de-voce" className="m-0 mb-3 text-[14px] font-medium">
+              Precisa de você
+            </h2>
+            <div className="grid items-start gap-4 lg:grid-cols-2">
+              <ListPanel title="Negócios parados" icon={<TriangleAlert />} tone={stalled.length ? "attention" : "neutral"} count={stalled.length} action={<a href={stalledHref}>Ver no pipeline</a>}>
+                <ul className="m-0 list-none divide-y divide-line p-0">
+                  {stalled.slice(0, 4).map((d) => (
+                    <li key={d.id}>
+                      <ListRow href={`#/frame/crm-deal?id=${d.id}`} kicker={`${companyById(d.companyId).name} · ${repById(d.owner).name.split(" ")[0]}`} title={d.title} meta={<span className="font-medium text-amber">{d.age} dias na etapa</span>} />
+                    </li>
+                  ))}
+                  {!stalled.length && <li className="px-4 py-4 text-[13px] text-muted">Nenhum negócio parado. Bom ritmo.</li>}
+                </ul>
+              </ListPanel>
+              <ListPanel title="Atividades atrasadas" icon={<CalendarClock />} tone={overdue.length ? "attention" : "neutral"} count={overdue.length} action={<a href="#/frame/crm-activities">Abrir atividades</a>}>
+                <ul className="m-0 list-none divide-y divide-line p-0">
+                  {overdue.slice(0, 4).map((a) => (
+                    <li key={a.id}>
+                      <ListRow
+                        href={a.dealId ? `#/frame/crm-deal?id=${a.dealId}` : `#/frame/crm-company?id=${a.companyId}`}
+                        kicker={`${activityLabel[a.type]} · ${a.owner === me ? "você" : repById(a.owner).name.split(" ")[0]}`}
+                        title={a.title}
+                        meta={<span className="font-medium text-rose">{-daysFromToday(a.due) === 1 ? "desde ontem" : `há ${-daysFromToday(a.due)} dias`}</span>}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </ListPanel>
+              <ListPanel title="Leads novos para qualificar" icon={<Inbox />} count={newLeads.length} action={<a href="#/frame/crm-leads">Caixa de leads</a>}>
+                <ul className="m-0 list-none divide-y divide-line p-0">
+                  {newLeads.slice(0, 3).map((l) => (
+                    <li key={l.id}>
+                      <ListRow href={`#/frame/crm-leads?id=${l.id}`} kicker={`${l.source} · pontuação ${l.score}`} title={`${l.name} · ${l.company}`} meta={money(l.estimate)} />
+                    </li>
+                  ))}
+                </ul>
+              </ListPanel>
+              <ListPanel title="Propostas vencendo" icon={<FileText />} count={expiring.length} action={<a href="#/frame/crm-quotes">Todas as propostas</a>}>
+                <ul className="m-0 list-none divide-y divide-line p-0">
+                  {expiring.map((q) => (
+                    <li key={q.id}>
+                      <ListRow
+                        href={`#/frame/crm-quotes?id=${q.id}`}
+                        kicker={q.number}
+                        title={companyById(q.companyId).name}
+                        meta={<span className={daysFromToday(q.validUntil) < 0 ? "font-medium text-rose" : "text-amber"}>{daysFromToday(q.validUntil) < 0 ? "vencida" : daysFromToday(q.validUntil) === 0 ? "vence hoje" : `vence em ${daysFromToday(q.validUntil)} d`}</span>}
+                      />
+                    </li>
+                  ))}
+                  {!expiring.length && <li className="px-4 py-4 text-[13px] text-muted">Nenhuma proposta perto do vencimento.</li>}
+                </ul>
+              </ListPanel>
+            </div>
+          </section>
 
           <div className="grid gap-6 lg:grid-cols-3">
             <ChartCard className="lg:col-span-2" title="Estamos batendo a meta mensal?" description="Receita ganha e prevista por mês · meta de R$ 1,1 mi">

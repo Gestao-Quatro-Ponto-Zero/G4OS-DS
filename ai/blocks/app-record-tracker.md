@@ -27,4 +27,4 @@ Banco de registros estilo Notion: tabela com etiquetas coloridas, status e prior
 
 ## Componentes usados
 
-`ActivitySection`, `Avatar`, `Checkbox`, `DataGrid`, `FilesList`, `GridColumn`, `KanbanBoard`, `KanbanColumn`, `NotesTable`, `Priority`, `PriorityIcon`, `PriorityPill`, `PropertyPill`, `PropertyPills`, `RecordCard`, `RecordFile`, `RecordPanel`, `RecordSection`, `SectionAddButton`, `SegmentedControl`, `StatusPill`, `TableSearch`, `TagPill`, `TaskStatus`, `notify`, `priorityLabel`, `taskStatusLabel`, `useTableSearch`
+`ActivitySection`, `Avatar`, `Button`, `Checkbox`, `DataGrid`, `DueDatePicker`, `Empty`, `FileDropzone`, `FilesList`, `GridColumn`, `KanbanBoard`, `KanbanColumn`, `Modal`, `NotesTable`, `Priority`, `PriorityIcon`, `PriorityPill`, `PropertyPill`, `PropertyPills`, `RecordCard`, `RecordFile`, `RecordFileKind`, `RecordPanel`, `RecordSection`, `SectionAddButton`, `SegmentedControl`, `Skeleton`, `StatusPill`, `TableSearch`, `TagPill`, `TaskStatus`, `notify`, `priorityLabel`, `taskStatusLabel`, `useTableSearch`

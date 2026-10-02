@@ -1,10 +1,11 @@
-import { Boxes, ClipboardList, FileText } from "lucide-react";
+import { Boxes, ClipboardList, FileText, ShoppingBag, Truck } from "lucide-react";
 import { useState } from "react";
 import {
   AreaChart,
   Badge,
   BarList,
   ChartCard,
+  Empty,
   KpiCard,
   KpiGrid,
   LineChart,
@@ -18,7 +19,7 @@ import {
   formatCurrency,
   formatNumber,
 } from "@g4ai/ds";
-import { customerById, customers, levelInfo, levelOf, me, orderTotal, orders, otifByWeek, lateReasons, products, qtyOf, salesByDay } from "./data/erp";
+import { br, customerById, customers, levelInfo, levelOf, me, orderTotal, orders, otifByWeek, lateReasons, poLate, products, purchaseOrders, qtyOf, requestTotal, requestsAwaitingMe, salesByDay, shipmentLate, shipments, supplierById } from "./data/erp";
 import { go } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
@@ -28,7 +29,7 @@ export const meta = {
   description: "Vendas do dia contra a meta, OTIF por semana, causas de atraso (Pareto), maiores clientes e as filas que pedem ação: faturar, repor estoque e aprovar compras.",
   category: "ERP",
   order: 1,
-  height: 1300,
+  height: 1640,
   concept: {
     goal: "Mostrar à operação se as vendas estão no ritmo e quais filas pedem ação agora (faturar, repor, aprovar).",
     patterns: [
@@ -50,6 +51,9 @@ export default function ErpDashboard() {
   const days = salesByDay.slice(range === "30" ? 0 : -5);
   const sold = days.reduce((s, d) => s + d.vendas, 0);
   const toInvoice = orders.filter((o) => o.status === "aprovado");
+  const awaiting = requestsAwaitingMe();
+  const latePOs = purchaseOrders.filter(poLate);
+  const lateShipments = shipments.filter(shipmentLate);
   const ruptures = products.filter((p) => levelOf(p) === "ruptura" || levelOf(p) === "baixo");
   const byCustomer = customers
     .map((c) => ({ label: c.name, value: orders.filter((o) => o.customerId === c.id && o.status !== "cancelado").reduce((s, o) => s + orderTotal(o), 0), href: `#/frame/erp-customers?id=${c.id}` }))
@@ -78,32 +82,72 @@ export default function ErpDashboard() {
 
           <div className="grid items-start gap-6 lg:grid-cols-3">
             <ListPanel title="Aguardando faturamento" icon={<FileText />} count={toInvoice.length} action={<a href="#/frame/erp-orders">Pedidos</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                {toInvoice.slice(0, 5).map((o) => (
-                  <li key={o.id}>
-                    <ListRow onClick={() => go("erp-order", o.id)} kicker={<span className="font-mono">{o.number}</span>} title={customerById(o.customerId).name} meta={formatCurrency(orderTotal(o), { compact: true })} />
-                  </li>
-                ))}
-              </ul>
+              {toInvoice.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {toInvoice.slice(0, 5).map((o) => (
+                    <li key={o.id}>
+                      <ListRow onClick={() => go("erp-order", o.id)} kicker={<span className="font-mono">{o.number}</span>} title={customerById(o.customerId).name} meta={formatCurrency(orderTotal(o), { compact: true })} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<FileText />} title="Nada para faturar" hint="Pedidos aprovados aparecem aqui até virar NF-e." />
+              )}
             </ListPanel>
-            <ListPanel title="Estoque crítico" icon={<Boxes />} count={ruptures.length} tone="attention" action={<a href="#/frame/erp-inventory">Estoque</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                {ruptures.slice(0, 5).map((p) => (
-                  <li key={p.sku}>
-                    <ListRow onClick={() => go("erp-product", p.sku)} kicker={<span className="font-mono">{p.sku}</span>} title={p.name} meta={<Badge tone={levelInfo[levelOf(p)].tone}>{formatNumber(qtyOf(p))} {p.unit}</Badge>} />
-                  </li>
-                ))}
-              </ul>
+            <ListPanel title="Estoque crítico" icon={<Boxes />} count={ruptures.length} tone={ruptures.length ? "attention" : undefined} action={<a href="#/frame/erp-inventory">Estoque</a>}>
+              {ruptures.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {ruptures.slice(0, 5).map((p) => (
+                    <li key={p.sku}>
+                      <ListRow onClick={() => go("erp-product", p.sku)} kicker={<span className="font-mono">{p.sku}</span>} title={p.name} meta={<Badge tone={levelInfo[levelOf(p)].tone}>{formatNumber(qtyOf(p))} {p.unit}</Badge>} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<Boxes />} title="Estoque saudável" hint="Nenhum item em ruptura ou abaixo do mínimo." />
+              )}
             </ListPanel>
-            <ListPanel title="Compras aguardando você" icon={<ClipboardList />} count={2} action={<a href="#/frame/erp-purchase-requests">Compras</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                <li>
-                  <ListRow onClick={() => go("erp-purchase-requests")} kicker="RC-2026-0412 · urgente" title="Reposição de chapas 2 e 3 mm" meta="R$ 96 mil" />
-                </li>
-                <li>
-                  <ListRow onClick={() => go("erp-purchase-requests")} kicker="RC-2026-0409" title="Notebooks para o time comercial" meta="R$ 31 mil" />
-                </li>
-              </ul>
+            <ListPanel title="Compras aguardando você" icon={<ClipboardList />} count={awaiting.length} action={<a href="#/frame/erp-purchase-requests">Requisições</a>}>
+              {awaiting.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {awaiting.slice(0, 4).map((r) => (
+                    <li key={r.id}>
+                      <ListRow onClick={() => go("erp-purchase-requests", r.id)} kicker={`${r.number}${r.urgent ? " · urgente" : ""}`} title={r.title} meta={r.quotes.length ? formatCurrency(requestTotal(r), { compact: true }) : "em cotação"} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<ClipboardList />} title="Nenhuma requisição na sua etapa" hint="Quando o gestor aprovar, a requisição chega aqui para cotar." />
+              )}
+            </ListPanel>
+          </div>
+
+          <div className="grid items-start gap-6 lg:grid-cols-2">
+            <ListPanel title="Compras atrasadas" icon={<ShoppingBag />} count={latePOs.length} tone={latePOs.length ? "attention" : undefined} action={<a href="#/frame/erp-purchase-orders">Pedidos de compra</a>}>
+              {latePOs.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {latePOs.map((o) => (
+                    <li key={o.id}>
+                      <ListRow onClick={() => go("erp-purchase-order", o.id)} kicker={<span className="font-mono">{o.number}</span>} title={supplierById(o.supplierId).name} meta={<Badge tone="bad">{`previsto ${br(o.expected).slice(0, 5)}`}</Badge>} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<ShoppingBag />} title="Fornecedores no prazo" hint="Nenhum pedido de compra passou da previsão de entrega." />
+              )}
+            </ListPanel>
+            <ListPanel title="Entregas atrasadas" icon={<Truck />} count={lateShipments.length} tone={lateShipments.length ? "attention" : undefined} action={<a href="#/frame/erp-shipping">Expedição</a>}>
+              {lateShipments.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {lateShipments.map((s) => (
+                    <li key={s.id}>
+                      <ListRow onClick={() => go("erp-shipping", s.id)} kicker={`${s.id} · ${s.carrier}`} title={customerById(orders.find((o) => o.id === s.orderId)?.customerId ?? "").name} meta={`${s.dest.city}/${s.dest.uf}`} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<Truck />} title="Entregas no prazo" hint="Nenhuma carga passou do prazo prometido ao cliente." />
+              )}
             </ListPanel>
           </div>
 

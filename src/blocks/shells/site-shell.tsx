@@ -19,7 +19,7 @@ const links: SiteLink[] = [
   { label: "Assistente", href: frameHref("ai-chat") },
 ];
 
-export function SiteShell({ current, children }: { current: "landing" | "pricing"; children: ReactNode }) {
+export function SiteShell({ current, children }: { current: "landing" | "pricing" | "legal"; children: ReactNode }) {
   const [menu, setMenu] = useState(false);
   const secao = useFrameQuery().get("secao");
   useEffect(() => {
@@ -82,6 +82,8 @@ export function SiteShell({ current, children }: { current: "landing" | "pricing
             {[
               ["Preços", frameHref("marketing-pricing")],
               ["Status", frameHref("app-error-pages", { estado: "manutencao" })],
+              ["Termos", authRoutes.terms],
+              ["Privacidade", authRoutes.privacy],
               ["Entrar", authRoutes.login],
               ["Contato", "mailto:contato@atlas.app"],
             ].map(([l, href]) => (

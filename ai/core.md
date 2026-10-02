@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (442 componentes) → `components/<nome>.md`
+## Módulos (448 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -158,19 +158,24 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **command**: Command componível (equivalente ao Command do shadcn/ui, sem cmdk): busca + lista com grupos, ↑ ↓ Home End Enter, vazio, carregando e atalhos.
 - **conversation**: Conversa (equivalentes a Bubble, Marker e Message Scroller do shadcn/ui).
 - **nav-tree**: Navegação com subitens: tipos NavItem/NavGroup/NavSubItem/NavParentItem da Sidebar, WorkspaceMenu, menu da pessoa, SectionNav (docs/ajuda), flyout do trilho recolhido e helpers navMatches/navActiveDeep.
+- **history**: Histórico e progresso no tempo.
+- **presence**: Presença: quem está por aqui e onde.
 
-## Blocos (87) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
-- **ATS**: `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`
-- **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-marketplace`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
+## Blocos (140) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
+- **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`
+- **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-legal`, `app-marketplace`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
-- **CRM**: `crm-activities`, `crm-company`, `crm-contact`, `crm-contacts`, `crm-deal`, `crm-pipeline`, `crm-sales-dashboard`, `crm-settings`, `crm-team`
-- **Configurações**: `settings-appearance`, `settings-audit-log`, `settings-billing`, `settings-integrations`, `settings-notifications`, `settings-profile`, `settings-security`, `settings-team`
-- **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-purchase-requests`, `erp-suppliers`
-- **Financeiro**: `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
-- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-run`, `ai-assistant`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
+- **CRM**: `crm-activities`, `crm-company`, `crm-contact`, `crm-contacts`, `crm-deal`, `crm-leads`, `crm-pipeline`, `crm-quotes`, `crm-sales-dashboard`, `crm-settings`, `crm-team`
+- **Comunicação**: `comms-analytics`, `comms-announcement`, `comms-channels`, `comms-compose`, `comms-events`, `comms-home`, `comms-people`, `comms-surveys`
+- **Configurações**: `settings-appearance`, `settings-audit-log`, `settings-billing`, `settings-data`, `settings-integrations`, `settings-notifications`, `settings-organization`, `settings-profile`, `settings-roles`, `settings-security`, `settings-team`, `settings-webhooks`
+- **Contratos**: `clm-approvals`, `clm-contract`, `clm-contracts`, `clm-counterparties`, `clm-dashboard`, `clm-obligations`, `clm-request`, `clm-templates`
+- **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-products`, `erp-purchase-order`, `erp-purchase-orders`, `erp-purchase-requests`, `erp-receiving`, `erp-shipping`, `erp-stock-movements`, `erp-suppliers`
+- **Financeiro**: `fin-bank-accounts`, `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
+- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-approvals`, `ai-assistant`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
 - **Marketing**: `marketing-landing`, `marketing-pricing`
 - **Onboarding**: `onboarding-checklist`, `onboarding-wizard`
-- **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-integrations`, `saas-reports`, `saas-support`
+- **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-integrations`, `saas-plans`, `saas-reports`, `saas-support`, `saas-usage`
+- **Serviços**: `srv-billing`, `srv-client`, `srv-clients`, `srv-contracts`, `srv-dashboard`, `srv-invoices`, `srv-quotes`, `srv-schedule`, `srv-work-order`, `srv-work-orders`
 
 ## Mais
 - Regras completas: `AGENTS.md`. Padrões: `docs/padroes/` (anatomia de página, formulários, tabelas, filtros, superfícies, feedback). Receitas por tipo de app: `docs/receitas/`. Auditoria (todas as regras, com exemplos): `docs/guias/auditoria.md`.

@@ -3,16 +3,20 @@ import { useState } from "react";
 import {
   AppIcon,
   Button,
+  ChoiceCards,
   ConnectionsCard,
+  Modal,
   Page,
   PageHeading,
   Switch,
+  TextField,
   notify,
   type AgentConnection,
   type Subagent,
 } from "@g4ai/ds";
+import { williamsRuns } from "./data/agents";
 import { agent, appById } from "./data/apps";
-import { go, goTo } from "./shells/frame-route";
+import { frameHref, go, goTo } from "./shells/frame-route";
 import { StudioShell, studioRoutes } from "./shells/studio-shell";
 
 export const meta = {
@@ -49,6 +53,10 @@ export default function AiAgentConnections() {
   const [linked, setLinked] = useState<Record<string, boolean>>({ "meta-ads": true, "google-ads": true, site: true, shopify: false });
   const [selected, setSelected] = useState("site");
   const [instructions, setInstructions] = useState(agent.instructions);
+  const [adding, setAdding] = useState(false);
+  const [kind, setKind] = useState<"agenda" | "evento" | "mencao">("agenda");
+  const [when, setWhen] = useState("");
+  const [tried, setTried] = useState(false);
   const [triggers, setTriggers] = useState([
     { id: "t1", icon: CalendarClock, text: "Toda segunda-feira às 8h", on: true },
     { id: "t2", icon: Zap, text: "Nova campanha publicada no Meta Ads", on: true },
@@ -79,16 +87,18 @@ export default function AiAgentConnections() {
     icon: subIcons[s.id as keyof typeof subIcons],
     color: subColors[s.id as keyof typeof subColors],
     status: active ? s.status : "idle",
-    onClick: () => goTo(studioRoutes.trace),
+    // Cada subagente abre a execução em que está (ou a última que fez).
+    onClick: () => go("ai-agent-run", williamsRuns[s.id as keyof typeof williamsRuns]),
   }));
-  const results = agent.results.map((r) => ({ ...r, onClick: () => goTo(studioRoutes.workspace) }));
+  // Cada resultado abre a execução que o produziu (saída + trace).
+  const results = agent.results.map((r) => ({ ...r, onClick: () => go("ai-agent-run", williamsRuns[r.id as keyof typeof williamsRuns]) }));
 
   return (
     <StudioShell current={studioRoutes.home} mode="agent">
       <Page>
         <div className="mx-auto w-full max-w-[1120px]">
           <PageHeading
-            crumbs={[{ label: "Agentes", href: studioRoutes.home }, { label: agent.name }]}
+            crumbs={[{ label: "Agentes", href: frameHref("ai-agents") }]}
             title={agent.name}
             description={`${agent.role}. ${agent.description}`}
             actions={
@@ -117,7 +127,16 @@ export default function AiAgentConnections() {
                     <h2 className="m-0 text-[15px] font-medium">Gatilhos</h2>
                     <p className="m-0 mt-0.5 text-[12.5px] text-muted">O agente roda quando qualquer uma destas condições acontece.</p>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => notify("Exemplo: abre a escolha de gatilho (agenda, evento de app, menção)", undefined, "info")}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setKind("agenda");
+                      setWhen("");
+                      setTried(false);
+                      setAdding(true);
+                    }}
+                  >
                     <Plus /> Adicionar
                   </Button>
                 </div>
@@ -198,6 +217,53 @@ export default function AiAgentConnections() {
           </div>
         </div>
       </Page>
+      <Modal
+        open={adding}
+        onClose={() => setAdding(false)}
+        title="Adicionar gatilho"
+        description={`O ${agent.name} roda quando esta condição acontecer. Liga na hora; você pode desligar na lista.`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setAdding(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                setTried(true);
+                if (!when.trim()) return;
+                const icon = kind === "agenda" ? CalendarClock : kind === "evento" ? Zap : MessageSquare;
+                const id = `t${Date.now()}`;
+                setTriggers((list) => [...list, { id, icon, text: when.trim(), on: true }]);
+                setAdding(false);
+                notify("Gatilho adicionado", () => setTriggers((list) => list.filter((x) => x.id !== id)));
+              }}
+            >
+              Adicionar gatilho
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <ChoiceCards
+            label="Tipo"
+            value={kind}
+            onChange={(v: "agenda" | "evento" | "mencao") => setKind(v)}
+            columns={3}
+            options={[
+              { value: "agenda", label: "Agenda", description: "Dia e hora fixos" },
+              { value: "evento", label: "Evento de app", description: "Algo acontece no Meta Ads, Shopify…" },
+              { value: "mencao", label: "Menção", description: "Alguém chama o agente no Slack" },
+            ]}
+          />
+          <TextField
+            label="Quando"
+            value={when}
+            onChange={setWhen}
+            placeholder={kind === "agenda" ? "Ex.: toda sexta às 17h" : kind === "evento" ? "Ex.: pedido acima de R$ 5 mil no Shopify" : "Ex.: menção a @williams em #vendas"}
+            error={tried && !when.trim() ? "Descreva quando o agente deve rodar." : undefined}
+          />
+        </div>
+      </Modal>
     </StudioShell>
   );
 }

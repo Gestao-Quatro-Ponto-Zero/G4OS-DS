@@ -77,16 +77,15 @@ Rótulo curto de estado.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/estrutura-separador-e-rolagem`):
+Exemplo (showcase `#/p/dash-progresso-e-presenca`):
 
 ```tsx
-<ScrollArea maxHeight={280} label="Membros do time" className="rounded-xl border border-line bg-surface">
-  {pessoas.map((p) => <Row key={p.nome} {...p} />)}
-</ScrollArea>
-
-<ScrollArea orientation="horizontal" label="Etapas">
-  <div className="flex gap-2 p-1">{etapas.map((e) => <Badge key={e}>{e}</Badge>)}</div>
-</ScrollArea>
+<StackedList
+  title="Online agora"
+  directoryLabel="Time comercial"
+  action={<IconButton label="Convidar pessoa"><UserPlus /></IconButton>}
+  items={[{ id: "1", name: "Ana Lopes", status: "online", description: "Online", meta: <Badge>Gestora</Badge> }, …]}
+/>
 ```
 
 ## Button

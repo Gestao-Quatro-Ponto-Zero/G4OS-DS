@@ -26,4 +26,4 @@ Página do SKU: saldo por depósito contra o mínimo, projeção de estoque em 3
 
 ## Componentes usados
 
-`AreaChart`, `Badge`, `Button`, `ChartCard`, `Column`, `CurrencyField`, `DataTable`, `KpiCard`, `KpiGrid`, `Meter`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `SplitLayout`, `formatCurrency`, `formatNumber`, `formatPercent`, `notify`
+`AreaChart`, `Badge`, `Button`, `ChartCard`, `Column`, `CurrencyField`, `DataTable`, `Empty`, `KpiCard`, `KpiGrid`, `Meter`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `SplitLayout`, `formatCurrency`, `formatNumber`, `formatPercent`, `notify`

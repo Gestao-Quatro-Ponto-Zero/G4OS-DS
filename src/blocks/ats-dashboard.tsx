@@ -1,4 +1,4 @@
-import { CalendarDays, Download, TriangleAlert } from "lucide-react";
+import { BarChart3, CalendarDays, Inbox, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import {
   AreaChart,
@@ -19,11 +19,10 @@ import {
   formatCurrency,
   formatNumber,
   formatPercent,
-  notify,
   type Column,
 } from "@g4ai/ds";
-import { candidateById, hiresByMonth, hiringFunnel, interviews, iso, jobById, jobs, offers, openDays, sourceQuality, timeByArea } from "./data/ats";
-import { go } from "./shells/frame-route";
+import { candidateById, hiresByMonth, hiringFunnel, interviews, iso, jobById, jobs, offers, openDays, requisitionsAwaitingMe, sourceQuality, timeByArea } from "./data/ats";
+import { frameHref, go } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -38,7 +37,8 @@ export const meta = {
     patterns: [
       "Anatomia B · Painel: cabeçalho fixo com período, KPIs no topo",
       "Um gráfico por pergunta: meta, tempo × SLA, funil, aceite, origem",
-      "Fila 'o que pede ação hoje' antes dos detalhes",
+      "Fila 'o que pede ação hoje' antes dos detalhes; “Precisa de você” leva a cada fila",
+      "KPIs abrem o detalhe (relatórios, propostas)",
     ],
     adapt: [
       "Painel de vendas, operações ou atendimento: troque as perguntas e as filas",
@@ -63,6 +63,13 @@ export default function AtsDashboard() {
     { label: "Recusadas", value: Math.round(9 * scale) + offers.filter((o) => o.status === "recusada").length, color: "var(--ds-rose)" },
     { label: "Aguardando", value: offers.filter((o) => o.status === "enviada" || o.status === "aprovacao").length, color: "var(--ds-chart-6)" },
   ];
+  const pendingReviews = interviews.filter((i) => i.feedback === "pendente").length;
+  const offersToApprove = offers.filter((o) => o.status === "aprovacao").length;
+  const needs = [
+    { title: "Avaliações de entrevista pendentes", count: pendingReviews, href: frameHref("ats-interviews") },
+    { title: "Propostas aguardando aprovação", count: offersToApprove, href: frameHref("ats-offers") },
+    { title: "Requisições de vaga para aprovar", count: requisitionsAwaitingMe, href: frameHref("ats-requisitions") },
+  ].filter((n) => n.count > 0);
   const columns: Column<Source>[] = [
     { key: "source", header: "Origem", primary: true, cell: (s) => s.source },
     { key: "applicants", header: "Candidaturas", align: "right", nowrap: true, cell: (s) => formatNumber(Math.round(s.applicants * scale)) },
@@ -81,19 +88,31 @@ export default function AtsDashboard() {
           actions={
             <>
               <SegmentedControl label="Período" value={range} onChange={setRange} options={[{ value: "ano", label: "2026" }, { value: "tri", label: "3º tri" }]} />
-              <Button variant="ghost" onClick={() => notify("Relatório em PDF sendo gerado. Você recebe por e-mail em instantes.", undefined, "info")}>
-                <Download /> Relatório
+              <Button variant="ghost" href={frameHref("ats-reports")}>
+                <BarChart3 /> Relatórios
               </Button>
             </>
           }
         />
         <div className="mt-6 space-y-6">
           <KpiGrid>
-            <KpiCard label="Contratações" value={formatNumber(hires)} delta={range === "ano" ? 0.31 : 0.18} period={range === "ano" ? "vs. mesmo período de 2025" : "vs. 2º trimestre"} spark={months.map((m) => m.contratacoes)} />
-            <KpiCard label="Tempo médio até contratar" value={range === "ano" ? "34 dias" : "31 dias"} delta={-0.12} goodWhen="down" period="da abertura ao aceite" />
+            <KpiCard label="Contratações" value={formatNumber(hires)} delta={range === "ano" ? 0.31 : 0.18} period={range === "ano" ? "vs. mesmo período de 2025" : "vs. 2º trimestre"} spark={months.map((m) => m.contratacoes)} href={frameHref("ats-reports")} />
+            <KpiCard label="Tempo médio até contratar" value={range === "ano" ? "34 dias" : "31 dias"} delta={-0.12} goodWhen="down" period="da abertura ao aceite" href={frameHref("ats-reports")} />
             <KpiCard label="Aceite de propostas" value={formatPercent(offerMix[0].value / (offerMix[0].value + offerMix[1].value), 0)} delta={0.04} period="propostas respondidas" href="#/frame/ats-offers" />
-            <KpiCard label="Custo por contratação" value={formatCurrency(3_870, { cents: false })} delta={0.08} goodWhen="down" period="anúncios, hunting e bônus" />
+            <KpiCard label="Custo por contratação" value={formatCurrency(3_870, { cents: false })} delta={0.08} goodWhen="down" period="anúncios, hunting e bônus" href={frameHref("ats-reports")} />
           </KpiGrid>
+
+          {needs.length > 0 && (
+            <ListPanel title="Precisa de você" tone="attention" icon={<Inbox />} count={needs.reduce((s, n) => s + n.count, 0)}>
+              <ul className="list-none divide-y divide-line p-0">
+                {needs.map((n) => (
+                  <li key={n.href}>
+                    <ListRow href={n.href} title={n.title} meta={<span className="font-medium tabular-nums">{n.count}</span>} />
+                  </li>
+                ))}
+              </ul>
+            </ListPanel>
+          )}
 
           <div className="grid items-start gap-6 lg:grid-cols-2">
             <ListPanel title="Vagas perto ou fora do SLA" tone={late.some((j) => openDays(j) > j.sla) ? "attention" : "neutral"} icon={<TriangleAlert />} count={late.length} action={<a href="#/frame/ats-jobs">Todas as vagas</a>}>

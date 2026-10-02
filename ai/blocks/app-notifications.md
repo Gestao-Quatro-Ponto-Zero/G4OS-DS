@@ -26,4 +26,4 @@ Caixa de entrada com abas (todas, não lidas, menções), grupos por dia, lida/n
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Button`, `CountBadge`, `Empty`, `Page`, `PageHeading`, `Tabs`, `Tooltip`, `notify`
+`ActionMenu`, `Avatar`, `Button`, `CountBadge`, `Empty`, `Page`, `PageHeading`, `Skeleton`, `Tabs`, `Tooltip`, `notify`

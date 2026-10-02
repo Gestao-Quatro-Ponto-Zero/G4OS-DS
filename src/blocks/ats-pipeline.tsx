@@ -5,12 +5,14 @@ import {
   Badge,
   Button,
   DataTable,
+  Empty,
   KanbanBoard,
   KanbanColumn,
   Modal,
   Page,
   PageHeading,
   RecordCard,
+  Skeleton,
   SegmentedControl,
   InlineSelect,
   Select,
@@ -19,9 +21,9 @@ import {
   notify,
   type Column,
 } from "@g4ai/ds";
-import { candidatesOf, company, iso, jobById, openDays, person, stageLabel, stages, type Candidate, type StageId } from "./data/ats";
+import { candidateById, candidatesOf, company, iso, jobById, openDays, person, stageLabel, stages, type Candidate, type StageId } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
-import { TalentosShell } from "./shells/talentos-shell";
+import { LoadError, TalentosShell, useListState } from "./shells/talentos-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -37,6 +39,8 @@ export const meta = {
       "Card com nota média, origem e tempo na etapa; arrastar para avançar",
       "Alternar Quadro/Lista sem perder filtros",
       "Card abre o perfil",
+      "Vaga sem candidatos: vazio com Adicionar candidato e Copiar link da vaga",
+      "Cinco estados: ?estado=carregando|vazio|erro simula",
     ],
     adapt: [
       "Pipeline de vendas, esteira de pedidos, kanban de chamados",
@@ -71,7 +75,10 @@ export default function AtsPipeline() {
 
 function Board({ jobId }: { jobId: string }) {
   const job = jobById(jobId);
-  const [list, setList] = useState<Candidate[]>(() => candidatesOf(job.id));
+  const estado = useListState();
+  const [list, setList] = useState<Candidate[]>(() => (estado === "vazio" ? [] : candidatesOf(job.id)));
+  const copyLink = () => notify(`Link copiado: ${company.careersUrl}/vagas/${job.id}`, undefined, "info");
+  const noCandidates = !list.length;
   const [dragging, setDragging] = useState<string | null>(null);
   const [view, setView] = useState<"quadro" | "lista">("quadro");
   const [adding, setAdding] = useState(false);
@@ -92,7 +99,7 @@ function Board({ jobId }: { jobId: string }) {
   };
   const add = () => {
     if (!name.trim()) return;
-    const n: Candidate = { ...list[0], id: `novo-${Date.now()}`, name, initials: name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase(), email, source, stage: "triagem", rating: null, daysInStage: 0, appliedAt: iso(0), headline: "Adicionado manualmente", referral: undefined };
+    const n: Candidate = { ...(list[0] ?? candidateById("c1")), jobId: job.id, status: "ativo", id: `novo-${Date.now()}`, name, initials: name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase(), email, source, stage: "triagem", rating: null, daysInStage: 0, appliedAt: iso(0), headline: "Adicionado manualmente", referral: undefined };
     setList((all) => [n, ...all]);
     setAdding(false);
     setName("");
@@ -123,7 +130,7 @@ function Board({ jobId }: { jobId: string }) {
           actions={
             <>
               <SegmentedControl label="Visualização" value={view} onChange={setView} options={[{ value: "quadro", label: "Quadro" }, { value: "lista", label: "Lista" }]} />
-              <Button variant="ghost" onClick={() => notify(`Link copiado: ${company.careersUrl}/vagas/${job.id}`, undefined, "info")}>
+              <Button variant="ghost" onClick={copyLink}>
                 <Link2 /> Link da vaga
               </Button>
               <Button onClick={() => setAdding(true)}>
@@ -133,8 +140,47 @@ function Board({ jobId }: { jobId: string }) {
           }
         />
         <div className="mt-5 flex min-h-0 flex-1 flex-col">
-          {view === "lista" ? (
-            <DataTable rows={list} columns={columns} rowKey={(c) => c.id} onRowClick={(c) => go("ats-candidate", c.id)} rowLabel={(c) => `Abrir ${c.name}`} />
+          {estado === "carregando" ? (
+            <div className="flex min-h-[520px] gap-3 overflow-hidden" aria-busy="true" aria-label="Carregando candidatos da vaga">
+              {stages.map((st, i) => (
+                <div key={st.id} className="w-[212px] shrink-0 space-y-2 rounded-xl bg-soft/60 p-2">
+                  <Skeleton className="h-4 w-24" />
+                  {Array.from({ length: 3 - (i % 2) }, (_, k) => (
+                    <div key={k} className="space-y-2 rounded-lg border border-line bg-surface p-3">
+                      <Skeleton className="h-3 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                      <Skeleton className="h-3 w-1/3" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : estado === "erro" ? (
+            <LoadError what="os candidatos da vaga" />
+          ) : noCandidates ? (
+            <Empty
+              title="Nenhum candidato nesta vaga ainda"
+              hint="Divulgue o link da vaga ou cadastre uma indicação. Quem se candidatar entra direto na triagem."
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button variant="ghost" onClick={copyLink}>
+                    <Link2 /> Copiar link da vaga
+                  </Button>
+                  <Button onClick={() => setAdding(true)}>
+                    <UserPlus /> Adicionar candidato
+                  </Button>
+                </div>
+              }
+            />
+          ) : view === "lista" ? (
+            <DataTable
+              rows={list}
+              columns={columns}
+              rowKey={(c) => c.id}
+              onRowClick={(c) => go("ats-candidate", c.id)}
+              rowLabel={(c) => `Abrir ${c.name}`}
+              empty={<Empty framed={false} title="Nenhum candidato na lista" hint="Adicione um candidato ou divulgue o link da vaga." />}
+            />
           ) : (
             <KanbanBoard className="min-h-[520px] flex-1">
               {stages.map((st, i) => {

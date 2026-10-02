@@ -8,11 +8,18 @@ import {
   ConfirmDialog,
   ConnectionStatus,
   DataSyncTable,
+  DataTable,
+  Drawer,
   MarketplaceHero,
+  Modal,
+  OperationButton,
+  OperationFeedback,
   Page,
+  TextField,
   ToolPermissionList,
   formatNumber,
   notify,
+  useOperation,
 } from "@g4ai/ds";
 import { appById, apps, type Account, type App } from "./data/apps";
 import { go, goTo, useFrameParam } from "./shells/frame-route";
@@ -51,6 +58,15 @@ function capabilities(app: App) {
   ];
 }
 
+/** Amostra dos itens sincronizados de um conjunto (no seu app, a API do conector). */
+function sampleOf(app: App, label: string) {
+  return Array.from({ length: 6 }, (_, i) => ({
+    id: `${app.id}-${label}-${i}`,
+    name: `#${1048 - i} · ${["Acme Comercial", "Vértice Logística", "Grupo Aurora", "Rede Horizonte", "Construtora Pilar", "Café Serra Alta"][i]}`,
+    updated: ["há 12 min", "há 40 min", "há 2 h", "ontem", "ontem", "há 3 dias"][i],
+  }));
+}
+
 export default function AppConnection() {
   const id = useFrameParam("id", "shopify");
   const app = appById(id) ?? apps.find((a) => a.id === "shopify")!;
@@ -58,6 +74,32 @@ export default function AppConnection() {
   const [accounts, setAccounts] = useState<Account[]>(app.accounts ?? []);
   const [confirm, setConfirm] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [syncOpen, setSyncOpen] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [newAccount, setNewAccount] = useState("");
+  const [addTried, setAddTried] = useState(false);
+  const addOp = useOperation({ busyLabel: "Autorizando…" });
+  const addAccount = () => {
+    setAddTried(true);
+    const name = newAccount.trim();
+    if (!name) return;
+    const template = accounts[0]?.permissions ?? [];
+    const acc: Account = {
+      id: `${app.id}-${Date.now()}`,
+      name: name.split(/[@.]/)[0].replace(/^./, (c) => c.toUpperCase()),
+      url: name,
+      color: app.color,
+      // Conta nova começa só com leitura; escrita é decisão explícita.
+      permissions: template.map((p) => ({ ...p, id: `${p.id}-${Date.now()}`, enabled: p.scope === "read" })),
+    };
+    void addOp.run(() => new Promise((r) => setTimeout(r, 800)), `Conta ${name} autorizada no ${app.name}`).then((err) => {
+      if (err) return;
+      setAccounts((xs) => [...xs, acc]);
+      setNewAccount("");
+      setAddTried(false);
+      setAddOpen(false);
+    });
+  };
 
   const setPermission = (accountId: string, permId: string, enabled: boolean) => {
     const before = accounts;
@@ -77,8 +119,8 @@ export default function AppConnection() {
 
   return (
     <StudioShell current={studioRoutes.connection(app.id)} mode="chat">
-      <Page>
-        <div className="mx-auto w-full max-w-[760px] pb-10">
+      <Page width="reading">
+        <div className="w-full pb-10">
           <Breadcrumb items={[{ label: "Apps", href: studioRoutes.apps }, { label: app.name }]} />
 
           <header className="mt-6">
@@ -143,7 +185,7 @@ export default function AppConnection() {
                   value: formatNumber(s.value),
                   hint: s.hint,
                   icon: syncIcons[i % syncIcons.length],
-                  onClick: () => notify(`Exemplo: abre a lista de “${s.label.toLowerCase()}”`, undefined, "info"),
+                  onClick: () => setSyncOpen(s.label),
                 }))}
               />
               <p className="m-0 mt-2 text-[12px] text-muted">Última sincronização há 12 min · automática a cada hora.</p>
@@ -154,7 +196,7 @@ export default function AppConnection() {
             <section className="mt-9">
               <div className="mb-3 flex items-end justify-between gap-3">
                 <h2 className="m-0 text-[16px] font-medium">{app.category === "Comércio" ? "Lojas" : "Contas"}</h2>
-                <Button size="sm" variant="quiet" onClick={() => notify(`Exemplo: abre a autorização de outra conta do ${app.name}`, undefined, "info")}>
+                <Button size="sm" variant="quiet" onClick={() => setAddOpen(true)}>
                   Adicionar conta
                 </Button>
               </div>
@@ -209,6 +251,49 @@ export default function AppConnection() {
           </nav>
         </div>
       </Page>
+      <Drawer open={!!syncOpen} onClose={() => setSyncOpen(null)} kicker={`${app.name} · sincronizado`} title={syncOpen ?? ""}>
+        {syncOpen && (
+          <div className="space-y-3">
+            <p className="m-0 text-[13px] text-muted">Os itens mais recentes que o agente pode consultar. A lista completa fica no próprio {app.name}.</p>
+            <DataTable
+              label={syncOpen}
+              rows={sampleOf(app, syncOpen)}
+              rowKey={(r) => r.id}
+              columns={[
+                { key: "nome", header: "Item", primary: true, cell: (r) => r.name },
+                { key: "quando", header: "Atualizado", nowrap: true, cell: (r) => <span className="text-muted">{r.updated}</span> },
+              ]}
+            />
+          </div>
+        )}
+      </Drawer>
+
+      <Modal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        title={`Adicionar conta do ${app.name}`}
+        description="Você vai autorizar o acesso na página do próprio app. A conta nova começa só com permissões de leitura."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setAddOpen(false)}>
+              Cancelar
+            </Button>
+            <OperationButton operation={addOp} onClick={addAccount}>
+              Autorizar conta
+            </OperationButton>
+          </>
+        }
+      >
+        <OperationFeedback operation={addOp} />
+        <TextField
+          label={app.category === "Comércio" ? "Endereço da loja" : "Conta ou e-mail"}
+          value={newAccount}
+          onChange={setNewAccount}
+          placeholder={app.category === "Comércio" ? "Ex.: loja-sul.myshopify.com" : "Ex.: financeiro@acme.com.br"}
+          error={addTried && !newAccount.trim() ? "Informe qual conta conectar." : undefined}
+        />
+      </Modal>
+
       <ConfirmDialog
         open={confirm}
         onClose={() => setConfirm(false)}

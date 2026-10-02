@@ -15,12 +15,15 @@ import {
   PageHeading,
   SegmentedControl,
   Tabs,
+  downloadCsv,
   formatCurrency,
   formatNumber,
+  gridToCsv,
   notify,
   type Column,
+  type GridColumn,
 } from "@g4ai/ds";
-import { customers, daily, go, healthLabel, healthTone, mrrMovements, npsScores, totalMrr, type Customer } from "./data/saas";
+import { customers, daily, go, iso, healthLabel, healthTone, mrrMovements, npsScores, totalMrr, type Customer } from "./data/saas";
 import { SaasShell } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -55,6 +58,13 @@ const statusBadge = {
   trial: <Badge tone="info">Trial</Badge>,
   atraso: <Badge tone="warn">Pagamento em atraso</Badge>,
 };
+
+type DailyRow = (typeof daily)[number];
+const csvColumns: GridColumn<DailyRow>[] = [
+  { key: "dia", header: "Dia", value: (d) => d.dia },
+  { key: "desktop", header: "Visitantes desktop", value: (d) => d.desktop },
+  { key: "celular", header: "Visitantes celular", value: (d) => d.celular },
+];
 
 export default function SaasDashboard() {
   const [period, setPeriod] = useState<"90" | "30" | "7">("90");
@@ -92,10 +102,16 @@ export default function SaasDashboard() {
           description="Uso e receita das contas ativas. Atualizado há 4 minutos."
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify("Relatório da visão geral exportado em PDF")}>
-                <Download /> Exportar
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  downloadCsv(`visao-geral-pulso-${iso(0)}`, gridToCsv(data, csvColumns));
+                  notify(`Visitantes dos últimos ${period} dias exportados em CSV`);
+                }}
+              >
+                <Download /> Exportar CSV
               </Button>
-              <Button onClick={() => (location.hash = "/frame/saas-customers?novo=1")}>
+              <Button href="#/frame/saas-customers?novo=1">
                 <Plus /> Nova conta
               </Button>
             </>
@@ -106,7 +122,7 @@ export default function SaasDashboard() {
             <KpiCard label="Receita recorrente (MRR)" value={formatCurrency(totalMrr, { cents: false })} delta={0.125} period="vs. agosto" spark={[31, 33, 32, 35, 36, 38, 41]} href="#/frame/saas-billing" />
             <KpiCard label="Novas contas" value="38" delta={-0.2} period="Aquisição abaixo do esperado" spark={[52, 48, 50, 44, 41, 39, 38]} href="#/frame/saas-analytics" />
             <KpiCard label="Contas ativas" value={formatNumber(customers.filter((c) => c.status !== "trial").length)} delta={0.042} period="Retenção forte no trimestre" spark={[28, 29, 30, 31, 32, 33, 34]} href="#/frame/saas-customers" />
-            <KpiCard label="Churn mensal" value="1,8 %" delta={-0.045} goodWhen="down" period="Menor em 6 meses" spark={[2.6, 2.4, 2.3, 2.1, 2, 1.9, 1.8]} />
+            <KpiCard label="Churn mensal" value="1,8 %" delta={-0.045} goodWhen="down" period="Menor em 6 meses" spark={[2.6, 2.4, 2.3, 2.1, 2, 1.9, 1.8]} href="#/frame/saas-customers?visao=risco" />
           </KpiGrid>
 
           <ChartCard

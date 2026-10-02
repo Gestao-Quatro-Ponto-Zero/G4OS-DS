@@ -15,6 +15,7 @@ Conta (?id=): indicadores, negócios, contatos e atividades da empresa, propried
 - Anatomia C · Registro: cabeçalho fixo; propriedades fixas à direita (SplitLayout)
 - KPIs da conta no topo; abas para negócios, contatos e atividades
 - Novo negócio já vinculado à empresa
+- Editar em gaveta; mesclar duplicada = escolher a outra empresa + confirmação irreversível
 
 **Quando usar e o que adaptar**
 
@@ -26,4 +27,4 @@ Conta (?id=): indicadores, negócios, contatos e atividades da empresa, propried
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `EntityMark`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `PropertyList`, `SplitLayout`, `Tabs`, `formatCurrency`, `formatDate`, `notify`
+`ActionMenu`, `Avatar`, `Badge`, `Button`, `Column`, `Combobox`, `ConfirmDialog`, `DataTable`, `Drawer`, `Empty`, `EntityMark`, `FieldBlock`, `FieldGrid`, `KpiCard`, `KpiGrid`, `Modal`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `Tabs`, `TextField`, `formatCurrency`, `formatDate`, `notify`, `useOperation`
