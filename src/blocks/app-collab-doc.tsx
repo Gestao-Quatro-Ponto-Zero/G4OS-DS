@@ -131,7 +131,10 @@ export default function CollabDoc() {
       <header className="flex items-center gap-2 border-b border-line px-5 py-3">
         <FileText className="h-4 w-4 text-muted" aria-hidden />
         <span className="min-w-0 flex-1 truncate text-[13px] text-muted">Documentos / Jurídico</span>
-        <button type="button" onClick={() => notify("Link do documento copiado", undefined, "info")} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] ring-1 ring-line hover:bg-soft">
+        <button type="button" onClick={() => {
+            void navigator.clipboard?.writeText(location.href).catch(() => undefined);
+            notify("Link do documento copiado");
+          }} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] ring-1 ring-line hover:bg-soft">
           <Share2 className="h-3.5 w-3.5" /> Compartilhar
         </button>
       </header>

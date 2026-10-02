@@ -1,0 +1,145 @@
+import { Download } from "lucide-react";
+import { useState } from "react";
+import {
+  BarChart,
+  Button,
+  ChartCard,
+  DataTable,
+  DumbbellChart,
+  FunnelChart,
+  KpiCard,
+  KpiGrid,
+  Page,
+  PageHeading,
+  ParetoChart,
+  SegmentedControl,
+  downloadCsv,
+  formatCurrency,
+  formatNumber,
+  formatPercent,
+  notify,
+  type Column,
+} from "@g4ai/ds";
+import { hiringFunnel, offerDeclineReasons, sourceQuality, timeByArea, timeByStage } from "./data/ats";
+import { TalentosShell } from "./shells/talentos-shell";
+
+/** Metadados do showcase. Pode apagar ao copiar para o seu app. */
+export const meta = {
+  title: "Relatórios de recrutamento",
+  description: "Funil de contratação com conversão entre etapas, qualidade e custo por origem, tempo para contratar por área contra o SLA, tempo por etapa e motivos de recusa de proposta. Período no cabeçalho e exportação em CSV.",
+  category: "ATS",
+  order: 11,
+  height: 1500,
+  concept: {
+    goal: "Explicar onde o processo seletivo perde tempo e candidatos, e quais origens valem o investimento.",
+    patterns: [
+      "Anatomia B · Painel: cabeçalho fixo com período à direita; exportar como ação secundária",
+      "Um gráfico por pergunta: funil, tempo × SLA, tempo por etapa, recusas (Pareto), origem",
+      "Tabela de origens com conversão, retenção e custo (o detalhe acionável no fim)",
+      "Drill-down a partir dos KPIs do painel de recrutamento",
+    ],
+    adapt: [
+      "Relatório comercial (funil e origem de leads), relatório de atendimento (tempo por etapa)",
+    ],
+    avoid: [
+      "Gráfico sem pergunta no título ou sem referência (meta, SLA)",
+      "Exportar como ação principal da tela",
+    ],
+  },
+} as const;
+
+type Source = (typeof sourceQuality)[number];
+const periods = { ano: { label: "2026", scale: 1, desc: "jan–set de 2026" }, tri: { label: "3º tri", scale: 0.36, desc: "3º trimestre de 2026 (jul–set)" } } as const;
+
+export default function AtsReports() {
+  const [range, setRange] = useState<keyof typeof periods>("ano");
+  const p = periods[range];
+  const funnel = hiringFunnel.map((f, i, all) => ({ label: f.label, value: Math.round(f.value * p.scale), hint: i ? `${formatPercent(f.value / all[i - 1].value, 0)} da etapa anterior` : undefined }));
+  const sources = sourceQuality.map((s) => ({ ...s, applicants: Math.round(s.applicants * p.scale), hires: Math.max(1, Math.round(s.hires * p.scale)) }));
+  const hires = funnel[funnel.length - 1].value;
+  const totalDays = timeByStage.reduce((s, t) => s + t.dias, 0);
+
+  const columns: Column<Source>[] = [
+    { key: "source", header: "Origem", primary: true, cell: (s) => s.source },
+    { key: "applicants", header: "Candidaturas", align: "right", nowrap: true, cell: (s) => <span className="tabular-nums">{formatNumber(s.applicants)}</span> },
+    { key: "hires", header: "Contratações", align: "right", nowrap: true, cell: (s) => <span className="font-medium tabular-nums">{formatNumber(s.hires)}</span> },
+    { key: "rate", header: "Conversão", align: "right", nowrap: true, cell: (s) => <span className="tabular-nums">{formatPercent(s.hires / s.applicants)}</span> },
+    { key: "retention", header: "Retenção 12 meses", align: "right", nowrap: true, mobileHidden: true, cell: (s) => <span className={s.retention < 0.75 ? "font-medium text-amber tabular-nums" : "tabular-nums"}>{formatPercent(s.retention, 0)}</span> },
+    { key: "cost", header: "Custo por contratação", align: "right", nowrap: true, cell: (s) => <span className="tabular-nums">{formatCurrency(s.cost, { cents: false })}</span> },
+  ];
+
+  const exportCsv = () => {
+    const rows = [["Origem", "Candidaturas", "Contratações", "Conversão", "Retenção 12 meses", "Custo por contratação"], ...sources.map((s) => [s.source, String(s.applicants), String(s.hires), formatPercent(s.hires / s.applicants), formatPercent(s.retention, 0), formatCurrency(s.cost, { cents: false })])];
+    downloadCsv(`recrutamento-origens-${range}`, rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(";")).join("\n"));
+    notify("Relatório exportado em CSV");
+  };
+
+  return (
+    <TalentosShell section="relatorios">
+      <Page>
+        <PageHeading
+          crumbs={[{ label: "Painel", href: "#/frame/ats-dashboard" }]}
+          title="Relatórios de recrutamento"
+          description={`Funil, tempo e origem das contratações · ${p.desc}.`}
+          actions={
+            <>
+              <SegmentedControl label="Período" value={range} onChange={setRange} options={[{ value: "ano", label: periods.ano.label }, { value: "tri", label: periods.tri.label }]} />
+              <Button variant="ghost" onClick={exportCsv}>
+                <Download /> Exportar CSV
+              </Button>
+            </>
+          }
+        />
+        <div className="space-y-6">
+          <KpiGrid>
+            <KpiCard label="Contratações" value={formatNumber(hires)} delta={range === "ano" ? 0.31 : 0.18} period={range === "ano" ? "vs. mesmo período de 2025" : "vs. 2º trimestre"} />
+            <KpiCard label="Conversão candidatura → contratação" value={formatPercent(hiringFunnel[4].value / hiringFunnel[0].value, 1)} delta={0.002} period="vs. mesmo período de 2025" />
+            <KpiCard label="Tempo médio até contratar" value={`${totalDays} dias`} delta={-0.12} goodWhen="down" period="soma das etapas, vs. 2025" />
+            <KpiCard label="Aceite de propostas" value={formatPercent(58 / 71, 0)} delta={0.04} period="propostas respondidas" href="#/frame/ats-offers" />
+          </KpiGrid>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <ChartCard title="Onde o funil de contratação afunila?" description="Candidaturas por etapa alcançada · conversão sobre a etapa anterior">
+              <FunnelChart stages={funnel} label="Funil de contratação por etapa" />
+            </ChartCard>
+            <ChartCard title="Em qual etapa o processo demora mais?" description={`Dias médios por etapa · meta somada ${timeByStage.reduce((s, t) => s + t.meta, 0)} dias`}>
+              <BarChart
+                label="Dias médios em cada etapa do processo seletivo contra a meta"
+                data={timeByStage}
+                index="etapa"
+                layout="horizontal"
+                series={[
+                  { key: "dias", label: "Tempo real" },
+                  { key: "meta", label: "Meta", color: "var(--ds-chart-6)" },
+                ]}
+                format={(n) => `${formatNumber(n)} d`}
+                height={260}
+              />
+            </ChartCard>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <ChartCard title="Quais áreas estouram o SLA de contratação?" description="SLA da área → tempo real, em dias. Verde = dentro do SLA.">
+              <DumbbellChart rows={timeByArea.map((t) => ({ label: t.area, a: t.sla, b: t.dias }))} aLabel="SLA" bLabel="Tempo real" format={(n) => `${n} d`} goodWhen="down" />
+            </ChartCard>
+            <ChartCard title="Por que recusam nossas propostas?" description={`Motivo registrado na recusa · ${offerDeclineReasons.reduce((s, r) => s + r.value, 0)} recusas em 2026`}>
+              <ParetoChart items={offerDeclineReasons} height={260} />
+            </ChartCard>
+          </div>
+
+          <ChartCard title="Qual origem traz mais contratações?" description="Contratações por origem no período">
+            <BarChart label="Contratações por origem de candidatura" data={sources} index="source" series={[{ key: "hires", label: "Contratações" }]} format={(n) => formatNumber(n)} labels height={240} />
+          </ChartCard>
+
+          <section>
+            <div className="mb-3">
+              <h2 className="m-0 text-[14px] font-medium">Qual origem vale o investimento?</h2>
+              <p className="m-0 mt-0.5 text-[12px] text-muted">Volume, conversão, retenção após 12 meses e custo · retenção abaixo de 75 % em destaque</p>
+            </div>
+            <DataTable rows={sources} columns={columns} rowKey={(s) => s.source} />
+          </section>
+        </div>
+      </Page>
+    </TalentosShell>
+  );
+}

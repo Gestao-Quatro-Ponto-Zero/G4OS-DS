@@ -1,4 +1,4 @@
-import { Briefcase, Building2, Handshake, Landmark, LayoutDashboard, Package } from "lucide-react";
+import { Bot, Briefcase, Building2, FileSignature, Handshake, Landmark, LayoutDashboard, Megaphone, Package, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { Badge, Card, CardAction } from "@g4ai/ds";
 import { DocPage, DocSection, type PageMeta } from "../kit";
@@ -8,7 +8,7 @@ export const meta: PageMeta = {
   title: "Receitas por tipo de app",
   group: "Começar",
   order: 4,
-  description: "Como montar um CRM, um ATS, um ERP, um financeiro, um SaaS ou um portal do cliente com os mesmos componentes e blocos.",
+  description: "Como montar um CRM, um ATS, um ERP (de produtos ou de serviços), um financeiro, um SaaS, um portal do cliente, uma gestão de contratos, uma comunicação interna ou uma plataforma de agentes de IA com os mesmos componentes e blocos.",
 };
 
 type Recipe = { icon: ReactNode; title: string; href: string; entities: string[]; screens: string; doc: string };
@@ -39,6 +39,14 @@ const recipes: Recipe[] = [
     doc: "docs/receitas/erp.md",
   },
   {
+    icon: <Wrench />,
+    title: "ERP de serviços",
+    href: "#/blocos/servicos",
+    entities: ["Cliente", "Ordem de serviço", "Orçamento", "Contrato", "NFS-e", "Cobrança"],
+    screens: "Início com caixa e filas, OS em quadro com SLA, agenda dos técnicos, NFS-e em lote, cobrança com régua.",
+    doc: "docs/receitas/erp-servicos.md",
+  },
+  {
     icon: <Landmark />,
     title: "Financeiro",
     href: "#/blocos/financeiro",
@@ -61,6 +69,30 @@ const recipes: Recipe[] = [
     entities: ["Projeto", "Entrega", "Documento", "Fatura", "Solicitação"],
     screens: "Início com próximo passo, aceite de entregas, documentos, faturas. Menos densidade, mais explicação.",
     doc: "docs/receitas/portal-do-cliente.md",
+  },
+  {
+    icon: <FileSignature />,
+    title: "Contratos (CLM)",
+    href: "#/blocos/contratos",
+    entities: ["Contrato", "Contraparte", "Modelo", "Cláusula", "Obrigação"],
+    screens: "Painel de vencimentos e avisos prévios, carteira com visões salvas, aprovação por diferença, assinatura e prazos.",
+    doc: "docs/receitas/contratos.md",
+  },
+  {
+    icon: <Megaphone />,
+    title: "Comunicação interna",
+    href: "#/blocos/comunicacao",
+    entities: ["Comunicado", "Canal", "Pessoa", "Evento", "Pesquisa"],
+    screens: "Mural com leituras obrigatórias, comunicado com confirmação, conversas, diretório, eventos, eNPS e alcance.",
+    doc: "docs/receitas/comunicacao-interna.md",
+  },
+  {
+    icon: <Bot />,
+    title: "Agentes de IA",
+    href: "#/blocos/ia",
+    entities: ["Agente", "Versão", "Execução", "Aprovação", "Avaliação"],
+    screens: "Painel da frota, agentes com custo e orçamento, trace da execução, aprovações humanas, avaliações e governança.",
+    doc: "docs/receitas/agentes-ia.md",
   },
 ];
 
@@ -116,6 +148,10 @@ export default function Page() {
             ["ATS", "Vaga, Candidato, Etapa, Entrevista, Proposta", "job, aplicação, processo"],
             ["ERP", "Pedido, Produto, Estoque, Fornecedor, Nota fiscal", "ordem, item, SKU na interface"],
             ["Financeiro", "Conta a pagar, Conta a receber, Lançamento, Conciliação", "título e boleto como sinônimos"],
+            ["ERP de serviços", "Ordem de serviço (OS), Orçamento, Contrato, Cobrança", "chamado, ticket, proposta"],
+            ["Contratos", "Contrato, Contraparte, Aditivo, Aviso prévio, Obrigação", "fornecedor e cliente quando a lista mistura os dois"],
+            ["Comunicação interna", "Comunicado (oficial), Mensagem (conversa), Leitura obrigatória", "post, aviso e mensagem como sinônimos"],
+            ["Agentes de IA", "Agente, Execução, Aprovação, Avaliação, Créditos", "run, job, eval, bot na interface"],
           ]}
         />
       </DocSection>

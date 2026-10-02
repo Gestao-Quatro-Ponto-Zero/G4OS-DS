@@ -1,11 +1,19 @@
-import { ArrowLeftRight, Check, Link2, Plus, Sparkles, Undo2, Upload } from "lucide-react";
+import { ArrowLeftRight, Check, FileUp, Link2, Plus, Sparkles, Undo2, Upload } from "lucide-react";
 import { useState } from "react";
 import {
   Badge,
   Button,
+  Callout,
   Empty,
   FieldBlock,
+  FileDropzone,
   Meter,
+  Modal,
+  OperationButton,
+  OperationFeedback,
+  PropertyList,
+  useOperation,
+  type UploadItem,
   Page,
   PageHeading,
   Select,
@@ -14,7 +22,8 @@ import {
   formatPercent,
   notify,
 } from "@g4ai/ds";
-import { accounts, bankLines, br, ledger, type BankLine } from "./data/fin";
+import { accounts, bankLines, br, iso, ledger, type BankLine } from "./data/fin";
+import { useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -42,19 +51,30 @@ export const meta = {
 
 type State = { matched: string | null; created?: boolean };
 
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** Linhas que o arquivo de exemplo traz (no SEU app: parse do OFX/CSV no servidor). */
+const parsedLines = (account: string): BankLine[] => [
+  { id: `${account}-i1`, date: iso(0), description: "PIX RECEBIDO CONSTRUTORA PILAR LTDA", value: 23_559.3 },
+  { id: `${account}-i2`, date: iso(0), description: "TED ENVIADA RAPIDO SUL TRANSP", value: -18_760 },
+  { id: `${account}-i3`, date: iso(0), description: "IOF S/ OPERACAO", value: -42.18 },
+];
+
 export default function FinReconciliation() {
-  const [account, setAccount] = useState("itau");
+  const contaParam = useFrameParam("conta");
+  const [account, setAccount] = useState(contaParam && accounts.some((a) => a.id === contaParam && a.id !== "cdb") ? contaParam : "itau");
+  const [imported, setImported] = useState<Record<string, BankLine[]>>({});
+  const [importing, setImporting] = useState(false);
   const [state, setState] = useState<Record<string, State>>({});
   const [picking, setPicking] = useState<string | null>(null);
   // Cada conta tem o próprio extrato (aqui: Itaú com 7 linhas, BB com 2, Inter em dia).
-  const lines = account === "itau" ? bankLines : account === "bb" ? bankLines.slice(3, 5) : [];
+  const lines = [...(imported[account] ?? []), ...(account === "itau" ? bankLines : account === "bb" ? bankLines.slice(3, 5) : [])];
   const done = (b: BankLine) => !!state[b.id]?.matched || !!state[b.id]?.created;
   const used = new Set(Object.values(state).map((s) => s.matched).filter(Boolean));
   const doneCount = lines.filter(done).length;
 
   const accept = (ids: string[]) => {
     const before = state;
-    setState((s) => ({ ...s, ...Object.fromEntries(ids.map((id) => [id, { matched: bankLines.find((b) => b.id === id)!.match ?? null }])) }));
+    setState((s) => ({ ...s, ...Object.fromEntries(ids.map((id) => [id, { matched: lines.find((b) => b.id === id)?.match ?? null }])) }));
     notify(ids.length === 1 ? "Lançamento conciliado" : `${ids.length} lançamentos conciliados`, () => setState(before));
   };
   const create = (b: BankLine) => {
@@ -71,8 +91,8 @@ export default function FinReconciliation() {
           description="Cada linha do extrato precisa de um lançamento no ERP. O motor sugere o par pelo valor, data e nome."
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify("Extrato OFX de 30/09 importado · 7 novas linhas", undefined, "info")}>
-                <Upload /> Importar OFX
+              <Button variant="ghost" onClick={() => setImporting(true)}>
+                <Upload /> Importar extrato
               </Button>
               <Button disabled={!confident.length} onClick={() => accept(confident.map((b) => b.id))}>
                 <Sparkles /> Aceitar {confident.length} sugestões seguras
@@ -208,6 +228,100 @@ export default function FinReconciliation() {
           })}
         </ul>
       </Page>
+      {importing && (
+        <ImportModal
+          initialAccount={account}
+          onClose={() => setImporting(false)}
+          onImported={(acc, newLines) => {
+            setImported((all) => ({ ...all, [acc]: [...newLines, ...(all[acc] ?? [])] }));
+            setAccount(acc);
+          }}
+        />
+      )}
     </NexoShell>
+  );
+}
+
+function ImportModal({ initialAccount, onClose, onImported }: { initialAccount: string; onClose: () => void; onImported: (account: string, lines: BankLine[]) => void }) {
+  const [acc, setAcc] = useState(initialAccount);
+  const [files, setFiles] = useState<UploadItem[]>([]);
+  const [read, setRead] = useState(false);
+  const op = useOperation({ busyLabel: "Importando…" });
+  const a = accounts.find((x) => x.id === acc)!;
+  const lines = parsedLines(acc);
+  const credits = lines.filter((l) => l.value > 0).reduce((s, l) => s + l.value, 0);
+  const debits = lines.filter((l) => l.value < 0).reduce((s, l) => s + l.value, 0);
+  const file = files[0];
+  const isCsv = file?.name.toLowerCase().endsWith(".csv");
+
+  const take = async (list: File[]) => {
+    const f = list[0];
+    if (!f) return;
+    setRead(false);
+    setFiles([{ id: String(Date.now()), name: f.name, size: f.size, progress: 30 }]);
+    await wait(700);
+    setFiles([{ id: String(Date.now()), name: f.name, size: f.size }]);
+    setRead(true);
+  };
+  const confirm = async () => {
+    const failed = await op.run(() => wait(800), `Extrato de ${a.bank} importado · ${lines.length} linhas novas para conciliar`);
+    if (failed) return;
+    onImported(acc, lines);
+    onClose();
+  };
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Importar extrato"
+      description="Arquivo OFX do internet banking ou CSV no layout padrão (data; histórico; valor). Linhas já importadas são ignoradas."
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <OperationButton operation={op} onClick={confirm} disabled={!read} disabledReason="Envie o arquivo do extrato primeiro.">
+            <FileUp /> {read ? `Importar ${lines.length} linhas` : "Importar"}
+          </OperationButton>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <Select label="Conta" value={acc} onValueChange={(v) => { setAcc(v); setRead(false); setFiles([]); }} options={accounts.filter((x) => x.id !== "cdb").map((x) => ({ value: x.id, label: x.label, description: x.feed === "Open Finance" ? "também chega sozinho pelo Open Finance" : "só por arquivo" }))} />
+        <FileDropzone
+          label="Arquivo do extrato"
+          accept=".ofx,.csv"
+          multiple={false}
+          maxFiles={1}
+          maxSize={5_000_000}
+          items={files}
+          onRemove={() => { setFiles([]); setRead(false); }}
+          onFiles={take}
+          hint="OFX (recomendado) ou CSV, até 5 MB."
+        />
+        {read && file && (
+          <section className="rounded-xl border border-line bg-soft/40 p-4">
+            <h3 className="m-0 mb-2 text-[13px] font-medium">Resumo do arquivo</h3>
+            <PropertyList
+              items={[
+                { label: "Formato", value: isCsv ? "CSV · separador ponto e vírgula" : "OFX 2.1 · Itaú" },
+                { label: "Período", value: `${br(iso(-1))} a ${br(iso(0))}` },
+                { label: "Linhas novas", value: lines.length, hint: "6 já importadas foram ignoradas" },
+                { label: "Entradas", value: <span className="tabular-nums text-ok">+{formatCurrency(credits)}</span> },
+                { label: "Saídas", value: <span className="tabular-nums">−{formatCurrency(Math.abs(debits))}</span> },
+                { label: "Saldo final do extrato", value: formatCurrency(a.balance + credits + debits), hint: `ERP: ${formatCurrency(a.balance)}` },
+              ]}
+            />
+            {isCsv && (
+              <div className="mt-3">
+                <Callout tone="info">CSV não traz o identificador único da transação: confira se o período não se sobrepõe a uma importação anterior.</Callout>
+              </div>
+            )}
+          </section>
+        )}
+        <OperationFeedback operation={op} />
+      </div>
+    </Modal>
   );
 }

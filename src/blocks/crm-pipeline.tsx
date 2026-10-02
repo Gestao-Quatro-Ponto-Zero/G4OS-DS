@@ -1,15 +1,19 @@
-import { Plus } from "lucide-react";
+import { Inbox, Plus } from "lucide-react";
 import { useEffect, useState, type DragEvent } from "react";
 import {
   Badge,
   Button,
+  Empty,
+  EmptyFilterResult,
   EntityMark,
+  ErrorState,
   FilterBar,
   KanbanBoard,
   KanbanColumn,
   PageHeading,
   RecordCard,
   SegmentedControl,
+  Skeleton,
   TableSearch,
   formatCurrency,
   formatPercent,
@@ -18,6 +22,7 @@ import {
   type FilterField,
 } from "@g4ai/ds";
 import { companyById, deals as initialDeals, go, me, repById, reps, sources, stages, today, useFrameParam, type Deal, type Stage } from "./data/crm";
+import { setFrameQuery } from "./shells/frame-route";
 import { CrmShell, NewDealModal } from "./shells/crm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -34,6 +39,7 @@ export const meta = {
       "Soma de valor e previsão ponderada no topo e por coluna",
       "Arrastar muda a etapa (com desfazer); card abre o negócio",
       "Filtros e busca na barra acima do quadro",
+      "Cinco estados: sem negócios (criar), recorte vazio (limpar filtros), carregando, erro; ?estado=carregando|vazio|erro simula",
     ],
     adapt: [
       "Candidatos (ATS), pedidos (ERP), chamados por status",
@@ -61,11 +67,19 @@ export default function CrmPipeline() {
   const [scope, setScope] = useState<"todos" | "meus">("todos");
   const [creating, setCreating] = useState(false);
   const novo = useFrameParam("novo");
+  const titulo = useFrameParam("titulo");
+  const estado = useFrameParam("estado");
   useEffect(() => {
     if (novo) setCreating(true);
   }, [novo]);
+  const closeCreate = () => {
+    setCreating(false);
+    if (novo) setFrameQuery({ novo: undefined, titulo: undefined });
+  };
 
-  const filters = useFilters(scope === "meus" ? deals.filter((d) => d.owner === me) : deals, {
+  // ?estado=vazio simula uma conta sem nenhum negócio.
+  const base = estado === "vazio" ? [] : deals;
+  const filters = useFilters(scope === "meus" ? base.filter((d) => d.owner === me) : base, {
     fields,
     search: (d) => [d.title, companyById(d.companyId).name, repById(d.owner).name],
     me,
@@ -114,6 +128,9 @@ export default function CrmPipeline() {
         />
 
         {/* Previsão: total, ponderado e distribuição por etapa */}
+        {estado === "carregando" ? (
+          <Skeleton className="mt-5 h-[84px] w-full shrink-0 rounded-xl" />
+        ) : (
         <div className="mt-5 grid shrink-0 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-3">
           <div className="bg-surface px-4 py-3">
             <div className="text-[12px] text-muted">Em aberto</div>
@@ -143,6 +160,7 @@ export default function CrmPipeline() {
             </div>
           </div>
         </div>
+        )}
 
         <FilterBar
           className="mt-4 shrink-0"
@@ -152,6 +170,36 @@ export default function CrmPipeline() {
         />
 
         <div className="mt-4 flex min-h-[440px] flex-1 flex-col">
+          {estado === "carregando" ? (
+            <div className="flex gap-3 overflow-hidden" aria-busy="true" aria-label="Carregando o pipeline">
+              {stages.map((st) => (
+                <div key={st.id} className="w-[212px] shrink-0 space-y-2">
+                  <Skeleton className="h-5 w-28" />
+                  <Skeleton className="h-[92px] w-full rounded-xl" />
+                  <Skeleton className="h-[92px] w-full rounded-xl" />
+                </div>
+              ))}
+            </div>
+          ) : estado === "erro" ? (
+            <ErrorState size="md" title="Não foi possível carregar o pipeline" description="Os negócios continuam salvos. Tente de novo em alguns segundos." onRetry={() => setFrameQuery({ estado: undefined })} />
+          ) : !base.length ? (
+            <Empty
+              title="Nenhum negócio no pipeline"
+              hint="Crie o primeiro negócio ou qualifique um lead da caixa de entrada para começar a prever receita."
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button variant="ghost" href="#/frame/crm-leads">
+                    <Inbox /> Ver leads
+                  </Button>
+                  <Button onClick={() => setCreating(true)}>
+                    <Plus /> Criar negócio
+                  </Button>
+                </div>
+              }
+            />
+          ) : !visible.length ? (
+            <EmptyFilterResult filters={filters} noun="negócio" framed />
+          ) : (
           <KanbanBoard className="h-full">
             {stages.map((st) => {
               const list = visible.filter((d) => d.stage === st.id);
@@ -188,11 +236,13 @@ export default function CrmPipeline() {
               );
             })}
           </KanbanBoard>
+          )}
         </div>
       </div>
       <NewDealModal
         open={creating}
-        onClose={() => setCreating(false)}
+        defaultTitle={titulo ?? undefined}
+        onClose={closeCreate}
         onCreate={(d) => {
           setDeals((all) => [d, ...all]);
           notify(`${companyById(d.companyId).name} entrou em ${stages.find((s) => s.id === d.stage)?.label}`, () => setDeals((all) => all.filter((x) => x.id !== d.id)));

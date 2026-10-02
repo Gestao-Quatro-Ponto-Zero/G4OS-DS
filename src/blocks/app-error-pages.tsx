@@ -10,7 +10,7 @@ import {
   SegmentedControl,
   notify } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
-import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
+import { frameHref, goTo, setFrameQuery, useFrameQuery } from "./shells/frame-route";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -77,7 +77,7 @@ export default function ErrorPagesBlock() {
         {kind === "500" && (
           <ErrorState
             size="page"
-            onRetry={() => notify("Recarregando…", undefined, "info")}
+            onRetry={() => goTo(frameHref("erp-orders"))}
             details={errorDetails}
             secondaryAction={
               <Button size="sm" variant="ghost" href="mailto:suporte@atlas.app">

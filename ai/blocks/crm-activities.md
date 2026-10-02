@@ -15,6 +15,7 @@ Tarefas, ligações, reuniões e e-mails agrupados por prazo (atrasadas primeiro
 - Anatomia A · Lista: cabeçalho fixo + PageToolbar colada
 - Agrupado por prazo (atrasadas primeiro) ou por semana
 - Conclusão rápida na linha; nova atividade em modal
+- Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros
 
 **Quando usar e o que adaptar**
 
@@ -26,4 +27,4 @@ Tarefas, ligações, reuniões e e-mails agrupados por prazo (atrasadas primeiro
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Checkbox`, `Combobox`, `DatePicker`, `EmptyFilterResult`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `Highlight`, `Modal`, `Page`, `PageHeading`, `PageToolbar`, `SegmentedControl`, `Select`, `TableSearch`, `TextField`, `formatDate`, `notify`, `useFilters`
+`Avatar`, `Badge`, `Button`, `Checkbox`, `Combobox`, `DatePicker`, `Empty`, `EmptyFilterResult`, `ErrorState`, `FieldBlock`, `FieldGrid`, `FilterBar`, `FilterField`, `Highlight`, `Modal`, `Page`, `PageHeading`, `PageToolbar`, `SegmentedControl`, `Select`, `Skeleton`, `TableSearch`, `TextField`, `formatDate`, `notify`, `useFilters`

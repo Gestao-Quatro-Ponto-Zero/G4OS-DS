@@ -16,6 +16,7 @@ Quadro de negócios por etapa com soma de valor, previsão ponderada, filtros, a
 - Soma de valor e previsão ponderada no topo e por coluna
 - Arrastar muda a etapa (com desfazer); card abre o negócio
 - Filtros e busca na barra acima do quadro
+- Cinco estados: sem negócios (criar), recorte vazio (limpar filtros), carregando, erro; ?estado=carregando|vazio|erro simula
 
 **Quando usar e o que adaptar**
 
@@ -27,4 +28,4 @@ Quadro de negócios por etapa com soma de valor, previsão ponderada, filtros, a
 
 ## Componentes usados
 
-`Badge`, `Button`, `EntityMark`, `FilterBar`, `FilterField`, `KanbanBoard`, `KanbanColumn`, `PageHeading`, `RecordCard`, `SegmentedControl`, `TableSearch`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`
+`Badge`, `Button`, `Empty`, `EmptyFilterResult`, `EntityMark`, `ErrorState`, `FilterBar`, `FilterField`, `KanbanBoard`, `KanbanColumn`, `PageHeading`, `RecordCard`, `SegmentedControl`, `Skeleton`, `TableSearch`, `formatCurrency`, `formatPercent`, `notify`, `useFilters`

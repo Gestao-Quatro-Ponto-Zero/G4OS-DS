@@ -14,7 +14,8 @@ Propostas de contratação em lista + detalhe: cadeia de aprovação, alerta de 
 
 - Anatomia F · Mestre-detalhe: lista de propostas + detalhe com cadeia de aprovação
 - Alerta quando o salário sai da faixa
-- Ações mudam com a situação (aprovar, enviar, registrar resposta)
+- Ações mudam com a situação (aprovar, enviar, registrar resposta); aceite leva à admissão
+- Cinco estados: ?estado=carregando|vazio|erro simula; aba sem propostas tem vazio próprio
 
 **Quando usar e o que adaptar**
 
@@ -26,4 +27,4 @@ Propostas de contratação em lista + detalhe: cadeia de aprovação, alerta de 
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Callout`, `ConfirmDialog`, `CurrencyField`, `Page`, `PageHeading`, `PropertyList`, `Stepper`, `Tabs`, `formatCurrency`, `notify`
+`Avatar`, `Badge`, `Button`, `Callout`, `ConfirmDialog`, `CurrencyField`, `Empty`, `Page`, `PageHeading`, `PropertyList`, `Stepper`, `Tabs`, `formatCurrency`, `notify`

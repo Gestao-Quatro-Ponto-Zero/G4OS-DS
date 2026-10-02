@@ -16,6 +16,7 @@ Registro de um negócio (?id=): caminho de etapas, ganho/perda com motivo, nota 
 - StagePath clicável; perda pede motivo
 - Nota rápida alimenta o feed de atividade
 - Edição longa em gaveta (Drawer)
+- Duplicar cria a cópia em Qualificação e abre o novo registro; vincular contato com busca
 
 **Quando usar e o que adaptar**
 
@@ -27,4 +28,4 @@ Registro de um negócio (?id=): caminho de etapas, ganho/perda com motivo, nota 
 
 ## Componentes usados
 
-`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `Checkbox`, `ConfirmDialog`, `CurrencyField`, `DatePicker`, `Drawer`, `EntityMark`, `FieldBlock`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `StagePath`, `Tabs`, `TextField`, `areaClass`, `formatCurrency`, `formatDate`, `formatPercent`, `notify`
+`ActionMenu`, `ActivityFeed`, `ActivityItem`, `Avatar`, `Badge`, `Button`, `Checkbox`, `Combobox`, `ConfirmDialog`, `CurrencyField`, `DatePicker`, `Drawer`, `Empty`, `EntityMark`, `FieldBlock`, `Modal`, `Page`, `PageHeading`, `PropertyList`, `Select`, `SplitLayout`, `StagePath`, `Tabs`, `TextField`, `areaClass`, `formatCurrency`, `formatDate`, `formatPercent`, `notify`

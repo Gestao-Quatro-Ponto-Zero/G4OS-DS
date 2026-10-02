@@ -1,22 +1,33 @@
-import { Archive, Briefcase, Mail, Phone, Plus, Upload, UserRoundPen } from "lucide-react";
+import { Archive, Briefcase, Download, FileSpreadsheet, Mail, Phone, Plus, Upload, UserRoundPen, UserSearch } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
+  AlertCard,
   AvatarGroup,
   Avatar,
   Badge,
   Button,
+  Checkbox,
+  ComposeEmailDialog,
   DataGrid,
+  Drawer,
+  Empty,
   EmptyFilterResult,
   EntityMark,
+  ErrorState,
   FieldBlock,
+  FileDropzone,
   FieldGrid,
   FilterBar,
   Highlight,
   Modal,
+  OperationButton,
+  OperationFeedback,
   Page,
   PageHeading,
   SavedViews,
   Select,
+  Skeleton,
+  Stepper,
   TableSearch,
   Tabs,
   TextField,
@@ -25,13 +36,18 @@ import {
   downloadCsv,
   gridToCsv,
   notify,
+  formatNumber,
   useFilters,
+  useOperation,
   useSavedViews,
   type FilterField,
   type GridColumn,
+  type Person,
   type SavedView,
+  type UploadItem,
 } from "@g4ai/ds";
-import { companies as baseCompanies, companyById, contacts, deals, go, iso, me, repById, reps, today, type Company, type Lifecycle } from "./data/crm";
+import { companies as baseCompanies, companyById, contacts, deals, go, iso, me, repById, reps, today, useFrameParam, type Company, type Lifecycle } from "./data/crm";
+import { setFrameQuery } from "./shells/frame-route";
 import { CrmShell } from "./shells/crm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -48,6 +64,9 @@ export const meta = {
       "Estágio e responsável editáveis na célula com desfazer",
       "Ações rápidas na linha (ligar, e-mail, ⋯ e clique direito)",
       "Seleção em massa; colunas configuráveis; CSV; cards no celular",
+      "Importar planilha em gaveta: arquivo → mapear colunas → revisar (linhas com erro antes de gravar)",
+      "E-mail pela linha abre o compositor com o contato principal",
+      "Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros",
     ],
     adapt: [
       "Clientes (ERP), candidatos (ATS), contas (SaaS)",
@@ -91,6 +110,10 @@ const systemViews: SavedView[] = [
 
 const here = "#/frame/crm-contacts";
 
+/* E-mail: remetente e diretório de destinatários do compositor. */
+const sender: Person = { id: "ana", name: "Ana Lopes", email: "ana.lopes@acme.com.br", initials: "AL" };
+const directory: Person[] = contacts.map((p) => ({ id: p.id, name: p.name, email: p.email, initials: p.initials, tint: p.tint }));
+
 export default function CrmContacts() {
   const [all, setAll] = useState<Row[]>(() => baseCompanies.map(toRow));
   const [tab, setTab] = useState("empresas");
@@ -98,6 +121,9 @@ export default function CrmContacts() {
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState({ name: "", domain: "", industry: industries[0], city: "", owner: me });
   const [tried, setTried] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [mail, setMail] = useState<{ to: Person[]; subject: string; body: string; company: string } | null>(null);
+  const estado = useFrameParam("estado");
   // Busca + filtros + URL (?q=…&f=…): o link desta tela reproduz o recorte.
   const filters = useFilters(all, { fields, search: searchText, me, now: today, url: true });
   const views = useSavedViews(filters, systemViews, "crm-empresas-visoes");
@@ -209,7 +235,7 @@ export default function CrmContacts() {
           description="Todas as contas do time, de lead a ex-cliente."
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify("Exemplo: importa uma planilha CSV/XLSX com mapeamento de colunas.", undefined, "info")}>
+              <Button variant="ghost" onClick={() => setImporting(true)}>
                 <Upload /> Importar
               </Button>
               <Button onClick={() => setCreating(true)}>
@@ -229,7 +255,38 @@ export default function CrmContacts() {
           ]}
         />
         <div className="mt-5 space-y-4">
-          {tab === "empresas" ? (
+          {estado === "carregando" ? (
+            <div className="space-y-2" aria-busy="true" aria-label="Carregando empresas">
+              <Skeleton className="h-9 w-72" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className="flex items-center gap-3 px-1 py-1.5">
+                  <Skeleton className="h-7 w-7 rounded-lg" />
+                  <Skeleton className="h-3.5 w-48" />
+                  <Skeleton className="ml-auto h-3.5 w-24" />
+                  <Skeleton className="h-3.5 w-20" />
+                </div>
+              ))}
+            </div>
+          ) : estado === "erro" ? (
+            <ErrorState size="md" title="Não foi possível carregar as empresas" description="Nada foi perdido. Verifique a conexão e tente de novo." onRetry={() => setFrameQuery({ estado: undefined })} />
+          ) : estado === "vazio" ? (
+            <Empty
+              icon={<FileSpreadsheet />}
+              title="Nenhuma empresa na base"
+              hint="Importe a planilha que o time já usa ou cadastre a primeira conta. Contatos e negócios ficam dentro de cada empresa."
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button variant="ghost" onClick={() => setImporting(true)}>
+                    <Upload /> Importar planilha
+                  </Button>
+                  <Button onClick={() => setCreating(true)}>
+                    <Plus /> Adicionar empresa
+                  </Button>
+                </div>
+              }
+            />
+          ) : tab === "empresas" ? (
             <>
               <SavedViews views={views} counts={counts} />
               <DataGrid
@@ -256,7 +313,15 @@ export default function CrmContacts() {
                 }}
                 rowActions={(c) => [
                   { label: "Registrar ligação", icon: <Phone />, inline: true, onSelect: () => notify(`Ligação para ${c.name} registrada`) },
-                  { label: "Enviar e-mail", icon: <Mail />, inline: true, onSelect: () => notify(`Exemplo: abre o e-mail para ${contacts.find((p) => p.companyId === c.id)?.email ?? c.domain}.`, undefined, "info") },
+                  {
+                    label: "Enviar e-mail",
+                    icon: <Mail />,
+                    inline: true,
+                    onSelect: () => {
+                      const main = contacts.find((p) => p.companyId === c.id);
+                      setMail({ to: main ? directory.filter((d) => d.id === main.id) : [], subject: `${c.name} · próximos passos`, body: `Olá${main ? `, ${main.name.split(" ")[0]}` : ""}.\n\nSigo com os próximos passos que combinamos.\n\nAbraço,\nAna`, company: c.name });
+                    },
+                  },
                   { label: "Ver negócios", icon: <Briefcase />, onSelect: () => go("crm-company", c.id) },
                   { label: "Trocar para mim", icon: <UserRoundPen />, disabled: c.owner === me, onSelect: () => update(new Set([c.id]), { owner: me }, `${c.name} agora é sua`) },
                   { label: "Arquivar", icon: <Archive />, tone: "danger", separator: true, onSelect: () => archive([c]) },
@@ -299,7 +364,20 @@ export default function CrmContacts() {
                     </li>
                   );
                 })}
-                {!people.length && <li className="col-span-full py-10 text-center text-[13px] text-muted">Nenhum contato encontrado para “{contactQuery}”.</li>}
+                {!people.length && (
+                  <li className="col-span-full">
+                    <Empty
+                      icon={<UserSearch />}
+                      title={`Nenhum contato encontrado para “${contactQuery}”`}
+                      hint="A busca considera nome, cargo, e-mail e empresa."
+                      action={
+                        <Button variant="ghost" onClick={() => setContactQuery("")}>
+                          Limpar busca
+                        </Button>
+                      }
+                    />
+                  </li>
+                )}
               </ul>
             </>
           )}
@@ -336,6 +414,212 @@ export default function CrmContacts() {
           </FieldGrid>
         </div>
       </Modal>
+
+      <ImportDrawer
+        open={importing}
+        onClose={() => setImporting(false)}
+        onImported={(rows) => {
+          setAll((a) => [...rows, ...a]);
+          return () => setAll((a) => a.filter((x) => !rows.includes(x)));
+        }}
+      />
+
+      <ComposeEmailDialog
+        open={!!mail}
+        onClose={() => setMail(null)}
+        title={mail ? `E-mail · ${mail.company}` : "Escrever e-mail"}
+        from={sender}
+        to={mail?.to ?? []}
+        onToChange={(to) => setMail((m) => (m ? { ...m, to } : m))}
+        directory={directory}
+        subject={mail?.subject ?? ""}
+        onSubjectChange={(subject) => setMail((m) => (m ? { ...m, subject } : m))}
+        body={mail?.body ?? ""}
+        onBodyChange={(body) => setMail((m) => (m ? { ...m, body } : m))}
+        onSend={() => {
+          const who = mail?.to.map((p) => p.name.split(" ")[0]).join(", ");
+          setMail(null);
+          notify(`E-mail enviado para ${who}`);
+        }}
+      />
     </CrmShell>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Importar planilha: arquivo → mapear colunas → revisar               */
+/* ------------------------------------------------------------------ */
+
+type Target = "name" | "domain" | "city" | "industry" | "owner" | "phone" | "skip";
+const targetLabel: Record<Target, string> = { name: "Nome da empresa", domain: "Site", city: "Cidade", industry: "Setor", owner: "Responsável", phone: "Telefone", skip: "Não importar" };
+// Colunas lidas da planilha de exemplo (no seu app, venha do parser de CSV/XLSX).
+const detected: { column: string; sample: string; guess: Target }[] = [
+  { column: "Razão social", sample: "Lumen Energia S.A.", guess: "name" },
+  { column: "Website", sample: "lumen.com.br", guess: "domain" },
+  { column: "Cidade/UF", sample: "São Paulo, SP", guess: "city" },
+  { column: "Segmento", sample: "Energia", guess: "industry" },
+  { column: "Dono da conta", sample: "Ana Lopes", guess: "owner" },
+  { column: "Observações", sample: "Veio da feira de março", guess: "skip" },
+];
+const sampleRows: [string, string, string, string][] = [
+  ["Lumen Energia", "lumen.com.br", "São Paulo, SP", "Energia"],
+  ["Transvale Cargas", "transvale.com.br", "São José dos Campos, SP", "Logística"],
+  ["Universidade Metropolitana", "unimetro.edu.br", "Rio de Janeiro, RJ", "Educação"],
+];
+const importStats = { total: 128, created: 112, updated: 9, invalid: 7 };
+const invalidLines = [
+  { id: "14", label: "Linha 14 · Razão social vazia" },
+  { id: "37", label: "Linha 37 · Site inválido (“www”)" },
+  { id: "52", label: "Linha 52 · Responsável “Marcos T.” não está no time" },
+];
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+function ImportDrawer({ open, onClose, onImported }: { open: boolean; onClose: () => void; onImported: (rows: Row[]) => () => void }) {
+  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [files, setFiles] = useState<UploadItem[]>([]);
+  const [map, setMap] = useState<Record<string, Target>>(() => Object.fromEntries(detected.map((d) => [d.column, d.guess])));
+  const [update, setUpdate] = useState(true);
+  const op = useOperation({ busyLabel: "Importando…" });
+  const mapped = Object.values(map);
+  const hasName = mapped.includes("name");
+  const dupTarget = (["name", "domain", "city", "industry", "owner", "phone"] as Target[]).find((t) => mapped.filter((m) => m === t).length > 1);
+
+  const reset = () => {
+    setStep(0);
+    setFiles([]);
+    setMap(Object.fromEntries(detected.map((d) => [d.column, d.guess])));
+    op.reset();
+  };
+  const close = () => {
+    onClose();
+    reset();
+  };
+  const run = async () => {
+    const rows = sampleRows.map(([name, domain, city, industry], i) => toRow({ id: `imp${Date.now()}${i}`, name, domain, industry, size: "—", city, owner: me, tint: "#184560", lifecycle: "Lead", lastTouch: 0, cnpj: "—" }));
+    let undo = () => {};
+    const failed = await op.run(() => wait(900), {
+      message: `${formatNumber(importStats.created)} empresas importadas como Lead${update ? ` · ${importStats.updated} atualizadas` : ""}`,
+      undo: () => undo(),
+    });
+    if (!failed) {
+      undo = onImported(rows);
+      close();
+    }
+  };
+
+  return (
+    <Drawer
+      open={open}
+      onClose={close}
+      width={560}
+      kicker="Empresas e contatos"
+      title="Importar planilha"
+      footer={
+        <>
+          {step > 0 ? (
+            <Button variant="ghost" onClick={() => setStep((s) => (s - 1) as 0 | 1)}>
+              Voltar
+            </Button>
+          ) : (
+            <Button variant="ghost" onClick={close}>
+              Cancelar
+            </Button>
+          )}
+          {step === 0 && (
+            <Button onClick={() => setStep(1)} disabled={!files.length} disabledReason="Envie a planilha primeiro.">
+              Mapear colunas
+            </Button>
+          )}
+          {step === 1 && (
+            <Button onClick={() => setStep(2)} disabled={!hasName || !!dupTarget} disabledReason={!hasName ? "Indique a coluna com o nome da empresa." : "Dois campos apontam para o mesmo destino."}>
+              Revisar importação
+            </Button>
+          )}
+          {step === 2 && (
+            <OperationButton operation={op} onClick={run}>
+              Importar {formatNumber(importStats.created + (update ? importStats.updated : 0))} empresas
+            </OperationButton>
+          )}
+        </>
+      }
+    >
+      <div className="space-y-5">
+        <Stepper
+          label="Etapas da importação"
+          steps={["Arquivo", "Mapear colunas", "Revisar"].map((label, i) => ({ id: String(i), label, state: i < step ? "done" : i === step ? "current" : "upcoming" }))}
+        />
+        {step === 0 && (
+          <>
+            <FileDropzone
+              label="Planilha"
+              accept=".csv,.xlsx"
+              multiple={false}
+              maxFiles={1}
+              maxSize={10 * 1024 * 1024}
+              hint="CSV ou XLSX até 10 MB. Uma empresa por linha, com cabeçalho na primeira."
+              items={files}
+              onRemove={() => setFiles([])}
+              onFiles={(list) => {
+                const f = list[0];
+                if (f) setFiles([{ id: f.name, name: f.name, size: f.size, progress: 100 }]);
+              }}
+            />
+            <Button
+              variant="quiet"
+              size="sm"
+              onClick={() => downloadCsv("modelo-empresas", ["Razão social;Website;Cidade/UF;Segmento;Dono da conta", "Exemplo Ltda.;exemplo.com.br;São Paulo, SP;Varejo;Ana Lopes"].join("\n"))}
+            >
+              <Download /> Baixar planilha modelo
+            </Button>
+          </>
+        )}
+        {step === 1 && (
+          <section aria-label="Mapear colunas">
+            <p className="m-0 mb-3 text-[13px] text-muted">
+              Lemos {detected.length} colunas em <span className="text-ink">{files[0]?.name}</span>. Diga para qual campo do CRM vai cada uma.
+            </p>
+            <ul className="m-0 list-none divide-y divide-line rounded-xl border border-line bg-surface p-0">
+              {detected.map((d) => (
+                <li key={d.column} className="grid items-center gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_200px]">
+                  <div className="min-w-0">
+                    <div className="truncate text-[13.5px] font-medium">{d.column}</div>
+                    <div className="truncate text-[12px] text-muted">Ex.: {d.sample}</div>
+                  </div>
+                  <Select
+                    label={`Destino de ${d.column}`}
+                    hideLabel
+                    value={map[d.column]}
+                    onValueChange={(v) => setMap((m) => ({ ...m, [d.column]: v as Target }))}
+                    options={(Object.keys(targetLabel) as Target[]).map((t) => ({ value: t, label: targetLabel[t] }))}
+                  />
+                </li>
+              ))}
+            </ul>
+            {!hasName && <p className="m-0 mt-2 text-[12.5px] text-rose">Indique a coluna com o nome da empresa: é o único campo obrigatório.</p>}
+            {dupTarget && <p className="m-0 mt-2 text-[12.5px] text-rose">Duas colunas vão para “{targetLabel[dupTarget]}”. Escolha só uma.</p>}
+          </section>
+        )}
+        {step === 2 && (
+          <>
+            <OperationFeedback operation={op} />
+            <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
+              {[
+                { label: "Novas", value: importStats.created },
+                { label: "Já existem", value: importStats.updated },
+                { label: "Com erro", value: importStats.invalid },
+              ].map((k) => (
+                <div key={k.label} className="bg-surface px-4 py-3">
+                  <div className="text-[12px] text-muted">{k.label}</div>
+                  <div className={k.label === "Com erro" ? "text-[18px] font-semibold tabular-nums text-rose" : "text-[18px] font-semibold tabular-nums"}>{formatNumber(k.value)}</div>
+                </div>
+              ))}
+            </div>
+            <Checkbox label={`Atualizar as ${importStats.updated} empresas que já existem (mesmo site)`} checked={update} onCheckedChange={setUpdate} />
+            <AlertCard tone="warn" title={`${importStats.invalid} linhas não serão importadas`} description="Corrija na planilha e importe só essas linhas depois. As outras entram agora." items={invalidLines} />
+            <p className="m-0 text-[12.5px] text-muted">Todas entram como Lead, com você como responsável quando a coluna estiver vazia.</p>
+          </>
+        )}
+      </div>
+    </Drawer>
   );
 }

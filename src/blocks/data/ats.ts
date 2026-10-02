@@ -167,6 +167,9 @@ const seeds: Seed[] = [
   ["c22", "Lucas Barreto", "Desenvolvedor Back-end · Zup", "Uberlândia, MG", "LinkedIn", "j1", "case", "reprovado", 2.9, 0, -21, 19_500, ["Java"]],
   ["c23", "Fernanda Castro", "Engenheira de Software · VTEX", "Rio de Janeiro, RJ", "Site de carreiras", "j1", "triagem", "banco", 3.7, 0, -120, 22_000, ["Node.js", "TypeScript"]],
   ["c24", "Marcelo Duarte", "Executivo de Vendas · Senior Sistemas", "Blumenau, SC", "LinkedIn", "j3", "rh", "banco", 3.4, 0, -90, 15_000, ["Indústria"]],
+  ["c25", "Bruno Carvalho", "SDR · Pipefy", "Belo Horizonte, MG", "LinkedIn", "j4", "proposta", "contratado", 4.1, 0, -28, 4_900, ["Cadências", "Prospecção"]],
+  ["c26", "Juliana Teixeira", "Supervisora de CD · Magalu", "Campinas, SP", "Hunting", "j7", "proposta", "contratado", 4.4, 0, -35, 14_500, ["WMS", "Liderança"]],
+  ["c27", "Renan Oliveira", "Analista de Dados · Creditas", "Remoto", "Site de carreiras", "j2", "proposta", "contratado", 4.2, 0, -50, 11_800, ["SQL", "dbt"]],
 ];
 const phones = ["(11) 98765-4321", "(21) 99812-3344", "(31) 99654-1020", "(41) 98877-6655", "(19) 99123-4567"];
 
@@ -319,4 +322,100 @@ export const sourceQuality = [
   { source: "Site de carreiras", applicants: 1_120, hires: 12, retention: 0.81, cost: 1_300 },
   { source: "Hunting", applicants: 96, hires: 7, retention: 0.88, cost: 9_800 },
   { source: "Universidades", applicants: 610, hires: 3, retention: 0.67, cost: 2_900 },
+];
+
+/* ------------------------------------------------------------------ */
+/* Requisições de vaga (fila de aprovação antes de abrir a vaga)       */
+/* ------------------------------------------------------------------ */
+
+export type RequisitionStatus = "pendente" | "aprovada" | "recusada";
+export type Requisition = {
+  id: string;
+  number: string;
+  title: string;
+  area: string;
+  requester: string;
+  reason: "Aumento de quadro" | "Substituição";
+  replaces?: string;
+  salary: [number, number];
+  openings: number;
+  /** Custo anual estimado (salário máximo × 13,3 × encargos), em reais. */
+  budget: number;
+  status: RequisitionStatus;
+  createdAt: string;
+  approvals: { who: string; state: "done" | "current" | "upcoming" }[];
+  justification: string;
+  declineReason?: string;
+};
+const budgetOf = (max: number, openings: number) => Math.round(max * 13.3 * 1.7 * openings);
+export const requisitions: Requisition[] = [
+  { id: "r1", number: "REQ-0142", title: "Pessoa Engenheira de Plataforma Sênior", area: "Tecnologia", requester: "marcos", reason: "Aumento de quadro", salary: [19_000, 26_000], openings: 1, budget: budgetOf(26_000, 1), status: "pendente", createdAt: iso(-2), approvals: [{ who: "marcos", state: "done" }, { who: "juliana", state: "current" }, { who: "rafael", state: "upcoming" }], justification: "Migração para Kubernetes e observabilidade unificada. Hoje o time de Pagamentos absorve o plantão de infraestrutura." },
+  { id: "r2", number: "REQ-0141", title: "Analista de Customer Success Pleno", area: "Comercial", requester: "renata", reason: "Substituição", replaces: "Bruna Lima (desligamento em 15/10)", salary: [7_000, 9_500], openings: 1, budget: budgetOf(9_500, 1), status: "pendente", createdAt: iso(-4), approvals: [{ who: "renata", state: "done" }, { who: "juliana", state: "current" }], justification: "Carteira de 60 contas PME fica sem responsável a partir de 15/10." },
+  { id: "r3", number: "REQ-0140", title: "Auxiliar de Logística", area: "Operações", requester: "helena", reason: "Aumento de quadro", salary: [2_400, 2_900], openings: 6, budget: budgetOf(2_900, 6), status: "pendente", createdAt: iso(-6), approvals: [{ who: "helena", state: "done" }, { who: "thiago", state: "done" }, { who: "juliana", state: "current" }], justification: "Pico de fim de ano no CD Campinas: volume previsto 38 % acima de setembro." },
+  { id: "r4", number: "REQ-0138", title: "Product Manager Sênior", area: "Produto", requester: "rafael", reason: "Aumento de quadro", salary: [20_000, 27_000], openings: 1, budget: budgetOf(27_000, 1), status: "aprovada", createdAt: iso(-12), approvals: [{ who: "rafael", state: "done" }, { who: "juliana", state: "done" }, { who: "helena", state: "done" }], justification: "Novo squad de Faturamento a partir de novembro." },
+  { id: "r5", number: "REQ-0136", title: "Assistente Administrativo", area: "Financeiro", requester: "helena", reason: "Aumento de quadro", salary: [3_000, 3_600], openings: 1, budget: budgetOf(3_600, 1), status: "recusada", createdAt: iso(-15), approvals: [{ who: "helena", state: "done" }, { who: "juliana", state: "done" }], justification: "Apoio no fechamento mensal.", declineReason: "Sem orçamento de quadro no 4º trimestre. Reavaliar em janeiro." },
+];
+export const requisitionStatus: Record<RequisitionStatus, { label: string; tone: "warn" | "ok" | "bad" }> = {
+  pendente: { label: "Aguardando aprovação", tone: "warn" },
+  aprovada: { label: "Aprovada", tone: "ok" },
+  recusada: { label: "Recusada", tone: "bad" },
+};
+/** Pendentes na etapa da pessoa logada (contador da navegação: pede ação). */
+export const requisitionsAwaitingMe = requisitions.filter((r) => r.status === "pendente" && r.approvals.some((a) => a.who === me.id && a.state === "current")).length;
+
+/* ------------------------------------------------------------------ */
+/* Admissões (checklist do aceite ao primeiro dia)                     */
+/* ------------------------------------------------------------------ */
+
+export type ChecklistGroup = "Documentos" | "Exame admissional" | "Contrato" | "Acessos" | "Primeiro dia";
+export type ChecklistItem = { id: string; group: ChecklistGroup; label: string; owner: string; done: boolean };
+export type Admission = { id: string; candidateId: string; jobId: string; start: string; status: "andamento" | "concluida"; items: ChecklistItem[] };
+
+const checklistTemplate: [ChecklistGroup, string, string][] = [
+  ["Documentos", "RG e CPF", "contratado"],
+  ["Documentos", "Comprovante de residência", "contratado"],
+  ["Documentos", "Carteira de trabalho digital", "contratado"],
+  ["Documentos", "Dados bancários", "contratado"],
+  ["Exame admissional", "Agendar exame na clínica", "camila"],
+  ["Exame admissional", "Receber ASO (atestado de saúde)", "camila"],
+  ["Contrato", "Gerar contrato de trabalho", "helena"],
+  ["Contrato", "Assinatura digital do contratado", "contratado"],
+  ["Acessos", "Criar e-mail corporativo", "eduardo"],
+  ["Acessos", "Separar notebook", "eduardo"],
+  ["Acessos", "Emitir crachá", "camila"],
+  ["Primeiro dia", "Definir buddy", "manager"],
+  ["Primeiro dia", "Agenda da primeira semana", "manager"],
+];
+/** Checklist inicial; `doneCount` marca os primeiros N itens como concluídos. */
+export const newChecklist = (doneCount = 0, manager = "marcos"): ChecklistItem[] =>
+  checklistTemplate.map(([group, label, owner], i) => ({ id: `k${i + 1}`, group, label, owner: owner === "manager" ? manager : owner, done: i < doneCount }));
+
+export const admissions: Admission[] = [
+  { id: "a-c21", candidateId: "c21", jobId: "j8", start: iso(5), status: "andamento", items: newChecklist(9, "helena") },
+  { id: "a-c25", candidateId: "c25", jobId: "j4", start: iso(3), status: "andamento", items: newChecklist(4, "renata") },
+  { id: "a-c26", candidateId: "c26", jobId: "j7", start: iso(12), status: "andamento", items: newChecklist(2, "helena") },
+  { id: "a-c27", candidateId: "c27", jobId: "j2", start: iso(-6), status: "concluida", items: newChecklist(13, "marcos") },
+];
+/** Dias entre hoje e a data: daysFromToday(iso(3)) = 3. */
+export const daysFromToday = (isoDate: string) => Math.round((new Date(`${isoDate}T00:00:00`).getTime() - today.getTime()) / 86400000);
+
+/* ------------------------------------------------------------------ */
+/* Relatórios                                                          */
+/* ------------------------------------------------------------------ */
+
+/** Dias médios em cada etapa (contratações de 2026) contra a meta da etapa. */
+export const timeByStage = [
+  { etapa: "Triagem", dias: 6, meta: 5 },
+  { etapa: "Entrevista RH", dias: 5, meta: 5 },
+  { etapa: "Case técnico", dias: 9, meta: 7 },
+  { etapa: "Entrevista final", dias: 6, meta: 5 },
+  { etapa: "Proposta", dias: 4, meta: 3 },
+];
+/** Por que candidatos recusaram propostas em 2026. */
+export const offerDeclineReasons = [
+  { label: "Contraproposta do empregador atual", value: 7 },
+  { label: "Salário abaixo da pretensão", value: 5 },
+  { label: "Modelo de trabalho (presencial)", value: 3 },
+  { label: "Aceitou outra oferta", value: 2 },
+  { label: "Processo demorado", value: 1 },
 ];

@@ -1,11 +1,19 @@
-import { Check, Clock, Database, FileText, Mail, PencilLine, Play, RotateCcw, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CalendarClock, Check, ClipboardCheck, Clock, Database, FileText, PencilLine, RotateCcw, Search, Sparkles, X } from "lucide-react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 import {
   AgentTrace,
   AiBadge,
   Badge,
   Button,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandMenu,
+  IconButton,
   JsonView,
+  OperationButton,
+  OperationFeedback,
   Page,
   PageHeading,
   PropertyList,
@@ -18,27 +26,29 @@ import {
   formatCurrency,
   formatDuration,
   formatNumber,
-  notify,
+  useOperation,
   type ToolCall,
   type TraceStep,
 } from "@g4ai/ds";
-import { AssistantShell, assistantRoutes } from "./shells/assistant-shell";
-import { frameHref } from "./shells/frame-route";
+import { agentById, agents, creditPlan, modelById, runById, runStatusLabel, runWhen, runs, traceOf, triggerKindLabel, type Run } from "./data/agents";
+import { AgentShell, agentRoutes } from "./shells/agent-shell";
+import { frameHref, go, useFrameParam } from "./shells/frame-route";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
   title: "Execução de agente",
-  description: "Detalhe de uma execução: trace em cascata com replay, passo selecionado com entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar e tentar de novo.",
+  description: "Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado.",
   category: "IA",
-  order: 2,
-  height: 1040,
+  order: 12,
+  height: 1120,
   concept: {
-    goal: "Explicar uma execução do agente passo a passo para quem precisa auditar ou aprovar o resultado antes de usar.",
+    goal: "Explicar uma execução do agente passo a passo para quem precisa auditar, aprovar o resultado ou corrigir o agente.",
     patterns: [
-      "Anatomia C · Registro: trilha + título fixos, trace em cascata no conteúdo",
-      "Passo selecionado mostra entrada e saída lado a lado",
+      "Anatomia C · Registro: trilha (Execuções › agente) + título fixos, trace em cascata no conteúdo",
+      "Passo selecionado mostra entrada e saída lado a lado; falha com mensagem em linguagem de gente",
       "Custo, tokens e tempo sempre visíveis",
-      "Saída que pede aprovação humana antes de agir; tentar de novo por passo",
+      "Executar de novo com useOperation (o botão informa enquanto roda)",
+      "Fim da execução: 'O que você quer fazer agora?' com 3 opções numeradas (↑ ↓ Enter, 1–3, Esc) e campo livre",
     ],
     adapt: [
       "Logs de automação, jobs de integração, pipelines de dados",
@@ -46,120 +56,170 @@ export const meta = {
     ],
     avoid: [
       "Mostrar só o resultado final sem como chegou nele",
+      "Terminar a execução sem próximo passo (o usuário volta para a lista sem saber o que fazer)",
     ],
   },
 } as const;
 
-/* ------------------------------------------------------------------ */
-/* Dados de exemplo                                                    */
-/* ------------------------------------------------------------------ */
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const kindLabel = { agent: "Agente", thinking: "Raciocínio", tool: "Ferramenta", search: "Busca", output: "Saída", error: "Erro" } as const;
+const toolIcon = { tool: <Database />, search: <Search />, output: <FileText />, thinking: <Sparkles />, agent: <Sparkles />, error: <X /> } as const;
 
-const trace: TraceStep[] = [
-  {
-    id: "run",
-    kind: "agent",
-    title: "Agente de follow-up",
-    startMs: 0,
-    durationMs: 9400,
-    tokens: 8420,
-    children: [
-      { id: "plan", kind: "thinking", title: "Planejar os passos", startMs: 0, durationMs: 1100, tokens: 640 },
-      { id: "crm", kind: "tool", title: "crm.buscar_negocio", startMs: 1100, durationMs: 420, tokens: 180 },
-      { id: "doc", kind: "tool", title: "arquivos.ler · Proposta v3.pdf", startMs: 1550, durationMs: 1300, tokens: 2600 },
-      {
-        id: "sub",
-        kind: "agent",
-        title: "Subagente de pesquisa",
-        startMs: 1550,
-        durationMs: 3900,
-        tokens: 2100,
-        children: [
-          { id: "web", kind: "search", title: "web.buscar · notícias", startMs: 1600, durationMs: 1200, tokens: 400 },
-          { id: "erp1", kind: "tool", title: "erp.consultar_faturas", startMs: 2850, durationMs: 1400, tokens: 120, status: "error" },
-          { id: "erp2", kind: "tool", title: "erp.consultar_faturas (nova tentativa)", startMs: 4300, durationMs: 1100, tokens: 260 },
-        ],
-      },
-      { id: "cross", kind: "thinking", title: "Cruzar proposta com histórico", startMs: 5500, durationMs: 1300, tokens: 1100 },
-      { id: "out", kind: "output", title: "Redigir e-mail de follow-up", startMs: 6800, durationMs: 2600, tokens: 1300 },
-    ],
-  },
-];
+function flat(steps: TraceStep[], out: TraceStep[] = []) {
+  steps.forEach((s) => {
+    out.push(s);
+    if (s.children) flat(s.children, out);
+  });
+  return out;
+}
 
-const details: Record<string, { input?: unknown; output?: unknown; error?: string; model?: string }> = {
-  plan: { model: "g4-pro", output: { passos: ["buscar negócio", "ler proposta", "pesquisar empresa", "consultar faturas", "redigir e-mail"] } },
-  crm: { input: { empresa: "Grupo Aurora Alimentos" }, output: { id: "NEG-2291", etapa: "Negociação", valor: 460800 } },
-  doc: { input: { arquivo: "Proposta v3.pdf" }, output: { preco_usuario_mes: 160, prazo_meses: 12, implantacao_dias: 60 } },
-  web: { input: { q: "Grupo Aurora Alimentos 2026" }, output: { resultados: 6, relevantes: 2 } },
-  erp1: { input: { cliente: "AURORA-01" }, error: "Tempo esgotado após 1,4 s (limite do conector). Repetido automaticamente." },
-  erp2: { input: { cliente: "AURORA-01" }, output: { faturas_abertas: 0, inadimplencia: false } },
-  cross: { model: "g4-pro", output: { riscos: ["SLA 99,9 %", "prazo de implantação"], argumento: "case Santa Clara" } },
-  out: { model: "g4-pro", output: { assunto: "Próximos passos · licenças Aurora", palavras: 142 } },
-};
-
-const calls: ToolCall[] = [
-  { id: "c1", name: "crm.buscar_negocio", label: "Buscou o negócio no CRM", icon: <Database />, status: "success", durationMs: 420, input: details.crm.input, output: details.crm.output },
-  { id: "c2", name: "arquivos.ler", label: "Leu a proposta v3", icon: <FileText />, status: "success", durationMs: 1300, input: details.doc.input, output: details.doc.output },
-  { id: "c3", name: "web.buscar", label: "Pesquisou notícias da empresa", icon: <Search />, status: "success", durationMs: 1200, input: details.web.input, output: details.web.output },
-  { id: "c4", name: "erp.consultar_faturas", label: "Consultou faturas no ERP (2 tentativas)", icon: <Database />, status: "success", durationMs: 2500, input: details.erp2.input, output: details.erp2.output },
-];
-
-const email = `Olá, Renata,
-
-Obrigado pela conversa de ontem. Ajustamos a proposta com o SLA de 99,9 % e multa por indisponibilidade, como o jurídico pediu, mantendo a implantação em 60 dias.
-
-Para seguirmos, preciso só da confirmação do número de usuários (240) até sexta. Com isso, envio a minuta final na segunda.
-
-Um abraço,
-Ana Lopes`;
-
-/* ------------------------------------------------------------------ */
-
-function findStep(steps: TraceStep[], id: string): TraceStep | undefined {
-  for (const s of steps) {
-    if (s.id === id) return s;
-    const c = s.children && findStep(s.children, id);
-    if (c) return c;
-  }
+/** "O que você quer fazer agora?": opções numeradas + pedido livre, tudo por teclado. */
+function NextActions({ agentId, agentName, onRerun, onDismiss }: { agentId: string; agentName: string; onRerun: () => void; onDismiss: () => void }) {
+  const [q, setQ] = useState("");
+  const options = [
+    { id: "rerun", label: "Rodar de novo com a mesma entrada", hint: "Útil depois de corrigir um conector", icon: <RotateCcw />, run: onRerun },
+    { id: "edit", label: "Alterar o agente", hint: `Abre ${agentName} no construtor: instruções, ferramentas e verificações`, icon: <PencilLine />, run: () => go("ai-agent-builder", agentId) },
+    { id: "schedule", label: "Ajustar agenda ou gatilho", hint: "Quando e com que frequência o agente roda", icon: <CalendarClock />, run: () => go("ai-agent-builder", { id: agentId, secao: "gatilhos" }) },
+  ];
+  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      onDismiss();
+      return;
+    }
+    if (!q && /^[1-3]$/.test(e.key)) {
+      e.preventDefault();
+      options[Number(e.key) - 1].run();
+    }
+  };
+  return (
+    <section aria-labelledby="next-title" className="rounded-xl border border-line bg-surface" onKeyDown={onKey}>
+      <header className="flex items-center gap-2 px-4 pt-3.5">
+        <h2 id="next-title" className="m-0 flex-1 text-[14px] font-medium">
+          O que você quer fazer agora?
+        </h2>
+        <span className="hidden text-[12px] text-muted sm:inline">↑ ↓ para escolher · Enter · Esc dispensa</span>
+        <IconButton label="Dispensar sugestões" size="sm" onClick={onDismiss}>
+          <X />
+        </IconButton>
+      </header>
+      <CommandMenu label="Próximo passo" value={q} onValueChange={setQ} filter={false} className="mt-2 rounded-none border-0 border-t border-line bg-transparent">
+        <CommandList maxHeight={260}>
+          {q.trim() ? (
+            <CommandGroup heading="Pedir ao agente">
+              <CommandItem value={`pedido ${q}`} icon={<Sparkles />} description="Abre o construtor com o seu pedido na conversa" onSelect={() => go("ai-agent-builder", { id: agentId, pedido: q.trim() })}>
+                {q.trim()}
+              </CommandItem>
+            </CommandGroup>
+          ) : (
+            options.map((o, i) => (
+              <CommandItem key={o.id} value={o.id} icon={o.icon} description={o.hint} shortcut={[String(i + 1)]} onSelect={o.run}>
+                {o.label}
+              </CommandItem>
+            ))
+          )}
+        </CommandList>
+        <CommandInput placeholder="Ou escreva o que fazer…" className="border-b-0 border-t" />
+      </CommandMenu>
+    </section>
+  );
 }
 
 export default function AiAgentRun() {
+  const id = useFrameParam("id", "RUN-4821");
+  const run = runById(id) ?? runs[0];
+  // key: trocar de execução (?id=) zera passo selecionado e sugestões.
+  return <RunRecord key={run.id} run={run} />;
+}
+
+function RunRecord({ run }: { run: Run }) {
+  const agent = agentById(run.agentId) ?? agents[0];
+  const { steps, io } = useMemo(() => traceOf(run), [run]);
+  const all = useMemo(() => flat(steps), [steps]);
+  const firstError = all.find((s) => s.status === "error" && s.id !== "run");
   const [tab, setTab] = useState("execucao");
-  const [sel, setSel] = useState("erp1");
-  const [approved, setApproved] = useState(false);
-  const step = useMemo(() => findStep(trace, sel), [sel]);
-  const d = details[sel];
+  const [sel, setSel] = useState(firstError?.id ?? all[1]?.id ?? "run");
+  const [showNext, setShowNext] = useState(true);
+  const rerun = useOperation({ busyLabel: "Executando de novo…" });
+  const step = all.find((s) => s.id === sel) ?? all[0];
+  const d = io[step.id];
+  const finished = run.status !== "executando";
+
+  const calls: ToolCall[] = all
+    .filter((s) => s.kind === "tool" || s.kind === "search")
+    .map((s) => ({
+      id: s.id,
+      name: s.title.split(" ")[0],
+      label: s.title,
+      icon: toolIcon[s.kind],
+      status: s.status === "error" ? "error" : s.status === "running" ? "running" : "success",
+      durationMs: s.durationMs,
+      input: io[s.id]?.input,
+      output: io[s.id]?.output ?? io[s.id]?.error,
+    }));
+
+  const doRerun = () => void rerun.run(() => wait(1400), `Execução ${run.id} enviada de novo · RUN-4831 na fila`);
+  const triggerText = run.trigger.by ? run.trigger.text : `${triggerKindLabel[run.trigger.kind]} · ${run.trigger.text}`;
+
   return (
-    <AssistantShell current={assistantRoutes.runs}>
+    <AgentShell current={agentRoutes.runs}>
       <Page>
         <PageHeading
-          crumbs={[{ label: "Execuções", href: assistantRoutes.runs }, { label: "RUN-4821" }]}
-          title="Follow-up · Grupo Aurora"
-          description="Agente de follow-up · disparado por Ana Lopes hoje às 09:41 · 9,4 s"
+          crumbs={[
+            { label: "Execuções", href: agentRoutes.runs },
+            { label: agent.name, href: frameHref("ai-agent", agent.id) },
+          ]}
+          title={run.subject}
+          description={`${run.id} · v${run.version} · ${triggerText} · ${runWhen(run.startedAt)}`}
           actions={
             <>
-              <Button variant="ghost" href={frameHref("crm-deal", { id: "d1" })}>
-                Abrir negócio
+              <Button variant="ghost" href={frameHref("ai-agent-builder", agent.id)}>
+                <PencilLine /> Editar agente
               </Button>
-              <Button variant="ghost" onClick={() => notify("Execução reiniciada", undefined, "info")}>
-                <RotateCcw /> Executar de novo
-              </Button>
-              <Button onClick={() => setTab("saida")}>
-                <Mail /> Ver e-mail gerado
-              </Button>
+              {run.status === "aguardando" && run.approvalId ? (
+                <>
+                  <OperationButton operation={rerun} variant="ghost" onClick={doRerun} disabled={!finished}>
+                    <RotateCcw /> Executar de novo
+                  </OperationButton>
+                  <Button href={frameHref("ai-approvals", run.approvalId)}>
+                    <ClipboardCheck /> Revisar aprovação
+                  </Button>
+                </>
+              ) : (
+                <OperationButton operation={rerun} onClick={doRerun} disabled={!finished} disabledReason="A execução ainda está rodando">
+                  <RotateCcw /> Executar de novo
+                </OperationButton>
+              )}
             </>
           }
         />
-        <div className="mt-6 space-y-6">
+        <div className="space-y-6">
+          <OperationFeedback operation={rerun} />
           <StatGrid cols={4}>
-            <StatCell label="Status" value={<span className="inline-flex items-center gap-1.5 text-ok"><Check className="h-4 w-4" /> Concluída</span>} hint="1 falha recuperada" />
-            <StatCell label="Duração" value={formatDuration(9400)} hint="p50 do agente: 11,2 s" />
-            <StatCell label="Tokens" value={formatNumber(8420)} hint="entrada 6.910 · saída 1.510" />
-            <StatCell label="Custo" value={formatCurrency(0.42)} hint="4 ferramentas · 3 chamadas de modelo" />
+            <StatCell
+              label="Status"
+              value={
+                <span className={run.status === "sucesso" ? "inline-flex items-center gap-1.5 text-ok" : run.status === "falhou" ? "inline-flex items-center gap-1.5 text-rose" : "inline-flex items-center gap-1.5"}>
+                  {run.status === "sucesso" ? <Check className="h-4 w-4" /> : run.status === "falhou" ? <X className="h-4 w-4" /> : <Clock className="h-4 w-4" />} {runStatusLabel[run.status]}
+                </span>
+              }
+              hint={run.retriedStep ? "1 falha recuperada" : run.failedStep ? `parou em “${agent.flow.find((f) => f.id === run.failedStep)?.title ?? run.failedStep}”` : undefined}
+            />
+            <StatCell label="Duração" value={formatDuration(run.durationMs)} hint={`p95 do agente: ${formatDuration(agent.p95Ms)}`} />
+            <StatCell label="Tokens" value={formatNumber(run.tokensIn + run.tokensOut)} hint={`entrada ${formatNumber(run.tokensIn)} · saída ${formatNumber(run.tokensOut)}`} />
+            <StatCell label="Custo" value={formatCurrency(run.cost)} hint={`${calls.length} ${calls.length === 1 ? "ferramenta" : "ferramentas"} · ${modelById(agent.model).name}`} />
           </StatGrid>
 
-          <SystemMessage tone="warn" title="Uma ferramenta falhou e foi repetida">
-            <span>erp.consultar_faturas estourou o tempo do conector na 1ª tentativa. A 2ª tentativa respondeu em 1,1 s.</span>
-          </SystemMessage>
+          {run.retriedStep && run.error && (
+            <SystemMessage tone="warn" title="Uma ferramenta falhou e foi repetida">
+              <span>{run.error}</span>
+            </SystemMessage>
+          )}
+          {run.status === "falhou" && run.error && (
+            <SystemMessage tone="error" title="A execução parou">
+              <span>{run.error}</span>
+            </SystemMessage>
+          )}
 
           <Tabs
             label="Seções da execução"
@@ -174,19 +234,19 @@ export default function AiAgentRun() {
 
           {tab === "execucao" && (
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-              <AgentTrace steps={trace} selectedId={sel} onSelect={(s) => setSel(s.id)} label="Trace da execução RUN-4821" />
+              <AgentTrace steps={steps} selectedId={sel} onSelect={(s) => setSel(s.id)} label={`Trace da execução ${run.id}`} />
               <section className="min-w-0 rounded-xl border border-line bg-surface">
                 <header className="border-b border-line px-4 py-3">
                   <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Passo selecionado</p>
-                  <h2 className="m-0 mt-1 truncate text-[14px] font-semibold">{step?.title}</h2>
+                  <h2 className="m-0 mt-1 truncate text-[14px] font-semibold">{step.title}</h2>
                 </header>
                 <div className="space-y-4 px-4 py-4">
                   <PropertyList
                     items={[
-                      { label: "Tipo", value: step && { agent: "Agente", thinking: "Raciocínio", tool: "Ferramenta", search: "Busca", output: "Saída", error: "Erro" }[step.kind] },
-                      { label: "Início", value: step && `+${formatDuration(step.startMs)}` },
-                      { label: "Duração", value: step && formatDuration(step.durationMs) },
-                      { label: "Tokens", value: step?.tokens != null ? formatNumber(step.tokens) : undefined },
+                      { label: "Tipo", value: kindLabel[step.kind] },
+                      { label: "Início", value: `+${formatDuration(step.startMs)}` },
+                      { label: "Duração", value: formatDuration(step.durationMs) },
+                      { label: "Tokens", value: step.tokens != null ? formatNumber(step.tokens) : undefined },
                       { label: "Modelo", value: d?.model },
                     ]}
                   />
@@ -207,6 +267,7 @@ export default function AiAgentRun() {
                       <JsonView value={d.output} maxHeight={200} />
                     </div>
                   )}
+                  {d?.input === undefined && d?.output === undefined && !d?.error && <p className="m-0 text-[12.5px] text-muted">Este passo não registra entrada nem saída (raciocínio interno do modelo).</p>}
                 </div>
               </section>
             </div>
@@ -216,37 +277,46 @@ export default function AiAgentRun() {
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
               <section className="min-w-0 rounded-xl border border-line bg-surface">
                 <header className="flex flex-wrap items-center gap-2 border-b border-line px-5 py-3">
-                  <h2 className="m-0 text-[14px] font-semibold">Próximos passos · licenças Aurora</h2>
-                  <AiBadge label="Rascunho da IA" />
-                  {approved && <Badge tone="ok">Aprovado</Badge>}
-                  <span className="ml-auto text-[12px] text-muted">para renata.farias@aurora.com.br</span>
+                  <h2 className="m-0 text-[14px] font-semibold">{run.output?.title ?? "Resultado"}</h2>
+                  <AiBadge label="Gerado pela IA" />
+                  {run.status === "aguardando" && <Badge tone="warn">Aguardando aprovação</Badge>}
+                  {run.output?.to && <span className="ml-auto text-[12px] text-muted">para {run.output.to}</span>}
                 </header>
-                <pre className="m-0 whitespace-pre-wrap px-5 py-4 font-sans text-[14px] leading-relaxed text-ink">{email}</pre>
-                <footer className="flex flex-wrap justify-end gap-2 border-t border-line bg-soft/40 px-5 py-3">
-                  <Button variant="ghost" size="sm">
-                    <PencilLine /> Editar
-                  </Button>
-                  <Button
-                    size="sm"
-                    disabled={approved}
-                    onClick={() => {
-                      setApproved(true);
-                      notify("E-mail enviado e registrado no negócio", () => setApproved(false));
-                    }}
-                  >
-                    <Play /> Aprovar e enviar
-                  </Button>
-                </footer>
+                {run.output ? (
+                  <pre className="m-0 whitespace-pre-wrap px-5 py-4 font-sans text-[14px] leading-relaxed text-ink">{run.output.body}</pre>
+                ) : (
+                  <p className="m-0 px-5 py-4 text-[13.5px] leading-relaxed text-ink-soft">
+                    {run.status === "falhou"
+                      ? "Sem saída: a execução parou antes do último passo. Veja o erro na aba Execução."
+                      : run.status === "executando"
+                        ? "O agente ainda está trabalhando. A saída aparece aqui quando terminar."
+                        : `${agent.name} concluiu “${run.subject}” e registrou o resultado em ${agent.tools[0]?.label ?? "suas ferramentas"}.`}
+                  </p>
+                )}
+                {run.status === "aguardando" && run.approvalId && (
+                  <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-line bg-soft/40 px-5 py-3">
+                    <span className="text-[12.5px] text-muted">Nada sai sem aprovação humana.</span>
+                    <Button size="sm" href={frameHref("ai-approvals", run.approvalId)}>
+                      <ClipboardCheck /> Revisar e aprovar
+                    </Button>
+                  </footer>
+                )}
               </section>
               <aside className="space-y-4">
                 <div className="rounded-xl border border-line bg-surface p-4">
-                  <TokenUsageMeter used={62480} limit={100000} label="Créditos do time neste mês" unit="tokens" resetsIn="em 1º de outubro" />
+                  <TokenUsageMeter used={creditPlan.used} limit={creditPlan.limit} label="Créditos da Acme neste mês" unit="reais" resetsIn="em 1º de outubro" />
                 </div>
                 <div className="rounded-xl border border-line bg-surface p-4 text-[12.5px] leading-relaxed text-muted">
                   <p className="m-0 flex items-center gap-1.5 font-medium text-ink">
-                    <Clock className="h-3.5 w-3.5" /> Aprovação humana obrigatória
+                    <Clock className="h-3.5 w-3.5" /> Aprovação humana
                   </p>
-                  <p className="m-0 mt-1">Este agente só envia e-mails depois que alguém do time aprova. Configure em Agentes › Follow-up › Permissões.</p>
+                  <p className="m-0 mt-1">
+                    Passos que mexem com clientes ou dinheiro esperam alguém do time. Ajuste em{" "}
+                    <a href={frameHref("ai-agent-governance", { secao: "aprovacao" })} className="font-medium text-ink underline-offset-2 hover:underline">
+                      Governança › Aprovação humana
+                    </a>
+                    .
+                  </p>
                 </div>
               </aside>
             </div>
@@ -257,8 +327,10 @@ export default function AiAgentRun() {
               <ToolCallsSection calls={calls} defaultOpen />
             </div>
           )}
+
+          {finished && showNext && <NextActions agentId={agent.id} agentName={agent.name} onRerun={doRerun} onDismiss={() => setShowNext(false)} />}
         </div>
       </Page>
-    </AssistantShell>
+    </AgentShell>
   );
 }

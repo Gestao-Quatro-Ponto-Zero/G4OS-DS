@@ -4,7 +4,7 @@
 - Categoria: IA
 - Preview: showcase `#/frame/ai-agent-builder` (`?theme=dark` para o escuro)
 
-Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar.
+Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).
 
 ## Conceito
 
@@ -30,4 +30,4 @@ Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, proprieda
 
 ## Componentes usados
 
-`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `BuilderSection`, `ChipPicker`, `MenuEntry`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `ToolGlyph`, `TriggerList`, `notify`
+`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `BuilderSection`, `Button`, `ChipPicker`, `MenuEntry`, `Modal`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `TextField`, `ToolGlyph`, `TriggerList`, `notify`

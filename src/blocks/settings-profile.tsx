@@ -3,8 +3,10 @@ import { useState } from "react";
 import {
   Avatar,
   Button,
+  Callout,
   ConfirmDialog,
   MaskedField,
+  Modal,
   Select,
   TextField,
   TextareaField,
@@ -12,6 +14,7 @@ import {
   notify,
   SettingsSection } from "@g4ai/ds";
 import { me, org } from "./data/workspace";
+import { frameHref, goTo } from "./shells/frame-route";
 import { SettingsShell } from "./shells/settings-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -71,6 +74,20 @@ export default function SettingsProfileBlock() {
   const [form, setForm] = useState(initial);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [emailTried, setEmailTried] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const emailError = !/.+@.+\..+/.test(newEmail) ? "Escreva um e-mail válido." : newEmail === form.email ? "Esse já é o seu e-mail." : undefined;
+  const requestEmail = () => {
+    setEmailTried(true);
+    if (emailError) return;
+    setPendingEmail(newEmail);
+    setEmailOpen(false);
+    setEmailTried(false);
+    notify(`Link de confirmação enviado para ${newEmail}`);
+  };
   const set = <K extends keyof typeof form>(k: K) => (v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
   const dirty = JSON.stringify(form) !== JSON.stringify(saved);
   const nameError = !form.name.trim() ? "Informe seu nome." : undefined;
@@ -89,12 +106,32 @@ export default function SettingsProfileBlock() {
     <SettingsShell slug="settings-profile" title="Perfil" description="Como você aparece para o time e para clientes em e-mails e propostas.">
       <SettingsSection title="Foto" description="Quadrada, pelo menos 256 px. Sem foto, usamos suas iniciais.">
         <div className="flex items-center gap-4">
-          <Avatar initials={me.initials} tint={me.tint} size="lg" name={form.name} />
+          <Avatar initials={me.initials} tint={me.tint} src={photo ?? undefined} size="lg" name={form.name} />
           <label className="ui-button inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg bg-surface px-3 py-2 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft [&_svg]:h-4 [&_svg]:w-4">
             <Camera /> Enviar foto
-            <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && notify(`Foto “${e.target.files[0].name}” enviada`)} />
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setPhoto(URL.createObjectURL(file));
+                notify(`Foto “${file.name}” enviada`);
+              }}
+            />
           </label>
-          <Button size="sm" variant="quiet" onClick={() => notify("Foto removida; usando suas iniciais", undefined, "info")}>
+          <Button
+            size="sm"
+            variant="quiet"
+            disabled={!photo}
+            disabledReason="Você ainda não enviou uma foto"
+            onClick={() => {
+              const before = photo;
+              setPhoto(null);
+              notify("Foto removida; usando suas iniciais", () => setPhoto(before));
+            }}
+          >
             Remover
           </Button>
         </div>
@@ -108,12 +145,31 @@ export default function SettingsProfileBlock() {
           onChange={set("email")}
           readOnly
           corner={
-            <button type="button" className="text-blue hover:underline" onClick={() => notify("Enviamos um link para confirmar o novo e-mail", undefined, "info")}>
+            <button type="button" className="text-blue hover:underline" onClick={() => {
+                setNewEmail("");
+                setEmailOpen(true);
+              }}
+            >
               Alterar
             </button>
           }
           hint="Para trocar o e-mail, confirmamos pelo endereço novo."
         />
+        {pendingEmail && (
+          <div className="mb-5">
+            <Callout
+              tone="warn"
+              title="Confirmação pendente"
+              action={
+                <Button size="sm" variant="ghost" onClick={() => { setPendingEmail(null); notify("Troca de e-mail cancelada"); }}>
+                  Cancelar troca
+                </Button>
+              }
+            >
+              Abra o link que enviamos para {pendingEmail}. Até lá, você continua entrando com {form.email}.
+            </Callout>
+          </div>
+        )}
         <div className="grid gap-x-4 sm:grid-cols-2">
           <TextField label="Cargo" value={form.title} onChange={set("title")} optional />
           <MaskedField label="Celular" mask={masks.phone} value={form.phone} onChange={(m) => set("phone")(m)} type="tel" optional />
@@ -154,12 +210,30 @@ export default function SettingsProfileBlock() {
         </div>
       )}
 
+      <Modal
+        open={emailOpen}
+        onClose={() => setEmailOpen(false)}
+        title="Alterar e-mail"
+        description="Enviamos um link para o endereço novo. A troca só vale depois que você confirmar."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setEmailOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={requestEmail}>Enviar link de confirmação</Button>
+          </>
+        }
+      >
+        <TextField label="Novo e-mail" type="email" value={newEmail} onChange={setNewEmail} placeholder={`nome@${org.domain}`} autoComplete="email" error={emailTried ? emailError : undefined} />
+      </Modal>
+
       <ConfirmDialog
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
         onConfirm={() => {
           setConfirmDelete(false);
-          notify("Pedido de exclusão registrado", undefined, "info");
+          notify("Conta excluída. Seus dados pessoais são apagados em até 30 dias.");
+          goTo(frameHref("auth-login"));
         }}
         tone="danger"
         title="Excluir sua conta?"

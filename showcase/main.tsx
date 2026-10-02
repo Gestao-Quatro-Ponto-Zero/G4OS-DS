@@ -44,7 +44,7 @@ const isDoc = (p: PageModule) => (docGroups as readonly string[]).includes(p.met
 const byCategory = (cat: string) => blocks.filter((b) => b.meta.category === cat).sort((a, b) => (a.meta.order ?? 50) - (b.meta.order ?? 50));
 const categories = blockCategories.filter((c) => byCategory(c).length);
 const slugCat = (c: string) => normalize(c).replace(/\s+/g, "-");
-const featuredSlugs = ["saas-dashboard", "crm-pipeline", "ats-pipeline", "erp-orders", "fin-cashflow", "auth-login", "app-presentation"];
+const featuredSlugs = ["saas-dashboard", "crm-pipeline", "ats-pipeline", "erp-orders", "srv-work-orders", "fin-cashflow", "clm-contract", "comms-home", "ai-agents-dashboard", "ai-agent", "auth-login", "app-presentation"];
 const featured = featuredSlugs.map((s) => blocks.find((b) => b.slug === s)).filter(Boolean) as BlockModule[];
 
 /* ------------------------------------------------------------------ */

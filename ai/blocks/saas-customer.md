@@ -26,4 +26,4 @@ Conta de cliente (?id=): saúde, uso diário, adoção por recurso, faturas, cha
 
 ## Componentes usados
 
-`ActionMenu`, `AreaChart`, `Badge`, `Button`, `ChartCard`, `Column`, `ConfirmDialog`, `DataTable`, `EntityMark`, `FieldBlock`, `KpiCard`, `KpiGrid`, `Modal`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `RadialBars`, `Select`, `SplitLayout`, `Tabs`, `formatCurrency`, `formatDate`, `formatNumber`, `notify`
+`ActionMenu`, `AreaChart`, `Badge`, `Banner`, `Button`, `ChartCard`, `Column`, `ConfirmDialog`, `DataTable`, `Drawer`, `EntityMark`, `FieldBlock`, `KpiCard`, `KpiGrid`, `Modal`, `NumberField`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `RadialBars`, `Select`, `SplitLayout`, `Tabs`, `TextareaField`, `formatCurrency`, `formatDate`, `formatNumber`, `notify`, `useOperation`

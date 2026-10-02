@@ -35,4 +35,4 @@ Menu com subitens que abrem e fecham, grupo de projetos recolhível com “+”,
 
 ## Componentes usados
 
-`AppShell`, `Button`, `Card`, `IconButton`, `MenuEntry`, `NavGroup`, `NavSubItem`, `Page`, `PageHeading`, `Sidebar`, `Workspace`, `WorkspaceMenu`, `navActiveDeep`, `notify`
+`AppShell`, `Button`, `Card`, `Command`, `CommandPalette`, `IconButton`, `MenuEntry`, `Modal`, `NavGroup`, `NavSubItem`, `Page`, `PageHeading`, `Sidebar`, `TextField`, `Workspace`, `WorkspaceMenu`, `navActiveDeep`, `notify`, `useCommandShortcut`

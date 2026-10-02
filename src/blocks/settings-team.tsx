@@ -1,4 +1,4 @@
-import { Mail, ShieldCheck, UserPlus } from "lucide-react";
+import { Mail, ShieldCheck, UserPlus, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   ActionMenu,
@@ -8,9 +8,11 @@ import {
   ChoiceCards,
   ConfirmDialog,
   DataTable,
+  Empty,
   Meter,
   Modal,
   InlineSelect,
+  Select,
   TableToolbar,
   TagInput,
   cn,
@@ -18,6 +20,7 @@ import {
   notify,
   type Column } from "@g4ai/ds";
 import { org, people, roleLabel, type Person, type Role } from "./data/workspace";
+import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { SettingsShell } from "./shells/settings-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -79,7 +82,14 @@ function UsageMeter({ label, value, limit, format = (n: number) => n.toLocaleStr
 /* ------------------------------------------------------------------ */
 
 export default function SettingsTeamBlock() {
-  const [members, setMembers] = useState(initialMembers);
+  // ?estado=carregando|vazio|erro simula os estados da lista.
+  const estado = useFrameParam("estado");
+  const [members, setMembers] = useState(() => (estado === "vazio" ? initialMembers.filter((m) => m.id === "joana") : initialMembers));
+  // ?papel=<id> chega de Papéis e permissões ("ver pessoas").
+  const papelParam = useFrameParam("papel");
+  const papel = papelParam && papelParam in roleLabel ? (papelParam as Role) : null;
+  const [transferring, setTransferring] = useState<Member | null>(null);
+  const [transferTo, setTransferTo] = useState("");
   const [q, setQ] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [emails, setEmails] = useState<string[]>([]);
@@ -87,7 +97,7 @@ export default function SettingsTeamBlock() {
   const [removing, setRemoving] = useState<Member | null>(null);
   const [inviteTried, setInviteTried] = useState(false);
 
-  const shown = useMemo(() => members.filter((m) => !q || normalize(`${m.name} ${m.email}`).includes(normalize(q))), [members, q]);
+  const shown = useMemo(() => members.filter((m) => (!q || normalize(`${m.name} ${m.email}`).includes(normalize(q))) && (!papel || m.role === papel)), [members, q, papel]);
   const used = members.filter((m) => m.role !== "leitor").length; // leitor não conta licença
   const admins = members.filter((m) => m.role === "admin").length;
 
@@ -138,8 +148,8 @@ export default function SettingsTeamBlock() {
         <ActionMenu
           label={`Ações para ${m.name}`}
           actions={[
-            ...(m.status === "convidado" ? [{ label: "Reenviar convite", onSelect: () => notify(`Convite reenviado para ${m.email}`) }] : [{ label: "Ver atividade" }]),
-            { label: "Transferir registros…" },
+            ...(m.status === "convidado" ? [{ label: "Reenviar convite", onSelect: () => notify(`Convite reenviado para ${m.email}`) }] : [{ label: "Ver atividade", onSelect: () => go("settings-audit-log", { pessoa: m.id }) }]),
+            ...(m.status === "ativo" ? [{ label: "Transferir registros…", onSelect: () => { setTransferTo(""); setTransferring(m); } }] : []),
             { label: m.status === "convidado" ? "Cancelar convite" : "Remover do espaço", tone: "danger" as const, separator: true, onSelect: () => setRemoving(m), disabled: m.role === "admin" && admins === 1 },
           ]}
         />
@@ -174,9 +184,62 @@ export default function SettingsTeamBlock() {
       </div>
 
       <div className="mb-3">
-        <TableToolbar query={q} onQuery={setQ} placeholder="Buscar por nome ou e-mail" shown={shown.length} total={members.length} noun="pessoa" dirty={!!q} onClear={() => setQ("")} hideSearch={false} />
+        <TableToolbar
+          query={q}
+          onQuery={setQ}
+          placeholder="Buscar por nome ou e-mail"
+          shown={shown.length}
+          total={members.length}
+          noun="pessoa"
+          dirty={!!q || !!papel}
+          onClear={() => {
+            setQ("");
+            setFrameQuery({ papel: undefined });
+          }}
+          hideSearch={false}
+        />
+        {papel && (
+          <p className="m-0 mt-2 text-[12.5px] text-muted">
+            Mostrando só quem é <span className="font-medium text-ink">{roleLabel[papel].toLowerCase()}</span>.{" "}
+            <button type="button" className="font-medium text-ink underline underline-offset-2" onClick={() => setFrameQuery({ papel: undefined })}>
+              Ver todos
+            </button>
+          </p>
+        )}
       </div>
-      <DataTable rows={shown} columns={columns} rowKey={(m) => m.id} />
+      <DataTable
+        rows={estado === "carregando" || estado === "erro" ? [] : shown}
+        columns={columns}
+        rowKey={(m) => m.id}
+        label="Membros do workspace"
+        loading={estado === "carregando"}
+        error={estado === "erro" ? { message: "Não foi possível carregar a equipe.", onRetry: () => setFrameQuery({ estado: undefined }) } : undefined}
+        empty={
+          <Empty
+            framed={false}
+            title="Ninguém com esse recorte"
+            hint={q ? `Nenhuma pessoa com “${q}” no nome ou e-mail${papel ? ` e papel ${roleLabel[papel].toLowerCase()}` : ""}.` : `Ninguém tem o papel ${papel ? roleLabel[papel].toLowerCase() : ""} ainda.`}
+            action={
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setQ("");
+                  setFrameQuery({ papel: undefined });
+                }}
+              >
+                Limpar busca e filtros
+              </Button>
+            }
+          />
+        }
+      />
+      {/* Vazio: o workspace sempre tem quem o criou; o estado vazio é "só você". */}
+      {members.length <= 1 && !q && !papel && estado !== "carregando" && estado !== "erro" && (
+        <div className="mt-3">
+          <Empty icon={<Users />} title="Só você por aqui" hint="Convide quem trabalha com você para dividir registros e tarefas. O convite vale por 7 dias." />
+        </div>
+      )}
 
       <div className="mt-8 rounded-xl border border-line bg-soft/40 px-4 py-4">
         <h3 className="m-0 flex items-center gap-2 text-[13.5px] font-medium">
@@ -231,6 +294,38 @@ export default function SettingsTeamBlock() {
             { value: "membro", label: "Membro", description: "Trabalha nos módulos" },
             { value: "leitor", label: "Leitor", description: "Só visualiza" },
           ]}
+        />
+      </Modal>
+
+      <Modal
+        open={!!transferring}
+        onClose={() => setTransferring(null)}
+        title={`Transferir registros de ${transferring?.name ?? ""}`}
+        description="Negócios, tarefas e documentos dessa pessoa passam para quem você escolher. O histórico continua com o nome original."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setTransferring(null)}>
+              Cancelar
+            </Button>
+            <Button
+              disabledReason={!transferTo ? "Escolha quem vai receber os registros" : undefined}
+              onClick={() => {
+                const to = members.find((x) => x.id === transferTo);
+                notify(`Registros de ${transferring?.name.split(" ")[0]} transferidos para ${to?.name}`);
+                setTransferring(null);
+              }}
+            >
+              Transferir registros
+            </Button>
+          </>
+        }
+      >
+        <Select
+          label="Transferir para"
+          value={transferTo}
+          onValueChange={setTransferTo}
+          placeholder="Escolha uma pessoa"
+          options={members.filter((x) => x.status === "ativo" && x.id !== transferring?.id && x.role !== "leitor").map((x) => ({ value: x.id, label: x.name }))}
         />
       </Modal>
 

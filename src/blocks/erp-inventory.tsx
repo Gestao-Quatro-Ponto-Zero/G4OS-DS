@@ -1,4 +1,4 @@
-import { ArrowDownUp, PackagePlus, ShoppingBag } from "lucide-react";
+import { ArrowDownUp, Boxes, History, PackagePlus, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import {
   Badge,
@@ -6,6 +6,7 @@ import {
   Callout,
   ChartCard,
   DataTable,
+  Empty,
   EmptyFilterResult,
   FieldBlock,
   FilterBar,
@@ -29,9 +30,9 @@ import {
   type Column,
   type FilterField, PageToolbar
 } from "@g4ai/ds";
-import { categories, coverageDays, levelInfo, levelOf, products as seed, qtyOf, today, warehouses, type Level, type Product, type WarehouseId } from "./data/erp";
+import { addPurchaseRequest, addStockMove, productStatusOf, suggestedQty, categories, coverageDays, levelInfo, levelOf, products as seed, qtyOf, today, warehouses, type Level, type Product, type WarehouseId } from "./data/erp";
 import { go } from "./shells/frame-route";
-import { NexoShell } from "./shells/nexo-shell";
+import { NexoShell, demoError, useDemoState } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -65,8 +66,11 @@ const fields: FilterField<Product>[] = [
   { key: "value", label: "Valor em estoque", type: "currency", accessor: (p) => qtyOf(p) * p.cost },
 ];
 
+const snapshot = () => seed.filter((p) => productStatusOf(p) === "ativo").map((p) => ({ ...p, stock: { ...p.stock } }));
+
 export default function ErpInventory() {
-  const [items, setItems] = useState(seed);
+  const demo = useDemoState();
+  const [items, setItems] = useState(() => (demo === "vazio" ? [] : snapshot()));
   const [modal, setModal] = useState<"transfer" | "entry" | null>(null);
   const [sku, setSku] = useState(seed[1].sku);
   const [from, setFrom] = useState<WarehouseId>("gyn");
@@ -80,18 +84,19 @@ export default function ErpInventory() {
   const byCategory = categories.map((label) => ({ label, value: items.filter((p) => p.category === label).reduce((s, p) => s + qtyOf(p) * p.cost, 0) }));
   const to: WarehouseId = from === "gyn" ? "cps" : "gyn";
 
+  // Grava no kardex (erp-stock-movements) e atualiza o saldo; a lista relê o catálogo.
   const apply = () => {
     if (!qty) return;
     const p = items.find((x) => x.sku === sku)!;
-    const before = items;
     if (modal === "transfer") {
       const n = Math.min(qty, p.stock[from]);
-      setItems((all) => all.map((x) => (x.sku === sku ? { ...x, stock: { ...x.stock, [from]: x.stock[from] - n, [to]: x.stock[to] + n } } : x)));
-      notify(`${n} ${p.unit} de ${p.sku} transferidos para ${warehouses.find((w) => w.id === to)?.name}`, () => setItems(before));
+      const m = addStockMove({ sku, kind: "transferencia", warehouse: from, to, qty: n, doc: `TR-00${92 + Math.floor(Math.random() * 8)}`, who: "Paulo Menezes" });
+      notify(`${n} ${p.unit} de ${p.sku} transferidos para ${warehouses.find((w) => w.id === to)?.name} · ${m.doc}`);
     } else {
-      setItems((all) => all.map((x) => (x.sku === sku ? { ...x, stock: { ...x.stock, [from]: x.stock[from] + qty } } : x)));
-      notify(`Entrada de ${qty} ${p.unit} de ${p.sku} registrada${nf ? ` (NF ${nf})` : ""}`, () => setItems(before));
+      addStockMove({ sku, kind: "entrada", warehouse: from, qty, doc: nf ? `NF ${nf}` : "Entrada provisória", who: "Paulo Menezes", reason: nf ? undefined : "Sem nota: aguarda conferência" });
+      notify(`Entrada de ${qty} ${p.unit} de ${p.sku} registrada${nf ? ` (NF ${nf})` : " como provisória"}`);
     }
+    setItems(snapshot());
     setModal(null);
   };
 
@@ -160,10 +165,13 @@ export default function ErpInventory() {
     <NexoShell section="estoque">
       <Page>
         <PageHeading
-          title="Estoque"
+          title="Posição de estoque"
           description="Saldo físico por depósito. Cobertura: quantos dias o saldo dura no consumo médio dos últimos 30 dias."
           actions={
             <>
+              <Button variant="ghost" onClick={() => go("erp-stock-movements")}>
+                <History /> Movimentações
+              </Button>
               <Button variant="ghost" onClick={() => setModal("transfer")}>
                 <ArrowDownUp /> Transferir
               </Button>
@@ -183,8 +191,13 @@ export default function ErpInventory() {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    notify(`Requisição de compra criada com ${critical.length} itens · aguarda aprovação`);
-                    go("erp-purchase-requests");
+                    const r = addPurchaseRequest({
+                      title: `Reposição de ${critical.length} itens em ruptura ou abaixo do mínimo`,
+                      items: critical.map((p) => ({ name: p.name, qty: suggestedQty(p), unit: p.unit, sku: p.sku })),
+                      urgent: critical.some((p) => levelOf(p) === "ruptura"),
+                    });
+                    notify(`${r.number} criada com ${critical.length} itens · aguarda o gestor da área`);
+                    go("erp-purchase-requests", r.id);
                   }}
                 >
                   <ShoppingBag /> Gerar requisição
@@ -212,7 +225,23 @@ export default function ErpInventory() {
             <PageToolbar>
               <FilterBar filters={filters} noun="item" nounPlural="itens" search={<TableSearch value={q} onChange={filters.setQuery} total={items.length} noun="item" nounPlural="itens" searchIn="SKU, descrição e NCM" />} />
             </PageToolbar>
-            <DataTable rows={sort.rows} columns={columns} rowKey={(p) => p.sku} onRowClick={(p) => go("erp-product", p.sku)} rowLabel={(p) => `Abrir ${p.name}`} empty={<EmptyFilterResult filters={filters} noun="item" nounPlural="itens" />} />
+            <DataTable
+              label="Posição de estoque"
+              rows={sort.rows}
+              columns={columns}
+              rowKey={(p) => p.sku}
+              onRowClick={(p) => go("erp-product", p.sku)}
+              rowLabel={(p) => `Abrir ${p.name}`}
+              loading={demo === "carregando"}
+              error={demoError(demo, "o estoque")}
+              empty={
+                items.length === 0 ? (
+                  <Empty icon={<Boxes />} title="Nenhum item com saldo" hint="O estoque aparece aqui depois do primeiro recebimento de mercadoria ou do inventário inicial." action={<Button size="sm" onClick={() => go("erp-receiving")}><PackagePlus /> Registrar recebimento</Button>} framed={false} />
+                ) : (
+                  <EmptyFilterResult filters={filters} noun="item" nounPlural="itens" />
+                )
+              }
+            />
           </div>
         </div>
       </Page>

@@ -27,4 +27,4 @@ Quem fez o quê e quando: busca, filtros por pessoa, área e risco, período, ex
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `Drawer`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `Highlight`, `PageToolbar`, `Pagination`, `PropertyList`, `TableSearch`, `notify`, `useFilters`, `usePagination`
+`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `Drawer`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `FilterState`, `Highlight`, `PageToolbar`, `Pagination`, `PropertyList`, `TableSearch`, `downloadCsv`, `notify`, `useFilters`, `usePagination`

@@ -27,4 +27,4 @@ Membros com papel editável na linha, convites pendentes, uso de licenças, moda
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Badge`, `Button`, `ChoiceCards`, `Column`, `ConfirmDialog`, `DataTable`, `Meter`, `Modal`, `TableToolbar`, `TagInput`, `normalize`, `notify`
+`ActionMenu`, `Avatar`, `Badge`, `Button`, `ChoiceCards`, `Column`, `ConfirmDialog`, `DataTable`, `Empty`, `Meter`, `Modal`, `Select`, `TableToolbar`, `TagInput`, `normalize`, `notify`

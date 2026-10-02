@@ -26,4 +26,4 @@ Modelos prontos, relatórios salvos com agendamento, execução manual e criaç�
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Badge`, `Button`, `Card`, `Column`, `DataTable`, `FieldBlock`, `FieldGrid`, `Modal`, `Page`, `PageHeading`, `Select`, `Sparkline`, `TagInput`, `TextField`, `formatDate`, `notify`
+`ActionMenu`, `Avatar`, `Badge`, `Button`, `Card`, `Column`, `DataTable`, `Empty`, `FieldBlock`, `FieldGrid`, `Modal`, `Page`, `PageHeading`, `Select`, `Sparkline`, `TagInput`, `TextField`, `formatDate`, `notify`

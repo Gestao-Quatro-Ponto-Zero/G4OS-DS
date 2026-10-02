@@ -6,21 +6,25 @@ import {
   Button,
   ConfirmDialog,
   Drawer,
+  Empty,
+  EmptyFilterResult,
   FieldBlock,
   Modal,
   Page,
   PageHeading,
   SegmentedControl,
   Select,
+  Skeleton,
   Switch,
   TableSearch,
   TextField,
   cn,
-  matchesQuery,
   notify,
+  useFilters,
+  type FilterField,
 } from "@g4ai/ds";
 import { integrations as base, type Integration } from "./data/saas";
-import { SaasShell } from "./shells/saas-shell";
+import { ListError, SaasShell, useDemoState } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -47,17 +51,21 @@ export const meta = {
 
 const here = "#/frame/saas-integrations";
 const categories = ["Todas", "CRM", "Comunicação", "Dados", "Pagamentos", "Automação"] as const;
+const fields: FilterField<Integration>[] = [
+  { key: "category", label: "Categoria", type: "enum", accessor: (i) => i.category, options: categories.slice(1).map((c) => ({ value: c, label: c })) },
+];
 
 export default function SaasIntegrations() {
   const [items, setItems] = useState(base);
-  const [cat, setCat] = useState<(typeof categories)[number]>("Todas");
-  const [query, setQuery] = useState("");
+  const estado = useDemoState();
   const [connecting, setConnecting] = useState<Integration | null>(null);
   const [configuring, setConfiguring] = useState<Integration | null>(null);
   const [disconnecting, setDisconnecting] = useState<Integration | null>(null);
   const [freq, setFreq] = useState("15 min");
 
-  const list = items.filter((i) => (cat === "Todas" || i.category === cat) && matchesQuery(query, [i.name, i.description, i.category]));
+  const filters = useFilters(estado === "vazio" ? [] : items, { fields, search: (i) => [i.name, i.description, i.category] });
+  const list = filters.rows;
+  const cat = (filters.facetValue("category")[0] ?? "Todas") as (typeof categories)[number];
   const broken = items.filter((i) => i.connected && i.status === "erro");
   const patch = (id: string, p: Partial<Integration>) => setItems((all) => all.map((i) => (i.id === id ? { ...i, ...p } : i)));
 
@@ -88,11 +96,41 @@ export default function SaasIntegrations() {
           </Banner>
         ))}
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <TableSearch value={query} onChange={setQuery} total={items.length} noun="integração" nounPlural="integrações" searchIn="nome e descrição" className="w-full sm:w-72" />
+          <TableSearch value={filters.state.query} onChange={filters.setQuery} total={items.length} noun="integração" nounPlural="integrações" searchIn="nome e descrição" className="w-full sm:w-72" />
           <div className="max-w-full overflow-x-auto">
-            <SegmentedControl label="Categoria" value={cat} onChange={setCat} options={categories.map((c) => ({ value: c, label: c }))} />
+            <SegmentedControl label="Categoria" value={cat} onChange={(c) => filters.setFacet("category", c === "Todas" ? [] : [c])} options={categories.map((c) => ({ value: c, label: c }))} />
           </div>
         </div>
+        {estado === "carregando" ? (
+          <div role="status" aria-label="Carregando integrações" className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }, (_, k) => (
+              <div key={k} className="rounded-xl border border-line bg-surface p-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <span className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-2.5 w-1/4" />
+                  </span>
+                </div>
+                <Skeleton className="mt-4 h-3 w-full" />
+                <Skeleton className="mt-2 h-3 w-3/4" />
+                <Skeleton className="mt-5 h-7 w-24" />
+              </div>
+            ))}
+          </div>
+        ) : estado === "erro" ? (
+          <div className="mt-5">
+            <ListError noun="as integrações" />
+          </div>
+        ) : !filters.total ? (
+          <div className="mt-5">
+            <Empty title="Catálogo indisponível" hint="Nenhuma integração liberada para este workspace. Fale com o suporte para habilitar o catálogo." action={<Button href="#/frame/saas-support">Falar com o suporte</Button>} />
+          </div>
+        ) : !list.length ? (
+          <div className="mt-5 rounded-xl border border-line bg-surface">
+            <EmptyFilterResult filters={filters} noun="integração" nounPlural="integrações" gender="f" />
+          </div>
+        ) : (
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {list.map((i) => (
             <article key={i.id} className={cn("surface-card flex flex-col rounded-xl border bg-surface p-4", i.connected && i.status === "erro" ? "border-rose/30" : "border-line")}>
@@ -124,8 +162,8 @@ export default function SaasIntegrations() {
               </div>
             </article>
           ))}
-          {!list.length && <p className="col-span-full py-10 text-center text-[13px] text-muted">Nenhuma integração encontrada. Peça uma nova pelo suporte.</p>}
         </div>
+        )}
       </Page>
 
       <Modal

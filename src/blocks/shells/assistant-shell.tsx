@@ -1,6 +1,7 @@
 import { ArrowLeft, Coins, History, KanbanSquare, MessagesSquare, Plug, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppShell, Sidebar, type NavGroup, type NavItem } from "@g4ai/ds";
+import { runs } from "../data/agents";
 import { me, org } from "../data/workspace";
 import { atlasRoutes } from "./atlas-shell";
 import { frameHref } from "./frame-route";
@@ -8,12 +9,14 @@ import { frameHref } from "./frame-route";
 /*
  * Casca do "Assistente G4": conversas, execuções de agentes e o assistente
  * dentro do CRM. Mesmo workspace (Acme) e mesma pessoa do Atlas.
+ * "Execuções" abre a lista da frota (Agente G4): o contador é de execuções
+ * esperando aprovação, não o total.
  * Celular: pílula com Conversas · Execuções · No CRM; o resto em "Mais".
  */
 
 export const assistantRoutes = {
   chat: frameHref("ai-chat"),
-  runs: frameHref("ai-agent-run"),
+  runs: frameHref("ai-runs"),
   inCrm: frameHref("ai-assistant"),
   models: frameHref("settings-integrations", { id: "claude" }),
   usage: frameHref("settings-billing"),
@@ -21,7 +24,7 @@ export const assistantRoutes = {
 
 const main: NavItem[] = [
   { href: assistantRoutes.chat, label: "Conversas", icon: MessagesSquare },
-  { href: assistantRoutes.runs, label: "Execuções", icon: History, badge: 1 },
+  { href: assistantRoutes.runs, label: "Execuções", icon: History, badge: runs.filter((r) => r.status === "aguardando").length },
   { href: assistantRoutes.inCrm, label: "No CRM", icon: KanbanSquare },
 ];
 

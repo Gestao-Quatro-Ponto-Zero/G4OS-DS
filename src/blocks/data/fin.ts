@@ -15,13 +15,49 @@ export const finUser = { name: "Helena Duarte", initials: "HD", role: "Controlle
 /* Contas bancárias                                                    */
 /* ------------------------------------------------------------------ */
 
-export type BankAccount = { id: string; bank: string; label: string; balance: number; pending: number };
+export type BankAccount = {
+  id: string;
+  bank: string;
+  /** Código de compensação (341 Itaú, 001 BB, 077 Inter). */
+  code: string;
+  label: string;
+  kind: "Conta corrente" | "Aplicação";
+  agency: string;
+  number: string;
+  balance: number;
+  pending: number;
+  /** Última conciliação concluída (ISO) e quem fez. */
+  lastReconciled: string;
+  reconciledBy: string;
+  /** Limite de cheque especial / conta garantida (0 = sem limite). */
+  overdraft: number;
+  /** Uso: o que passa por esta conta. */
+  purpose: string;
+  /** Integração do extrato: automática (API/Open Finance) ou arquivo OFX. */
+  feed: "Open Finance" | "OFX manual";
+};
 export const accounts: BankAccount[] = [
-  { id: "itau", bank: "Itaú", label: "Itaú · CC 1234-5", balance: 612_400, pending: 6 },
-  { id: "bb", bank: "Banco do Brasil", label: "Banco do Brasil · CC 98.765-0", balance: 318_900, pending: 2 },
-  { id: "inter", bank: "Inter", label: "Inter · CC 55.432-1", balance: 142_700, pending: 0 },
-  { id: "cdb", bank: "Itaú", label: "Aplicação CDB liquidez diária", balance: 81_000, pending: 0 },
+  { id: "itau", bank: "Itaú", code: "341", label: "Itaú · CC 1234-5", kind: "Conta corrente", agency: "0912", number: "1234-5", balance: 612_400, pending: 6, lastReconciled: iso(-1), reconciledBy: "Helena Duarte", overdraft: 200_000, purpose: "Recebimentos de boleto e pagamentos a fornecedores", feed: "Open Finance" },
+  { id: "bb", bank: "Banco do Brasil", code: "001", label: "Banco do Brasil · CC 98.765-0", kind: "Conta corrente", agency: "3401-2", number: "98.765-0", balance: 318_900, pending: 2, lastReconciled: iso(-4), reconciledBy: "Helena Duarte", overdraft: 100_000, purpose: "Folha de pagamento e tributos (DARF, GPS)", feed: "OFX manual" },
+  { id: "inter", bank: "Inter", code: "077", label: "Inter · CC 55.432-1", kind: "Conta corrente", agency: "0001", number: "55.432-1", balance: 142_700, pending: 0, lastReconciled: iso(0), reconciledBy: "conciliação automática", overdraft: 0, purpose: "Pix de clientes do varejo e cartão", feed: "Open Finance" },
+  { id: "cdb", bank: "Itaú", code: "341", label: "Aplicação CDB liquidez diária", kind: "Aplicação", agency: "0912", number: "CDB 77.120-4", balance: 81_000, pending: 0, lastReconciled: iso(0), reconciledBy: "conciliação automática", overdraft: 0, purpose: "Reserva de caixa · 102 % do CDI", feed: "Open Finance" },
 ];
+export const accountById = (id: string) => accounts.find((a) => a.id === id);
+/** Entradas e saídas dos últimos 7 dias úteis de uma conta (para as barrinhas). */
+export function accountFlows(id: string) {
+  const seed = { itau: 1, bb: 2, inter: 3, cdb: 4 }[id] ?? 1;
+  const scale = { itau: 1, bb: 0.55, inter: 0.3, cdb: 0.02 }[id] ?? 1;
+  const days: string[] = [];
+  for (let d = 0; days.length < 7; d++) {
+    const dt = new Date(2026, 8, 30 - d);
+    if (dt.getDay() !== 0 && dt.getDay() !== 6) days.unshift(`${String(dt.getDate()).padStart(2, "0")}/${String(dt.getMonth() + 1).padStart(2, "0")}`);
+  }
+  return days.map((label, i) => ({
+    label,
+    entradas: Math.round((52_000 + ((i * 37 + seed * 11) % 9) * 7_400) * scale),
+    saidas: Math.round((44_000 + ((i * 53 + seed * 7) % 10) * 6_900) * scale * (id === "bb" && i === 4 ? 4.2 : 1)),
+  }));
+}
 export const cashBalance = accounts.reduce((s, a) => s + a.balance, 0);
 
 /* ------------------------------------------------------------------ */
@@ -78,6 +114,13 @@ export const agingBuckets = [
 /* ------------------------------------------------------------------ */
 /* Contas a pagar                                                      */
 /* ------------------------------------------------------------------ */
+
+export function addPayable(p: Payable) {
+  payables.unshift(p);
+  return p;
+}
+export const costCenters = ["1.02 · Estoque de revenda", "3.01 · Comercial", "3.02 · Logística", "4.01 · Ocupação", "4.02 · Administrativo", "5.01 · Pessoal", "6.01 · Tributos"];
+export const payableCategories = ["Fornecedores", "Frete", "Utilidades", "Pessoal", "Impostos", "Despesas fixas", "TI"];
 
 export type PayableStatus = "aprovacao" | "agendado" | "pago" | "atrasado";
 export type Payable = { id: string; doc: string; supplier: string; supplierId?: string; category: string; costCenter: string; due: string; value: number; status: PayableStatus; method: "Boleto" | "Pix" | "TED" | "DARF"; approver?: string };

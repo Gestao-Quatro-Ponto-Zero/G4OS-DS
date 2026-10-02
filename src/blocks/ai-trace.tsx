@@ -76,7 +76,7 @@ export default function AiTrace() {
     <Page className="!pb-10">
       <PageHeading
         compact
-        crumbs={[{ label: "Projetos", href: agentRoutes.projects }, { label: project.title, href: frameHref("ai-workspace", project.id) }, { label: "Execução" }]}
+        crumbs={[{ label: "Projetos", href: agentRoutes.projects }, { label: project.title, href: frameHref("ai-workspace", project.id) }]}
         title={`Execução de ${project.lastRun}`}
         description={`${project.agent} · pedida por ${owner.name}`}
         actions={
@@ -162,7 +162,7 @@ export default function AiTrace() {
   );
 
   return (
-    <AgentShell current={agentRoutes.trace}>
+    <AgentShell current={agentRoutes.projects}>
       <ResizableSplit left={left} right={right} rightOpen={!!sel} storageKey="ai-trace" defaultSize={0.58} min={0.4} max={0.75} />
     </AgentShell>
   );

@@ -228,14 +228,17 @@ Arquivos em `src/blocks/` (também no pacote: `node_modules/@g4ai/ds/src/blocks/
 
 | Categoria | Exemplos |
 | --- | --- |
-| SaaS | `saas-dashboard`, `saas-analytics`, `saas-customers` |
-| CRM | `crm-sales-dashboard`, `crm-pipeline`, `crm-deal`, `crm-contacts`, `crm-company` |
-| ATS | `ats-dashboard`, `ats-jobs`, `ats-pipeline`, `ats-candidate`, `ats-interviews` |
-| ERP | `erp-orders`, `erp-inventory`, `erp-purchase-requests`, `erp-invoice` |
-| Financeiro | `fin-dashboard`, `fin-cashflow`, `fin-receivables`, `fin-dre`, `fin-reconciliation` |
-| IA | `ai-workspace`, `ai-chat`, `ai-sessions`, `ai-trace`, `ai-agent-builder`, `ai-agent-connections` |
-| Aplicação | `app-command-palette`, `app-notifications`, `app-file-manager`, `app-error-pages`, `app-presentation`, `app-sidebar-submenus`, `app-help-center` |
-| Autenticação, configurações, onboarding | `auth-login`, `auth-otp`, `settings-team`, `settings-billing`, `onboarding-wizard` |
+| SaaS | `saas-dashboard`, `saas-customers`, `saas-plans`, `saas-usage`, `saas-analytics` |
+| CRM | `crm-sales-dashboard`, `crm-pipeline`, `crm-leads`, `crm-quotes`, `crm-deal`, `crm-contacts` |
+| ATS | `ats-dashboard`, `ats-jobs`, `ats-pipeline`, `ats-candidate`, `ats-requisitions`, `ats-reports` |
+| ERP | `erp-dashboard`, `erp-orders`, `erp-products`, `erp-purchase-orders`, `erp-receiving`, `erp-shipping`, `erp-invoice` |
+| Serviços (ERP de serviços) | `srv-dashboard`, `srv-work-orders`, `srv-work-order`, `srv-contracts`, `srv-invoices`, `srv-billing` |
+| Financeiro | `fin-dashboard`, `fin-cashflow`, `fin-receivables`, `fin-bank-accounts`, `fin-dre`, `fin-reconciliation` |
+| Contratos | `clm-dashboard`, `clm-contracts`, `clm-contract`, `clm-approvals`, `clm-obligations` |
+| Comunicação | `comms-home`, `comms-announcement`, `comms-channels`, `comms-people`, `comms-surveys` |
+| IA | `ai-agents-dashboard`, `ai-agents`, `ai-agent`, `ai-runs`, `ai-approvals`, `ai-agent-evals`, `ai-workspace`, `ai-chat` |
+| Aplicação | `app-command-palette`, `app-notifications`, `app-file-manager`, `app-error-pages`, `app-presentation`, `app-help-center`, `app-legal` |
+| Autenticação, configurações, onboarding | `auth-login`, `auth-otp`, `settings-organization`, `settings-roles`, `settings-team`, `settings-billing`, `onboarding-wizard` |
 
 Catálogo completo com objetivo de cada um: [ai/llms.txt](ai/llms.txt) ou `list_blocks` no MCP. Qual bloco usar por tipo de app: [AGENTS.md](AGENTS.md#qual-bloco-usar).
 

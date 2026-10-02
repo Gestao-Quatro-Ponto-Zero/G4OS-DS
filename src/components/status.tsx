@@ -147,20 +147,53 @@ export function NextStep({ title, children, action }: { title: string; children?
   );
 }
 
-/** Linha do tempo vertical de eventos (atividade, histórico). */
-export function Timeline({ items }: { items: { id: string; title: ReactNode; meta?: ReactNode; tone?: Tone; body?: ReactNode }[] }) {
+export type TimelineItem = {
+  id: string;
+  title: ReactNode;
+  meta?: ReactNode;
+  tone?: Tone;
+  body?: ReactNode;
+  /** Coluna à esquerda (ex.: versão + data num changelog). Some no celular e vai para baixo do título. */
+  leading?: ReactNode;
+  /** Item atual (versão em produção, etapa vigente): ponto vazado em destaque. */
+  current?: boolean;
+};
+
+/**
+ * Linha do tempo vertical: o que aconteceu, em ordem. Com `leading` vira um
+ * changelog (versão e data à esquerda, título e notas à direita).
+ */
+export function Timeline({ items, leadingWidth = 96 }: { items: TimelineItem[]; /** Largura da coluna `leading` em px. */ leadingWidth?: number }) {
+  const hasLeading = items.some((it) => it.leading);
   return (
     <ol className="list-none p-0">
       {items.map((it, i) => (
-        <li key={it.id} className="relative flex gap-3 pb-5 last:pb-0">
-          {i < items.length - 1 && <span aria-hidden className="absolute left-[3px] top-3 h-full w-px bg-line" />}
-          <span aria-hidden className={cn("relative mt-1.5 h-[7px] w-[7px] shrink-0 rounded-full ring-2 ring-surface", toneDot[it.tone ?? "neutral"])} />
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-              <div className="text-[13.5px] font-medium">{it.title}</div>
-              {it.meta && <div className="text-[11px] tabular-nums text-muted">{it.meta}</div>}
+        <li key={it.id} className="relative flex gap-3 sm:gap-4">
+          {hasLeading && (
+            <div className="hidden shrink-0 pt-0.5 text-right sm:block" style={{ width: leadingWidth }}>
+              {it.leading}
             </div>
-            {it.body && <div className="mt-1 text-[13px] leading-relaxed text-ink-soft">{it.body}</div>}
+          )}
+          <div className="relative flex min-w-0 flex-1 gap-3 pb-5">
+            {i < items.length - 1 && <span aria-hidden className="absolute left-[3px] top-3 h-full w-px bg-line" />}
+            <span
+              aria-hidden
+              className={cn(
+                "relative mt-1.5 h-[7px] w-[7px] shrink-0 rounded-full ring-2 ring-surface",
+                it.current ? "border-2 border-primary bg-surface outline outline-2 outline-offset-1 outline-primary/20" : toneDot[it.tone ?? "neutral"],
+              )}
+            />
+            <div className="min-w-0 flex-1">
+              {hasLeading && it.leading && <div className="mb-1 text-[12px] text-muted sm:hidden">{it.leading}</div>}
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <div className="text-[13.5px] font-medium">
+                  {it.title}
+                  {it.current && <span className="sr-only"> (atual)</span>}
+                </div>
+                {it.meta && <div className="text-[11px] tabular-nums text-muted">{it.meta}</div>}
+              </div>
+              {it.body && <div className="mt-1 text-[13px] leading-relaxed text-ink-soft">{it.body}</div>}
+            </div>
           </div>
         </li>
       ))}

@@ -35,6 +35,7 @@ export const users: User[] = [
   { id: "carla", name: "Carla Nogueira", initials: "CN", role: "Vendedora", tint: "#5f7f6f" },
   { id: "sergio", name: "Sérgio Moura", initials: "SM", role: "Almoxarifado", tint: "#8c6a3a" },
   { id: "helena", name: "Helena Duarte", initials: "HD", role: "Controller", tint: "#5f7f6f" },
+  { id: "debora", name: "Débora Rezende", initials: "DR", role: "Compradora", tint: "#184560" },
 ];
 export const me = users[0];
 export const user = (id: string) => users.find((u) => u.id === id) ?? users[0];
@@ -62,7 +63,13 @@ export type Product = {
   dailyUse: number;
   stock: Record<WarehouseId, number>;
   supplierId: string;
+  /** Inativo: não aparece no pedido de venda; o saldo restante é liquidado. */
+  status?: ProductStatus;
+  /** Código de barras (GTIN/EAN-13). */
+  ean?: string;
 };
+export type ProductStatus = "ativo" | "inativo";
+export const productStatusOf = (p: Product): ProductStatus => p.status ?? "ativo";
 export const products: Product[] = [
   { sku: "PAR-0412", name: "Parafuso sextavado M12 × 60 (cx 100)", category: "Fixação", unit: "cx", ncm: "7318.15.00", cost: 52.3, price: 89.9, min: 600, dailyUse: 42, stock: { gyn: 1_240, cps: 600 }, supplierId: "s7" },
   { sku: "CHP-2210", name: "Chapa aço carbono 2 mm 1200 × 3000", category: "Chapas", unit: "un", ncm: "7208.39.00", cost: 418.0, price: 612.0, min: 60, dailyUse: 6, stock: { gyn: 38, cps: 0 }, supplierId: "s1" },
@@ -76,7 +83,12 @@ export const products: Product[] = [
   { sku: "DSC-0415", name: "Disco de corte 7\"", category: "Abrasivos", unit: "un", ncm: "6804.22.19", cost: 7.4, price: 12.9, min: 300, dailyUse: 31, stock: { gyn: 520, cps: 0 }, supplierId: "s7" },
   { sku: "DSC-0420", name: "Disco flap 4,5\" grão 80", category: "Abrasivos", unit: "un", ncm: "6805.20.00", cost: 9.1, price: 16.5, min: 120, dailyUse: 9, stock: { gyn: 0, cps: 22 }, supplierId: "s7" },
   { sku: "CNT-0012", name: "Cantoneira 1\" × 1/8\" × 6 m", category: "Perfis", unit: "un", ncm: "7216.21.00", cost: 64.9, price: 98.0, min: 100, dailyUse: 8, stock: { gyn: 318, cps: 0 }, supplierId: "s3" },
+  { sku: "PRF-0075", name: "Perfil U enrijecido 75 × 40 × 2 mm × 6 m", category: "Perfis", unit: "un", ncm: "7216.61.10", cost: 88.4, price: 131.0, min: 120, dailyUse: 9, stock: { gyn: 210, cps: 96 }, supplierId: "s3" },
+  { sku: "BRC-0100", name: "Broca aço rápido HSS 10 mm", category: "Ferramentas", unit: "un", ncm: "8207.50.11", cost: 14.2, price: 24.9, min: 80, dailyUse: 3, stock: { gyn: 140, cps: 60 }, supplierId: "s7" },
+  { sku: "TNT-5010", name: "Tinta epóxi branca 18 L (linha antiga)", category: "Acabamento", unit: "lt", ncm: "3208.90.10", cost: 455.0, price: 690.0, min: 0, dailyUse: 0, stock: { gyn: 12, cps: 0 }, supplierId: "s8", status: "inativo" },
 ];
+/** Itens de linha usados nos pedidos de exemplo (os 12 primeiros do catálogo). */
+const catalog = products.slice(0, 12);
 export const productBySku = (sku: string) => products.find((p) => p.sku === sku) ?? products[0];
 export const qtyOf = (p: Product) => p.stock.gyn + p.stock.cps;
 export type Level = "ruptura" | "baixo" | "ok" | "excesso";
@@ -112,7 +124,26 @@ export function movementsOf(p: Product) {
 /* Clientes                                                            */
 /* ------------------------------------------------------------------ */
 
-export type Customer = { id: string; name: string; cnpj: string; city: string; uf: string; segment: string; since: string; creditLimit: number; seller: string; tint: string; contact: string; email: string; phone: string; status: "ativo" | "bloqueado" };
+export type Customer = {
+  id: string;
+  name: string;
+  cnpj: string;
+  city: string;
+  uf: string;
+  segment: string;
+  since: string;
+  creditLimit: number;
+  seller: string;
+  tint: string;
+  contact: string;
+  email: string;
+  phone: string;
+  status: "ativo" | "bloqueado";
+  /** Cadastro completo (clientes novos): endereço de entrega, IE e condição padrão. */
+  address?: string;
+  ie?: string;
+  payment?: Payment;
+};
 export const customers: Customer[] = [
   { id: "k1", name: "Construtora Pilar Ltda.", cnpj: "98.765.432/0001-10", city: "Goiânia", uf: "GO", segment: "Construção", since: "2019-03-12", creditLimit: 250_000, seller: "ana", tint: "#8c6a3a", contact: "Rogério Pilar", email: "compras@pilar.eng.br", phone: "(62) 3241-8800", status: "ativo" },
   { id: "k2", name: "Metalúrgica Santa Clara S.A.", cnpj: "23.456.789/0001-01", city: "Joinville", uf: "SC", segment: "Indústria", since: "2017-08-02", creditLimit: 400_000, seller: "bruno", tint: "#202124", contact: "Luíza Prado", email: "suprimentos@santaclara.ind.br", phone: "(47) 3422-1000", status: "ativo" },
@@ -154,7 +185,7 @@ export const orders: Order[] = Array.from({ length: 28 }, (_, i) => {
     customerId: customers[(i * 3) % customers.length].id,
     date: iso(-Math.floor(i / 2)),
     items: Array.from({ length: n }, (_, k) => {
-      const p = products[(i + k * 2) % products.length];
+      const p = catalog[(i + k * 2) % catalog.length];
       return { sku: p.sku, qty: 6 + ((i * 7 + k * 5 + 11) % 44), price: p.price };
     }).filter((it, k, a) => a.findIndex((x) => x.sku === it.sku) === k),
     payment: payments[i % payments.length],
@@ -174,7 +205,21 @@ export const ordersOf = (customerId: string) => orders.filter((o) => o.customerI
 /* ------------------------------------------------------------------ */
 
 export type InvoiceStatus = "autorizada" | "cancelada" | "rejeitada" | "processando";
-export type Invoice = { id: string; number: string; series: string; orderId: string; customerId: string; issuedAt: string; total: number; status: InvoiceStatus; key: string; cfop: string; reason?: string };
+export type Invoice = {
+  id: string;
+  number: string;
+  series: string;
+  orderId: string;
+  customerId: string;
+  issuedAt: string;
+  total: number;
+  status: InvoiceStatus;
+  key: string;
+  cfop: string;
+  reason?: string;
+  /** Campo que a SEFAZ recusou (rejeição): o que corrigir antes de reenviar. */
+  rejected?: { field: string; label: string; value: string; hint: string };
+};
 export const invoiceStatus: Record<InvoiceStatus, { label: string; tone: Tone }> = {
   autorizada: { label: "Autorizada", tone: "ok" },
   processando: { label: "Processando", tone: "info" },
@@ -196,7 +241,7 @@ export const invoices: Invoice[] = [
       key: `5226${o.date.slice(2, 4)}${o.date.slice(5, 7)}12345678000190550010000${o.invoice}1${String(12_345_678 + i).slice(0, 8)}`,
       cfop: customerById(o.customerId).uf === "GO" ? "5102" : "6102",
     })),
-  { id: "12290", number: "000.012.290", series: "1", orderId: "24849", customerId: "k3", issuedAt: iso(-6), total: 18_420, status: "rejeitada", key: "52260912345678000190550010000122901000000001", cfop: "5102", reason: "Rejeição 539: Duplicidade de NF-e com diferença na chave de acesso." },
+  { id: "12290", number: "000.012.290", series: "1", orderId: "24849", customerId: "k3", issuedAt: iso(-6), total: 18_420, status: "rejeitada", key: "52260912345678000190550010000122901000000001", cfop: "5102", reason: "Rejeição 233: IE do destinatário não cadastrada na SEFAZ-GO.", rejected: { field: "ie", label: "Inscrição estadual do destinatário", value: "10.456.789-0", hint: "Consulte o Sintegra de GO. Produtor rural usa a IE da propriedade." } },
   { id: "12281", number: "000.012.281", series: "1", orderId: "24846", customerId: "k5", issuedAt: iso(-8), total: 41_100, status: "cancelada", key: "52260912345678000190550010000122811000000002", cfop: "6102", reason: "Cancelada a pedido do cliente (pedido duplicado)." },
 ];
 export const invoiceById = (id: string) => invoices.find((n) => n.id === id) ?? invoices[0];
@@ -242,3 +287,486 @@ export const lateReasons = [
   { label: "Erro de cadastro", value: 4 },
   { label: "Endereço incompleto", value: 2 },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Gravação de exemplo                                                 */
+/* ------------------------------------------------------------------ */
+/*
+ * As telas do showcase gravam nos próprios arrays acima (ficam na memória
+ * enquanto a página está aberta): o pedido criado em "Novo pedido" aparece
+ * na lista e no detalhe; o cliente novo, no ⌘K. No SEU app, chame a API.
+ */
+
+export function addOrder(draft: Omit<Order, "id" | "number">) {
+  const n = Math.max(...orders.map((o) => Number(o.id))) + 1;
+  const order: Order = { ...draft, id: String(n), number: `PV-${String(n).padStart(6, "0")}` };
+  orders.unshift(order);
+  return order;
+}
+export function updateOrder(id: string, patch: Partial<Order>) {
+  const i = orders.findIndex((o) => o.id === id);
+  if (i >= 0) orders[i] = { ...orders[i], ...patch };
+}
+export function addCustomer(c: Customer) {
+  customers.push(c);
+  return c;
+}
+export function addProduct(p: Product) {
+  products.push(p);
+  return p;
+}
+export function addSupplier(s: Supplier) {
+  suppliers.push(s);
+  return s;
+}
+export function addInvoice(n: Invoice) {
+  invoices.unshift(n);
+  return n;
+}
+
+export const ufs = ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"];
+export const paymentTerms: Payment[] = ["Pix", "Boleto 28 dias", "Cartão 3x", "Boleto 30/60/90"];
+export const segments = [...new Set(customers.map((c) => c.segment))];
+
+/* ------------------------------------------------------------------ */
+/* Requisições de compra                                               */
+/* ------------------------------------------------------------------ */
+
+export type ReqStatus = "pendente" | "aprovada" | "recusada";
+export type PurchaseRequest = {
+  id: string;
+  number: string;
+  title: string;
+  requester: { name: string; initials: string; area: string };
+  date: string;
+  need: string;
+  costCenter: string;
+  items: { name: string; qty: number; unit: string; sku?: string }[];
+  quotes: { supplier: string; total: number; delivery: string; terms: string }[];
+  chain: { role: string; who: string; state: "done" | "current" | "upcoming" }[];
+  status: ReqStatus;
+  urgent?: boolean;
+  /** Fornecedor da cotação escolhida (depois da aprovação). */
+  chosen?: string;
+  /** Pedido de compra gerado a partir desta requisição. */
+  orderId?: string;
+};
+export const reqStatus: Record<ReqStatus, { label: string; tone: Tone }> = {
+  pendente: { label: "Aguardando", tone: "warn" },
+  aprovada: { label: "Aprovada", tone: "ok" },
+  recusada: { label: "Recusada", tone: "bad" },
+};
+export const purchaseRequests: PurchaseRequest[] = [
+  {
+    id: "r1",
+    number: "RC-2026-0412",
+    title: "Reposição de chapas de aço 2 mm e 3 mm",
+    requester: { name: "Sérgio Moura", initials: "SM", area: "Almoxarifado" },
+    date: "30/09",
+    need: "08/10/2026",
+    costCenter: "1.02 · Estoque de revenda",
+    items: [
+      { name: "Chapa aço carbono 2 mm 1200 × 3000", qty: 120, unit: "un", sku: "CHP-2210" },
+      { name: "Chapa aço carbono 3 mm 1200 × 3000", qty: 80, unit: "un", sku: "CHP-2215" },
+    ],
+    quotes: [
+      { supplier: "Usiminas Distribuição", total: 98_400, delivery: "5 dias úteis", terms: "28/56 dias" },
+      { supplier: "Gerdau Comercial", total: 101_900, delivery: "3 dias úteis", terms: "30 dias" },
+      { supplier: "Aço Brasil Metais", total: 96_200, delivery: "12 dias úteis", terms: "à vista" },
+    ],
+    chain: [
+      { role: "Solicitante", who: "Sérgio Moura", state: "done" },
+      { role: "Gestor da área", who: "Fernanda Luz", state: "done" },
+      { role: "Compras", who: "Você", state: "current" },
+      { role: "Diretoria financeira", who: "acima de R$ 50 mil", state: "upcoming" },
+    ],
+    status: "pendente",
+    urgent: true,
+  },
+  {
+    id: "r2",
+    number: "RC-2026-0409",
+    title: "Notebooks para novo time comercial",
+    requester: { name: "Paulo Menezes", initials: "PM", area: "Comercial" },
+    date: "29/09",
+    need: "20/10/2026",
+    costCenter: "3.01 · Comercial",
+    items: [{ name: "Notebook i7 16 GB 512 GB SSD", qty: 6, unit: "un" }],
+    quotes: [
+      { supplier: "Kabum Empresas", total: 31_140, delivery: "7 dias", terms: "30 dias" },
+      { supplier: "Dell Brasil", total: 33_600, delivery: "15 dias", terms: "30/60 dias" },
+    ],
+    chain: [
+      { role: "Solicitante", who: "Paulo Menezes", state: "done" },
+      { role: "Gestor da área", who: "Rafael Queiroz", state: "done" },
+      { role: "Compras", who: "Você", state: "current" },
+    ],
+    status: "pendente",
+  },
+  {
+    id: "r3",
+    number: "RC-2026-0405",
+    title: "EPIs trimestrais · luvas e óculos",
+    requester: { name: "Sérgio Moura", initials: "SM", area: "Almoxarifado" },
+    date: "26/09",
+    need: "05/10/2026",
+    costCenter: "4.10 · Segurança do trabalho",
+    items: [
+      { name: "Luva de vaqueta (par)", qty: 400, unit: "par", sku: "LUV-0301" },
+      { name: "Óculos de proteção incolor", qty: 150, unit: "un" },
+    ],
+    quotes: [{ supplier: "Protege EPI", total: 5_870, delivery: "4 dias", terms: "28 dias" }],
+    chain: [
+      { role: "Solicitante", who: "Sérgio Moura", state: "done" },
+      { role: "Gestor da área", who: "Fernanda Luz", state: "current" },
+      { role: "Compras", who: "Você", state: "upcoming" },
+    ],
+    status: "pendente",
+  },
+  {
+    id: "r5",
+    number: "RC-2026-0401",
+    title: "Consumíveis de solda · eletrodo 6013 e arame MIG",
+    requester: { name: "Sérgio Moura", initials: "SM", area: "Almoxarifado" },
+    date: "24/09",
+    need: "10/10/2026",
+    costCenter: "1.02 · Estoque de revenda",
+    items: [
+      { name: "Eletrodo 6013 2,5 mm (kg)", qty: 600, unit: "kg", sku: "ELT-0098" },
+      { name: "Arame MIG ER70S-6 1,0 mm (kg)", qty: 300, unit: "kg", sku: "ELT-0110" },
+    ],
+    quotes: [
+      { supplier: "ESAB Soldagem", total: 21_270, delivery: "6 dias úteis", terms: "28 dias" },
+      { supplier: "3M do Brasil", total: 23_480, delivery: "8 dias úteis", terms: "30 dias" },
+      { supplier: "Gerdau Comercial", total: 22_900, delivery: "4 dias úteis", terms: "28 dias" },
+    ],
+    chain: [
+      { role: "Solicitante", who: "Sérgio Moura", state: "done" },
+      { role: "Gestor da área", who: "Fernanda Luz", state: "done" },
+      { role: "Compras", who: "Você", state: "done" },
+    ],
+    status: "aprovada",
+    chosen: "ESAB Soldagem",
+    orderId: "4132",
+  },
+  {
+    id: "r6",
+    number: "RC-2026-0399",
+    title: "Discos flap e brocas para o CD Campinas",
+    requester: { name: "Sérgio Moura", initials: "SM", area: "Almoxarifado" },
+    date: "23/09",
+    need: "07/10/2026",
+    costCenter: "1.02 · Estoque de revenda",
+    items: [
+      { name: "Disco flap 4,5\" grão 80", qty: 400, unit: "un", sku: "DSC-0420" },
+      { name: "Broca aço rápido HSS 10 mm", qty: 120, unit: "un", sku: "BRC-0100" },
+    ],
+    quotes: [
+      { supplier: "3M do Brasil", total: 5_344, delivery: "8 dias úteis", terms: "30 dias" },
+      { supplier: "Protege EPI", total: 5_910, delivery: "5 dias úteis", terms: "28 dias" },
+      { supplier: "ESAB Soldagem", total: 5_720, delivery: "6 dias úteis", terms: "28 dias" },
+    ],
+    chain: [
+      { role: "Solicitante", who: "Sérgio Moura", state: "done" },
+      { role: "Gestor da área", who: "Fernanda Luz", state: "done" },
+      { role: "Compras", who: "Você", state: "done" },
+    ],
+    status: "aprovada",
+    chosen: "3M do Brasil",
+  },
+  {
+    id: "r4",
+    number: "RC-2026-0398",
+    title: "Manutenção preventiva da ponte rolante",
+    requester: { name: "Diego Araújo", initials: "DA", area: "Manutenção" },
+    date: "22/09",
+    need: "30/09/2026",
+    costCenter: "5.02 · Manutenção",
+    items: [{ name: "Serviço de manutenção preventiva", qty: 1, unit: "sv" }],
+    quotes: [{ supplier: "Içamento Centro-Oeste", total: 7_900, delivery: "agendado 29/09", terms: "30 dias" }],
+    chain: [
+      { role: "Solicitante", who: "Diego Araújo", state: "done" },
+      { role: "Gestor da área", who: "Fernanda Luz", state: "done" },
+      { role: "Compras", who: "Você", state: "done" },
+    ],
+    status: "aprovada",
+    chosen: "Içamento Centro-Oeste",
+  },
+];
+export const requestById = (id: string) => purchaseRequests.find((r) => r.id === id || r.number === id);
+/** Requisições que chegaram à etapa de Compras e esperam decisão. */
+export const requestsAwaitingMe = () => purchaseRequests.filter((r) => r.status === "pendente" && r.chain.some((c) => c.who === "Você" && c.state === "current"));
+export const requestTotal = (r: PurchaseRequest) => (r.quotes.length ? Math.min(...r.quotes.map((q) => q.total)) : 0);
+
+/** Cria a requisição (vai para o gestor da área) e devolve o registro. */
+export function addPurchaseRequest(input: { title: string; items: PurchaseRequest["items"]; need?: string; urgent?: boolean; costCenter?: string }) {
+  const n = 413 + purchaseRequests.filter((r) => r.id.startsWith("n")).length;
+  const r: PurchaseRequest = {
+    id: `n${n}`,
+    number: `RC-2026-0${n}`,
+    title: input.title,
+    requester: { name: "Sérgio Moura", initials: "SM", area: "Almoxarifado" },
+    date: br(iso(0)).slice(0, 5),
+    need: input.need ?? br(iso(10)),
+    costCenter: input.costCenter ?? "1.02 · Estoque de revenda",
+    items: input.items,
+    quotes: [],
+    chain: [
+      { role: "Solicitante", who: "Sérgio Moura", state: "done" },
+      { role: "Gestor da área", who: "Fernanda Luz", state: "current" },
+      { role: "Compras", who: "Você", state: "upcoming" },
+    ],
+    status: "pendente",
+    urgent: input.urgent,
+  };
+  purchaseRequests.unshift(r);
+  return r;
+}
+export function updatePurchaseRequest(id: string, patch: Partial<PurchaseRequest>) {
+  const i = purchaseRequests.findIndex((r) => r.id === id);
+  if (i >= 0) purchaseRequests[i] = { ...purchaseRequests[i], ...patch };
+}
+/** Quanto pedir para voltar a 3× o mínimo (sugestão de reposição). */
+export const suggestedQty = (p: Product) => Math.max(0, p.min * 3 - qtyOf(p));
+
+/* ------------------------------------------------------------------ */
+/* Pedidos de compra                                                   */
+/* ------------------------------------------------------------------ */
+
+export type PoStatus = "rascunho" | "enviado" | "confirmado" | "parcial" | "recebido" | "cancelado";
+export const poStatus: Record<PoStatus, { label: string; tone: Tone }> = {
+  rascunho: { label: "Rascunho", tone: "neutral" },
+  enviado: { label: "Enviado", tone: "info" },
+  confirmado: { label: "Confirmado", tone: "accent" },
+  parcial: { label: "Recebido parcial", tone: "warn" },
+  recebido: { label: "Recebido", tone: "ok" },
+  cancelado: { label: "Cancelado", tone: "bad" },
+};
+export const poFlow: PoStatus[] = ["rascunho", "enviado", "confirmado", "parcial", "recebido"];
+export type PoItem = { sku: string; qty: number; cost: number; received: number };
+export type PurchaseOrder = {
+  id: string;
+  number: string;
+  supplierId: string;
+  requestId?: string;
+  buyer: string;
+  createdAt: string;
+  expected: string;
+  payment: string;
+  freight: "CIF" | "FOB";
+  freightValue: number;
+  warehouse: WarehouseId;
+  items: PoItem[];
+  status: PoStatus;
+  sentAt?: string;
+  confirmedAt?: string;
+  receivedAt?: string;
+  /** Nº do pedido no sistema do fornecedor (vem na confirmação). */
+  supplierRef?: string;
+  /** Chave da NF-e de entrada (44 dígitos). */
+  nfeKey?: string;
+  notes?: string;
+};
+const po = (n: number, supplierId: string, status: PoStatus, expectedIn: number, warehouse: WarehouseId, items: [string, number, number, number?][], extra: Partial<PurchaseOrder> = {}): PurchaseOrder => ({
+  id: String(n),
+  number: `OC-${String(n).padStart(6, "0")}`,
+  supplierId,
+  buyer: "debora",
+  createdAt: iso(expectedIn - supplierById(supplierId).leadTime - 2),
+  expected: iso(expectedIn),
+  payment: "28/56 dias",
+  freight: "CIF",
+  freightValue: 0,
+  warehouse,
+  items: items.map(([sku, qty, cost, received]) => ({ sku, qty, cost, received: received ?? (status === "recebido" ? qty : 0) })),
+  status,
+  sentAt: status === "rascunho" ? undefined : iso(expectedIn - supplierById(supplierId).leadTime - 1),
+  confirmedAt: ["confirmado", "parcial", "recebido"].includes(status) ? iso(expectedIn - supplierById(supplierId).leadTime) : undefined,
+  receivedAt: status === "recebido" ? iso(expectedIn) : status === "parcial" ? iso(expectedIn) : undefined,
+  supplierRef: ["confirmado", "parcial", "recebido"].includes(status) ? `${supplierById(supplierId).name.split(" ")[0].toUpperCase()}-${88_000 + n}` : undefined,
+  nfeKey: status === "recebido" || status === "parcial" ? `5226${iso(expectedIn).slice(2, 4)}${iso(expectedIn).slice(5, 7)}${supplierById(supplierId).cnpj.replace(/\D/g, "")}5500100${String(n * 7).padStart(7, "0")}1${String(n * 13).padStart(8, "0")}` : undefined,
+  ...extra,
+});
+export const purchaseOrders: PurchaseOrder[] = [
+  po(4132, "s6", "rascunho", 8, "gyn", [["ELT-0098", 600, 21.1], ["ELT-0110", 300, 28.7]], { requestId: "r5", notes: "Entregar no CD Goiânia, doca 2, das 7h às 16h." }),
+  po(4131, "s1", "enviado", 4, "gyn", [["CHP-2215", 80, 602], ["CHP-2210", 60, 418]], { payment: "28/56 dias" }),
+  po(4130, "s2", "confirmado", 0, "gyn", [["TUB-1050", 120, 171.4], ["TUB-1034", 100, 96.2]], { payment: "30 dias", freight: "FOB", freightValue: 1_850 }),
+  po(4129, "s7", "parcial", -2, "cps", [["DSC-0420", 300, 9.1, 120], ["DSC-0415", 500, 7.4, 500]], { payment: "30 dias", notes: "Saldo de 180 discos flap prometido para 03/10." }),
+  po(4128, "s6", "confirmado", -1, "gyn", [["ELT-0110", 200, 28.7]], { payment: "28 dias" }),
+  po(4127, "s8", "enviado", 6, "cps", [["TNT-5000", 40, 480]], { payment: "28 dias", freight: "FOB", freightValue: 640 }),
+  po(4126, "s3", "recebido", -6, "gyn", [["CNT-0012", 200, 64.9], ["PRF-0075", 150, 88.4]], { payment: "à vista" }),
+  po(4125, "s1", "recebido", -12, "gyn", [["CHP-2210", 100, 418]]),
+  po(4124, "s7", "cancelado", -9, "gyn", [["LUV-0301", 400, 9.8]], { notes: "Cancelado: preço acima da tabela negociada. Recomprado com outro fornecedor." }),
+  po(4123, "s2", "recebido", -15, "cps", [["TUB-1034", 200, 96.2]], { payment: "30 dias" }),
+  po(4122, "s6", "recebido", -20, "gyn", [["ELT-0098", 800, 20.9]], { payment: "28 dias" }),
+];
+export const purchaseOrderById = (id: string) => purchaseOrders.find((p) => p.id === id || p.number === id);
+export const poSubtotal = (p: Pick<PurchaseOrder, "items">) => p.items.reduce((s, it) => s + it.qty * it.cost, 0);
+export const poTotal = (p: Pick<PurchaseOrder, "items" | "freightValue">) => poSubtotal(p) + p.freightValue;
+/** Aguardando chegada (enviado, confirmado ou com saldo a receber). */
+export const awaitingReceipt = (p: PurchaseOrder) => p.status === "enviado" || p.status === "confirmado" || p.status === "parcial";
+export const poLate = (p: PurchaseOrder) => awaitingReceipt(p) && p.expected < iso(0);
+export function addPurchaseOrder(draft: Omit<PurchaseOrder, "id" | "number">) {
+  const n = Math.max(...purchaseOrders.map((p) => Number(p.id))) + 1;
+  const order: PurchaseOrder = { ...draft, id: String(n), number: `OC-${String(n).padStart(6, "0")}` };
+  purchaseOrders.unshift(order);
+  return order;
+}
+export function updatePurchaseOrder(id: string, patch: Partial<PurchaseOrder>) {
+  const i = purchaseOrders.findIndex((p) => p.id === id);
+  if (i >= 0) purchaseOrders[i] = { ...purchaseOrders[i], ...patch };
+  return purchaseOrders[i];
+}
+
+/* ------------------------------------------------------------------ */
+/* Movimentações de estoque (kardex)                                   */
+/* ------------------------------------------------------------------ */
+
+export type MoveKind = "entrada" | "saida" | "transferencia" | "ajuste";
+export const moveKind: Record<MoveKind, { label: string; tone: Tone }> = {
+  entrada: { label: "Entrada", tone: "ok" },
+  saida: { label: "Saída", tone: "neutral" },
+  transferencia: { label: "Transferência", tone: "info" },
+  ajuste: { label: "Ajuste", tone: "warn" },
+};
+export const adjustReasons = ["Contagem cíclica", "Avaria no manuseio", "Perda por oxidação", "Erro de lançamento", "Inventário anual"];
+export type StockMove = {
+  id: string;
+  date: string;
+  time: string;
+  sku: string;
+  kind: MoveKind;
+  warehouse: WarehouseId;
+  /** Depósito de destino (transferência). */
+  to?: WarehouseId;
+  /** Quantidade com sinal no saldo total (transferência = quantidade movida, não muda o total). */
+  qty: number;
+  doc: string;
+  who: string;
+  reason?: string;
+  /** Saldo total do produto depois do movimento. */
+  balance: number;
+};
+function seedMoves(): StockMove[] {
+  const out: StockMove[] = [];
+  const pattern: MoveKind[] = ["saida", "saida", "entrada", "saida", "transferencia", "saida", "ajuste", "saida"];
+  catalog.forEach((p, pi) => {
+    let bal = qtyOf(p);
+    const home: WarehouseId = p.stock.gyn >= p.stock.cps ? "gyn" : "cps";
+    for (let i = 0; i < 7; i++) {
+      let kind = pattern[(i + pi) % pattern.length];
+      const day = -(i * 3 + (pi % 3));
+      const base = Math.max(1, Math.round(p.dailyUse * (2 + ((i * 5 + pi) % 4))));
+      let qty = kind === "entrada" ? base * 4 : kind === "ajuste" ? -Math.max(1, Math.round(base / 6)) : kind === "transferencia" ? base : -base;
+      // Andando para trás no tempo: o saldo antes do movimento não pode ficar negativo.
+      if (kind === "entrada" && bal - qty < 0) {
+        kind = "saida";
+        qty = -base;
+      }
+      const sale = orders[(pi * 3 + i) % orders.length];
+      const buy = purchaseOrders.find((o) => o.status === "recebido" && o.items.some((it) => it.sku === p.sku));
+      out.push({
+        id: `${p.sku}-${i}`,
+        date: iso(day),
+        time: `${String(8 + ((i * 3 + pi) % 9)).padStart(2, "0")}:${String((i * 17 + pi * 7) % 60).padStart(2, "0")}`,
+        sku: p.sku,
+        kind,
+        warehouse: kind === "transferencia" ? (home === "gyn" ? "gyn" : "cps") : home,
+        to: kind === "transferencia" ? (home === "gyn" ? "cps" : "gyn") : undefined,
+        qty,
+        doc: kind === "saida" ? sale.number : kind === "entrada" ? buy?.number ?? `OC-00${4110 - i}` : kind === "transferencia" ? `TR-00${91 - i - pi}` : `AJ-00${17 + pi}`,
+        who: kind === "saida" ? "Faturamento automático" : kind === "entrada" ? "Sérgio Moura" : kind === "transferencia" ? "Sérgio Moura" : "Helena Duarte",
+        reason: kind === "ajuste" ? adjustReasons[(i + pi) % adjustReasons.length] : undefined,
+        balance: bal,
+      });
+      if (kind !== "transferencia") bal -= qty;
+    }
+  });
+  return out.sort((a, b) => (a.date === b.date ? b.time.localeCompare(a.time) : b.date.localeCompare(a.date)));
+}
+export const stockMoves: StockMove[] = seedMoves();
+/** Registra o movimento, atualiza o saldo do produto e devolve o lançamento. */
+export function addStockMove(input: Omit<StockMove, "id" | "balance" | "date" | "time"> & { date?: string }) {
+  const p = productBySku(input.sku);
+  if (input.kind === "transferencia" && input.to) {
+    p.stock[input.warehouse] -= input.qty;
+    p.stock[input.to] += input.qty;
+  } else {
+    p.stock[input.warehouse] = Math.max(0, p.stock[input.warehouse] + input.qty);
+  }
+  const now = new Date();
+  const m: StockMove = { ...input, id: `m${now.getTime()}${input.sku}`, date: input.date ?? iso(0), time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`, balance: qtyOf(p) };
+  stockMoves.unshift(m);
+  return m;
+}
+
+/* ------------------------------------------------------------------ */
+/* Expedição                                                           */
+/* ------------------------------------------------------------------ */
+
+export type ShipStatus = "separar" | "separado" | "transito" | "entregue";
+export const shipStatus: Record<ShipStatus, { label: string; tone: Tone }> = {
+  separar: { label: "A separar", tone: "neutral" },
+  separado: { label: "Separado", tone: "info" },
+  transito: { label: "Em trânsito", tone: "warn" },
+  entregue: { label: "Entregue", tone: "ok" },
+};
+export const shipFlow: ShipStatus[] = ["separar", "separado", "transito", "entregue"];
+export const carriers = ["Rápido Sul Transportes", "Jamef Encomendas", "Braspress", "Patrus Transportes"];
+const tzOf = (uf: string) => (uf === "AM" ? "America/Manaus" : uf === "MT" || uf === "MS" ? "America/Cuiaba" : "America/Sao_Paulo");
+export type ShipEvent = { id: string; date: string; time: string; title: string; place: string; tone?: Tone };
+export type Shipment = {
+  id: string;
+  orderId: string;
+  carrier: string;
+  tracking?: string;
+  origin: WarehouseId;
+  dest: { city: string; uf: string; timeZone: string };
+  volumes: number;
+  weightKg: number;
+  freight: number;
+  eta: string;
+  status: ShipStatus;
+  events: ShipEvent[];
+};
+export const originOf = (w: WarehouseId) => (w === "gyn" ? { place: "CD Goiânia, GO", timeZone: "America/Sao_Paulo" } : { place: "CD Campinas, SP", timeZone: "America/Sao_Paulo" });
+function seedShipments(): Shipment[] {
+  return orders
+    .filter((o) => o.status === "faturado" || o.status === "enviado" || o.status === "entregue")
+    .slice(0, 16)
+    .map((o, i) => {
+      const c = customerById(o.customerId);
+      const status: ShipStatus = o.status === "faturado" ? (i % 2 ? "separado" : "separar") : o.status === "enviado" ? "transito" : "entregue";
+      const carrier = carriers[i % carriers.length];
+      const far = c.uf === "AM" || c.uf === "RJ" || c.uf === "SC";
+      const eta = iso(status === "entregue" ? -2 - (i % 4) : status === "transito" ? (i % 3 === 0 ? -1 : 1 + (i % 3)) : far ? 6 : 3);
+      const origin = originOf(o.warehouse);
+      const dest = `${c.city}, ${c.uf}`;
+      const ev: ShipEvent[] = [{ id: "e1", date: o.date, time: "09:12", title: "NF-e autorizada · pedido liberado para separação", place: origin.place }];
+      if (status !== "separar") ev.push({ id: "e2", date: o.date, time: "14:40", title: `Separado e conferido · ${2 + (i % 5)} volumes`, place: origin.place });
+      if (status === "transito" || status === "entregue") {
+        const back = status === "entregue" ? daysAgo(eta) : 0;
+        ev.push({ id: "e3", date: iso(-back - 2), time: "18:05", title: `Coletado por ${carrier}`, place: origin.place });
+        ev.push({ id: "e4", date: iso(-back - 1), time: "06:30", title: far ? "Em transferência entre filiais da transportadora" : "Chegou à unidade de destino", place: far ? "Centro de distribuição da transportadora" : dest });
+      }
+      if (status === "transito" && eta < iso(0)) ev.push({ id: "e5", date: iso(0), time: "07:50", title: "Tentativa de entrega sem sucesso · recebimento fechado", place: dest, tone: "bad" });
+      if (status === "entregue") ev.push({ id: "e6", date: eta, time: "10:24", title: `Entregue · recebido por ${c.contact}`, place: dest, tone: "ok" });
+      return {
+        id: `EXP-${String(3_310 - i)}`,
+        orderId: o.id,
+        carrier,
+        tracking: status === "separar" || status === "separado" ? undefined : `${carrier.slice(0, 2).toUpperCase()}${String(48_210_000 + i * 731)}BR`,
+        origin: o.warehouse,
+        dest: { city: c.city, uf: c.uf, timeZone: tzOf(c.uf) },
+        volumes: 2 + (i % 5),
+        weightKg: Math.round(orderTotal(o) / 38),
+        freight: o.freight || 180 + (i % 4) * 65,
+        eta,
+        status,
+        events: ev.reverse(),
+      };
+    });
+}
+export const shipments: Shipment[] = seedShipments();
+export const shipmentById = (id: string) => shipments.find((s) => s.id === id || s.orderId === id);
+export const shipmentLate = (s: Shipment) => s.status !== "entregue" && s.eta < iso(0);

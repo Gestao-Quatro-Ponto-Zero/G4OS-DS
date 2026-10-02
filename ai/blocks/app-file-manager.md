@@ -26,4 +26,4 @@ Pastas em árvore, arquivos em grade ou lista, busca, envio com progresso e pré
 
 ## Componentes usados
 
-`ActionMenu`, `Avatar`, `Button`, `Column`, `DataTable`, `Empty`, `FileCard`, `FileIcon`, `Meter`, `PropertyList`, `SearchInput`, `SegmentedControl`, `Sheet`, `TreeNode`, `TreeView`, `formatBytes`, `normalize`, `notify`
+`ActionMenu`, `Avatar`, `Button`, `Column`, `DataTable`, `Empty`, `FileCard`, `FileIcon`, `Meter`, `PropertyList`, `SearchInput`, `SegmentedControl`, `Sheet`, `Skeleton`, `TreeNode`, `TreeView`, `formatBytes`, `normalize`, `notify`

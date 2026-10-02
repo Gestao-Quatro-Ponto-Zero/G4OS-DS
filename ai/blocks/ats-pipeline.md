@@ -16,6 +16,8 @@ Quadro (ou lista) de candidatos de uma vaga por etapa: nota média, origem, temp
 - Card com nota média, origem e tempo na etapa; arrastar para avançar
 - Alternar Quadro/Lista sem perder filtros
 - Card abre o perfil
+- Vaga sem candidatos: vazio com Adicionar candidato e Copiar link da vaga
+- Cinco estados: ?estado=carregando|vazio|erro simula
 
 **Quando usar e o que adaptar**
 
@@ -27,4 +29,4 @@ Quadro (ou lista) de candidatos de uma vaga por etapa: nota média, origem, temp
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `KanbanBoard`, `KanbanColumn`, `Modal`, `Page`, `PageHeading`, `RecordCard`, `SegmentedControl`, `Select`, `TextField`, `chartColor`, `notify`
+`Avatar`, `Badge`, `Button`, `Column`, `DataTable`, `Empty`, `KanbanBoard`, `KanbanColumn`, `Modal`, `Page`, `PageHeading`, `RecordCard`, `SegmentedControl`, `Select`, `Skeleton`, `TextField`, `chartColor`, `notify`

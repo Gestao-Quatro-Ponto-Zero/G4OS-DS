@@ -76,13 +76,29 @@ Etapas de um ciclo/processo.
 
 ## Timeline
 
-Linha do tempo vertical de eventos (atividade, histórico).
+Linha do tempo vertical: o que aconteceu, em ordem.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `items` * | `{ id: string; title: ReactNode; meta?: ReactNode; tone?: Tone; body?: ReactNode; }[]` |  |  |
+| `items` * | `TimelineItem[]` |  |  |
+| `leadingWidth` | `number \| undefined` | `96` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/exibicao-historico-e-versoes`):
+
+```tsx
+<Timeline items={[
+  { id: "v12", current: true, leading: <><b>v1.2</b><br />29 set</>, title: "Passagem para o vendedor", body: "Agenda a reunião…" },
+  { id: "v11", leading: <><b>v1.1</b><br />19 set</>, title: "Consulta ao ERP", body: "…" },
+]} />
+```
+
+## TimelineItem (type)
+
+```ts
+type TimelineItem = { id: string; title: ReactNode; meta?: ReactNode; tone?: Tone; body?: ReactNode; leading?: ReactNode; current?: boolean; }
+```
 
 ## WorkStatus (type)
 

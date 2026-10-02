@@ -3,7 +3,7 @@
  * telas do produto: a conta aberta na lista mostra o mesmo MRR na página da
  * conta, na cobrança e no suporte. "Hoje" = 30/09/2026.
  */
-import { useEffect, useState } from "react";
+export { go, useFrameParam } from "../shells/frame-route";
 
 export const today = new Date(2026, 8, 30);
 export const iso = (days: number) => {
@@ -12,22 +12,6 @@ export const iso = (days: number) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 export const daysFromToday = (isoDate: string) => Math.round((new Date(`${isoDate}T00:00:00`).getTime() - today.getTime()) / 86400000);
-
-/** Parâmetro da rota do frame: #/frame/saas-customer?id=3 → "3". */
-export function useFrameParam(name: string) {
-  const read = () => (typeof window === "undefined" ? null : new URLSearchParams(window.location.hash.split("?")[1] ?? "").get(name));
-  const [value, setValue] = useState(read);
-  useEffect(() => {
-    const on = () => setValue(read());
-    window.addEventListener("hashchange", on);
-    return () => window.removeEventListener("hashchange", on);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name]);
-  return value;
-}
-export const go = (slug: string, id?: string) => {
-  location.hash = `/frame/${slug}${id ? `?id=${id}` : ""}`;
-};
 
 export const team = [
   { id: "marina", name: "Marina Couto", initials: "MC", tint: "#3f3f46", role: "Head de Produto" },
@@ -224,3 +208,39 @@ export const daily = Array.from({ length: 90 }, (_, i) => {
 
 /** Notas 0–10 de NPS (quantidade por nota) no trimestre. */
 export const npsScores = [3, 2, 4, 5, 6, 9, 14, 38, 61, 118, 152];
+
+/* ------------------------------------------------------------------ */
+/* Planos e limites                                                    */
+/* ------------------------------------------------------------------ */
+
+export type PlanLimits = { usuarios: number | null; paineis: number | null; eventos: number | null; api: number | null; retencao: number };
+export type PlanDef = { id: Plan; description: string; monthly: number; annual: number; limits: PlanLimits; features: string[]; trialDays: number; public: boolean };
+/** Preço por usuário/mês. `annual` = preço mensal equivalente no plano anual. Limite null = ilimitado. */
+export const planCatalog: PlanDef[] = [
+  { id: "Starter", description: "Para times pequenos começarem a medir o produto.", monthly: planPrice.Starter, annual: 84, limits: { usuarios: 15, paineis: 10, eventos: 2_000_000, api: 0, retencao: 90 }, features: ["Painéis prontos", "Relatórios por e-mail", "Suporte por e-mail"], trialDays: 14, public: true },
+  { id: "Pro", description: "Para empresas que decidem com dados toda semana.", monthly: planPrice.Pro, annual: 119, limits: { usuarios: 80, paineis: 50, eventos: 20_000_000, api: 100_000, retencao: 365 }, features: ["Tudo do Starter", "Alertas e metas", "Integrações com CRM", "Suporte por chat"], trialDays: 14, public: true },
+  { id: "Enterprise", description: "Para operações grandes, com segurança e contrato.", monthly: planPrice.Enterprise, annual: 136, limits: { usuarios: 320, paineis: null, eventos: 200_000_000, api: 1_000_000, retencao: 730 }, features: ["Tudo do Pro", "SSO e auditoria", "API ilimitada de leitura", "Gerente de conta"], trialDays: 30, public: false },
+];
+export const planById = (id: Plan) => planCatalog.find((p) => p.id === id) ?? planCatalog[0];
+
+export type Resource = "usuarios" | "paineis" | "eventos" | "api";
+export const resourceLabel: Record<Resource, string> = { usuarios: "Usuários", paineis: "Painéis", eventos: "Eventos no mês", api: "Chamadas de API" };
+export const resources = Object.keys(resourceLabel) as Resource[];
+export type UsageRow = { customerId: string; resource: Resource; used: number; limit: number | null };
+
+/** Consumo do ciclo atual por conta e recurso (determinístico). */
+export const usage: UsageRow[] = customers
+  .filter((c) => c.status !== "atraso" || c.usage > 0)
+  .flatMap((c, i) => {
+    const l = planById(c.plan).limits;
+    const ratio = (k: number) => Math.min(1.08, ((c.usage + k * 17 + i * 11) % 100) / 100 + (c.usage > 70 ? 0.25 : 0));
+    const rows: UsageRow[] = [
+      { customerId: c.id, resource: "usuarios", used: Math.min(c.seats, l.usuarios ?? c.seats), limit: l.usuarios },
+      { customerId: c.id, resource: "paineis", used: Math.round((l.paineis ?? 120) * ratio(1)), limit: l.paineis },
+      { customerId: c.id, resource: "eventos", used: Math.round((l.eventos ?? 0) * ratio(2)), limit: l.eventos },
+    ];
+    if (l.api) rows.push({ customerId: c.id, resource: "api", used: Math.round(l.api * ratio(3)), limit: l.api });
+    return rows;
+  });
+/** Fração do limite usada (0–1+). Ilimitado = 0. */
+export const usageRatio = (u: UsageRow) => (u.limit ? u.used / u.limit : 0);

@@ -392,6 +392,28 @@ Curva monotônica (Fritsch–Carlson): suave sem inventar picos entre pontos.
 linePath(points, curved): string
 ```
 
+## MiniBarChart
+
+Barrinhas de atividade num cartão pequeno (7 dias, 12 meses, 24 horas).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `data` * | `{ label: string; value: number; }[]` |  |  |
+| `label` * | `string` |  |  |
+| `caption` | `ReactNode` |  | Linha abaixo do título ("Últimos 7 dias"). |
+| `className` | `string \| undefined` |  |  |
+| `format` | `((n: number) => string) \| undefined` | `(n: number) => formatNumber(n)` |  |
+| `framed` | `boolean \| undefined` | `true` | false dentro de um cartão que já tem borda. |
+| `height` | `number \| undefined` | `96` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/dash-progresso-e-presenca`):
+
+```tsx
+<MiniBarChart label="Custo por dia" format={(n) => formatCurrency(n)} data={…} />
+```
+
 ## niceDomain (function)
 
 Escala "bonita": passos 1 · 2 · 2,5 · 5 · 10 × 10ⁿ, sempre incluindo zero.

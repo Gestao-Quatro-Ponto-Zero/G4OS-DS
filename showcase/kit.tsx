@@ -70,7 +70,7 @@ function ShadcnChips() {
 }
 export type PageModule = { meta: PageMeta; default: ComponentType; slug: string; source: string };
 
-export const blockCategories = ["SaaS", "CRM", "ATS", "ERP", "Financeiro", "Autenticação", "Configurações", "Onboarding", "Aplicação", "IA", "Marketing"] as const;
+export const blockCategories = ["SaaS", "CRM", "ATS", "ERP", "Serviços", "Financeiro", "Contratos", "Comunicação", "Autenticação", "Configurações", "Onboarding", "Aplicação", "IA", "Marketing"] as const;
 /** Conceito do bloco: o que ele quer passar, para reaproveitar com intenção. */
 export type BlockConcept = {
   /** Problema que a tela resolve e para quem. */

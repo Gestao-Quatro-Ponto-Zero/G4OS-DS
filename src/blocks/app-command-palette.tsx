@@ -11,6 +11,7 @@ import {
   useCommandShortcut,
   useTheme,
   type Command } from "@g4ai/ds";
+import { companies, companyById, deals } from "./data/crm";
 import { me } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
 import { frameHref, goTo } from "./shells/frame-route";
@@ -54,8 +55,9 @@ const baseCommands: Command[] = [
   { id: "relatorios", group: "Navegar", label: "Painel de vendas", icon: <BarChart3 />, keywords: ["dashboard", "métricas", "relatórios"], onSelect: to(frameHref("crm-sales-dashboard")) },
   { id: "novo-chamado", group: "Criar", label: "Novo chamado", icon: <FilePlus2 />, shortcut: ["⌘", "N"], onSelect: to(frameHref("app-filtered-list", { novo: 1 })) },
   { id: "convidar", group: "Criar", label: "Convidar pessoa para o time", icon: <UserPlus />, onSelect: to(frameHref("settings-team")) },
-  { id: "acme", group: "Empresas", label: "Acme Logística", hint: "São Paulo · 3 negócios", icon: <Building2 />, onSelect: to(frameHref("app-global-search")) },
-  { id: "vertice", group: "Empresas", label: "Vértice Saúde", hint: "Belo Horizonte · 1 negócio", icon: <Building2 />, onSelect: to(frameHref("app-global-search")) },
+  // Empresas: cada resultado abre o registro da conta (crm-company?id=…).
+  ...companies.slice(0, 8).map<Command>((c) => ({ id: `empresa-${c.id}`, group: "Empresas", label: c.name, hint: `${c.city} · ${c.industry}`, icon: <Building2 />, keywords: [c.domain, c.cnpj], onSelect: to(frameHref("crm-company", c.id)) })),
+  { id: "todas-empresas", group: "Empresas", label: "Ver todas as empresas", icon: <Search />, keywords: ["contas", "clientes"], onSelect: to(frameHref("app-global-search")) },
   { id: "proposta", group: "Documentos", label: "Proposta comercial — Acme", hint: "PDF · ontem", icon: <FileText />, onSelect: to(frameHref("app-file-manager", { id: "1" })) },
   { id: "config", group: "Preferências", label: "Configurações", icon: <Settings />, shortcut: ["⌘", ","], onSelect: to(atlasRoutes.settings) },
   { id: "aparencia", group: "Preferências", label: "Aparência e marca", icon: <Palette />, keywords: ["tema", "cores", "white-label"], onSelect: to(frameHref("settings-appearance")) },
@@ -91,7 +93,7 @@ export default function CommandPaletteBlock() {
         <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
           <ListPanel title="Continuar de onde parou" icon={<Clock />} count={3}>
             <div className="divide-y divide-line">
-              <ListRow href={frameHref("crm-deal")} kicker="Negócio · Proposta" title="Acme Logística — Frota 2027" meta="há 12 min" />
+              <ListRow href={frameHref("crm-deal", deals[0].id)} kicker="Negócio · Negociação" title={`${companyById(deals[0].companyId).name} — ${deals[0].title}`} meta="há 12 min" />
               <ListRow href={frameHref("crm-contacts")} kicker="Contato" title="Mariana Couto · Acme" meta="há 1 h" />
               <ListRow href={frameHref("crm-sales-dashboard")} kicker="Relatório" title="Forecast de outubro" meta="ontem" />
             </div>
@@ -114,7 +116,7 @@ export default function CommandPaletteBlock() {
           </div>
         </div>
       </Page>
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} recent={["negocios", "acme", "novo-chamado"]} placeholder="Buscar negócios, contatos, empresas ou comandos…" />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} recent={["negocios", `empresa-${companies[0].id}`, "novo-chamado"]} placeholder="Buscar negócios, contatos, empresas ou comandos…" />
     </AtlasShell>
   );
 }

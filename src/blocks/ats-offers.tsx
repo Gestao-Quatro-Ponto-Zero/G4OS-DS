@@ -7,6 +7,7 @@ import {
   Callout,
   ConfirmDialog,
   CurrencyField,
+  Empty,
   Page,
   PageHeading,
   PropertyList,
@@ -17,7 +18,7 @@ import {
 } from "@g4ai/ds";
 import { candidateById, iso, jobById, me, offerStatus, offers as seed, person, shortDate, type Offer, type OfferStatus } from "./data/ats";
 import { go, useFrameParam } from "./shells/frame-route";
-import { TalentosShell } from "./shells/talentos-shell";
+import { LoadError, LoadingRows, TalentosShell, useListState } from "./shells/talentos-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -31,7 +32,8 @@ export const meta = {
     patterns: [
       "Anatomia F · Mestre-detalhe: lista de propostas + detalhe com cadeia de aprovação",
       "Alerta quando o salário sai da faixa",
-      "Ações mudam com a situação (aprovar, enviar, registrar resposta)",
+      "Ações mudam com a situação (aprovar, enviar, registrar resposta); aceite leva à admissão",
+      "Cinco estados: ?estado=carregando|vazio|erro simula; aba sem propostas tem vazio próprio",
     ],
     adapt: [
       "Descontos comerciais, compras acima da alçada, reembolsos",
@@ -50,6 +52,7 @@ const tabs: { id: "abertas" | OfferStatus | "todas"; label: string; match: (o: O
 
 export default function AtsOffers() {
   const candidato = useFrameParam("candidato");
+  const estado = useListState();
   const [list, setList] = useState<Offer[]>(() => {
     if (!candidato || seed.some((o) => o.candidateId === candidato)) return seed;
     const c = candidateById(candidato);
@@ -82,6 +85,24 @@ export default function AtsOffers() {
           }}
           items={tabs.map((t) => ({ id: t.id, label: `${t.label} · ${list.filter(t.match).length}` }))}
         />
+        {estado === "carregando" ? (
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)]">
+            <LoadingRows variant="cards" rows={4} label="Carregando propostas" />
+            <LoadingRows rows={4} label="Carregando detalhe da proposta" />
+          </div>
+        ) : estado === "erro" ? (
+          <div className="mt-5">
+            <LoadError what="as propostas" />
+          </div>
+        ) : estado === "vazio" ? (
+          <div className="mt-5">
+            <Empty
+              title="Nenhuma proposta ainda"
+              hint="Propostas nascem no perfil do candidato, quando ele chega à etapa Proposta. Veja quem está perto disso."
+              action={<Button href="#/frame/ats-candidates">Ver candidatos em processo</Button>}
+            />
+          </div>
+        ) : (
         <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)]">
           <ul className="list-none space-y-2 p-0">
             {shown.map((x) => {
@@ -105,10 +126,19 @@ export default function AtsOffers() {
                 </li>
               );
             })}
-            {!shown.length && <li className="rounded-xl border border-dashed border-line px-4 py-8 text-center text-[13px] text-muted">Nenhuma proposta aqui.</li>}
+            {!shown.length && (
+              <li>
+                <Empty
+                  title={tab === "aceita" ? "Nenhuma proposta aceita" : tab === "recusada" ? "Nenhuma proposta recusada" : "Nenhuma proposta em andamento"}
+                  hint={tab === "abertas" ? "Quando um finalista chegar à etapa Proposta, crie a proposta pelo perfil dele." : tab === "aceita" ? "Os aceites aparecem aqui e seguem para a admissão." : "Bom sinal: ninguém recusou no período."}
+                  action={tab === "abertas" ? <Button variant="ghost" href="#/frame/ats-candidates">Ver finalistas</Button> : undefined}
+                />
+              </li>
+            )}
           </ul>
-          {o && <OfferDetail key={o.id} offer={o} onUpdate={update} onDecline={() => setDecline(true)} />}
+          {o && shown.some((x) => x.id === o.id) && <OfferDetail key={o.id} offer={o} onUpdate={update} onDecline={() => setDecline(true)} />}
         </div>
+        )}
       </Page>
       <ConfirmDialog
         open={decline}
@@ -200,7 +230,7 @@ function OfferDetail({ offer: o, onUpdate, onDecline }: { offer: Offer; onUpdate
             </Button>
           </>
         )}
-        {o.status === "aceita" && <Button onClick={() => notify("Admissão iniciada: documentos solicitados por e-mail")}>Iniciar admissão</Button>}
+        {o.status === "aceita" && <Button onClick={() => go("ats-admission", c.id)}>Iniciar admissão</Button>}
         {o.status === "recusada" && (
           <Button variant="ghost" onClick={() => go("ats-pipeline", o.jobId)}>
             Voltar às finalistas da vaga

@@ -26,4 +26,4 @@ Extrato do banco × lançamentos do ERP lado a lado: sugestões com grau de conf
 
 ## Componentes usados
 
-`Badge`, `Button`, `Empty`, `FieldBlock`, `Meter`, `Page`, `PageHeading`, `Select`, `formatCurrency`, `formatPercent`, `notify`
+`Badge`, `Button`, `Callout`, `Empty`, `FieldBlock`, `FileDropzone`, `Meter`, `Modal`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `Select`, `UploadItem`, `formatCurrency`, `formatPercent`, `notify`, `useOperation`

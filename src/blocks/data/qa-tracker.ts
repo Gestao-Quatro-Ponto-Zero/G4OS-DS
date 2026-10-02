@@ -16,7 +16,15 @@ export type QaCase = {
   owner: string;
   due: string;
   files: RecordFile[];
+  /** Rótulos livres além da categoria. */
+  labels?: string[];
+  /** Quem vê o caso. */
+  sharing?: QaSharing;
 };
+
+export type QaSharing = "privado" | "time" | "workspace";
+export const sharingLabel: Record<QaSharing, string> = { privado: "Só eu", time: "Time de Produto", workspace: "Todo o workspace" };
+export const qaLabels = ["Regressão", "Bloqueia release", "Celular", "Cliente reportou", "Acessibilidade"];
 
 export const categoryColor: Record<string, TagColor> = {
   Autenticação: "purple",
@@ -71,6 +79,8 @@ export const cases: QaCase[] = seed.map(([title, category, status, priority], i)
     status,
     priority,
     owner: owners[i % owners.length],
+    labels: i === 0 ? ["Bloqueia release"] : i % 4 === 1 ? ["Regressão"] : [],
+    sharing: "time",
     due: `${String(((i * 3) % 27) + 1).padStart(2, "0")}/10/2026`,
     files:
       i === 0

@@ -1,6 +1,7 @@
-import { ArrowLeft, ArrowRight, BookOpen, Search } from "lucide-react";
-import { AppShell, Callout, IconButton, Page, PageHeading, SectionNav, Sidebar, notify, type NavSection, type NavSubItem } from "@g4ai/ds";
-import { frameHref, useFrameParam } from "./shells/frame-route";
+import { ArrowLeft, ArrowRight, BookOpen, FileText, Search, Undo2 } from "lucide-react";
+import { useState } from "react";
+import { AppShell, Callout, CommandPalette, IconButton, Page, PageHeading, SectionNav, Sidebar, useCommandShortcut, type Command, type NavSection, type NavSubItem } from "@g4ai/ds";
+import { frameHref, goTo, useFrameParam } from "./shells/frame-route";
 
 export const meta = {
   title: "Central de ajuda (navegação de seções)",
@@ -66,7 +67,12 @@ const walk = (list: NavSubItem[], section: string) =>
   });
 sections.forEach((s) => walk(s.items, s.label));
 
+/** Busca da ajuda: todos os artigos, agrupados pela seção (sem acento, sem caixa). */
+const articleCommands: Command[] = flat.map(({ item, section }) => ({ id: item.match ?? item.href, group: section, label: item.label, icon: <FileText />, onSelect: () => goTo(item.href) }));
+
 export default function HelpCenterBlock() {
+  const [searchOpen, setSearchOpen] = useState(false);
+  useCommandShortcut(() => setSearchOpen(true));
   const p = useFrameParam("p", "inicio/bem-vindo");
   const path = `/${p}`;
   const index = Math.max(0, flat.findIndex((f) => f.item.match === path));
@@ -78,9 +84,14 @@ export default function HelpCenterBlock() {
       product="Ajuda Acme"
       currentPath={path}
       headerActions={
-        <IconButton label="Buscar na ajuda" onClick={() => notify("Busca aberta")}>
-          <Search />
-        </IconButton>
+        <>
+          <IconButton label="Buscar na ajuda" onClick={() => setSearchOpen(true)}>
+            <Search />
+          </IconButton>
+          <IconButton label="Voltar ao Atlas" onClick={() => goTo(frameHref("onboarding-checklist"))}>
+            <Undo2 />
+          </IconButton>
+        </>
       }
       sidebar={({ mobileOpen, close }) => (
         <Sidebar
@@ -113,7 +124,13 @@ export default function HelpCenterBlock() {
           <ol className="m-0 list-decimal space-y-1.5 pl-5">
             <li>Abra Configurações no menu da conta.</li>
             <li>Escolha a seção correspondente e revise os campos.</li>
-            <li>Salve. O histórico fica em Configurações › Registro de auditoria.</li>
+            <li>
+              Salve. O histórico fica em{" "}
+              <a href={frameHref("settings-audit-log")} className="font-medium text-ink underline underline-offset-2">
+                Configurações › Log de auditoria
+              </a>
+              .
+            </li>
           </ol>
         </article>
         <nav aria-label="Artigos vizinhos" className="mt-10 grid gap-3 border-t border-line pt-6 sm:grid-cols-2">
@@ -137,6 +154,7 @@ export default function HelpCenterBlock() {
           )}
         </nav>
       </Page>
+      <CommandPalette open={searchOpen} onClose={() => setSearchOpen(false)} commands={articleCommands} placeholder="Buscar artigos da ajuda…" />
     </AppShell>
   );
 }

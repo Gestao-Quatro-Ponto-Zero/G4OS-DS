@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BrainCircuit, Code, FileText, Search } from "lucide-react";
 import { AgentPlan, ApprovalRequest, ReasoningBlock, notify, type ApprovalState } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
@@ -25,6 +26,57 @@ export default function Page() {
             ]}
           />
         </Demo>
+        <Demo
+          className="block max-w-[680px]"
+          title="Recolhível, com detalhe por passo"
+          description="`collapsible` vira cartão com status geral no cabeçalho. Passo com `content` abre o detalhe (ferramenta chamada, aviso); `durationMs` mostra quanto levou; `icon` identifica o tipo dos passos pendentes."
+          code={`<AgentPlan collapsible title="Planejando a régua de cobrança" steps={[
+  { id: "1", label: "Entender o pedido", status: "done", durationMs: 400, content: <Restricoes /> },
+  { id: "2", label: "Buscar faturas no ERP", status: "done", durationMs: 1200, content: <ToolCallCard … /> },
+  { id: "3", label: "Montar a régua por perfil", status: "active", defaultOpen: true, content: <Rascunho /> },
+  { id: "4", label: "Revisar conflito com a política", status: "error", content: <Callout tone="bad" … /> },
+  { id: "5", label: "Enviar para aprovação", status: "pending", icon: <Code /> },
+]} />`}
+        >
+          <AgentPlan
+            collapsible
+            title="Planejando a régua de cobrança"
+            steps={[
+              {
+                id: "1",
+                label: "Entender o pedido e extrair restrições",
+                status: "done",
+                durationMs: 400,
+                icon: <Search />,
+                content: (
+                  <dl className="m-0 grid grid-cols-[96px_1fr] gap-x-3 gap-y-1 rounded-lg border border-line bg-soft/60 p-2.5 text-[12px]">
+                    <dt className="text-muted">Região</dt>
+                    <dd className="m-0">Nordeste</dd>
+                    <dt className="text-muted">Atraso</dt>
+                    <dd className="m-0">15 dias ou mais</dd>
+                    <dt className="text-muted">Restrição</dt>
+                    <dd className="m-0 text-amber">Não contatar clientes em negociação</dd>
+                  </dl>
+                ),
+              },
+              { id: "2", label: "Buscar faturas no ERP", status: "done", durationMs: 1240, icon: <FileText />, content: <p className="m-0">Consulta <code className="rounded bg-soft px-1 font-mono text-[11.5px]">contas_receber.vencidas</code> devolveu 42 faturas, R$ 318,4 mil.</p> },
+              { id: "3", label: "Montar a régua por perfil de pagador", status: "active", defaultOpen: true, icon: <BrainCircuit />, content: <p className="m-0">Separando quem sempre atrasou (lembrete leve) de quem começou agora (ligação do gerente)…</p> },
+              { id: "4", label: "Revisar conflito com a política de cobrança", status: "error", durationMs: 800, content: <p className="m-0 rounded-lg border border-rose/20 bg-rose-soft/50 p-2.5 text-rose">3 clientes estão em negociação jurídica. Removidos da régua antes de continuar.</p> },
+              { id: "5", label: "Enviar a régua para aprovação", status: "pending", icon: <Code /> },
+            ]}
+          />
+        </Demo>
+        <PropsTable
+          rows={[
+            ["steps[].status", '"pending" | "active" | "done" | "error" | "skipped"', "—", "Onde o passo está. Ícone + texto para leitor de tela."],
+            ["steps[].content", "ReactNode", "—", "Detalhe expansível do passo (ferramenta, trecho, aviso)."],
+            ["steps[].durationMs", "number", "—", "Quanto o passo levou (formatDuration)."],
+            ["steps[].icon", "ReactNode", "—", "Tipo do passo, mostrado enquanto pendente."],
+            ["steps[].defaultOpen", "boolean", "false", "Abre o detalhe de início (passo atual ou que falhou)."],
+            ["collapsible", "boolean", "false", "Cabeçalho clicável com status geral; recolhe o plano."],
+            ["defaultOpen", "boolean", "true", "Plano aberto de início (com collapsible)."],
+          ]}
+        />
       </DocSection>
       <DocSection title="ApprovalRequest" rule="Toda ação que sai da empresa ou não tem volta: preview do que vai acontecer, impacto, e três saídas.">
         <Demo

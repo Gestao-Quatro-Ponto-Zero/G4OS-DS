@@ -182,7 +182,7 @@
               "description": null
             }
           ],
-          "examplePage": "estrutura-separador-e-rolagem"
+          "examplePage": "dash-progresso-e-presenca"
         },
         {
           "name": "Button",
@@ -3555,17 +3555,30 @@
         {
           "name": "Timeline",
           "kind": "component",
-          "summary": "Linha do tempo vertical de eventos (atividade, histórico).",
+          "summary": "Linha do tempo vertical: o que aconteceu, em ordem.",
           "props": [
             {
               "name": "items",
-              "type": "{ id: string; title: ReactNode; meta?: ReactNode; tone?: Tone; body?: ReactNode; }[]",
+              "type": "TimelineItem[]",
               "required": true,
               "default": null,
               "description": null
+            },
+            {
+              "name": "leadingWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": "96",
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "exibicao-historico-e-versoes"
+        },
+        {
+          "name": "TimelineItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; title: ReactNode; meta?: ReactNode; tone?: Tone; body?: ReactNode; leading?: ReactNode; current?: boolean; }"
         },
         {
           "name": "WorkStatus",
@@ -5295,6 +5308,63 @@
           "kind": "function",
           "summary": "Curva monotônica (Fritsch–Carlson): suave sem inventar picos entre pontos.",
           "signature": "linePath(points, curved): string"
+        },
+        {
+          "name": "MiniBarChart",
+          "kind": "component",
+          "summary": "Barrinhas de atividade num cartão pequeno (7 dias, 12 meses, 24 horas).",
+          "props": [
+            {
+              "name": "data",
+              "type": "{ label: string; value: number; }[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "caption",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Linha abaixo do título (\"Últimos 7 dias\")."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n: number) => formatNumber(n)",
+              "description": null
+            },
+            {
+              "name": "framed",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "false dentro de um cartão que já tem borda."
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "96",
+              "description": null
+            }
+          ],
+          "examplePage": "dash-progresso-e-presenca"
         },
         {
           "name": "niceDomain",
@@ -16420,8 +16490,22 @@
               "description": null
             },
             {
+              "name": "collapsible",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Cabeçalho clicável que recolhe o plano; ícone mostra o status geral."
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
               "name": "title",
-              "type": "string | undefined",
+              "type": "ReactNode",
               "required": false,
               "default": "\"Plano\"",
               "description": null
@@ -16947,7 +17031,7 @@
           "name": "PlanStep",
           "kind": "type",
           "summary": null,
-          "definition": "{ id: string; label: string; status: \"pending\" | \"active\" | \"done\" | \"error\" | \"skipped\"; detail?: ReactNode }"
+          "definition": "{ id: string; label: ReactNode; status: \"pending\" | \"active\" | \"done\" | \"error\" | \"skipped\"; detail?: ReactNode; content?: ReactNode; defaultOpen?: boolean; durationMs?: number; icon?: ReactNode; }"
         },
         {
           "name": "RailItem",
@@ -20306,6 +20390,28 @@
               "type": "RichTextTool[][] | undefined",
               "required": false,
               "default": "allTools",
+              "description": null
+            }
+          ],
+          "examplePage": "editor-de-texto"
+        },
+        {
+          "name": "RichTextView",
+          "kind": "component",
+          "summary": "Mostra texto rico (HTML do RichTextEditor, comentário, comunicado) só para leitura, com o mesmo estilo do editor.",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
               "description": null
             }
           ],
@@ -24879,6 +24985,310 @@
         }
       ],
       "doc": "components/nav-tree.md"
+    },
+    {
+      "name": "history",
+      "file": "src/components/history.tsx",
+      "summary": "Histórico e progresso no tempo.",
+      "exports": [
+        {
+          "name": "Milestone",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; title: ReactNode; description?: ReactNode; status: \"done\" | \"current\" | \"todo\"; date?: string; }"
+        },
+        {
+          "name": "ProjectProgressCard",
+          "kind": "component",
+          "summary": "Projeto em um cartão: título, responsável, prazo, progresso e marcos numa linha do tempo vertical; um único próximo passo no rodapé.",
+          "props": [
+            {
+              "name": "milestones",
+              "type": "Milestone[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "O próximo passo: um `Button` (primário) ou link."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "due",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Prazo final (ISO)."
+            },
+            {
+              "name": "late",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Prazo vencido: a data fica em `rose` com a palavra \"Atrasado\"."
+            },
+            {
+              "name": "owner",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Responsável (\"Ana Lopes\")."
+            },
+            {
+              "name": "subtitle",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "dash-progresso-e-presenca"
+        },
+        {
+          "name": "Revision",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; date: string; title: ReactNode; time?: string; author?: ReactNode; kind?: \"major\" | \"minor\"; tag?: ReactNode; content?: ReactNode; }"
+        },
+        {
+          "name": "RevisionTimeline",
+          "kind": "component",
+          "summary": "Histórico de revisões navegável por dia.",
+          "props": [
+            {
+              "name": "revisions",
+              "type": "Revision[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Id inicial. Padrão: a mais recente."
+            },
+            {
+              "name": "futureDays",
+              "type": "number | undefined",
+              "required": false,
+              "default": "7",
+              "description": "Dias futuros (tracejados) depois de hoje."
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Altura fixa da área de conteúdo (rola por dentro)."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Histórico de revisões\"",
+              "description": "Nome acessível do dial."
+            },
+            {
+              "name": "onChange",
+              "type": "((id: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "padDays",
+              "type": "number | undefined",
+              "required": false,
+              "default": "14",
+              "description": "Dias vazios desenhados antes da primeira revisão."
+            },
+            {
+              "name": "today",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"Hoje\" do dial (ISO)."
+            },
+            {
+              "name": "value",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Id da revisão aberta (controlado)."
+            }
+          ],
+          "examplePage": "exibicao-historico-e-versoes"
+        }
+      ],
+      "doc": "components/history.md"
+    },
+    {
+      "name": "presence",
+      "file": "src/components/presence.tsx",
+      "summary": "Presença: quem está por aqui e onde.",
+      "exports": [
+        {
+          "name": "LocationTag",
+          "kind": "component",
+          "summary": "Lugar + hora local. Pílula com o nome do lugar e, ao lado, a hora no fuso dele (atualiza sozinha); o fuso completo aparece no tooltip.",
+          "props": [
+            {
+              "name": "place",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "\"São Paulo, SP\", \"Lisboa, Portugal\"."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "href",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "showTime",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "status",
+              "type": "{ label: string; tone?: Tone; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Estado do lugar com palavra: `{ label: \"Operando\", tone: \"ok\" }`."
+            },
+            {
+              "name": "timeZone",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Fuso IANA (\"America/Sao_Paulo\")."
+            }
+          ],
+          "examplePage": "dash-progresso-e-presenca"
+        },
+        {
+          "name": "StackedList",
+          "kind": "component",
+          "summary": "Lista em destaque com o diretório completo empilhado embaixo.",
+          "props": [
+            {
+              "name": "items",
+              "type": "StackedListItem[]",
+              "required": true,
+              "default": null,
+              "description": "Todos os itens (vão para o diretório)."
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ação no cabeçalho (ex.: IconButton \"Convidar\")."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "directoryHint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Linha abaixo do título da barra."
+            },
+            {
+              "name": "directoryLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Todas as pessoas\"",
+              "description": "Título da barra/diretório."
+            },
+            {
+              "name": "emptyFeatured",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Ninguém online agora.\"",
+              "description": null
+            },
+            {
+              "name": "featured",
+              "type": "((item: StackedListItem) => boolean) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Quem aparece em destaque."
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "420",
+              "description": "Altura do cartão em px (o diretório abre dentro dela)."
+            },
+            {
+              "name": "searchPlaceholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Buscar pessoas…\"",
+              "description": null
+            }
+          ],
+          "examplePage": "dash-progresso-e-presenca"
+        },
+        {
+          "name": "StackedListItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; name: string; initials?: string; tint?: string; src?: string; status?: AvatarStatus; description?: ReactNode; meta?: ReactNode; href?: string; onClick?: () => void; keywords?: string; }"
+        }
+      ],
+      "doc": "components/presence.md"
     }
   ],
   "blocks": [
@@ -24886,7 +25296,7 @@
       "slug": "ai-agent-builder",
       "file": "src/blocks/ai-agent-builder.tsx",
       "title": "Construtor de agentes",
-      "description": "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar.",
+      "description": "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).",
       "category": "IA",
       "concept": {
         "goal": "Definir o que um agente faz sem sair da conversa com ele: quem configura automações monta gatilhos, ferramentas e instruções e testa na hora.",
@@ -24914,13 +25324,16 @@
         "AgentMessage",
         "AgentStatus",
         "BuilderSection",
+        "Button",
         "ChipPicker",
         "MenuEntry",
+        "Modal",
         "PropertyRow",
         "PublishBar",
         "ResizableSplit",
         "RunStatus",
         "RunSummary",
+        "TextField",
         "ToolGlyph",
         "TriggerList",
         "notify"
@@ -24952,34 +25365,147 @@
         "AgentConnection",
         "AppIcon",
         "Button",
+        "ChoiceCards",
         "ConnectionsCard",
+        "Modal",
         "Page",
         "PageHeading",
         "Subagent",
         "Switch",
+        "TextField",
         "notify"
+      ]
+    },
+    {
+      "slug": "ai-agent-evals",
+      "file": "src/blocks/ai-agent-evals.tsx",
+      "title": "Avaliações de agentes",
+      "description": "Suítes de teste de cada agente: casos, score contra o mínimo para publicar, score por versão em gráfico, regressões, rodar avaliação (uma suíte ou todas) e casos que falharam com link para a execução. Cinco estados (?estado=).",
+      "category": "IA",
+      "concept": {
+        "goal": "Saber se uma versão nova do agente ficou melhor ou pior antes de ela atender clientes, e achar o caso que quebrou.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar com filtros; gráfico do agente escolhido acima da tabela",
+          "Score por versão em LineChart com linha de referência no mínimo para publicar",
+          "Suíte abaixo do mínimo = palavra + cor na linha (regressão)",
+          "Rodar avaliação com useOperation: o botão diz o que está fazendo",
+          "Caso que falhou leva à execução, onde está o trace"
+        ],
+        "adapt": [
+          "Testes de regras de automação, validação de prompts, QA de integrações",
+          "Fora de IA: suíte = conjunto de cenários; score = % aprovado"
+        ],
+        "avoid": [
+          "Score sem o mínimo ao lado (ninguém sabe se 87 % é bom)",
+          "Falha sem link para o caso e a execução"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "HealthDot",
+        "Highlight",
+        "LineChart",
+        "Meter",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "ai-agent-governance",
+      "file": "src/blocks/ai-agent-governance.tsx",
+      "title": "Governança de agentes",
+      "description": "Configurações da frota (?secao=): créditos do mês e orçamento por área e por agente com alerta, limites de uso, política de aprovação humana, modelos permitidos, dados e LGPD (retenção, mascaramento, região) e chaves de API.",
+      "category": "IA",
+      "concept": {
+        "goal": "Quem responde pela IA na empresa define quanto cada agente pode gastar, o que exige uma pessoa, quais modelos valem e onde os dados ficam.",
+        "patterns": [
+          "Anatomia D · Configurações: título fixo + subnavegação colada (SettingsLayout); seção na URL (?secao=)",
+          "Créditos do mês com GoalMeter e 'Ver uso'; orçamento por área com Meter e por agente editável em Drawer",
+          "Política de aprovação por tipo de ação: Sempre · Acima de um valor · Nunca",
+          "Mudança arriscada (modelo fora do Brasil, revogar chave) pede ConfirmDialog",
+          "Chave nova aparece uma única vez, com copiar"
+        ],
+        "adapt": [
+          "Governança de automações, limites de API de um SaaS, políticas de compras"
+        ],
+        "avoid": [
+          "Orçamento sem alerta antes de estourar",
+          "Liberar modelo que envia dados para fora do Brasil sem avisar o impacto de LGPD",
+          "Mostrar a chave inteira depois de criada"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Column",
+        "ConfirmDialog",
+        "CopyButton",
+        "CurrencyField",
+        "DataTable",
+        "Drawer",
+        "Meter",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "SegmentedControl",
+        "Select",
+        "SettingsLayout",
+        "SettingsNavItem",
+        "SettingsSection",
+        "Slider",
+        "Switch",
+        "TextField",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useOperation"
       ]
     },
     {
       "slug": "ai-agent-run",
       "file": "src/blocks/ai-agent-run.tsx",
       "title": "Execução de agente",
-      "description": "Detalhe de uma execução: trace em cascata com replay, passo selecionado com entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar e tentar de novo.",
+      "description": "Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado.",
       "category": "IA",
       "concept": {
-        "goal": "Explicar uma execução do agente passo a passo para quem precisa auditar ou aprovar o resultado antes de usar.",
+        "goal": "Explicar uma execução do agente passo a passo para quem precisa auditar, aprovar o resultado ou corrigir o agente.",
         "patterns": [
-          "Anatomia C · Registro: trilha + título fixos, trace em cascata no conteúdo",
-          "Passo selecionado mostra entrada e saída lado a lado",
+          "Anatomia C · Registro: trilha (Execuções › agente) + título fixos, trace em cascata no conteúdo",
+          "Passo selecionado mostra entrada e saída lado a lado; falha com mensagem em linguagem de gente",
           "Custo, tokens e tempo sempre visíveis",
-          "Saída que pede aprovação humana antes de agir; tentar de novo por passo"
+          "Executar de novo com useOperation (o botão informa enquanto roda)",
+          "Fim da execução: 'O que você quer fazer agora?' com 3 opções numeradas (↑ ↓ Enter, 1–3, Esc) e campo livre"
         ],
         "adapt": [
           "Logs de automação, jobs de integração, pipelines de dados",
           "Troque 'tokens' por 'registros processados' fora de IA"
         ],
         "avoid": [
-          "Mostrar só o resultado final sem como chegou nele"
+          "Mostrar só o resultado final sem como chegou nele",
+          "Terminar a execução sem próximo passo (o usuário volta para a lista sem saber o que fazer)"
         ]
       },
       "uses": [
@@ -24987,7 +25513,15 @@
         "AiBadge",
         "Badge",
         "Button",
+        "CommandGroup",
+        "CommandInput",
+        "CommandItem",
+        "CommandList",
+        "CommandMenu",
+        "IconButton",
         "JsonView",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PropertyList",
@@ -25002,6 +25536,259 @@
         "formatCurrency",
         "formatDuration",
         "formatNumber",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "ai-agent-templates",
+      "file": "src/blocks/ai-agent-templates.tsx",
+      "title": "Descobrir agentes",
+      "description": "Galeria de modelos de agente por categoria (Vendas, Financeiro, Suporte, Pessoas, Operações): ferramentas que cada um usa, quantas equipes usam, quem criou e tempo para configurar. 'Usar modelo' abre o construtor; campo de pedido para começar do zero.",
+      "category": "IA",
+      "concept": {
+        "goal": "Quem ainda não sabe o que automatizar encontra um ponto de partida testado por outras equipes e sai com um agente em rascunho em minutos.",
+        "patterns": [
+          "Anatomia A · Lista (galeria): cabeçalho fixo + PageToolbar com categorias e busca",
+          "Cartão = ferramentas (glifos), nome, uma frase, prova social (equipes) e autor",
+          "Um primário por cartão: 'Usar modelo' abre o construtor com ?modelo=",
+          "Pedido livre no topo para quem prefere descrever do zero"
+        ],
+        "adapt": [
+          "Galeria de automações, modelos de relatório, playbooks de atendimento"
+        ],
+        "avoid": [
+          "Cartões com ilustração genérica no lugar das ferramentas reais",
+          "Usar modelo publicando direto (sempre nasce rascunho)"
+        ]
+      },
+      "uses": [
+        "AgentComposer",
+        "Badge",
+        "Button",
+        "Empty",
+        "FilterChip",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "TableSearch",
+        "ToolGlyph",
+        "formatNumber",
+        "normalize"
+      ]
+    },
+    {
+      "slug": "ai-agent",
+      "file": "src/blocks/ai-agent.tsx",
+      "title": "Página do agente",
+      "description": "Registro de um agente (?id=): status, pausar/retomar com confirmação, editar no construtor; abas Visão geral (KPIs, fluxo padrão, rollout da próxima versão, região, quem acompanha), Versões (dial de revisões + changelog, restaurar), Execuções, Avaliações e Permissões; propriedades fixas à direita.",
+      "category": "IA",
+      "concept": {
+        "goal": "Dar ao dono de um agente tudo o que ele precisa para confiar, evoluir e responder pelo agente: o que faz, como está indo, o que mudou e o que pode acessar.",
+        "patterns": [
+          "Anatomia C · Registro: trilha 'Agentes', título, status e ações fixos; propriedades em SplitLayout à direita",
+          "Ações mudam com o estado: Pausar (com ConfirmDialog) × Retomar; Editar abre o construtor",
+          "Fluxo padrão em AgentPlan recolhível; passos que pedem aprovação marcados",
+          "Rollout da próxima versão como ProjectProgressCard com o próximo passo",
+          "Versões: RevisionTimeline (dial por dia) + Timeline com `leading` como changelog; restaurar pede confirmação",
+          "Região de execução com LocationTag (hora local) e aviso de LGPD fora do Brasil"
+        ],
+        "adapt": [
+          "Página de uma automação, integração ou robô de RPA",
+          "Sem versões? Troque a aba por 'Histórico de alterações' (log de auditoria)"
+        ],
+        "avoid": [
+          "Pausar sem dizer o que acontece com o que está na fila",
+          "Permissões escondidas em outra tela: quem é dono precisa ver o que o agente pode tocar",
+          "Restaurar versão sem confirmação (muda o comportamento em produção)"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "AgentPlan",
+        "AppIcon",
+        "Badge",
+        "Button",
+        "Callout",
+        "ChartCard",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "HealthDot",
+        "IconButton",
+        "LineChart",
+        "LocationTag",
+        "Meter",
+        "MiniBarChart",
+        "Page",
+        "PageHeading",
+        "PlanStep",
+        "ProjectProgressCard",
+        "PropertyList",
+        "Revision",
+        "RevisionTimeline",
+        "SplitLayout",
+        "StackedList",
+        "StatCell",
+        "StatGrid",
+        "Tabs",
+        "Timeline",
+        "TimelineItem",
+        "formatCurrency",
+        "formatDate",
+        "formatDuration",
+        "formatNumber",
+        "formatPercent",
+        "notify"
+      ]
+    },
+    {
+      "slug": "ai-agents-dashboard",
+      "file": "src/blocks/ai-agents-dashboard.tsx",
+      "title": "Painel da frota de agentes",
+      "description": "Saúde de todos os agentes num olhar: execuções, sucesso, custo e latência p95 com base explícita, execuções × falhas por dia, quem mais roda, custo por área, créditos do mês, 'Precisa de você' clicável e incidentes recentes.",
+      "category": "IA",
+      "concept": {
+        "goal": "Quem responde pela operação de IA da empresa vê em segundos se a frota está saudável, quanto custa e o que precisa de uma pessoa agora.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com período à direita",
+          "5 KPIs com delta e base explícita; custo e latência com goodWhen='down'",
+          "Gráfico principal responde uma pergunta (execuções × falhas); MiniBarChart para custo por área",
+          "'Precisa de você' antes do detalhe: aprovações, agentes com erro, orçamento perto do limite, regressão",
+          "Incidentes recentes abrem a execução que falhou"
+        ],
+        "adapt": [
+          "Painel de automações/RPA: troque tokens e custo de modelo por horas de robô",
+          "Painel de integrações: execuções viram sincronizações; falhas por conector"
+        ],
+        "avoid": [
+          "Mais de 5 KPIs no topo",
+          "Falhas só como número, sem levar à execução",
+          "Custo sem orçamento ao lado (ninguém sabe se é muito)"
+        ]
+      },
+      "uses": [
+        "BarChart",
+        "BarList",
+        "Button",
+        "ChartCard",
+        "KpiCard",
+        "KpiGrid",
+        "ListPanel",
+        "ListRow",
+        "Meter",
+        "MiniBarChart",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "formatCurrency",
+        "formatDuration",
+        "formatNumber",
+        "formatPercent"
+      ]
+    },
+    {
+      "slug": "ai-agents",
+      "file": "src/blocks/ai-agents.tsx",
+      "title": "Frota de agentes",
+      "description": "Todos os agentes da empresa: status com palavra, dono, modelo, versão em produção, execuções dos últimos 7 dias, sucesso e custo contra o orçamento. Visões salvas, filtros, busca e os cinco estados (?estado=carregando|vazio|erro).",
+      "category": "IA",
+      "concept": {
+        "goal": "Saber de relance quais agentes a empresa tem, quem é dono de cada um e quais pedem atenção (erro, orçamento estourando).",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (visões salvas, filtros, busca)",
+          "Status = ponto + palavra; linha com erro ou orçamento acima de 90 % ganha faixa",
+          "Execuções em Sparkline de 7 dias; custo com a fração do orçamento ao lado",
+          "Linha abre o registro do agente; ⋯ com editar, execuções, pausar e duplicar",
+          "Vazio vira 'O que você quer automatizar?' com campo de pedido e modelos sugeridos"
+        ],
+        "adapt": [
+          "Catálogo de automações, robôs de RPA, integrações agendadas: troque modelo por conector",
+          "Sem orçamento por agente? Troque a coluna de custo por 'última execução'"
+        ],
+        "avoid": [
+          "Badge colorido sem palavra para o status",
+          "Mostrar só o total de execuções sem a tendência",
+          "Vazio sem próxima ação (um app de agentes começa pelo pedido)"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "AgentComposer",
+        "AppIcon",
+        "Avatar",
+        "Button",
+        "Column",
+        "DataTable",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "HealthDot",
+        "Highlight",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Pagination",
+        "SavedView",
+        "SavedViews",
+        "SortHeader",
+        "Sparkline",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "ToolGlyph",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "usePagination",
+        "useSavedViews",
+        "useSort"
+      ]
+    },
+    {
+      "slug": "ai-approvals",
+      "file": "src/blocks/ai-approvals.tsx",
+      "title": "Aprovações de agentes",
+      "description": "Fila human-in-the-loop (?id=): o que o agente quer fazer, impacto, risco, dados de apoio e a prévia (e-mail, tabela ou mensagem); aprovar, editar antes, sempre aprovar este tipo ou recusar com motivo.",
+      "category": "IA",
+      "concept": {
+        "goal": "Quem aprova decide rápido e com segurança o que os agentes vão fazer em nome da empresa, sem abrir cinco telas.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: fila à esquerda, pedido à direita; a seleção fica no endereço (?id=)",
+          "ApprovalRequest com impacto, risco e prévia exata do que vai sair",
+          "Recusar exige motivo (volta para o agente como instrução)",
+          "Por que pediu aprovação: a política aparece junto, com link para mudar",
+          "Celular: a fila ocupa a tela e o pedido abre em tela cheia com Voltar"
+        ],
+        "adapt": [
+          "Aprovação de despesas, descontos comerciais, publicação de conteúdo",
+          "Sem IA: troque 'agente' por 'solicitante' e mantenha a prévia do efeito"
+        ],
+        "avoid": [
+          "Aprovar sem ver a prévia do que vai sair",
+          "Recusar sem motivo (o agente repete o erro)",
+          "Fila sem prazo: pedidos expiram e ninguém sabe"
+        ]
+      },
+      "uses": [
+        "ApprovalRequest",
+        "ApprovalState",
+        "Badge",
+        "Button",
+        "Empty",
+        "Modal",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHead",
+        "TableHeader",
+        "TableRow",
+        "Tabs",
+        "TextareaField",
         "notify"
       ]
     },
@@ -25130,18 +25917,14 @@
         "AnswerCard",
         "BottomNav",
         "Disclaimer",
-        "IconRail",
         "InputModal",
         "ListToggle",
         "MenuEntry",
         "MessageActions",
         "ModelEffort",
         "ModelPicker",
-        "NavItem",
         "PermissionMode",
         "PermissionModeChip",
-        "ProductMark",
-        "RailItem",
         "RunSummary",
         "SessionQuickSwitcher",
         "SessionSidebar",
@@ -25149,7 +25932,6 @@
         "StepItem",
         "ThreadHeader",
         "ThreadView",
-        "Tooltip",
         "UserBubble",
         "VoiceModeButton",
         "VoiceOverlay",
@@ -25276,6 +26058,61 @@
       ]
     },
     {
+      "slug": "ai-runs",
+      "file": "src/blocks/ai-runs.tsx",
+      "title": "Execuções de agentes",
+      "description": "Todas as execuções da frota: agente, status com palavra, gatilho, início, duração, tokens e custo. Filtros por agente, status, gatilho e período, p95 do recorte, CSV e os cinco estados (?estado=carregando|vazio|erro). Linha abre a execução.",
+      "category": "IA",
+      "concept": {
+        "goal": "Achar a execução certa (a que falhou, a que custou caro, a que está esperando alguém) e abrir o passo a passo dela.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (visões salvas, filtros, busca)",
+          "Resumo do recorte acima da tabela: total, falhas, p95 e custo mudam com o filtro",
+          "Status = ponto + palavra; falha pinta a linha; número à direita com tabular-nums",
+          "Vindo de outra tela, o filtro chega pela URL (?agente=, ?status=)"
+        ],
+        "adapt": [
+          "Jobs de integração, sincronizações, rotinas agendadas de ERP",
+          "Fora de IA troque tokens por registros processados"
+        ],
+        "avoid": [
+          "Log em texto corrido sem status por execução",
+          "Custo sem unidade ou sem total do recorte"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Column",
+        "DataTable",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Pagination",
+        "SavedView",
+        "SavedViews",
+        "SortHeader",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "downloadCsv",
+        "formatCurrency",
+        "formatDuration",
+        "formatNumber",
+        "gridToCsv",
+        "notify",
+        "useFilters",
+        "usePagination",
+        "useSavedViews",
+        "useSort"
+      ]
+    },
+    {
       "slug": "ai-sessions-artifacts",
       "file": "src/blocks/ai-sessions-artifacts.tsx",
       "title": "Sessões com artefatos",
@@ -25319,7 +26156,6 @@
         "ContextItem",
         "ContextView",
         "Disclaimer",
-        "IconRail",
         "InputModal",
         "InsightCard",
         "ListToggle",
@@ -25328,12 +26164,9 @@
         "MinimapItem",
         "ModelEffort",
         "ModelPicker",
-        "NavItem",
         "PermissionMode",
         "PermissionModeChip",
-        "ProductMark",
         "PromptSuggestions",
-        "RailItem",
         "ReportSection",
         "RunStatus",
         "RunSummary",
@@ -25346,7 +26179,6 @@
         "StepItem",
         "ThreadHeader",
         "ThreadView",
-        "Tooltip",
         "UserBubble",
         "VoiceModeButton",
         "VoiceOverlay",
@@ -25665,11 +26497,18 @@
         "ConfirmDialog",
         "ConnectionStatus",
         "DataSyncTable",
+        "DataTable",
+        "Drawer",
         "MarketplaceHero",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
+        "TextField",
         "ToolPermissionList",
         "formatNumber",
-        "notify"
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -25738,6 +26577,7 @@
         "SearchInput",
         "SegmentedControl",
         "Sheet",
+        "Skeleton",
         "TreeNode",
         "TreeView",
         "formatBytes",
@@ -25869,6 +26709,8 @@
       "uses": [
         "AppShell",
         "Callout",
+        "Command",
+        "CommandPalette",
         "IconButton",
         "NavSection",
         "NavSubItem",
@@ -25876,7 +26718,39 @@
         "PageHeading",
         "SectionNav",
         "Sidebar",
-        "notify"
+        "useCommandShortcut"
+      ]
+    },
+    {
+      "slug": "app-legal",
+      "file": "src/blocks/app-legal.tsx",
+      "title": "Termos e privacidade",
+      "description": "Página legal pública com Termos de uso e Política de privacidade: alternância entre os dois documentos, SectionNav com as seções, data de vigência e saídas para exportar dados e falar com o encarregado.",
+      "category": "Aplicação",
+      "concept": {
+        "goal": "Deixar termos e privacidade legíveis e fáceis de citar, para quem vai criar conta ou precisa responder a uma dúvida jurídica.",
+        "patterns": [
+          "Anatomia I · Público: cabeçalho do site fixo, o documento rola, sem casca de app",
+          "Dois documentos irmãos em abas; cada seção tem endereço próprio (?p=termos/pagamento) para citar e compartilhar",
+          "SectionNav fixo na lateral no desktop; no celular vem antes do texto",
+          "Data de vigência no topo e resumo em linguagem simples antes do texto formal"
+        ],
+        "adapt": [
+          "Política de cookies, SLA, contrato de processamento de dados (DPA), código de conduta"
+        ],
+        "avoid": [
+          "PDF como única versão",
+          "Texto sem data de vigência",
+          "Link de Termos que leva à home"
+        ]
+      },
+      "uses": [
+        "Callout",
+        "NavSection",
+        "NavSubItem",
+        "SectionNav",
+        "Tabs",
+        "formatDate"
       ]
     },
     {
@@ -25940,6 +26814,7 @@
         "Empty",
         "Page",
         "PageHeading",
+        "Skeleton",
         "Tabs",
         "Tooltip",
         "notify"
@@ -26002,12 +26877,17 @@
       "uses": [
         "ActivitySection",
         "Avatar",
+        "Button",
         "Checkbox",
         "DataGrid",
+        "DueDatePicker",
+        "Empty",
+        "FileDropzone",
         "FilesList",
         "GridColumn",
         "KanbanBoard",
         "KanbanColumn",
+        "Modal",
         "NotesTable",
         "Priority",
         "PriorityIcon",
@@ -26016,10 +26896,12 @@
         "PropertyPills",
         "RecordCard",
         "RecordFile",
+        "RecordFileKind",
         "RecordPanel",
         "RecordSection",
         "SectionAddButton",
         "SegmentedControl",
+        "Skeleton",
         "StatusPill",
         "TableSearch",
         "TagPill",
@@ -26063,17 +26945,66 @@
         "AppShell",
         "Button",
         "Card",
+        "Command",
+        "CommandPalette",
         "IconButton",
         "MenuEntry",
+        "Modal",
         "NavGroup",
         "NavSubItem",
         "Page",
         "PageHeading",
         "Sidebar",
+        "TextField",
         "Workspace",
         "WorkspaceMenu",
         "navActiveDeep",
-        "notify"
+        "notify",
+        "useCommandShortcut"
+      ]
+    },
+    {
+      "slug": "ats-admission",
+      "file": "src/blocks/ats-admission.tsx",
+      "title": "Admissões",
+      "description": "Do aceite ao primeiro dia: lista de contratados com progresso e, ao lado, o checklist por grupo (documentos, exame, contrato, acessos, primeiro dia) com responsável, alerta de prazo e conclusão. ?id=<candidato> abre a admissão (cria se ainda não existir).",
+      "category": "ATS",
+      "concept": {
+        "goal": "Garantir que cada contratado chegue no primeiro dia com documentos, contrato e acessos prontos.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: contratados à esquerda, checklist à direita; seleção no endereço (?id=)",
+          "Progresso por pessoa e alerta quando faltam itens perto da data de início",
+          "Checklist agrupado com responsável por item; concluir só com tudo marcado (motivo no botão)",
+          "Vem da proposta aceita (Iniciar admissão) já com a pessoa selecionada",
+          "Cinco estados: ?estado=carregando|vazio|erro simula"
+        ],
+        "adapt": [
+          "Onboarding de clientes (portal), implantação (SaaS), homologação de fornecedor (ERP)"
+        ],
+        "avoid": [
+          "Checklist sem dono por item (ninguém cobra)",
+          "Concluir com pendências sem dizer quais"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Checkbox",
+        "ConfirmDialog",
+        "Empty",
+        "Meter",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Tabs",
+        "formatDate",
+        "notify",
+        "plural",
+        "useOperation"
       ]
     },
     {
@@ -26131,7 +27062,8 @@
           "Anatomia A · Lista com DataGrid: rolagem interna, cabeçalho e colunas fixos",
           "Visões salvas, filtros e busca local (/) na barra da grade",
           "Seleção em massa com BulkBar (mover etapa, e-mail)",
-          "Ações rápidas na linha; colunas configuráveis; CSV"
+          "Ações rápidas na linha; colunas configuráveis; CSV",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
         ],
         "adapt": [
           "Base de contatos (CRM), clientes B2B (ERP), leads de marketing"
@@ -26145,6 +27077,7 @@
         "Badge",
         "Button",
         "DataGrid",
+        "Empty",
         "EmptyFilterResult",
         "FilterBar",
         "FilterField",
@@ -26212,7 +27145,8 @@
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo com período, KPIs no topo",
           "Um gráfico por pergunta: meta, tempo × SLA, funil, aceite, origem",
-          "Fila 'o que pede ação hoje' antes dos detalhes"
+          "Fila 'o que pede ação hoje' antes dos detalhes; “Precisa de você” leva a cada fila",
+          "KPIs abrem o detalhe (relatórios, propostas)"
         ],
         "adapt": [
           "Painel de vendas, operações ou atendimento: troque as perguntas e as filas"
@@ -26240,28 +27174,31 @@
         "SegmentedControl",
         "formatCurrency",
         "formatNumber",
-        "formatPercent",
-        "notify"
+        "formatPercent"
       ]
     },
     {
       "slug": "ats-interviews",
       "file": "src/blocks/ats-interviews.tsx",
       "title": "Entrevistas",
-      "description": "Agenda de entrevistas por dia com sala/link, avaliações pendentes em destaque e preenchimento do scorecard em uma folha lateral (critérios da vaga, parecer e comentário).",
+      "description": "Agenda de entrevistas por dia com sala/link, avaliações pendentes em destaque, scorecard em folha lateral e agendamento em gaveta (?candidato= abre já preenchido) com horários livres, entrevistadores e link.",
       "category": "ATS",
       "concept": {
         "goal": "Organizar a agenda de entrevistas e não deixar avaliações pendentes.",
         "patterns": [
           "Anatomia A · Lista agrupada por dia, cabeçalho fixo",
           "Pendências de avaliação em destaque no topo",
-          "Scorecard em folha lateral com os critérios da vaga"
+          "Scorecard em folha lateral com os critérios da vaga",
+          "Agendar em Drawer sem sair da agenda: ?candidato=c4 (vindo do banco de talentos) abre já preenchido",
+          "Entrar na sala e Como chegar são links (abrem o Meet ou o mapa)",
+          "Cinco estados: ?estado=carregando|vazio|erro simula"
         ],
         "adapt": [
           "Agenda de visitas comerciais, reuniões de onboarding, auditorias"
         ],
         "avoid": [
-          "Formulário de avaliação em outra página (perde a agenda)"
+          "Formulário de avaliação em outra página (perde a agenda)",
+          "Agendar por data solta sem mostrar os horários livres"
         ]
       },
       "uses": [
@@ -26270,16 +27207,29 @@
         "Badge",
         "Button",
         "ChoiceCards",
+        "Combobox",
+        "Drawer",
         "Empty",
         "ListPanel",
+        "MultiSelect",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "Rating",
         "SegmentedControl",
+        "Select",
         "Sheet",
+        "Skeleton",
+        "Slot",
+        "SlotPicker",
+        "TextField",
         "TextareaField",
+        "buttonClass",
+        "formatDate",
         "notify",
-        "plural"
+        "plural",
+        "useOperation"
       ]
     },
     {
@@ -26384,7 +27334,8 @@
         "patterns": [
           "Anatomia F · Mestre-detalhe: lista de propostas + detalhe com cadeia de aprovação",
           "Alerta quando o salário sai da faixa",
-          "Ações mudam com a situação (aprovar, enviar, registrar resposta)"
+          "Ações mudam com a situação (aprovar, enviar, registrar resposta); aceite leva à admissão",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; aba sem propostas tem vazio próprio"
         ],
         "adapt": [
           "Descontos comerciais, compras acima da alçada, reembolsos"
@@ -26400,6 +27351,7 @@
         "Callout",
         "ConfirmDialog",
         "CurrencyField",
+        "Empty",
         "Page",
         "PageHeading",
         "PropertyList",
@@ -26421,7 +27373,9 @@
           "Anatomia E · Quadro: colunas por etapa; no desktop a página não rola",
           "Card com nota média, origem e tempo na etapa; arrastar para avançar",
           "Alternar Quadro/Lista sem perder filtros",
-          "Card abre o perfil"
+          "Card abre o perfil",
+          "Vaga sem candidatos: vazio com Adicionar candidato e Copiar link da vaga",
+          "Cinco estados: ?estado=carregando|vazio|erro simula"
         ],
         "adapt": [
           "Pipeline de vendas, esteira de pedidos, kanban de chamados"
@@ -26436,6 +27390,7 @@
         "Button",
         "Column",
         "DataTable",
+        "Empty",
         "KanbanBoard",
         "KanbanColumn",
         "Modal",
@@ -26444,9 +27399,97 @@
         "RecordCard",
         "SegmentedControl",
         "Select",
+        "Skeleton",
         "TextField",
         "chartColor",
         "notify"
+      ]
+    },
+    {
+      "slug": "ats-reports",
+      "file": "src/blocks/ats-reports.tsx",
+      "title": "Relatórios de recrutamento",
+      "description": "Funil de contratação com conversão entre etapas, qualidade e custo por origem, tempo para contratar por área contra o SLA, tempo por etapa e motivos de recusa de proposta. Período no cabeçalho e exportação em CSV.",
+      "category": "ATS",
+      "concept": {
+        "goal": "Explicar onde o processo seletivo perde tempo e candidatos, e quais origens valem o investimento.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com período à direita; exportar como ação secundária",
+          "Um gráfico por pergunta: funil, tempo × SLA, tempo por etapa, recusas (Pareto), origem",
+          "Tabela de origens com conversão, retenção e custo (o detalhe acionável no fim)",
+          "Drill-down a partir dos KPIs do painel de recrutamento"
+        ],
+        "adapt": [
+          "Relatório comercial (funil e origem de leads), relatório de atendimento (tempo por etapa)"
+        ],
+        "avoid": [
+          "Gráfico sem pergunta no título ou sem referência (meta, SLA)",
+          "Exportar como ação principal da tela"
+        ]
+      },
+      "uses": [
+        "BarChart",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "DumbbellChart",
+        "FunnelChart",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "ParetoChart",
+        "SegmentedControl",
+        "downloadCsv",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify"
+      ]
+    },
+    {
+      "slug": "ats-requisitions",
+      "file": "src/blocks/ats-requisitions.tsx",
+      "title": "Requisições de vaga",
+      "description": "Fila de aprovação de novas vagas: quem pede, motivo (aumento de quadro ou substituição), faixa, orçamento anual e cadeia de aprovação. Aprovar libera a abertura da vaga; recusar exige motivo. Seleção em ?id=.",
+      "category": "ATS",
+      "concept": {
+        "goal": "Decidir rápido quais vagas podem ser abertas, com orçamento e justificativa à vista.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: fila à esquerda, requisição à direita; seleção no endereço (?id=)",
+          "Aba “Aguardando você” primeiro; contador na navegação só com o que pede ação",
+          "Cadeia de aprovação em Stepper; recusar pede motivo obrigatório",
+          "Abrir vaga (ats-job ?id=nova) envia para cá: ?nova=<título> entra no topo da fila",
+          "Cinco estados: ?estado=carregando|vazio|erro simula"
+        ],
+        "adapt": [
+          "Aprovação de compras (ERP), descontos acima da alçada (CRM), reembolsos"
+        ],
+        "avoid": [
+          "Recusar sem motivo (o gestor não sabe o que ajustar)",
+          "Abrir vaga sem orçamento aprovado"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Empty",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Stepper",
+        "Tabs",
+        "TextareaField",
+        "formatCurrency",
+        "formatDate",
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -26560,6 +27603,846 @@
       ]
     },
     {
+      "slug": "clm-approvals",
+      "file": "src/blocks/clm-approvals.tsx",
+      "title": "Fila de aprovação",
+      "description": "Mestre-detalhe (?id=): contratos esperando você, cadeia de aprovadores, o que muda em relação ao modelo padrão (cláusulas fora do padrão lado a lado, com risco e justificativa) e aprovar ou recusar com comentário.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Aprovar ou recusar um contrato olhando só o que foge do modelo padrão, sem reler a minuta inteira.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: fila à esquerda, aprovação à direita; seleção no endereço (?id=); no celular o detalhe abre em tela cheia com Voltar",
+          "Diferenças contra o modelo: padrão × proposto lado a lado, risco em palavra e “alternativa já aprovada” quando existe na biblioteca",
+          "Cadeia de aprovação (Stepper) com o comentário de quem já aprovou",
+          "Recusar exige comentário; aprovar passa para o próximo da cadeia",
+          "Cinco estados na fila: ?estado=carregando|vazio|erro"
+        ],
+        "adapt": [
+          "Aprovação de pedidos de compra, propostas comerciais com desconto, políticas internas"
+        ],
+        "avoid": [
+          "Mostrar a minuta inteira para aprovar: o aprovador precisa do que mudou",
+          "Recusar sem dizer o que precisa mudar"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Empty",
+        "EntityMark",
+        "FactLine",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "Stepper",
+        "Tabs",
+        "TextareaField",
+        "formatCurrency",
+        "formatDate",
+        "plural",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "clm-contract",
+      "file": "src/blocks/clm-contract.tsx",
+      "title": "Contrato",
+      "description": "Registro do contrato (?id=): caminho até a vigência, cláusulas-chave extraídas com risco, versões da minuta (dial + changelog), assinaturas ICP-Brasil/gov.br por ordem, obrigações com prazo, anexos e atividade. Ações mudam com a situação: enviar para aprovação, lembrar signatários, renovar por aditivo e encerrar.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Dar ao Jurídico tudo sobre um contrato numa tela: o que foi combinado, o que foge do padrão, quem falta assinar e o que precisa ser cumprido até quando.",
+        "patterns": [
+          "Anatomia C · Registro: trilha, título e ações fixos; propriedades e contraparte fixas à direita (SplitLayout)",
+          "StagePath mostra o caminho rascunho → vigente; vencido/encerrado como desfecho",
+          "Ações por situação: Enviar para aprovação, Enviar para assinatura (com motivo quando bloqueado), Lembrar signatários, Renovar (Drawer), Encerrar (ConfirmDialog)",
+          "Cláusulas-chave extraídas da minuta: fora do padrão com risco em palavra e comparação com o modelo",
+          "Versões: RevisionTimeline para navegar por dia + Timeline com versão e data à esquerda (changelog)",
+          "Assinaturas em ordem, com método (ICP-Brasil, gov.br) e lembrete individual",
+          "?aba= abre a aba certa; ?acao=renovar abre a renovação vinda da lista"
+        ],
+        "adapt": [
+          "Apólice (endossos e renovações), pedido de compra com aceite, convênio"
+        ],
+        "avoid": [
+          "Encerrar sem mostrar a multa e o aviso prévio",
+          "Enviar para assinatura sem a aprovação completa",
+          "Editar o contrato vigente direto: mudança em contrato assinado é aditivo"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "ActivityFeed",
+        "ActivityItem",
+        "AiBadge",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Checkbox",
+        "ConfirmDialog",
+        "CurrencyField",
+        "DateBadge",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EntityMark",
+        "FileDropzone",
+        "FilesList",
+        "LocationTag",
+        "Meter",
+        "NextStep",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "RevisionTimeline",
+        "Select",
+        "SplitLayout",
+        "StagePath",
+        "StatCell",
+        "StatGrid",
+        "Tabs",
+        "TextField",
+        "TextareaField",
+        "Timeline",
+        "UploadItem",
+        "formatCurrency",
+        "formatDate",
+        "formatPercent",
+        "notify",
+        "plural",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "clm-contracts",
+      "file": "src/blocks/clm-contracts.tsx",
+      "title": "Contratos",
+      "description": "Carteira de contratos em DataGrid: visões salvas (vencendo, renovação automática, aguardando assinatura), filtros por tipo, situação, contraparte e valor, vigência com alerta, total no rodapé, ações em massa e os cinco estados.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Achar qualquer contrato da empresa em segundos e enxergar o que vence, o que renova sozinho e o que está parado em alguma etapa.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: visões salvas acima, filtros e busca na barra da grade, rolagem interna com total no rodapé",
+          "Visões salvas do sistema: Vigentes, Vencendo em 90 dias, Renovação automática, Aguardando assinatura, Meus",
+          "Vigência com palavra (“Vence em 12 dias”); só ≤ 30 dias e vencidos pintam",
+          "Seleção em massa: atribuir responsável e lembrar responsáveis",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar",
+          "Linha abre o contrato (?id=); ?visao= abre a visão certa a partir do painel"
+        ],
+        "adapt": [
+          "Apólices de seguro, licenças, imóveis, convênios: troque tipos e situações"
+        ],
+        "avoid": [
+          "Coluna só com a data de fim: mostre também renovação e aviso prévio",
+          "Status editável na linha: a situação do contrato muda por fluxo (aprovação, assinatura), não à mão"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Button",
+        "DataGrid",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "Menu",
+        "Page",
+        "PageHeading",
+        "SavedView",
+        "SavedViews",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "formatCurrency",
+        "formatDate",
+        "notify",
+        "plural",
+        "useFilters",
+        "useSavedViews"
+      ]
+    },
+    {
+      "slug": "clm-counterparties",
+      "file": "src/blocks/clm-counterparties.tsx",
+      "title": "Contrapartes",
+      "description": "Fornecedores, clientes e parceiros com CNPJ, sede (com hora local), contratos ativos, valor sob contrato e due diligence: certidões (Federal, FGTS, CNDT, estadual, municipal) e compliance (CEIS/CNEP, sanções, LGPD, beneficiário final). Detalhe em gaveta por ?id=.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Saber com quem a empresa tem contrato, quanto está em jogo com cada um e se a contraparte está regular antes de assinar ou renovar.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid; detalhe em Drawer (?id=) para não perder a lista",
+          "Due diligence resumida em palavra (Em dia, Certidão vencida, Pendências) e aberta por verificação na gaveta",
+          "LocationTag com a hora local da sede (contraparte em Manaus, Recife ou Lisboa)",
+          "Atualizar certidões e cadastrar contraparte com operação e aviso ao terminar",
+          "Cinco estados: ?estado=carregando|vazio|erro; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Cadastro de fornecedores (ERP), parceiros de canal, prestadores PJ"
+        ],
+        "avoid": [
+          "Mostrar só “risco alto” sem dizer qual certidão está vencida",
+          "Assinar com certidão vencida sem registro de exceção"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "DataGrid",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "LocationTag",
+        "MaskedField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "TableSearch",
+        "TextField",
+        "formatCurrency",
+        "formatDate",
+        "masks",
+        "plural",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "clm-dashboard",
+      "file": "src/blocks/clm-dashboard.tsx",
+      "title": "Painel de contratos",
+      "description": "Valor sob contrato, janela de vencimentos (30/60/90 dias), renovações automáticas a decidir antes do aviso prévio, assinaturas paradas, obrigações atrasadas e a fila “Precisa de você”.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Mostrar ao Jurídico e a Suprimentos o que vence, o que renova sozinho e o que está parado esperando alguém, antes que o prazo de aviso prévio passe.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com horizonte à direita; KPIs, um gráfico por pergunta e filas de ação",
+          "KPI com base explícita; obrigações atrasadas com goodWhen=\"down\"",
+          "Vencimentos por mês com alternância Valor/Quantidade (ChartCardTotals) e renovação automática separada da por aditivo",
+          "“Precisa de você” antes dos detalhes: aprovações, assinaturas paradas e prazos de aviso prévio",
+          "Cada linha abre o registro certo (contrato, fila de aprovação, obrigações)"
+        ],
+        "adapt": [
+          "Gestão de apólices (vencimento e renovação), licenças de software, imóveis locados",
+          "Troque as janelas 30/60/90 pela política da empresa (ex.: 45/90/180 em locação)"
+        ],
+        "avoid": [
+          "Mostrar só a data de fim: o que importa é o último dia para avisar que não renova",
+          "Somar contratos encerrados no valor sob contrato"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarChart",
+        "BarList",
+        "Button",
+        "ChartCard",
+        "ChartCardTotals",
+        "EntityMark",
+        "KpiCard",
+        "KpiGrid",
+        "ListPanel",
+        "ListRow",
+        "MiniBarChart",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "formatCompact",
+        "formatCurrency",
+        "formatDate",
+        "formatNumber",
+        "plural"
+      ]
+    },
+    {
+      "slug": "clm-obligations",
+      "file": "src/blocks/clm-obligations.tsx",
+      "title": "Obrigações e prazos",
+      "description": "Tudo o que os contratos exigem com data: pagamentos, entregas, reajustes (IGP-M/IPCA), avisos prévios de não renovação e garantias. Lista agrupada por urgência ou calendário do mês, filtros, marcar como cumprida e as renovações em andamento com marcos.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Não perder prazo de contrato: cobrar a contraparte, pagar em dia e decidir renovações antes do aviso prévio.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (situação, filtros, busca); lista agrupada por urgência ou calendário do mês",
+          "Atrasadas primeiro, com dias de atraso em palavra; prazo em DateBadge",
+          "Checkbox marca como cumprida com Desfazer",
+          "Renovações em andamento como ProjectProgressCard (marcos, responsável, prazo)",
+          "Nova obrigação em Drawer, com operação e aviso ao terminar",
+          "Cinco estados: ?estado=carregando|vazio|erro; ?filtro=atrasadas vem do painel"
+        ],
+        "adapt": [
+          "Compliance regulatório (licenças, alvarás), manutenção preventiva, vencimento de certificados"
+        ],
+        "avoid": [
+          "Lista plana por data sem separar o que já atrasou",
+          "Aviso prévio tratado como data qualquer: é o prazo que mais custa perder"
+        ]
+      },
+      "uses": [
+        "AgendaEvent",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Checkbox",
+        "Combobox",
+        "CurrencyField",
+        "DateBadge",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "MonthCalendar",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "ProjectProgressCard",
+        "SegmentedControl",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "TextField",
+        "formatCurrency",
+        "notify",
+        "plural",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "clm-request",
+      "file": "src/blocks/clm-request.tsx",
+      "title": "Nova solicitação de contrato",
+      "description": "Assistente em 5 etapas (modelo → contraparte → dados comerciais → anexos → aprovadores) que valida cada etapa, mostra a due diligence da contraparte, calcula a cadeia de aprovação pelo valor e gera o rascunho a partir do modelo.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Deixar Suprimentos, TI ou Comercial pedirem um contrato ao Jurídico com tudo o que ele precisa na primeira vez, partindo de um modelo aprovado.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: sem navegação do app, só o assistente e um resumo ao lado",
+          "FormWizard: cada etapa valida ao avançar; Voltar nunca valida; anexos são opcionais",
+          "Contraparte por Combobox com a situação da due diligence (certidões) logo abaixo; contraparte nova por CNPJ",
+          "Cadeia de aprovação calculada pelo valor e pelo tratamento de dados (DPO)",
+          "Ao concluir, gera o rascunho e leva ao registro do contrato",
+          "?objeto= vem preenchido pela busca ⌘K (“Solicitar contrato “…””); ?modelo= e ?contraparte= vêm de Modelos e de Contrapartes"
+        ],
+        "adapt": [
+          "Requisição de compra, pedido de aditivo, abertura de fornecedor"
+        ],
+        "avoid": [
+          "Formulário único com 20 campos",
+          "Pedir dados que o modelo já define (foro, cláusulas padrão)"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Checkbox",
+        "ChoiceCards",
+        "Combobox",
+        "CurrencyField",
+        "DatePicker",
+        "EntityMark",
+        "FileDropzone",
+        "LocationTag",
+        "MaskedField",
+        "NumberField",
+        "ProductMark",
+        "PropertyList",
+        "Select",
+        "Stepper",
+        "TextField",
+        "TextareaField",
+        "UploadItem",
+        "formatCurrency",
+        "formatDate",
+        "masks",
+        "plural"
+      ]
+    },
+    {
+      "slug": "clm-templates",
+      "file": "src/blocks/clm-templates.tsx",
+      "title": "Modelos e cláusulas",
+      "description": "Modelos de contrato aprovados pelo Jurídico (versão, última revisão, uso, quem pode usar sem o Jurídico) e a biblioteca de cláusulas com o texto padrão, orientação de uso e alternativas pré-aprovadas por risco e alçada.",
+      "category": "Contratos",
+      "concept": {
+        "goal": "Manter os modelos e as cláusulas que o Jurídico aceita num só lugar, para que as áreas peçam contratos sem reinventar texto e a aprovação só olhe o que foge disso.",
+        "patterns": [
+          "Anatomia A · Lista (modelos) com Drawer de detalhe por ?modelo=; Anatomia F · Mestre-detalhe (cláusulas) com ?clausula=",
+          "Revisão vencida (mais de 1 ano) aparece com palavra, não só cor",
+          "Quem pode usar: áreas com autoatendimento e limite de valor",
+          "Alternativas aprovadas com risco, alçada e quantas vezes foram usadas",
+          "Propor alternativa e criar modelo em Drawer, com operação e aviso ao terminar",
+          "Cinco estados: ?estado=carregando|vazio|erro"
+        ],
+        "adapt": [
+          "Políticas internas, modelos de proposta comercial, biblioteca de respostas de RFP"
+        ],
+        "avoid": [
+          "Cláusula alternativa sem dizer quem pode aprovar",
+          "Editar o modelo publicado direto: nova versão passa por revisão"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Drawer",
+        "Empty",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Select",
+        "Tabs",
+        "TextField",
+        "TextareaField",
+        "formatCurrency",
+        "formatDate",
+        "formatNumber",
+        "plural",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "comms-analytics",
+      "file": "src/blocks/comms-analytics.tsx",
+      "title": "Mural · alcance da comunicação",
+      "description": "Painel de alcance: taxa de leitura contra a meta, tempo até a leitura, confirmações de leitura obrigatória, engajamento por canal, área e cidade, horário de leitura e comunicados com baixa leitura que pedem reforço.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Saber se a comunicação está chegando, em quem não chega e o que reforçar hoje.",
+        "patterns": [
+          "Anatomia B · Painel: período e exportar no cabeçalho; 4 KPIs com base explícita",
+          "“Precisa de você” antes dos gráficos: comunicados com leitura baixa ou confirmação atrasada, com ação de reforço",
+          "Um gráfico por pergunta: leitura × meta, canal, área × cidade (matriz), tempo até ler, horário",
+          "Tabela de comunicados ordenável no fim, linha abre o comunicado"
+        ],
+        "adapt": [
+          "Alcance de campanhas para clientes, adesão a treinamentos obrigatórios, leitura de políticas de compliance"
+        ],
+        "avoid": [
+          "Contar entrega como leitura (e abertura como confirmação)",
+          "Pintar de verde o que está bom: só o que pede atenção ganha cor"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarChart",
+        "BarList",
+        "Button",
+        "ChartCard",
+        "Column",
+        "DataTable",
+        "HeatmapMatrix",
+        "KpiCard",
+        "KpiGrid",
+        "LineChart",
+        "ListPanel",
+        "MiniBarChart",
+        "OperationButton",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "downloadCsv",
+        "formatDate",
+        "formatNumber",
+        "formatPercent",
+        "plural",
+        "useOperation",
+        "useSort"
+      ]
+    },
+    {
+      "slug": "comms-announcement",
+      "file": "src/blocks/comms-announcement.tsx",
+      "title": "Mural · comunicado",
+      "description": "Comunicado oficial (?id=) em tipografia de leitura: autor e público, confirmação de leitura obrigatória, reações, comentários com respostas e, para quem publica, o alcance por área com lembrete a quem não leu.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Ler um comunicado oficial com calma, confirmar que entendeu quando é obrigatório e, para quem publicou, saber quem ainda não leu.",
+        "patterns": [
+          "Anatomia C · Registro de leitura: trilha + título + Confirmar leitura fixos; coluna de propriedades e alcance à direita",
+          "ReadingDocument: serifa de leitura e medida curta para texto longo",
+          "Confirmação obrigatória com aceite explícito (caixa + botão), com operação assíncrona e erro em bloco",
+          "Alcance por área só para quem publica: lidos/total, mediana até a leitura e lembrete a quem não leu",
+          "Comentários com respostas oficiais; reações não substituem a confirmação"
+        ],
+        "adapt": [
+          "Política interna com aceite (compliance, LGPD), termo de ciência, atualização de contrato com o franqueado"
+        ],
+        "avoid": [
+          "Contar abertura como confirmação de leitura obrigatória",
+          "Mostrar alcance por área para todo o público (é dado de gestão)"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Checkbox",
+        "ConfirmDialog",
+        "Empty",
+        "LocationTag",
+        "Meter",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "ProgressRing",
+        "PropertyList",
+        "ReadingDocument",
+        "SplitLayout",
+        "TextareaField",
+        "formatDate",
+        "formatNumber",
+        "formatPercent",
+        "formatRelative",
+        "notify",
+        "plural",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "comms-channels",
+      "file": "src/blocks/comms-channels.tsx",
+      "title": "Mural · conversas",
+      "description": "Canais e mensagens diretas do time: lista com não lidas e menções, conversa com separador de data, menções destacadas, reações, fios de resposta, arquivos, comunicado compartilhado, pedido com envio de arquivo e composer.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Conversar com o time no mesmo lugar dos comunicados, sem confundir conversa com aviso oficial.",
+        "patterns": [
+          "Anatomia G · App de altura total: lista de canais, conversa e fio/detalhes; só a conversa rola",
+          "Canal e DM pela URL (?canal=); fio pela URL (?fio=); no celular cada um abre em tela cheia com voltar",
+          "Menção a você destacada; contador na lista só para menções (não para total de mensagens)",
+          "Comunicado oficial aparece como cartão que leva ao Mural, não como texto solto",
+          "Pedido com prazo vira faixa de ação obrigatória com envio de arquivo"
+        ],
+        "adapt": [
+          "Chat de atendimento interno (TI, RH), sala de projeto, canal com fornecedores"
+        ],
+        "avoid": [
+          "Publicar comunicado oficial só num canal (não tem confirmação de leitura)",
+          "Badge com total de mensagens não lidas em todo canal"
+        ]
+      },
+      "uses": [
+        "ActionRequiredBanner",
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Button",
+        "Combobox",
+        "DateSeparator",
+        "Empty",
+        "FileCard",
+        "IconButton",
+        "Marker",
+        "Modal",
+        "SearchInput",
+        "Skeleton",
+        "TeamComposer",
+        "TeamMessage",
+        "TypingIndicator",
+        "formatNumber",
+        "normalize",
+        "notify",
+        "plural"
+      ]
+    },
+    {
+      "slug": "comms-compose",
+      "file": "src/blocks/comms-compose.tsx",
+      "title": "Mural · publicar comunicado",
+      "description": "Criar comunicado oficial: editor de texto rico, público por área, cidade e cargo com estimativa de alcance, canais (app, e-mail, WhatsApp), leitura obrigatória com prazo, agendamento, pré-visualização no computador e no celular e aprovação antes de publicar.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Escrever um comunicado oficial que chega a quem precisa, pelo canal certo, e só sai depois de aprovado.",
+        "patterns": [
+          "Anatomia C · Registro em edição: trilha + título + Salvar rascunho / Enviar para aprovação fixos; pré-visualização fixa à direita",
+          "Stepper do ciclo (rascunho → aprovação → agendado → publicado) logo abaixo do cabeçalho",
+          "Público por MultiSelect (áreas, cidades, cargos) com estimativa de alcance ao vivo",
+          "Leitura obrigatória com prazo; agendamento com DateTimePicker (fuso visível)",
+          "Pré-visualização computador/celular com notificação e o que chega em cada canal",
+          "Envio com useOperation: botão informa, erro em bloco, rascunho nunca se perde"
+        ],
+        "adapt": [
+          "Campanha de e-mail para clientes, aviso a franqueados, comunicado a fornecedores"
+        ],
+        "avoid": [
+          "Publicar direto sem aprovação quando o público é a empresa toda",
+          "WhatsApp como canal padrão: só para quem não tem e-mail corporativo ou para urgências"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "CheckboxGroup",
+        "Combobox",
+        "DatePicker",
+        "DateTimePicker",
+        "MultiSelect",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "RadioGroup",
+        "RichTextEditor",
+        "RichTextView",
+        "SegmentedControl",
+        "Select",
+        "SplitLayout",
+        "Step",
+        "Stepper",
+        "Switch",
+        "TextField",
+        "TextareaField",
+        "formatDate",
+        "formatNumber",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "comms-events",
+      "file": "src/blocks/comms-events.tsx",
+      "title": "Mural · eventos",
+      "description": "Agenda de eventos internos por dia: presencial, on-line e híbrido, local com hora local, vagas e inscrição com desfazer, lista de espera, detalhe em gaveta com adicionar à agenda e criação de evento.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Ver o que vai acontecer, onde e quando (no meu fuso), e se inscrever em um clique.",
+        "patterns": [
+          "Anatomia A · Lista agrupada por dia: cabeçalho fixo + PageToolbar com formato, cidade e categoria",
+          "LocationTag no local do evento: hora local de Manaus, Cuiabá ou Lisboa ao lado do horário",
+          "Vagas como medidor com palavra; esgotado vira lista de espera (botão diz o que faz)",
+          "Detalhe (?id=) e criação (?novo=1) em Drawer, sem perder a agenda",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Treinamentos obrigatórios (com presença), agenda de visitas a clientes, turmas de curso"
+        ],
+        "avoid": [
+          "Horário sem fuso quando o time está em várias cidades",
+          "Inscrição sem desfazer"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Button",
+        "ChoiceCards",
+        "DateTimePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "LocationTag",
+        "Meter",
+        "MultiSelect",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "Select",
+        "Switch",
+        "Tabs",
+        "TextField",
+        "TextareaField",
+        "TimePicker",
+        "formatNumber",
+        "notify",
+        "plural",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "comms-home",
+      "file": "src/blocks/comms-home.tsx",
+      "title": "Mural · início",
+      "description": "Início da intranet: leituras obrigatórias pendentes, comunicados fixados, feed com reações e leitura, eventos da semana, enquete aberta, aniversariantes e quem chegou.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Em um minuto, saber o que a empresa precisa que eu leia, o que mudou e o que está acontecendo com as pessoas.",
+        "patterns": [
+          "Anatomia B · Painel de leitura: cabeçalho fixo; o que pede ação (leitura obrigatória) antes do feed",
+          "Fixados no topo; feed de comunicados com autor, público, reações e quantas pessoas leram",
+          "Coluna lateral com o que é da semana: eventos, enquete aberta, aniversários e novos colegas",
+          "Cinco estados no feed: ?estado=carregando|vazio|erro simula; aba Não lidos vazia oferece Ver todos"
+        ],
+        "adapt": [
+          "Portal do franqueado (comunicados da franqueadora), portal do parceiro, intranet de escola"
+        ],
+        "avoid": [
+          "Feed sem distinguir oficial (comunicado) de conversa (canal)",
+          "Contador de total de comunicados na navegação: só o que pede ação"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Button",
+        "Empty",
+        "ListPanel",
+        "ListRow",
+        "Meter",
+        "Page",
+        "PageHeading",
+        "Tabs",
+        "formatDate",
+        "formatNumber",
+        "formatPercent",
+        "formatRelative",
+        "notify",
+        "plural"
+      ]
+    },
+    {
+      "slug": "comms-people",
+      "file": "src/blocks/comms-people.tsx",
+      "title": "Mural · pessoas",
+      "description": "Diretório de pessoas: busca, filtros por área, cidade e presença, cards com cidade e hora local, lista, organograma, “Online agora” e perfil em gaveta com contato, gestão, equipe e habilidades.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Achar quem pode ajudar, saber onde a pessoa está e se é uma boa hora para chamar.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (filtros e busca); cards, lista ou organograma",
+          "LocationTag com hora local: time em 4 fusos (Manaus, Cuiabá, Recife/São Paulo, Lisboa)",
+          "StackedList “Online agora” com o diretório completo no mesmo cartão",
+          "Perfil em Drawer pela URL (?pessoa=): não perde a lista; gestão e equipe navegam dentro da gaveta",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Diretório de franqueados, de fornecedores, de alunos e professores"
+        ],
+        "avoid": [
+          "Mostrar presença só com cor (sempre com palavra: Online, Em reunião, Visto há…)",
+          "Abrir o perfil em página nova e perder o filtro"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "LocationTag",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "SegmentedControl",
+        "StackedList",
+        "TableSearch",
+        "TreeNode",
+        "TreeView",
+        "formatDate",
+        "formatNumber",
+        "notify",
+        "plural",
+        "useFilters"
+      ]
+    },
+    {
+      "slug": "comms-surveys",
+      "file": "src/blocks/comms-surveys.tsx",
+      "title": "Mural · pesquisas e clima",
+      "description": "eNPS do trimestre com distribuição de notas, evolução e eNPS por área, participação por área, temas dos comentários, lista de pesquisas com resultado em gaveta e criação de pesquisa com pré-visualização de como a pessoa responde.",
+      "category": "Comunicação",
+      "concept": {
+        "goal": "Ouvir o time com frequência e mostrar o resultado de forma honesta: quanto recomendam, quem respondeu e o que pedem.",
+        "patterns": [
+          "Anatomia A · Lista com resultado no topo: KPIs + NpsChart antes da lista de pesquisas",
+          "Participação por área (BarList) e eNPS por área: onde a amostra é fraca, o número vale menos",
+          "Resultado e ações da pesquisa em Drawer (?id=); criar em Drawer (?novo=1) com pré-visualização em Questionnaire",
+          "Anonimato visível em todo lugar onde aparece um resultado",
+          "Cinco estados na lista: ?estado=carregando|vazio|erro simula; aba sem itens oferece Ver todas"
+        ],
+        "adapt": [
+          "NPS de clientes (SaaS), pesquisa de satisfação de alunos, avaliação de fornecedores"
+        ],
+        "avoid": [
+          "Mostrar resultado de grupo com menos de 5 respostas (quebra o anonimato)",
+          "eNPS sem a base de comparação (trimestre anterior)"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarList",
+        "Button",
+        "ChartCard",
+        "ChoiceCards",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "IconButton",
+        "KpiCard",
+        "KpiGrid",
+        "Meter",
+        "MiniBarChart",
+        "MultiSelect",
+        "NpsChart",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Questionnaire",
+        "QuestionnaireQuestion",
+        "Switch",
+        "Tabs",
+        "TextField",
+        "formatDate",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "plural",
+        "useOperation"
+      ]
+    },
+    {
       "slug": "crm-activities",
       "file": "src/blocks/crm-activities.tsx",
       "title": "Atividades e agenda",
@@ -26570,7 +28453,8 @@
         "patterns": [
           "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
           "Agrupado por prazo (atrasadas primeiro) ou por semana",
-          "Conclusão rápida na linha; nova atividade em modal"
+          "Conclusão rápida na linha; nova atividade em modal",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros"
         ],
         "adapt": [
           "Tarefas do ATS (entrevistas, retornos), cobranças do financeiro"
@@ -26586,7 +28470,9 @@
         "Checkbox",
         "Combobox",
         "DatePicker",
+        "Empty",
         "EmptyFilterResult",
+        "ErrorState",
         "FieldBlock",
         "FieldGrid",
         "FilterBar",
@@ -26598,6 +28484,7 @@
         "PageToolbar",
         "SegmentedControl",
         "Select",
+        "Skeleton",
         "TableSearch",
         "TextField",
         "formatDate",
@@ -26616,7 +28503,8 @@
         "patterns": [
           "Anatomia C · Registro: cabeçalho fixo; propriedades fixas à direita (SplitLayout)",
           "KPIs da conta no topo; abas para negócios, contatos e atividades",
-          "Novo negócio já vinculado à empresa"
+          "Novo negócio já vinculado à empresa",
+          "Editar em gaveta; mesclar duplicada = escolher a outra empresa + confirmação irreversível"
         ],
         "adapt": [
           "Cliente no ERP, conta no SaaS, fornecedor"
@@ -26631,18 +28519,30 @@
         "Badge",
         "Button",
         "Column",
+        "Combobox",
+        "ConfirmDialog",
         "DataTable",
+        "Drawer",
+        "Empty",
         "EntityMark",
+        "FieldBlock",
+        "FieldGrid",
         "KpiCard",
         "KpiGrid",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PropertyList",
+        "Select",
         "SplitLayout",
         "Tabs",
+        "TextField",
         "formatCurrency",
         "formatDate",
-        "notify"
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -26656,7 +28556,8 @@
         "patterns": [
           "Anatomia C · Registro: propriedades fixas à direita",
           "Papel na decisão (decisora, influenciadora) em destaque",
-          "Histórico em feed; e-mail com modelo em modal"
+          "Histórico em feed; e-mail com modelo em modal",
+          "Editar em gaveta (Drawer); mover de empresa com busca (Combobox) em modal curto"
         ],
         "adapt": [
           "Candidato (ATS), contato de fornecedor, usuário de conta SaaS"
@@ -26672,17 +28573,26 @@
         "Avatar",
         "Badge",
         "Button",
+        "Combobox",
+        "Drawer",
+        "Empty",
         "EntityMark",
+        "FieldBlock",
+        "FieldGrid",
         "Modal",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PropertyList",
+        "Select",
         "SplitLayout",
         "TextField",
         "TextareaField",
         "formatCurrency",
         "formatDate",
-        "notify"
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -26697,7 +28607,10 @@
           "Anatomia A · Lista com DataGrid: rolagem interna, cabeçalho e total fixos, empresa fixa à esquerda",
           "Estágio e responsável editáveis na célula com desfazer",
           "Ações rápidas na linha (ligar, e-mail, ⋯ e clique direito)",
-          "Seleção em massa; colunas configuráveis; CSV; cards no celular"
+          "Seleção em massa; colunas configuráveis; CSV; cards no celular",
+          "Importar planilha em gaveta: arquivo → mapear colunas → revisar (linhas com erro antes de gravar)",
+          "E-mail pela linha abre o compositor com o contato principal",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros"
         ],
         "adapt": [
           "Clientes (ERP), candidatos (ATS), contas (SaaS)"
@@ -26707,34 +28620,49 @@
         ]
       },
       "uses": [
+        "AlertCard",
         "Avatar",
         "AvatarGroup",
         "Badge",
         "Button",
+        "Checkbox",
+        "ComposeEmailDialog",
         "DataGrid",
+        "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "EntityMark",
+        "ErrorState",
         "FieldBlock",
         "FieldGrid",
+        "FileDropzone",
         "FilterBar",
         "FilterField",
         "GridColumn",
         "Highlight",
         "Modal",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
+        "Person",
         "SavedView",
         "SavedViews",
         "Select",
+        "Skeleton",
+        "Stepper",
         "TableSearch",
         "Tabs",
         "TextField",
+        "UploadItem",
         "downloadCsv",
         "formatCurrency",
+        "formatNumber",
         "gridToCsv",
         "matchesQuery",
         "notify",
         "useFilters",
+        "useOperation",
         "useSavedViews"
       ]
     },
@@ -26750,7 +28678,8 @@
           "Anatomia C · Registro: trilha + título + Perdido/Ganho fixos; propriedades fixas à direita",
           "StagePath clicável; perda pede motivo",
           "Nota rápida alimenta o feed de atividade",
-          "Edição longa em gaveta (Drawer)"
+          "Edição longa em gaveta (Drawer)",
+          "Duplicar cria a cópia em Qualificação e abre o novo registro; vincular contato com busca"
         ],
         "adapt": [
           "Proposta (ATS), pedido (ERP), chamado (suporte)"
@@ -26767,10 +28696,12 @@
         "Badge",
         "Button",
         "Checkbox",
+        "Combobox",
         "ConfirmDialog",
         "CurrencyField",
         "DatePicker",
         "Drawer",
+        "Empty",
         "EntityMark",
         "FieldBlock",
         "Modal",
@@ -26790,6 +28721,56 @@
       ]
     },
     {
+      "slug": "crm-leads",
+      "file": "src/blocks/crm-leads.tsx",
+      "title": "Caixa de leads",
+      "description": "Leads do site, de eventos e de indicação para qualificar: pontuação com os sinais que a explicam, mensagem original e decisão em um clique (qualificar vira negócio no pipeline; desqualificar pede motivo).",
+      "category": "CRM",
+      "concept": {
+        "goal": "Decidir rápido quais leads viram negócio e quais saem da fila, sem perder o motivo.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: fila à esquerda, lead à direita; seleção no endereço (?id=); no celular o detalhe ocupa a tela com voltar",
+          "Pontuação explicada pelos sinais (cor sempre com palavra: Quente, Morno, Frio)",
+          "Qualificar abre gaveta com o negócio pré-preenchido e leva ao registro criado",
+          "Desqualificar exige motivo (alimenta o relatório de origem)",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; aba vazia com próxima ação"
+        ],
+        "adapt": [
+          "Triagem de candidatos (ATS), chamados novos (suporte), pedidos de cotação (ERP)"
+        ],
+        "avoid": [
+          "Pontuação sem explicação",
+          "Qualificar sem criar o negócio (o lead some e ninguém acompanha)"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "CurrencyField",
+        "Drawer",
+        "Empty",
+        "EntityMark",
+        "ErrorState",
+        "FieldBlock",
+        "FieldGrid",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Select",
+        "Skeleton",
+        "Tabs",
+        "TextField",
+        "formatCurrency",
+        "formatDate",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
       "slug": "crm-pipeline",
       "file": "src/blocks/crm-pipeline.tsx",
       "title": "Pipeline de vendas",
@@ -26801,7 +28782,8 @@
           "Anatomia E · Quadro: cabeçalho fixo; colunas crescem em telas largas",
           "Soma de valor e previsão ponderada no topo e por coluna",
           "Arrastar muda a etapa (com desfazer); card abre o negócio",
-          "Filtros e busca na barra acima do quadro"
+          "Filtros e busca na barra acima do quadro",
+          "Cinco estados: sem negócios (criar), recorte vazio (limpar filtros), carregando, erro; ?estado=carregando|vazio|erro simula"
         ],
         "adapt": [
           "Candidatos (ATS), pedidos (ERP), chamados por status"
@@ -26813,7 +28795,10 @@
       "uses": [
         "Badge",
         "Button",
+        "Empty",
+        "EmptyFilterResult",
         "EntityMark",
+        "ErrorState",
         "FilterBar",
         "FilterField",
         "KanbanBoard",
@@ -26821,11 +28806,77 @@
         "PageHeading",
         "RecordCard",
         "SegmentedControl",
+        "Skeleton",
         "TableSearch",
         "formatCurrency",
         "formatPercent",
         "notify",
         "useFilters"
+      ]
+    },
+    {
+      "slug": "crm-quotes",
+      "file": "src/blocks/crm-quotes.tsx",
+      "title": "Propostas comerciais",
+      "description": "Cotações do time: rascunho, enviada, aceita e recusada, com valor, validade e visualizações. Linha abre o detalhe em gaveta (?id=) com itens e ações conforme a situação; nova proposta com itens, desconto e validade.",
+      "category": "CRM",
+      "concept": {
+        "goal": "Acompanhar as propostas enviadas e agir nas que vencem ou esperam resposta, sem sair da lista.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (visões, filtros, busca)",
+          "Situação = ponto + texto (Badge); validade em âmbar perto do vencimento e em rose quando venceu",
+          "Detalhe em Drawer pelo endereço (?id=): itens, total, ações que mudam com a situação",
+          "Nova proposta em Drawer com itens, desconto e validade (useOperation + OperationButton)",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; recorte vazio limpa filtros"
+        ],
+        "adapt": [
+          "Orçamentos (ERP), propostas de contratação (ATS), cotações de compra"
+        ],
+        "avoid": [
+          "Abrir a proposta em outra página só para mudar a situação",
+          "Total sem mostrar desconto e validade"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "Combobox",
+        "DataTable",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "ErrorState",
+        "FieldBlock",
+        "FieldGrid",
+        "FilterBar",
+        "FilterField",
+        "IconButton",
+        "Modal",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "SavedView",
+        "SavedViews",
+        "Select",
+        "Skeleton",
+        "TableSearch",
+        "TextField",
+        "formatCurrency",
+        "formatDate",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useOperation",
+        "useSavedViews"
       ]
     },
     {
@@ -26838,7 +28889,9 @@
         "goal": "Responder se o time vai bater a meta do trimestre e onde está perdendo negócios.",
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo com seletor de time",
-          "Meta com ritmo esperado (GoalMeter) antes de tudo",
+          "KPIs levam à lista já filtrada (drill-down)",
+          "“Precisa de você” logo abaixo dos KPIs: negócios parados, atividades atrasadas, leads e propostas vencendo",
+          "Meta com ritmo esperado (GoalMeter)",
           "Receita × meta, funil, ranking e motivos de perda (Pareto)"
         ],
         "adapt": [
@@ -26858,6 +28911,8 @@
         "KpiCard",
         "KpiGrid",
         "Leaderboard",
+        "ListPanel",
+        "ListRow",
         "Page",
         "PageHeading",
         "ParetoChart",
@@ -26946,44 +29001,56 @@
       "slug": "erp-customers",
       "file": "src/blocks/erp-customers.tsx",
       "title": "Clientes",
-      "description": "Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e títulos vencidos. Detalhe em gaveta com pedidos recentes, bloqueio de crédito e novo pedido.",
+      "description": "Carteira de clientes B2B: CNPJ, segmento, vendedor, uso do limite de crédito e títulos vencidos. Detalhe em gaveta (?id=) com pedidos e títulos, bloqueio de crédito, e cadastro com consulta de CNPJ, endereço e condições comerciais.",
       "category": "ERP",
       "concept": {
         "goal": "Ver a carteira de clientes B2B com risco de crédito e agir sem perder a lista.",
         "patterns": [
           "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
           "Uso do limite de crédito e títulos vencidos na linha",
-          "Detalhe em gaveta com bloqueio de crédito e novo pedido"
+          "Detalhe em gaveta pela URL (?id=): trocar de cliente no ⌘K troca a gaveta",
+          "Novo cliente em gaveta: CNPJ com máscara e consulta na Receita, endereço e condições",
+          "Cinco estados: ?estado=carregando|vazio|erro"
         ],
         "adapt": [
           "Contas (CRM), clientes (SaaS)"
         ],
         "avoid": [
-          "Abrir página nova só para ver o limite de crédito"
+          "Abrir página nova só para ver o limite de crédito",
+          "Guardar o registro aberto num estado que não acompanha a URL"
         ]
       },
       "uses": [
         "Badge",
         "Button",
         "Column",
+        "CurrencyField",
         "DataTable",
         "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "EntityMark",
         "FilterBar",
         "FilterField",
         "Highlight",
         "ListRow",
+        "MaskedField",
         "Meter",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PageToolbar",
         "PropertyList",
+        "Select",
         "SortHeader",
         "TableSearch",
+        "TextField",
         "formatCurrency",
+        "masks",
         "notify",
         "useFilters",
+        "useOperation",
         "useSort"
       ]
     },
@@ -27012,6 +29079,7 @@
         "Badge",
         "BarList",
         "ChartCard",
+        "Empty",
         "KpiCard",
         "KpiGrid",
         "LineChart",
@@ -27054,6 +29122,7 @@
         "ChartCard",
         "Column",
         "DataTable",
+        "Empty",
         "EmptyFilterResult",
         "FieldBlock",
         "FilterBar",
@@ -27139,23 +29208,34 @@
         "BulkBar",
         "Button",
         "Callout",
+        "ChoiceCards",
         "Column",
         "DataTable",
+        "DatePicker",
+        "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "FilterBar",
         "FilterField",
         "Highlight",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PageToolbar",
+        "PropertyList",
+        "Select",
         "SortHeader",
         "StatCell",
         "StatGrid",
         "TableSearch",
+        "TextField",
         "formatCurrency",
         "notify",
         "selectionColumn",
         "useFilters",
+        "useOperation",
         "useSelection",
         "useSort"
       ]
@@ -27197,6 +29277,13 @@
         "Select",
         "SplitLayout",
         "Stepper",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableFooter",
+        "TableHead",
+        "TableHeader",
+        "TableRow",
         "formatCurrency",
         "notify"
       ]
@@ -27226,6 +29313,7 @@
         "Badge",
         "Button",
         "DataGrid",
+        "Empty",
         "EmptyFilterResult",
         "FilterBar",
         "FilterField",
@@ -27236,6 +29324,12 @@
         "SegmentedControl",
         "StatCell",
         "StatGrid",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHead",
+        "TableHeader",
+        "TableRow",
         "TableSearch",
         "Tabs",
         "formatCurrency",
@@ -27271,6 +29365,7 @@
         "Column",
         "CurrencyField",
         "DataTable",
+        "Empty",
         "KpiCard",
         "KpiGrid",
         "Meter",
@@ -27283,6 +29378,183 @@
         "formatNumber",
         "formatPercent",
         "notify"
+      ]
+    },
+    {
+      "slug": "erp-products",
+      "file": "src/blocks/erp-products.tsx",
+      "title": "Produtos",
+      "description": "Catálogo de SKUs: categoria, saldo contra o mínimo, custo, preço e margem com alerta abaixo da meta, ativos e inativos em abas, cadastro em gaveta com margem calculada na hora. Linha abre o produto.",
+      "category": "ERP",
+      "concept": {
+        "goal": "Manter o catálogo saudável: preço com margem, estoque contra o mínimo e cadastro rápido de SKU novo.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: abas Ativos/Inativos, filtros e busca na barra da grade",
+          "Margem em cor só quando abaixo da meta (número bom não grita)",
+          "Novo produto em Drawer com margem calculada enquanto digita",
+          "Cinco estados: ?estado=carregando|vazio|erro"
+        ],
+        "adapt": [
+          "Catálogo de serviços, planos (SaaS), tabela de preços"
+        ],
+        "avoid": [
+          "Página nova só para cadastrar um SKU",
+          "Margem sem a referência de meta"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Combobox",
+        "CurrencyField",
+        "DataGrid",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "Meter",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "TextField",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "erp-purchase-order",
+      "file": "src/blocks/erp-purchase-order.tsx",
+      "title": "Pedido de compra",
+      "description": "Registro da ordem de compra: ciclo cotação → aprovado → enviado → recebido, itens com saldo a receber, condições, marcos com o próximo passo, histórico e ações que mudam com a situação (enviar, registrar confirmação, receber, cancelar).",
+      "category": "ERP",
+      "concept": {
+        "goal": "Acompanhar um pedido de compra do envio ao recebimento sabendo sempre qual é o próximo passo.",
+        "patterns": [
+          "Anatomia C · Registro: trilha, StagePath do ciclo, itens no corpo e condições fixas à direita",
+          "Ações mudam com a situação (enviar ao fornecedor, registrar confirmação, registrar recebimento)",
+          "ProjectProgressCard com o próximo passo + Timeline do histórico",
+          "Atraso vira Callout com a ação de cobrar o fornecedor"
+        ],
+        "adapt": [
+          "Ordem de serviço, contrato com marcos, pedido de transferência entre filiais"
+        ],
+        "avoid": [
+          "Todas as ações visíveis em todas as situações",
+          "Saldo a receber escondido dentro do item"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Callout",
+        "ConfirmDialog",
+        "DatePicker",
+        "EntityMark",
+        "Meter",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "ProjectProgressCard",
+        "PropertyList",
+        "SplitLayout",
+        "StagePath",
+        "StateView",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableFooter",
+        "TableHead",
+        "TableHeader",
+        "TableRow",
+        "TextField",
+        "Timeline",
+        "TimelineItem",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "erp-purchase-orders",
+      "file": "src/blocks/erp-purchase-orders.tsx",
+      "title": "Pedidos de compra",
+      "description": "Ordens de compra por fornecedor: itens e saldo a receber na linha, previsão de entrega com atraso em destaque, abas por situação, envio ao fornecedor em massa e criação a partir de requisição aprovada em gaveta. Linha abre o pedido.",
+      "category": "ERP",
+      "concept": {
+        "goal": "Garantir que o que foi comprado chegue no prazo: ver o que está atrasado, o que falta enviar e o que chega esta semana.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: abas por situação, total no rodapé, itens expansíveis",
+          "Previsão de entrega com atraso em palavra e cor (nunca só cor)",
+          "Novo pedido em Drawer a partir de requisição aprovada (itens e fornecedor já vêm preenchidos)",
+          "Cinco estados: ?estado=carregando|vazio|erro"
+        ],
+        "adapt": [
+          "Ordens de serviço a terceiros, pedidos de reposição entre filiais"
+        ],
+        "avoid": [
+          "Criar o pedido sem a requisição aprovada (perde a trilha de aprovação)",
+          "Previsão sem dizer se atrasou"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "ChoiceCards",
+        "Combobox",
+        "ConfirmDialog",
+        "CurrencyField",
+        "DataGrid",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "IconButton",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "SegmentedControl",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHead",
+        "TableHeader",
+        "TableRow",
+        "TableSearch",
+        "Tabs",
+        "TextareaField",
+        "formatCurrency",
+        "formatNumber",
+        "notify",
+        "useFilters",
+        "useOperation"
       ]
     },
     {
@@ -27320,17 +29592,171 @@
         "Stepper",
         "Tabs",
         "TextField",
-        "Tone",
         "areaClass",
         "formatCurrency",
         "notify"
       ]
     },
     {
+      "slug": "erp-receiving",
+      "file": "src/blocks/erp-receiving.tsx",
+      "title": "Recebimento de mercadoria",
+      "description": "Conferência da entrega contra o pedido de compra: fila de pedidos a receber, NF-e de entrada pela chave (com busca na SEFAZ), quantidade recebida por item com divergência em palavra, lote e validade, e entrada no estoque confirmada.",
+      "category": "ERP",
+      "concept": {
+        "goal": "Dar entrada só no que chegou de fato: conferir quantidade, nota e lote antes de atualizar o estoque.",
+        "patterns": [
+          "Anatomia F · Mestre-detalhe: pedidos a receber à esquerda, conferência à direita; seleção em ?pedido=",
+          "Divergência por item em palavra (Falta 20 · Sobra 5 · Confere), nunca só cor",
+          "Chave da NF-e validada contra o CNPJ do fornecedor",
+          "Confirmação com useOperation: estoque e kardex atualizados só no fim"
+        ],
+        "adapt": [
+          "Devolução de cliente, recebimento de transferência entre filiais, inventário por contagem"
+        ],
+        "avoid": [
+          "Dar entrada pela quantidade do pedido sem conferir",
+          "Encerrar o saldo sem perguntar o que fazer com a falta"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "ChoiceCards",
+        "CurrencyField",
+        "DatePicker",
+        "Empty",
+        "EntityMark",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Select",
+        "StateView",
+        "Tabs",
+        "TextField",
+        "formatCurrency",
+        "formatNumber",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "erp-shipping",
+      "file": "src/blocks/erp-shipping.tsx",
+      "title": "Expedição",
+      "description": "Pedidos faturados do separar à entrega em quadro: transportadora, rastreio e prazo no cartão, atraso em destaque, CD de origem e destino com hora local, rastreio em linha do tempo na gaveta e despacho com transportadora e código.",
+      "category": "ERP",
+      "concept": {
+        "goal": "Fazer o pedido faturado sair do CD e chegar no prazo, vendo onde cada carga está.",
+        "patterns": [
+          "Anatomia E · Quadro: A separar → Separados → Em trânsito → Entregues; arrastar muda a etapa",
+          "Detalhe em Drawer com LocationTag (CD de origem e destino com fuso) e Timeline do rastreio",
+          "Despachar pede transportadora e código de rastreio; atraso em palavra no cartão",
+          "Alternador Quadro/Lista (≥ 8 cargas) e cinco estados (?estado=)"
+        ],
+        "adapt": [
+          "Ordens de serviço em campo, coletas, devoluções de cliente"
+        ],
+        "avoid": [
+          "Despachar sem o código de rastreio",
+          "Esconder o fuso do destino (Manaus é 1 h a menos)"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "EntityMark",
+        "KanbanBoard",
+        "KanbanColumn",
+        "LocationTag",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "RecordCard",
+        "SegmentedControl",
+        "Select",
+        "Skeleton",
+        "StatCell",
+        "StatGrid",
+        "TextField",
+        "Timeline",
+        "chartColor",
+        "formatCurrency",
+        "formatNumber",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "erp-stock-movements",
+      "file": "src/blocks/erp-stock-movements.tsx",
+      "title": "Movimentações de estoque",
+      "description": "Kardex em DataGrid: entradas, saídas, transferências entre CDs e ajustes de inventário com motivo, saldo corrente por produto, documento de origem clicável, valor ao custo e ajuste de inventário em gaveta com diferença calculada.",
+      "category": "ERP",
+      "concept": {
+        "goal": "Explicar o saldo: de onde veio e para onde foi cada unidade, e corrigir o estoque com motivo registrado.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: abas por tipo, filtros, total no rodapé, rolagem interna",
+          "Saldo corrente por produto (kardex) ao filtrar um SKU (?sku=)",
+          "Ajuste de inventário em Drawer: saldo do sistema × contado, diferença e motivo obrigatórios",
+          "Cinco estados: ?estado=carregando|vazio|erro"
+        ],
+        "adapt": [
+          "Extrato de pontos, movimentação de ativos, histórico de lotes"
+        ],
+        "avoid": [
+          "Ajuste sem motivo",
+          "Saldo sem o documento que o mudou"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Combobox",
+        "DataGrid",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "SegmentedControl",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "TextareaField",
+        "formatCurrency",
+        "formatNumber",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
       "slug": "erp-suppliers",
       "file": "src/blocks/erp-suppliers.tsx",
       "title": "Fornecedores",
-      "description": "Fornecedores com classificação A/B/C, OTIF contra a meta, prazo de entrega, gasto no ano e compras em aberto. Dispersão prazo × pontualidade e detalhe em gaveta.",
+      "description": "Fornecedores com classificação A/B/C, OTIF contra a meta, prazo de entrega, gasto no ano e compras em aberto. Dispersão prazo × pontualidade, detalhe em gaveta (?id=), pedido de cotação com itens e prazo e cadastro com consulta de CNPJ.",
       "category": "ERP",
       "concept": {
         "goal": "Escolher e acompanhar fornecedores por pontualidade, prazo e gasto.",
@@ -27338,13 +29764,15 @@
           "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada",
           "Classificação A/B/C e OTIF contra a meta",
           "Dispersão prazo × pontualidade para achar os problemáticos",
-          "Detalhe em gaveta"
+          "Detalhe em gaveta pela URL; pedir cotação troca o conteúdo da mesma gaveta (gaveta nunca abre gaveta)",
+          "Cinco estados: ?estado=carregando|vazio|erro"
         ],
         "adapt": [
           "Parceiros, agências, transportadoras"
         ],
         "avoid": [
-          "Nota do fornecedor sem os critérios"
+          "Nota do fornecedor sem os critérios",
+          "Pedido de cotação sem itens nem prazo de resposta"
         ]
       },
       "uses": [
@@ -27354,26 +29782,84 @@
         "Button",
         "ChartCard",
         "Column",
+        "Combobox",
         "DataTable",
+        "DatePicker",
         "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "EntityMark",
         "FilterBar",
         "FilterField",
         "Highlight",
+        "IconButton",
         "ListRow",
+        "MaskedField",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PageToolbar",
         "PropertyList",
         "ScatterChart",
+        "Select",
         "SortHeader",
         "TableSearch",
+        "TextField",
+        "TextareaField",
         "formatCurrency",
         "formatPercent",
-        "notify",
+        "masks",
         "useFilters",
+        "useOperation",
         "useSort"
+      ]
+    },
+    {
+      "slug": "fin-bank-accounts",
+      "file": "src/blocks/fin-bank-accounts.tsx",
+      "title": "Contas bancárias",
+      "description": "Saldo por conta com limite disponível, barrinhas de entradas e saídas dos últimos 7 dias úteis, última conciliação e pendências que levam à conciliação, extrato recente da conta escolhida e transferência entre contas.",
+      "category": "Financeiro",
+      "concept": {
+        "goal": "Saber quanto há em cada banco agora, o que entrou e saiu e se a conta está conciliada.",
+        "patterns": [
+          "Anatomia B · Painel: KPIs consolidados no topo e um cartão por conta",
+          "MiniBarChart de entradas e saídas por conta (toque mostra o dia)",
+          "Última conciliação com palavra e atalho para conciliar as pendências",
+          "Extrato recente da conta escolhida (?id=) com situação de conciliação"
+        ],
+        "adapt": [
+          "Carteiras de meios de pagamento, cartões corporativos, caixas de loja"
+        ],
+        "avoid": [
+          "Saldo sem a data da última conciliação",
+          "Cor sozinha para entrada e saída"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "Empty",
+        "KpiCard",
+        "KpiGrid",
+        "MiniBarChart",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "Select",
+        "Skeleton",
+        "TextField",
+        "formatCurrency",
+        "formatRelative",
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -27487,6 +29973,7 @@
         "BarList",
         "Button",
         "ChartCard",
+        "Empty",
         "GaugeChart",
         "KpiCard",
         "KpiGrid",
@@ -27497,7 +29984,8 @@
         "Page",
         "PageHeading",
         "ProportionBar",
-        "formatCurrency"
+        "formatCurrency",
+        "formatPercent"
       ]
     },
     {
@@ -27559,29 +30047,42 @@
         "Badge",
         "BulkBar",
         "Button",
+        "Callout",
         "Column",
+        "Combobox",
+        "CurrencyField",
         "DataTable",
+        "DatePicker",
         "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "FileCard",
+        "FileDropzone",
         "FilterBar",
         "FilterField",
         "Highlight",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PageToolbar",
         "PropertyList",
+        "Select",
         "SortHeader",
         "StatCell",
         "StatGrid",
         "TableSearch",
         "Tabs",
+        "TextField",
         "TextareaField",
+        "UploadItem",
         "formatCurrency",
         "notify",
         "plural",
         "selectionColumn",
         "useFilters",
+        "useOperation",
         "useSelection",
         "useSort"
       ]
@@ -27615,6 +30116,7 @@
         "DataGrid",
         "DatePicker",
         "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "EntityMark",
         "FieldBlock",
@@ -27658,15 +30160,23 @@
       "uses": [
         "Badge",
         "Button",
+        "Callout",
         "Empty",
         "FieldBlock",
+        "FileDropzone",
         "Meter",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
+        "PropertyList",
         "Select",
+        "UploadItem",
         "formatCurrency",
         "formatPercent",
-        "notify"
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -27820,6 +30330,7 @@
         "Button",
         "CalendarHeatmap",
         "ChartCard",
+        "DataTable",
         "DonutChart",
         "FunnelChart",
         "KpiCard",
@@ -27829,9 +30340,10 @@
         "PageHeading",
         "SankeyChart",
         "SegmentedControl",
+        "formatCurrency",
+        "formatDelta",
         "formatNumber",
-        "formatPercent",
-        "notify"
+        "formatPercent"
       ]
     },
     {
@@ -27862,23 +30374,29 @@
         "Column",
         "DataTable",
         "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "EntityMark",
         "FilterBar",
         "FilterField",
+        "GridColumn",
         "Highlight",
         "KpiCard",
         "KpiGrid",
         "Page",
         "PageHeading",
+        "PageToolbar",
         "Pagination",
         "PropertyList",
         "ProportionBar",
         "SortHeader",
         "TableSearch",
         "WaterfallChart",
+        "downloadCsv",
         "formatCurrency",
         "formatDate",
+        "formatNumber",
+        "gridToCsv",
         "notify",
         "selectionColumn",
         "useFilters",
@@ -27911,17 +30429,21 @@
         "ActionMenu",
         "AreaChart",
         "Badge",
+        "Banner",
         "Button",
         "ChartCard",
         "Column",
         "ConfirmDialog",
         "DataTable",
+        "Drawer",
         "EntityMark",
         "FieldBlock",
         "KpiCard",
         "KpiGrid",
         "Modal",
         "NumberField",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PropertyList",
@@ -27929,10 +30451,12 @@
         "Select",
         "SplitLayout",
         "Tabs",
+        "TextareaField",
         "formatCurrency",
         "formatDate",
         "formatNumber",
-        "notify"
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -27963,12 +30487,14 @@
         "Button",
         "Column",
         "DataTable",
+        "Empty",
         "EmptyFilterResult",
         "EntityMark",
         "FieldBlock",
         "FieldGrid",
         "FilterBar",
         "FilterField",
+        "GridColumn",
         "Highlight",
         "Modal",
         "NumberField",
@@ -27983,8 +30509,10 @@
         "Sparkline",
         "TableSearch",
         "TextField",
+        "downloadCsv",
         "formatCurrency",
         "formatNumber",
+        "gridToCsv",
         "notify",
         "selectionColumn",
         "useFilters",
@@ -28024,6 +30552,7 @@
         "Column",
         "DataTable",
         "EntityMark",
+        "GridColumn",
         "KpiCard",
         "KpiGrid",
         "NpsChart",
@@ -28031,8 +30560,10 @@
         "PageHeading",
         "SegmentedControl",
         "Tabs",
+        "downloadCsv",
         "formatCurrency",
         "formatNumber",
+        "gridToCsv",
         "notify"
       ]
     },
@@ -28062,17 +30593,70 @@
         "Button",
         "ConfirmDialog",
         "Drawer",
+        "Empty",
+        "EmptyFilterResult",
         "FieldBlock",
+        "FilterField",
         "Modal",
         "Page",
         "PageHeading",
         "SegmentedControl",
         "Select",
+        "Skeleton",
         "Switch",
         "TableSearch",
         "TextField",
-        "matchesQuery",
-        "notify"
+        "notify",
+        "useFilters"
+      ]
+    },
+    {
+      "slug": "saas-plans",
+      "file": "src/blocks/saas-plans.tsx",
+      "title": "Planos e preços",
+      "description": "Catálogo de planos com preço mensal e anual por usuário, limites, assinantes e MRR por plano, comparação de limites e edição do plano em gaveta.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Manter o catálogo de planos coerente: quanto custa cada um, o que inclui e quantas contas dependem dele antes de mudar um preço.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo; catálogo em cards e tabela de limites abaixo",
+          "Alternador mensal/anual muda todos os preços de uma vez",
+          "Cada plano mostra assinantes e MRR: o impacto aparece antes de editar",
+          "Editar em Drawer com useOperation; preço novo vale para novas assinaturas"
+        ],
+        "adapt": [
+          "Tabelas de preço de serviço (ERP), pacotes de horas, planos de suporte"
+        ],
+        "avoid": [
+          "Mudar preço sem mostrar quantas contas estão no plano",
+          "Limite ilimitado escrito como número alto"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "FieldGrid",
+        "KpiCard",
+        "KpiGrid",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Skeleton",
+        "Switch",
+        "TextareaField",
+        "formatCompact",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "useOperation"
       ]
     },
     {
@@ -28103,6 +30687,7 @@
         "Card",
         "Column",
         "DataTable",
+        "Empty",
         "FieldBlock",
         "FieldGrid",
         "Modal",
@@ -28140,6 +30725,8 @@
         "Avatar",
         "Badge",
         "Button",
+        "Empty",
+        "EmptyFilterResult",
         "EntityMark",
         "FieldBlock",
         "FilterBar",
@@ -28151,10 +30738,67 @@
         "PageHeading",
         "PageToolbar",
         "Select",
+        "Skeleton",
         "TableSearch",
         "TextareaField",
         "notify",
         "useFilters"
+      ]
+    },
+    {
+      "slug": "saas-usage",
+      "file": "src/blocks/saas-usage.tsx",
+      "title": "Uso e limites",
+      "description": "Consumo do ciclo por conta e recurso (usuários, painéis, eventos, API) contra o limite do plano; quem está perto ou acima do limite primeiro, com filtro por conta (?id=).",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Achar as contas que vão bater (ou já bateram) no limite do plano, para avisar antes do bloqueio e oferecer upgrade.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (faixa, recurso, plano, busca)",
+          "Ordenada por % do limite: acima e perto primeiro",
+          "Barra de uso + número + palavra; só acima/perto ganham cor",
+          "Linha abre a conta; ?id= filtra uma conta vinda da página dela"
+        ],
+        "adapt": [
+          "Cotas de armazenamento, créditos de IA, franquia de minutos ou mensagens"
+        ],
+        "avoid": [
+          "Mostrar só a porcentagem sem o limite",
+          "Pintar de verde quem está dentro do limite"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "KpiCard",
+        "KpiGrid",
+        "Meter",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Pagination",
+        "SortHeader",
+        "TableSearch",
+        "downloadCsv",
+        "formatCompact",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent",
+        "gridToCsv",
+        "notify",
+        "useFilters",
+        "usePagination",
+        "useSort"
       ]
     },
     {
@@ -28218,14 +30862,17 @@
         "Column",
         "DataTable",
         "Drawer",
+        "Empty",
         "EmptyFilterResult",
         "FilterBar",
         "FilterField",
+        "FilterState",
         "Highlight",
         "PageToolbar",
         "Pagination",
         "PropertyList",
         "TableSearch",
+        "downloadCsv",
         "notify",
         "useFilters",
         "usePagination"
@@ -28255,13 +30902,67 @@
       "uses": [
         "Badge",
         "Button",
+        "ChoiceCards",
         "Column",
         "ConfirmDialog",
         "DataTable",
+        "Drawer",
         "Meter",
+        "OperationButton",
+        "OperationFeedback",
+        "RadioGroup",
         "SegmentedControl",
+        "TextField",
+        "TextareaField",
         "formatCurrency",
-        "notify"
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "settings-data",
+      "file": "src/blocks/settings-data.tsx",
+      "title": "Dados e privacidade",
+      "description": "Exportação de dados (LGPD) com escolha de conjuntos e formato, histórico com download, retenção de registros e exclusão da organização com confirmação digitada e prazo para desistir.",
+      "category": "Configurações",
+      "concept": {
+        "goal": "Atender pedidos de portabilidade e exclusão da LGPD sem abrir chamado: o administrador exporta, define retenção e encerra a conta sozinho.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Pedido assíncrono: o botão informa (useOperation) e o histórico mostra o andamento por ponto + texto",
+          "Zona de perigo no fim, separada; nome digitado libera o botão e ConfirmDialog confirma",
+          "Exclusão com prazo de 30 dias e saída para desistir"
+        ],
+        "adapt": [
+          "Portal do cliente (exportar meus dados), ERP (backup contábil), ATS (dados de candidatos)"
+        ],
+        "avoid": [
+          "Excluir a organização com um clique",
+          "Esconder quanto tempo o arquivo fica disponível"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Callout",
+        "CheckboxGroup",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "Empty",
+        "HealthDot",
+        "OperationButton",
+        "OperationFeedback",
+        "RadioGroup",
+        "Select",
+        "SettingsSection",
+        "Switch",
+        "TextField",
+        "downloadCsv",
+        "formatBytes",
+        "formatDate",
+        "formatRelative",
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -28330,6 +31031,49 @@
       ]
     },
     {
+      "slug": "settings-organization",
+      "file": "src/blocks/settings-organization.tsx",
+      "title": "Organização",
+      "description": "Dados da empresa e do workspace: nome, razão social, CNPJ, logo, domínios verificados, fuso, idioma, moeda e início do ano fiscal, com barra de alterações não salvas.",
+      "category": "Configurações",
+      "concept": {
+        "goal": "Manter num só lugar a identidade da empresa que aparece em documentos, e-mails e relatórios do workspace.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Seções rótulo-à-esquerda; barra de alterações não salvas no rodapé",
+          "Domínio com status por ponto + texto e verificação sob demanda",
+          "Logo por FileDropzone com prévia"
+        ],
+        "adapt": [
+          "Dados fiscais do ERP, perfil da empresa no portal do cliente, conta de cliente no SaaS"
+        ],
+        "avoid": [
+          "Salvar cada campo sozinho em formulário longo",
+          "Domínio sem dizer o que falta para verificar"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Badge",
+        "Button",
+        "Combobox",
+        "ConfirmDialog",
+        "CopyButton",
+        "EntityMark",
+        "FileDropzone",
+        "HealthDot",
+        "MaskedField",
+        "Modal",
+        "Select",
+        "SettingsSection",
+        "TextField",
+        "UploadItem",
+        "formatRelative",
+        "masks",
+        "notify"
+      ]
+    },
+    {
       "slug": "settings-profile",
       "file": "src/blocks/settings-profile.tsx",
       "title": "Perfil",
@@ -28353,14 +31097,59 @@
       "uses": [
         "Avatar",
         "Button",
+        "Callout",
         "ConfirmDialog",
         "MaskedField",
+        "Modal",
         "Select",
         "SettingsSection",
         "TextField",
         "TextareaField",
         "masks",
         "notify"
+      ]
+    },
+    {
+      "slug": "settings-roles",
+      "file": "src/blocks/settings-roles.tsx",
+      "title": "Papéis e permissões",
+      "description": "Matriz de papéis × permissões por módulo, papéis de sistema bloqueados, criar, duplicar e editar papel em Drawer e pessoas por papel com link para a equipe.",
+      "category": "Configurações",
+      "concept": {
+        "goal": "Decidir o que cada papel pode fazer, vendo todos os papéis lado a lado, sem abrir um por um.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Matriz com Checkbox por célula, agrupada por módulo",
+          "Papéis de sistema visíveis mas bloqueados, com o motivo",
+          "Criar e editar papel em Drawer (useOperation + OperationButton); barra de alterações não salvas para a matriz"
+        ],
+        "adapt": [
+          "Permissões de portal do cliente, perfis de acesso de ERP, alçadas de aprovação no financeiro"
+        ],
+        "avoid": [
+          "Uma página por papel para comparar permissões",
+          "Deixar editar o papel de administrador e perder o acesso"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Badge",
+        "Button",
+        "Checkbox",
+        "CheckboxGroup",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "Drawer",
+        "OperationButton",
+        "OperationFeedback",
+        "Select",
+        "SettingsSection",
+        "TextField",
+        "TextareaField",
+        "Tooltip",
+        "notify",
+        "useOperation"
       ]
     },
     {
@@ -28430,12 +31219,625 @@
         "Column",
         "ConfirmDialog",
         "DataTable",
+        "Empty",
         "Meter",
         "Modal",
+        "Select",
         "TableToolbar",
         "TagInput",
         "normalize",
         "notify"
+      ]
+    },
+    {
+      "slug": "settings-webhooks",
+      "file": "src/blocks/settings-webhooks.tsx",
+      "title": "Webhooks",
+      "description": "Endpoints com eventos, status e taxa de sucesso; criar e editar em Drawer, pausar, excluir com confirmação, entregas recentes com reenvio e os cinco estados (?estado=carregando|vazio|erro).",
+      "category": "Configurações",
+      "concept": {
+        "goal": "Ligar o workspace a outros sistemas por eventos e descobrir rápido quando uma entrega falha.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "Status por ponto + texto; endpoint falhando pinta a linha",
+          "Criar/editar em Drawer com useOperation + OperationButton",
+          "Entregas recentes com reenvio; excluir com ConfirmDialog",
+          "Cinco estados: carregando, vazio, vazio por busca (Limpar), erro, com dados"
+        ],
+        "adapt": [
+          "Integrações de ERP, notificações de pagamento no financeiro, eventos de candidatura no ATS"
+        ],
+        "avoid": [
+          "Mostrar o segredo inteiro na lista",
+          "Excluir endpoint sem confirmação",
+          "Falha de entrega só em log técnico"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Button",
+        "CheckboxGroup",
+        "Column",
+        "ConfirmDialog",
+        "CopyButton",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "ErrorState",
+        "HealthDot",
+        "OperationButton",
+        "OperationFeedback",
+        "Skeleton",
+        "TableToolbar",
+        "TextField",
+        "formatNumber",
+        "formatPercent",
+        "formatRelative",
+        "normalize",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "srv-billing",
+      "file": "src/blocks/srv-billing.tsx",
+      "title": "Cobranças (boleto e Pix)",
+      "description": "Boletos e Pix gerados por mensalidades e OS: a vencer, vencidos e pagos, com régua de cobrança automática (D-3, D0, D+1, D+7, D+15), envio de 2ª via em lote, registro de pagamento e conciliação simples do extrato. Cobrança abre em gaveta (?id=).",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Receber no prazo sem cobrar na mão: a régua faz os lembretes, a pessoa só age nas exceções (vencidas, acordo, extrato sem dono).",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (abas, filtros, busca)",
+          "Vencida em palavra com dias de atraso; seleção em massa com BulkBar para “Enviar 2ª via”",
+          "Cobrança em Drawer (?id=): Pix copia e cola, linha digitável e a régua em Timeline (enviado, próximo, pendente)",
+          "Régua de cobrança configurável por passo (Switch); D+15 vira tarefa, nunca suspensão automática",
+          "Conciliação simples: crédito do extrato com a cobrança provável; confirmar baixa o título",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Contas a receber de escola, condomínio, academia; cobrança de assinatura"
+        ],
+        "avoid": [
+          "Lembrete agressivo antes do vencimento",
+          "Baixa manual sem registrar data e valor recebido"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BulkBar",
+        "Button",
+        "Callout",
+        "Column",
+        "CurrencyField",
+        "DataTable",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "Switch",
+        "TableSearch",
+        "Tabs",
+        "Timeline",
+        "TimelineItem",
+        "formatCurrency",
+        "formatDate",
+        "notify",
+        "selectionColumn",
+        "useFilters",
+        "useOperation",
+        "useSelection"
+      ]
+    },
+    {
+      "slug": "srv-client",
+      "file": "src/blocks/srv-client.tsx",
+      "title": "Cliente do ERP de serviços",
+      "description": "Registro do cliente (?id=): receita recorrente, saldo em aberto e vencido, contratos, ordens de serviço, orçamentos, notas e cobranças, anotações da equipe e dados cadastrais (CNPJ, ISS retido, endereço com hora local). Edição em gaveta.",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Antes de ligar para o cliente, saber tudo em um lugar: o que ele paga, o que está aberto, o que deve e o que a equipe combinou.",
+        "patterns": [
+          "Anatomia C · Registro: trilha para Clientes, ação primária Abrir OS, resto no menu ⋯; dados cadastrais fixos na coluna",
+          "Faixa de números (StatGrid) com recorrente, em aberto, vencido e OS abertas",
+          "Abas: Ordens de serviço, Contratos e orçamentos, Financeiro (notas + cobranças), Anotações (Timeline)",
+          "Inadimplente vira Callout com a saída (enviar 2ª via, ver cobranças)",
+          "Editar cadastro em Drawer; ISS retido como Switch com explicação"
+        ],
+        "adapt": [
+          "Página do condomínio numa administradora, do paciente numa clínica, do aluno numa escola"
+        ],
+        "avoid": [
+          "Herdar o cabeçalho da lista (registro tem o próprio)",
+          "Saldo devedor escondido numa aba"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Badge",
+        "Button",
+        "Callout",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "EntityMark",
+        "LocationTag",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "SplitLayout",
+        "StatCell",
+        "StatGrid",
+        "Switch",
+        "Tabs",
+        "TextField",
+        "TextareaField",
+        "Timeline",
+        "TimelineItem",
+        "formatCurrency",
+        "formatDate",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "srv-clients",
+      "file": "src/blocks/srv-clients.tsx",
+      "title": "Clientes do ERP de serviços",
+      "description": "Carteira de clientes (condomínios, clínicas, escritórios, escolas) com CNPJ, segmento, receita recorrente, OS abertas e saldo em aberto/vencido. Cadastro em gaveta com busca do CNPJ na Receita (?novo=1). Linha abre o cliente.",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Achar o cliente em segundos e ver, na mesma linha, quanto ele vale por mês, o que está aberto e se está devendo.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (filtros rápidos por segmento e situação, busca por CNPJ sem pontuação)",
+          "Colunas numéricas à direita com tabular-nums; vencido pinta só o valor",
+          "Ordenação por receita recorrente e saldo (useSort)",
+          "Cadastrar em Drawer; “Buscar na Receita” preenche razão social e endereço pelo CNPJ",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Carteira de condomínios de uma administradora, pacientes de clínica, alunos de escola"
+        ],
+        "avoid": [
+          "Saldo devedor só em cor, sem o valor",
+          "Cadastro em página separada que perde a lista"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Column",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "Switch",
+        "TableSearch",
+        "TextField",
+        "formatCurrency",
+        "useFilters",
+        "useOperation",
+        "useSort"
+      ]
+    },
+    {
+      "slug": "srv-contracts",
+      "file": "src/blocks/srv-contracts.tsx",
+      "title": "Contratos recorrentes",
+      "description": "Mensalidades por cliente: plano, valor mensal, reajuste anual (IPCA/IGP-M), próxima cobrança, horas do pacote e situação. Contrato abre em gaveta (?id=) com simulação de reajuste, consumo e, quando novo, o progresso da implantação.",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Proteger a receita recorrente: renovar e reajustar no prazo, ver quem consome acima do pacote e acompanhar a implantação de quem acabou de fechar.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (abas por situação, filtros, busca)",
+          "Abas com contador só onde pede ação (Renovação próxima)",
+          "Horas do pacote com barra; consumo acima pinta só o número",
+          "Detalhe em Drawer (?id=): reajuste simulado pelo índice acumulado, últimas notas e cobranças",
+          "Contrato novo mostra ProjectProgressCard da implantação com um único próximo passo",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Assinaturas de SaaS, mensalidades de escola, planos de manutenção de frota"
+        ],
+        "avoid": [
+          "Reajuste aplicado sem mostrar o valor novo ao cliente",
+          "Contador total na aba “Ativos” (não pede ação)"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Column",
+        "ConfirmDialog",
+        "DataTable",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "EntityMark",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "Meter",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "ProjectProgressCard",
+        "PropertyList",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "formatCurrency",
+        "formatDate",
+        "formatNumber",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "srv-dashboard",
+      "file": "src/blocks/srv-dashboard.tsx",
+      "title": "Início do ERP de serviços",
+      "description": "Início no estilo Conta Azul: saldo em caixa, a receber e a pagar do mês, receita recorrente dos contratos, OS abertas e atrasadas, fluxo de caixa previsto, OS concluídas por dia e as filas que pedem ação.",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Mostrar ao dono da empresa de serviços, em um minuto, se o caixa aguenta o mês e o que está travando a operação.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo, 5 KPIs com base explícita, um gráfico por pergunta",
+          "Fluxo de caixa previsto em barras com entradas e saídas (negativas) por semana; insight do menor saldo",
+          "“Precisa de você” em quatro filas: cobranças vencidas, OS sem técnico, NFS-e rejeitadas, contratos a renovar",
+          "MiniBarChart de OS concluídas por dia; técnicos em campo em StackedList",
+          "Cada linha abre o registro certo (OS, cobrança, nota, contrato)"
+        ],
+        "adapt": [
+          "Início de qualquer ERP de PME (Omie, Conta Azul, Bling): troque OS por pedidos",
+          "Empresa de limpeza, segurança, dedetização, assistência técnica"
+        ],
+        "avoid": [
+          "KPI sem base de comparação (“R$ 76 mil” de quê?)",
+          "Fila de ação escondida abaixo dos gráficos"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarChart",
+        "Button",
+        "ChartCard",
+        "KpiCard",
+        "KpiGrid",
+        "LineChart",
+        "ListPanel",
+        "ListRow",
+        "MiniBarChart",
+        "Page",
+        "PageHeading",
+        "StackedList",
+        "formatCompact",
+        "formatCurrency",
+        "formatNumber"
+      ]
+    },
+    {
+      "slug": "srv-invoices",
+      "file": "src/blocks/srv-invoices.tsx",
+      "title": "Notas fiscais de serviço (NFS-e)",
+      "description": "NFS-e da Prefeitura de São Paulo em DataGrid: a emitir, na prefeitura, emitidas, rejeitadas e canceladas; ISS (alíquota, valor e retenção pelo tomador), município, origem (OS ou contrato), emissão em lote e correção de rejeitada em gaveta (?id=).",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Emitir todas as notas do mês sem deixar nenhuma para trás e resolver as rejeitadas antes do vencimento da cobrança.",
+        "patterns": [
+          "Anatomia A · Lista com DataGrid: abas por situação, total e ISS no rodapé",
+          "Emitir em lote pela seleção (só “A emitir” entram); ação primária do cabeçalho emite todas as pendentes",
+          "Rejeitada abre em Drawer com o código da prefeitura, o campo exato a corrigir e a dica de onde achar o dado",
+          "ISS retido pelo tomador em palavra, nunca só em cor",
+          "Cancelar nota emitida pede confirmação (irreversível na prefeitura)",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "NF-e de produto (ERP), recibos de autônomo, faturas de locação"
+        ],
+        "avoid": [
+          "Mostrar “Erro E160” sem dizer qual campo corrigir",
+          "Reenviar rejeitada sem editar (volta a rejeitar)"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "ConfirmDialog",
+        "DataGrid",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "GridColumn",
+        "Highlight",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "StatCell",
+        "StatGrid",
+        "TableSearch",
+        "Tabs",
+        "TextField",
+        "formatCurrency",
+        "formatDate",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "srv-quotes",
+      "file": "src/blocks/srv-quotes.tsx",
+      "title": "Orçamentos de serviço",
+      "description": "Orçamentos por situação (rascunho, enviado, aprovado, recusado, expirado) com validade e valor. Criar em gaveta com horas, valor/hora, materiais, desconto e ISS; aprovar vira OS (avulso) ou contrato (recorrente). ?id= abre o orçamento, ?novo=1 abre o cadastro.",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Transformar pedido do cliente em orçamento rápido e, aprovado, em trabalho agendado ou receita recorrente sem redigitar nada.",
+        "patterns": [
+          "Anatomia A · Lista: cabeçalho fixo + PageToolbar colada (abas por situação, filtros, busca)",
+          "Criar e ver orçamento em Drawer, sem perder a lista; ?id= e ?novo=1 no endereço",
+          "Itens de serviço (horas × valor/hora) e materiais separados; desconto e ISS destacado",
+          "Aprovar pergunta o destino: avulso → OS, recorrente → contrato; o orçamento guarda o vínculo",
+          "Validade vencendo em até 3 dias pinta só a data; expirado oferece renovar",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Proposta comercial (CRM), orçamento de obra, cotação de frete"
+        ],
+        "avoid": [
+          "Aprovar orçamento e redigitar tudo na OS",
+          "Desconto escondido no preço unitário (o cliente não vê o que ganhou)"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "Button",
+        "Callout",
+        "Column",
+        "Combobox",
+        "DataTable",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "IconButton",
+        "Modal",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PageToolbar",
+        "PropertyList",
+        "Select",
+        "StatCell",
+        "StatGrid",
+        "Table",
+        "TableSearch",
+        "Tabs",
+        "TextField",
+        "formatCurrency",
+        "formatDate",
+        "formatPercent",
+        "notify",
+        "useFilters",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "srv-schedule",
+      "file": "src/blocks/srv-schedule.tsx",
+      "title": "Agenda dos técnicos",
+      "description": "Semana por técnico (linhas) e dia (colunas) com OS e visitas preventivas alocadas, carga em horas, hoje destacado e fila de OS sem técnico para alocar. Alternador para o mês; no celular, a agenda de um técnico por vez. ?tecnico= destaca a linha.",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Encaixar cada OS no técnico certo sem estourar a carga de ninguém e sem deixar chamado sem dono.",
+        "patterns": [
+          "Anatomia B · Painel de agenda: cabeçalho fixo com a semana (WeekPicker) e o modo Semana/Mês à direita",
+          "Grade técnico × dia feita com tokens: OS em chip com hora, cliente e prioridade em palavra; visita preventiva em chip neutro",
+          "Carga semanal por técnico com barra (horas alocadas de 44 h); folga em palavra",
+          "Fila “Sem técnico” ao lado: Alocar abre o mesmo Modal de agendamento do quadro e do registro",
+          "Celular: escolhe o técnico e vê a MiniAgenda dele; mês em MonthCalendar",
+          "Cinco estados: ?estado=carregando|vazio|erro simula"
+        ],
+        "adapt": [
+          "Escala de plantão, agenda de consultórios por profissional, rotas de entrega por motorista"
+        ],
+        "avoid": [
+          "Arrastar como único jeito de alocar (inacessível por teclado)",
+          "Cor do técnico sem nome na célula"
+        ]
+      },
+      "uses": [
+        "AgendaEvent",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Empty",
+        "ListPanel",
+        "ListRow",
+        "Meter",
+        "MiniAgenda",
+        "MonthCalendar",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Select",
+        "Skeleton",
+        "Table",
+        "WeekPicker",
+        "addDays",
+        "formatNumber",
+        "startOfWeek",
+        "weekdayShort"
+      ]
+    },
+    {
+      "slug": "srv-work-order",
+      "file": "src/blocks/srv-work-order.tsx",
+      "title": "Ordem de serviço",
+      "description": "Registro da OS (?id=): etapas, checklist de execução, apontamento de horas por técnico, materiais, fotos e anexos, assinatura do cliente, local do atendimento com hora local, histórico e ações por estado (Agendar, Iniciar, Concluir, Faturar → NFS-e).",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Levar um atendimento do chamado à nota fiscal com prova do que foi feito: checklist, horas, materiais, fotos e assinatura.",
+        "patterns": [
+          "Anatomia C · Registro: trilha, título, ação do estado à direita; propriedades fixas na coluna",
+          "Uma ação primária por estado: Agendar → Iniciar → Concluir → Faturar; Concluir exige checklist e assinatura (disabledReason diz o que falta)",
+          "Abas: Execução (checklist + assinatura), Horas e materiais, Fotos e anexos, Histórico (Timeline)",
+          "LocationTag mostra o local e a hora local do atendimento; SLA em palavra",
+          "Valor a faturar separa mão de obra coberta pelo contrato de materiais",
+          "Orçamento aprovado abre aqui como OS nova (?id=orc-<orçamento>)"
+        ],
+        "adapt": [
+          "Chamado de assistência técnica, visita de vistoria, entrega com comprovante"
+        ],
+        "avoid": [
+          "Concluir sem assinatura (o cliente contesta a cobrança)",
+          "Todas as ações visíveis em todos os estados"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "Attachment",
+        "AttachmentContent",
+        "AttachmentDescription",
+        "AttachmentGroup",
+        "AttachmentMedia",
+        "AttachmentTitle",
+        "Avatar",
+        "Badge",
+        "Button",
+        "Callout",
+        "Checkbox",
+        "Combobox",
+        "ConfirmDialog",
+        "EntityMark",
+        "FileDropzone",
+        "IconButton",
+        "LocationTag",
+        "Meter",
+        "Modal",
+        "NumberField",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "PropertyList",
+        "Select",
+        "SplitLayout",
+        "StagePath",
+        "Table",
+        "Tabs",
+        "TextField",
+        "Timeline",
+        "TimelineItem",
+        "formatCurrency",
+        "formatDate",
+        "formatNumber",
+        "notify",
+        "useOperation"
+      ]
+    },
+    {
+      "slug": "srv-work-orders",
+      "file": "src/blocks/srv-work-orders.tsx",
+      "title": "Ordens de serviço",
+      "description": "Quadro de OS por etapa (Aberta → Agendada → Em execução → Concluída → Faturada) com técnico, cliente, SLA e prioridade; alternador para lista. Arrastar para Agendada pede técnico e horário; para Faturada, confirma a NFS-e. Abrir OS em gaveta (?nova=1).",
+      "category": "Serviços",
+      "concept": {
+        "goal": "Ver toda a operação de campo num olhar: o que está sem técnico, o que vai estourar o SLA e o que já pode ser faturado.",
+        "patterns": [
+          "Anatomia E · Quadro: colunas por etapa; no desktop a página não rola",
+          "Card com SLA em palavra (Atrasada 1 d, Vence hoje 16:00); borda vermelha só no estourado",
+          "Arrastar muda a etapa; Agendada pede técnico e horário em Modal; Faturada confirma a NFS-e",
+          "Totais por coluna no cabeçalho (atrasadas, valor a faturar)",
+          "Alternar Quadro/Lista sem perder filtros; etapa inline na lista",
+          "Abrir OS em Drawer (?nova=1); card abre o registro",
+          "Cinco estados: ?estado=carregando|vazio|erro simula; vazio por filtro com Limpar"
+        ],
+        "adapt": [
+          "Chamados de suporte, entregas de uma transportadora, obras por fase"
+        ],
+        "avoid": [
+          "Status por botões dentro do card",
+          "Cor de prioridade sem palavra"
+        ]
+      },
+      "uses": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Column",
+        "Combobox",
+        "DataTable",
+        "DatePicker",
+        "Drawer",
+        "Empty",
+        "EmptyFilterResult",
+        "FilterBar",
+        "FilterField",
+        "Highlight",
+        "KanbanBoard",
+        "KanbanColumn",
+        "Modal",
+        "OperationButton",
+        "OperationFeedback",
+        "Page",
+        "PageHeading",
+        "RecordCard",
+        "SegmentedControl",
+        "Select",
+        "Skeleton",
+        "TableSearch",
+        "TextField",
+        "TextareaField",
+        "chartColor",
+        "formatCurrency",
+        "notify",
+        "useFilters",
+        "useOperation"
       ]
     }
   ],

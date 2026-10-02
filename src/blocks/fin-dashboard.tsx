@@ -3,6 +3,7 @@ import {
   BarList,
   Button,
   ChartCard,
+  Empty,
   GaugeChart,
   Meter,
   KpiCard,
@@ -14,6 +15,7 @@ import {
   PageHeading,
   ProportionBar,
   formatCurrency,
+  formatPercent,
 } from "@g4ai/ds";
 import { agingBuckets, bankLines, br, budget, cashBalance, customerById, customers, finUser, lateDays, minimumCash, payables, receivables, weeks } from "./data/fin";
 import { go } from "./shells/frame-route";
@@ -56,6 +58,7 @@ export default function FinDashboard() {
     .map((c) => ({ label: c.name, value: overdue.filter((r) => r.customerId === c.id).reduce((s, r) => s + r.value, 0), href: `#/frame/erp-customers?id=${c.id}` }))
     .filter((d) => d.value);
   const overBudget = budget.filter((b) => b.kind === "despesa" && b.actual > b.planned);
+  const biggest = [...overdue].sort((a, b) => b.value - a.value)[0];
   const receivable30 = receivables.reduce((s, r) => s + r.value, 0);
   const payable30 = payables.filter((p) => p.status !== "pago").reduce((s, p) => s + p.value, 0);
 
@@ -65,7 +68,7 @@ export default function FinDashboard() {
         <PageHeading kicker={`Bom dia, ${finUser.name.split(" ")[0]}`} title="Visão financeira" description="Distribuidora Aço Forte · posição consolidada das contas às 08:00." />
         <div className="mt-6 space-y-6">
           <KpiGrid>
-            <KpiCard label="Saldo em contas" value={money(cashBalance)} delta={-0.069} goodWhen="neutral" period="vs. 01/09" href="#/frame/fin-cashflow" />
+            <KpiCard label="Saldo em contas" value={money(cashBalance)} delta={-0.069} goodWhen="neutral" period="vs. 01/09" href="#/frame/fin-bank-accounts" />
             <KpiCard label="A receber" value={money(receivable30)} hint={`${money(overdue.reduce((s, r) => s + r.value, 0))} vencido`} href="#/frame/fin-receivables" />
             <KpiCard label="A pagar" value={money(payable30)} hint={`${toApprove.length} aguardando sua aprovação`} href="#/frame/fin-payables" />
             <KpiCard label="Lucro líquido do mês" value={money(76_930)} delta={0.143} period="vs. orçado" href="#/frame/fin-dre" />
@@ -107,13 +110,17 @@ export default function FinDashboard() {
 
           <div className="grid items-start gap-6 lg:grid-cols-3">
             <ListPanel title="Pagamentos para aprovar" icon={<Landmark />} count={toApprove.length} tone="attention" action={<a href="#/frame/fin-payables">Contas a pagar</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                {toApprove.map((p) => (
-                  <li key={p.id}>
-                    <ListRow onClick={() => go("fin-payables", p.id)} kicker={`vence ${br(p.due)}`} title={p.supplier} meta={formatCurrency(p.value, { cents: false })} />
-                  </li>
-                ))}
-              </ul>
+              {toApprove.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {toApprove.map((p) => (
+                    <li key={p.id}>
+                      <ListRow onClick={() => go("fin-payables", p.id)} kicker={`vence ${br(p.due)}`} title={p.supplier} meta={formatCurrency(p.value, { cents: false })} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<Landmark />} title="Nada para aprovar" hint="Títulos acima de R$ 20 mil chegam aqui antes de ir ao banco." />
+              )}
             </ListPanel>
             <section className="rounded-2xl border border-line bg-soft/70 p-[3px]">
               <div className="flex items-center gap-2 px-3 py-2.5 text-[14px] font-medium">
@@ -130,19 +137,28 @@ export default function FinDashboard() {
                   </div>
                 </div>
                 <p className="m-0 text-[12.5px] leading-relaxed text-muted">{bankLines.filter((b) => (b.confidence ?? 0) >= 0.9).length} linhas têm sugestão segura: dá para conciliar em um clique.</p>
-                <Button size="sm" variant="ghost" onClick={() => go("fin-reconciliation")}>
-                  Conciliar agora
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => go("fin-reconciliation", { conta: "itau" })}>
+                    Conciliar agora
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => go("fin-bank-accounts")}>
+                    Ver contas
+                  </Button>
+                </div>
               </div>
             </section>
             <ListPanel title="Centros acima do orçamento" icon={<TriangleAlert />} count={overBudget.length} action={<a href="#/frame/fin-budget">Orçamento</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                {overBudget.map((b) => (
-                  <li key={b.id}>
-                    <ListRow onClick={() => go("fin-budget")} kicker={b.owner} title={b.center} meta={<span className="text-rose">+{Math.round((b.actual / b.planned - 1) * 100)} %</span>} />
-                  </li>
-                ))}
-              </ul>
+              {overBudget.length ? (
+                <ul className="list-none divide-y divide-line p-0">
+                  {overBudget.map((b) => (
+                    <li key={b.id}>
+                      <ListRow onClick={() => go("fin-budget")} kicker={b.owner} title={b.center} meta={<span className="text-rose">+{formatPercent(b.actual / b.planned - 1, 0)}</span>} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Empty framed={false} icon={<TriangleAlert />} title="Todos dentro do orçado" hint="Nenhum centro de custo passou do orçamento no mês." />
+              )}
             </ListPanel>
           </div>
 
@@ -157,13 +173,15 @@ export default function FinDashboard() {
               <BarList items={debtors} format={money} limit={5} />
             </ChartCard>
           </div>
-          <p className="m-0 text-[12px] text-muted">
-            Maior título vencido: {customerById(overdue.sort((a, b) => b.value - a.value)[0].customerId).name}. Detalhe em{" "}
-            <a className="text-blue hover:underline" href="#/frame/fin-receivables">
-              Contas a receber
-            </a>
-            .
-          </p>
+          {biggest && (
+            <p className="m-0 text-[12px] text-muted">
+              Maior título vencido: {customerById(biggest.customerId).name} ({formatCurrency(biggest.value, { cents: false })}). Detalhe em{" "}
+              <a className="text-blue hover:underline" href={`#/frame/fin-receivables?id=${biggest.id}`}>
+                Contas a receber
+              </a>
+              .
+            </p>
+          )}
         </div>
       </Page>
     </NexoShell>

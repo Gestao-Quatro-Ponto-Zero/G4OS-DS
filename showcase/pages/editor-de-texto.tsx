@@ -1,6 +1,6 @@
 import { Wand2 } from "lucide-react";
 import { useState } from "react";
-import { RichTextEditor, RichTextToolbar, richTextContentClass } from "@g4ai/ds";
+import { RichTextEditor, RichTextToolbar, RichTextView, richTextContentClass } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -54,6 +54,15 @@ export default function Page() {
             ["minHeight · readOnly", "number · boolean", "160 · false", ""],
           ]}
         />
+      </DocSection>
+      <DocSection title="Só leitura: RichTextView" rule="Para mostrar texto rico salvo (comunicado, comentário, descrição) fora do editor. O HTML passa por uma lista de permissões (tags, atributos, URLs http/https/mailto) antes de entrar na página: nunca use dangerouslySetInnerHTML com conteúdo de usuário.">
+        <Demo
+          className="block max-w-[640px]"
+          code={`<RichTextView value={comunicado.html} />`}
+        >
+          <RichTextView value={'<h3>Novo horário do CD Recife</h3><p>A partir de <strong>segunda, 06/10</strong>, o recebimento passa a ser das 6h às 14h.</p><ul><li>Agendamento pelo portal do fornecedor</li><li>Dúvidas: <a href="mailto:logistica@vertice.com.br">logistica@vertice.com.br</a></li></ul><p onclick="alert(1)">Atributos de evento e <script>scripts</script> são removidos.</p>'} />
+        </Demo>
+        <PropsTable rows={[["value", "string (HTML)", "—", "HTML do RichTextEditor ou de outra fonte; é higienizado antes de exibir."]]} />
       </DocSection>
       <DocSection title="Só a barra de ferramentas" rule="Use RichTextToolbar com o seu editor (TipTap, Lexical): passe onCommand e o estado ativo. Mesmo visual, motor de produção.">
         <Demo bare code={`<RichTextToolbar onCommand={(t, v) => editor.chain().focus().run(t, v)} active={{ bold: editor.isActive("bold") }} />`}>

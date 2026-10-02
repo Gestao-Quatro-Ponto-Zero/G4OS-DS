@@ -1,12 +1,23 @@
-import { Download, FileWarning, RotateCw } from "lucide-react";
-import { useState } from "react";
+import { Download, FilePlus2, FileText, FileWarning, RotateCw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   Badge,
   BulkBar,
   Button,
   Callout,
+  ChoiceCards,
   DataTable,
+  DatePicker,
+  Drawer,
+  Empty,
   EmptyFilterResult,
+  NumberField,
+  OperationButton,
+  OperationFeedback,
+  PropertyList,
+  Select,
+  TextField,
+  useOperation,
   FilterBar,
   Highlight,
   Page,
@@ -24,9 +35,9 @@ import {
   type Column,
   type FilterField, PageToolbar
 } from "@g4ai/ds";
-import { br, customerById, invoiceStatus, invoices as seed, orderById, today, type Invoice, type InvoiceStatus } from "./data/erp";
-import { go } from "./shells/frame-route";
-import { NexoShell } from "./shells/nexo-shell";
+import { addInvoice, br, carriers, customerById, iso, invoiceStatus, invoices as seed, orderById, orderTotal, orders, products, today, updateOrder, warehouses, type Invoice, type InvoiceStatus, type Order } from "./data/erp";
+import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
+import { NexoShell, demoError, useDemoState } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -60,7 +71,24 @@ const fields: FilterField<Invoice>[] = [
 ];
 
 export default function ErpInvoices() {
-  const [list, setList] = useState(seed);
+  const demo = useDemoState();
+  const emitting = useFrameParam("emitir") === "1";
+  const fixId = useFrameParam("corrigir");
+  const [list, setList] = useState<Invoice[]>(() => (demo === "vazio" ? [] : [...seed]));
+  const fixing = fixId ? list.find((n) => n.id === fixId && n.status === "rejeitada") : undefined;
+  // A SEFAZ responde em segundos: depois do envio, a nota sai de "Processando" sozinha.
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const authorizeLater = (id: string) => {
+    timers.current.push(
+      window.setTimeout(() => {
+        setList((all) => all.map((x) => (x.id === id ? { ...x, status: "autorizada", reason: undefined, rejected: undefined } : x)));
+        const n = seed.find((x) => x.id === id);
+        if (n) Object.assign(n, { status: "autorizada", reason: undefined, rejected: undefined });
+        notify(`NF-e ${n?.number ?? id} autorizada pela SEFAZ`);
+      }, 2200),
+    );
+  };
   const filters = useFilters(list, { fields, search: (n) => [n.number, n.id, n.key, customerById(n.customerId).name, customerById(n.customerId).cnpj.replace(/\D/g, "")], now: today, url: "n_" });
   const sort = useSort(filters.rows, { numero: (n) => n.id, valor: (n) => n.total, data: (n) => n.issuedAt }, { key: "numero", dir: "desc" });
   const sel = useSelection(sort.rows.map((n) => n.id));
@@ -68,11 +96,7 @@ export default function ErpInvoices() {
   const rejected = list.filter((n) => n.status === "rejeitada");
   const authorized = list.filter((n) => n.status === "autorizada");
 
-  const resend = (n: Invoice) => {
-    setList((all) => all.map((x) => (x.id === n.id ? { ...x, status: "processando" } : x)));
-    notify(`NF-e ${n.number} corrigida e reenviada à SEFAZ`);
-    setTimeout(() => setList((all) => all.map((x) => (x.id === n.id ? { ...x, status: "autorizada", reason: undefined } : x))), 1800);
-  };
+  const resend = (n: Invoice) => setFrameQuery({ corrigir: n.id });
 
   const columns: Column<Invoice>[] = [
     selectionColumn<Invoice>(sel, (n) => n.id, (n) => n.number),
@@ -126,9 +150,14 @@ export default function ErpInvoices() {
           title="Notas fiscais"
           description="NF-e de saída. Autorizadas podem ser canceladas em até 24 h da emissão."
           actions={
-            <Button variant="ghost" onClick={() => notify(`XML de ${authorized.length} notas do mês enviado para a contabilidade`, undefined, "info")}>
-              <Download /> Enviar XML do mês
-            </Button>
+            <>
+              <Button variant="ghost" onClick={() => notify(`XML de ${authorized.length} notas do mês enviado para a contabilidade`)}>
+                <Download /> Enviar XML do mês
+              </Button>
+              <Button onClick={() => setFrameQuery({ emitir: "1" })}>
+                <FilePlus2 /> Emitir nota
+              </Button>
+            </>
           }
         />
         <div className="mt-6 space-y-6">
@@ -158,7 +187,23 @@ export default function ErpInvoices() {
             <PageToolbar>
               <FilterBar filters={filters} noun="nota" search={<TableSearch value={q} onChange={filters.setQuery} total={list.length} noun="nota" searchIn="número, chave de acesso, cliente e CNPJ" />} />
             </PageToolbar>
-            <DataTable rows={sort.rows} columns={columns} rowKey={(n) => n.id} onRowClick={(n) => go("erp-invoice", n.id)} rowLabel={(n) => `Abrir NF-e ${n.number}`} empty={<EmptyFilterResult filters={filters} noun="nota" />} />
+            <DataTable
+              label="Notas fiscais"
+              rows={sort.rows}
+              columns={columns}
+              rowKey={(n) => n.id}
+              onRowClick={(n) => go("erp-invoice", n.id)}
+              rowLabel={(n) => `Abrir NF-e ${n.number}`}
+              loading={demo === "carregando"}
+              error={demoError(demo, "as notas fiscais")}
+              empty={
+                list.length === 0 ? (
+                  <Empty framed={false} icon={<FileText />} title="Nenhuma NF-e emitida" hint="Emita a nota a partir de um pedido aprovado: itens, cliente e impostos vêm do pedido." action={<Button size="sm" variant="ghost" onClick={() => setFrameQuery({ emitir: "1" })}><FilePlus2 /> Emitir nota</Button>} />
+                ) : (
+                  <EmptyFilterResult filters={filters} noun="nota" />
+                )
+              }
+            />
             <BulkBar count={sel.count} noun="nota" onClear={sel.clear}>
               <button type="button" onClick={() => { notify(`${sel.count} XML baixados (ZIP)`, undefined, "info"); sel.clear(); }}>
                 <Download /> Baixar XML
@@ -167,6 +212,192 @@ export default function ErpInvoices() {
           </div>
         </div>
       </Page>
+      {emitting && (
+        <EmitDrawer
+          onClose={() => setFrameQuery({ emitir: undefined })}
+          onEmitted={(n) => {
+            setList((all) => [n, ...all]);
+            authorizeLater(n.id);
+          }}
+        />
+      )}
+      {fixing && (
+        <FixDrawer
+          key={fixing.id}
+          n={fixing}
+          onClose={() => setFrameQuery({ corrigir: undefined })}
+          onSent={() => {
+            setList((all) => all.map((x) => (x.id === fixing.id ? { ...x, status: "processando" } : x)));
+            authorizeLater(fixing.id);
+          }}
+        />
+      )}
     </NexoShell>
+  );
+}
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const cfopOf = (uf: string) => (uf === "GO" ? "5102" : "6102");
+
+/* ------------------------------------------------------------------ */
+/* Emitir NF-e a partir de pedido aprovado                             */
+/* ------------------------------------------------------------------ */
+
+function EmitDrawer({ onClose, onEmitted }: { onClose: () => void; onEmitted: (n: Invoice) => void }) {
+  const ready = orders.filter((o) => o.status === "aprovado");
+  const [orderId, setOrderId] = useState(ready[0]?.id ?? "");
+  const [carrier, setCarrier] = useState(carriers[0]);
+  const [volumes, setVolumes] = useState<number | null>(4);
+  const [shipDate, setShipDate] = useState(iso(0));
+  const op = useOperation({ busyLabel: "Transmitindo…" });
+  const o: Order | undefined = ready.find((x) => x.id === orderId);
+  const c = o ? customerById(o.customerId) : undefined;
+  const total = o ? orderTotal(o) : 0;
+  const icms = c ? total * (c.uf === "GO" ? 0.17 : 0.12) : 0;
+  const nextId = String(Math.max(...seed.map((n) => Number(n.id))) + 1);
+
+  const emit = async () => {
+    if (!o || !c) return;
+    let created: Invoice | null = null;
+    const failed = await op.run(async () => {
+      await wait(1100);
+      created = addInvoice({
+        id: nextId,
+        number: `000.0${nextId.slice(0, 2)}.${nextId.slice(2)}`,
+        series: "1",
+        orderId: o.id,
+        customerId: c.id,
+        issuedAt: iso(0),
+        total,
+        status: "processando",
+        key: `5226${iso(0).slice(2, 4)}${iso(0).slice(5, 7)}12345678000190550010000${nextId}1${String(Date.now()).slice(-8)}`,
+        cfop: cfopOf(c.uf),
+      });
+      updateOrder(o.id, { status: "faturado", invoice: nextId });
+    }, `NF-e ${nextId} do pedido ${o.number} enviada à SEFAZ`);
+    if (failed || !created) return;
+    onEmitted(created);
+    onClose();
+  };
+
+  return (
+    <Drawer
+      open
+      onClose={onClose}
+      kicker="Faturamento"
+      title="Emitir NF-e"
+      width={600}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <OperationButton operation={op} onClick={emit} disabled={!o} disabledReason="Escolha um pedido aprovado.">
+            Emitir e transmitir
+          </OperationButton>
+        </>
+      }
+    >
+      {ready.length === 0 ? (
+        <Empty title="Nenhum pedido pronto para faturar" hint="Só pedidos aprovados viram NF-e. Aprove um orçamento ou libere o crédito do cliente." action={<Button size="sm" variant="ghost" onClick={() => go("erp-orders")}>Ver pedidos</Button>} />
+      ) : (
+        <div className="space-y-6">
+          <ChoiceCards
+            label={`Pedido aprovado · ${ready.length} prontos para faturar`}
+            columns={1}
+            value={orderId}
+            onChange={setOrderId}
+            options={ready.slice(0, 6).map((x) => {
+              const k = customerById(x.customerId);
+              return { value: x.id, label: `${x.number} · ${k.name}`, description: `${x.items.length} ${x.items.length === 1 ? "item" : "itens"} · ${k.city}/${k.uf} · ${warehouses.find((w) => w.id === x.warehouse)?.name}`, aside: <span className="text-[13px] font-medium tabular-nums">{formatCurrency(orderTotal(x), { cents: false })}</span> };
+            })}
+          />
+          {o && c && (
+            <>
+              <section className="rounded-xl border border-line bg-soft/40 p-4">
+                <PropertyList
+                  items={[
+                    { label: "Natureza", value: "Venda de mercadoria adquirida de terceiros" },
+                    { label: "CFOP", value: cfopOf(c.uf), hint: c.uf === "GO" ? "dentro do estado" : `interestadual · ${c.uf}` },
+                    { label: "Número", value: `000.0${nextId.slice(0, 2)}.${nextId.slice(2)} · série 1` },
+                    { label: "Destinatário", value: c.name, hint: `CNPJ ${c.cnpj}${c.ie ? ` · IE ${c.ie}` : ""}` },
+                    { label: "Itens", value: o.items.map((it) => `${it.qty} × ${products.find((p) => p.sku === it.sku)?.sku}`).join(", ") },
+                    { label: "ICMS estimado", value: formatCurrency(icms), hint: c.uf === "GO" ? "17 %" : "12 % interestadual" },
+                    { label: "Total da nota", value: <span className="text-[15px] font-semibold tabular-nums">{formatCurrency(total)}</span> },
+                  ]}
+                />
+              </section>
+              <section className="grid gap-3 sm:grid-cols-3">
+                <Select className="sm:col-span-3" label="Transportadora" value={carrier} onValueChange={setCarrier} options={carriers.map((x) => ({ value: x, label: x }))} />
+                <NumberField label="Volumes" value={volumes} onChange={setVolumes} min={1} />
+                <DatePicker className="sm:col-span-2" label="Data de saída" value={shipDate} onValueChange={setShipDate} min={iso(0)} />
+              </section>
+              {c.status === "bloqueado" && <Callout tone="warn" title="Cliente com crédito bloqueado">A nota sai, mas o título a receber já nasce marcado para cobrança antecipada.</Callout>}
+            </>
+          )}
+          <OperationFeedback operation={op} />
+        </div>
+      )}
+    </Drawer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Corrigir rejeição e reenviar                                        */
+/* ------------------------------------------------------------------ */
+
+function FixDrawer({ n, onClose, onSent }: { n: Invoice; onClose: () => void; onSent: () => void }) {
+  const field = n.rejected;
+  const [value, setValue] = useState(field?.value ?? "");
+  const [tried, setTried] = useState(false);
+  const op = useOperation({ busyLabel: "Reenviando…" });
+  const c = customerById(n.customerId);
+  const unchanged = !!field && value.trim() === field.value;
+  const send = async () => {
+    setTried(true);
+    if (unchanged || !value.trim()) return;
+    const failed = await op.run(() => wait(900), `NF-e ${n.number} corrigida e reenviada à SEFAZ`);
+    if (failed) return;
+    onSent();
+    onClose();
+  };
+  return (
+    <Drawer
+      open
+      onClose={onClose}
+      kicker={`NF-e ${n.number} · ${c.name}`}
+      title="Corrigir e reenviar"
+      width={520}
+      footer={
+        <>
+          <Button variant="ghost" onClick={() => go("erp-invoice", n.id)}>
+            Abrir nota
+          </Button>
+          <OperationButton operation={op} onClick={send}>
+            <RotateCw /> Corrigir e reenviar
+          </OperationButton>
+        </>
+      }
+    >
+      <div className="space-y-5">
+        <Callout tone="bad" title="Motivo da rejeição">
+          {n.reason}
+        </Callout>
+        {field ? (
+          <TextField label={field.label} value={value} onChange={setValue} hint={field.hint} error={tried && unchanged ? "Ainda é o valor recusado pela SEFAZ: corrija antes de reenviar." : tried && !value.trim() ? "Informe o valor correto." : undefined} />
+        ) : (
+          <p className="m-0 text-[13px] text-ink-soft">Revise o cadastro do cliente e os dados do pedido; o reenvio usa o mesmo número.</p>
+        )}
+        <PropertyList
+          items={[
+            { label: "Destinatário", value: c.name, hint: `CNPJ ${c.cnpj} · ${c.city}/${c.uf}` },
+            { label: "Pedido", value: orderById(n.orderId).number },
+            { label: "Valor", value: formatCurrency(n.total) },
+            { label: "Mesmo número", value: `${n.number} · série ${n.series}`, hint: "A rejeição não consome a numeração." },
+          ]}
+        />
+        <OperationFeedback operation={op} />
+      </div>
+    </Drawer>
   );
 }

@@ -71,7 +71,9 @@ Plano do agente antes/durante a execução: o que vai fazer, em que ordem, onde 
 | --- | --- | --- | --- |
 | `steps` * | `PlanStep[]` |  |  |
 | `className` | `string \| undefined` |  |  |
-| `title` | `string \| undefined` | `"Plano"` |  |
+| `collapsible` | `boolean \| undefined` | `false` | Cabeçalho clicável que recolhe o plano; ícone mostra o status geral. |
+| `defaultOpen` | `boolean \| undefined` | `true` |  |
+| `title` | `ReactNode` | `"Plano"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -320,7 +322,7 @@ Exemplo (showcase `#/p/ia-workspace`):
 ## PlanStep (type)
 
 ```ts
-type PlanStep = { id: string; label: string; status: "pending" | "active" | "done" | "error" | "skipped"; detail?: ReactNode }
+type PlanStep = { id: string; label: ReactNode; status: "pending" | "active" | "done" | "error" | "skipped"; detail?: ReactNode; content?: ReactNode; defaultOpen?: boolean; durationMs?: number; icon?: ReactNode; }
 ```
 
 ## RailItem (type)

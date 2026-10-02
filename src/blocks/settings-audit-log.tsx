@@ -5,20 +5,24 @@ import {
   Button,
   DataTable,
   Drawer,
+  Empty,
   EmptyFilterResult,
   FilterBar,
   Highlight,
   Pagination,
   PropertyList,
   TableSearch,
+  downloadCsv,
   notify,
   useFilters,
   usePagination,
   type Column,
-  type FilterField, PageToolbar
+  type FilterField,
+  type FilterState,
+  PageToolbar,
 } from "@g4ai/ds";
 import { me, people } from "./data/workspace";
-import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
+import { go, setFrameQuery, useFrameParam, useFrameQuery } from "./shells/frame-route";
 import { SettingsShell } from "./shells/settings-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -87,7 +91,12 @@ const fields: FilterField<Event>[] = [
 
 export default function SettingsAuditLogBlock() {
   const query = useFrameQuery();
-  const filters = useFilters(events, { fields, search: (e) => [nameOf(e.who), e.action, e.target, e.ip], me: me.id, now: today });
+  // ?pessoa=<id> chega da tela Equipe ("Ver atividade"); ?estado= simula carregando/vazio/erro.
+  const pessoa = useFrameParam("pessoa");
+  const estado = useFrameParam("estado");
+  const initial: FilterState | undefined = pessoa ? { query: "", conditions: [{ id: "pessoa", field: "who", op: "is", value: [pessoa] }] } : undefined;
+  const source = estado === "vazio" ? [] : events;
+  const filters = useFilters(source, { fields, search: (e) => [nameOf(e.who), e.action, e.target, e.ip], me: me.id, now: today, initial });
   const pages = usePagination(filters.rows, 10, { resetKey: filters.state });
   const q = filters.state.query;
   const open = events.find((e) => e.id === query.get("id")) ?? null;
@@ -120,7 +129,18 @@ export default function SettingsAuditLogBlock() {
       title="Log de auditoria"
       description="Tudo o que muda permissões, cobrança, integrações e dados fica registrado por 2 anos."
       actions={
-        <Button size="sm" variant="ghost" onClick={() => notify(`${filters.shown} eventos exportados para CSV`)}>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabledReason={filters.shown === 0 ? "Nenhum evento no recorte atual" : undefined}
+          onClick={() => {
+            const head = ["Data e hora", "Pessoa", "Ação", "Alvo", "Área", "Risco", "IP", "Antes", "Depois"];
+            const cell = (v: string) => `"${v.replace(/"/g, '""')}"`;
+            const lines = filters.rows.map((e) => [new Date(e.at).toLocaleString("pt-BR"), nameOf(e.who), e.action, e.target, e.area, e.risk, e.ip, e.before ?? "", e.after ?? ""].map(cell).join(";"));
+            downloadCsv("auditoria", `\uFEFF${[head.map(cell).join(";"), ...lines].join("\r\n")}`);
+            notify(`${filters.shown} ${filters.shown === 1 ? "evento exportado" : "eventos exportados"} para CSV`);
+          }}
+        >
           <Download /> Exportar
         </Button>
       }
@@ -130,12 +150,20 @@ export default function SettingsAuditLogBlock() {
           <FilterBar filters={filters} noun="evento" search={<TableSearch value={q} onChange={filters.setQuery} total={events.length} noun="evento" searchIn="pessoa, ação, alvo e IP" />} />
         </PageToolbar>
         <DataTable
-          rows={pages.rows}
+          rows={estado === "carregando" || estado === "erro" ? [] : pages.rows}
           columns={cols}
           rowKey={(e) => e.id}
           onRowClick={(e) => setFrameQuery({ id: e.id })}
           rowLabel={(e) => `Ver evento: ${nameOf(e.who)} ${e.action} ${e.target}`}
-          empty={<EmptyFilterResult filters={filters} noun="evento" />}
+          loading={estado === "carregando"}
+          error={estado === "erro" ? { message: "Não foi possível carregar o log de auditoria.", onRetry: () => setFrameQuery({ estado: undefined }) } : undefined}
+          empty={
+            filters.total === 0 ? (
+              <Empty framed={false} icon={<History />} title="Nenhum evento registrado ainda" hint="Mudanças de acesso, equipe, cobrança, integrações e dados aparecem aqui assim que acontecerem." action={<Button size="sm" variant="ghost" onClick={() => go("settings-team")}>Ver equipe</Button>} />
+            ) : (
+              <EmptyFilterResult filters={filters} noun="evento" />
+            )
+          }
         />
         <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
       </div>

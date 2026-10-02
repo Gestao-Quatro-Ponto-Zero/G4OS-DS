@@ -27,4 +27,4 @@ Pedidos em DataGrid: abas por situação, agrupamento com subtotal, itens expans
 
 ## Componentes usados
 
-`Badge`, `Button`, `DataGrid`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Page`, `PageHeading`, `SegmentedControl`, `StatCell`, `StatGrid`, `TableSearch`, `Tabs`, `formatCurrency`, `notify`, `useFilters`
+`Badge`, `Button`, `DataGrid`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Page`, `PageHeading`, `SegmentedControl`, `StatCell`, `StatGrid`, `Table`, `TableBody`, `TableCell`, `TableHead`, `TableHeader`, `TableRow`, `TableSearch`, `Tabs`, `formatCurrency`, `notify`, `useFilters`

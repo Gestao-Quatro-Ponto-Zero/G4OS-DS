@@ -6,6 +6,7 @@ import {
   BulkBar,
   Button,
   DataTable,
+  Empty,
   EmptyFilterResult,
   EntityMark,
   FieldBlock,
@@ -23,8 +24,10 @@ import {
   Sparkline,
   TableSearch,
   TextField,
+  downloadCsv,
   formatCurrency,
   formatNumber,
+  gridToCsv,
   notify,
   selectionColumn,
   useFilters,
@@ -34,10 +37,12 @@ import {
   useSort,
   type Column,
   type FilterField,
-  type SavedView, PageToolbar
+  type GridColumn,
+  type SavedView,
+  PageToolbar,
 } from "@g4ai/ds";
 import { customers as baseCustomers, go, healthLabel, healthTone, iso, personById, planPrice, plans, segments, team, useFrameParam, type Customer, type Health, type Plan } from "./data/saas";
-import { SaasShell } from "./shells/saas-shell";
+import { ListError, ListSkeleton, SaasShell, useDemoState } from "./shells/saas-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -83,6 +88,22 @@ const views: SavedView[] = [
   { id: "expansao", label: "Potencial de expansão", system: true, state: { query: "", conditions: [{ id: "u", field: "usage", op: "gt", value: 80 }, { id: "p", field: "plan", op: "is_not", value: ["Enterprise"] }] } },
 ];
 
+/** Colunas do CSV exportado (separador ";", decimal ","). */
+const csvColumns: GridColumn<Customer>[] = [
+  { key: "name", header: "Cliente", value: (c) => c.name },
+  { key: "cnpj", header: "CNPJ", value: (c) => c.cnpj },
+  { key: "plan", header: "Plano", value: (c) => c.plan },
+  { key: "seats", header: "Usuários", value: (c) => c.seats },
+  { key: "mrr", header: "MRR (R$)", value: (c) => c.mrr },
+  { key: "usage", header: "Uso 30 dias (%)", value: (c) => c.usage },
+  { key: "health", header: "Saúde", value: (c) => healthLabel[c.health] },
+  { key: "owner", header: "Responsável", value: (c) => personById(c.owner).name },
+];
+const exportCsv = (rows: Customer[]) => {
+  downloadCsv(`clientes-pulso-${iso(0)}`, gridToCsv(rows, csvColumns));
+  notify(`${formatNumber(rows.length)} ${rows.length === 1 ? "cliente exportado" : "clientes exportados"} em CSV`);
+};
+
 /* ------------------------------------------------------------------ */
 
 const here = "#/frame/saas-customers";
@@ -91,10 +112,31 @@ export default function SaasCustomers() {
   const [customers, setCustomers] = useState(baseCustomers);
   const [creating, setCreating] = useState(false);
   const novo = useFrameParam("novo");
+  const estado = useDemoState();
+  const visible = estado === "vazio" ? [] : customers;
   useEffect(() => {
     if (novo) setCreating(true);
   }, [novo]);
-  const filters = useFilters(customers, { fields, search: (c) => [c.name, c.city, personById(c.owner).name, c.segment, c.contact, c.cnpj], url: true });
+  const filters = useFilters(visible, { fields, search: (c) => [c.name, c.city, personById(c.owner).name, c.segment, c.contact, c.cnpj], url: true });
+  // Busca vinda do ⌘K ("Ver todos"): #/frame/saas-customers?q=aurora
+  const hashQuery = useFrameParam("q");
+  // Visão vinda de outro lugar (KPI de churn → #/frame/saas-customers?visao=risco).
+  const hashView = useFrameParam("visao");
+  const hashPlan = useFrameParam("plano");
+  const { setQuery, setState } = filters;
+  useEffect(() => {
+    if (hashQuery) setQuery(hashQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hashQuery]);
+  useEffect(() => {
+    const v = views.find((x) => x.id === hashView);
+    if (v) setState(v.state);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hashView]);
+  useEffect(() => {
+    if (hashPlan && plans.includes(hashPlan as Plan)) setState({ query: "", conditions: [{ id: "plano", field: "plan", op: "is", value: [hashPlan] }] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hashPlan]);
   const saved = useSavedViews(filters, views, "saas-clientes-visoes");
   const q = filters.state.query;
   const sort = useSort(filters.rows, { nome: (c) => c.name, mrr: (c) => c.mrr, uso: (c) => c.usage, usuarios: (c) => c.seats }, { key: "mrr", dir: "desc" });
@@ -165,7 +207,7 @@ export default function SaasCustomers() {
           description="Contas pagantes e em trial. Saúde calculada pelo uso dos últimos 30 dias."
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify(`${filters.shown} clientes exportados em CSV`)}>
+              <Button variant="ghost" disabled={!filters.shown} disabledReason="Nenhum cliente no recorte atual" onClick={() => exportCsv(sort.rows)}>
                 <Download /> Exportar CSV
               </Button>
               <Button onClick={() => setCreating(true)}>
@@ -183,8 +225,26 @@ export default function SaasCustomers() {
               search={<TableSearch value={q} onChange={filters.setQuery} total={customers.length} noun="cliente" searchIn="nome, cidade, segmento e responsável" />}
             />
           </PageToolbar>
-          <DataTable rows={pages.rows} columns={columns} rowKey={(c) => c.id} onRowClick={(c) => go("saas-customer", c.id)} rowLabel={(c) => `Abrir ${c.name}`} empty={<EmptyFilterResult filters={filters} noun="cliente" />} />
-          <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
+          {estado === "carregando" ? (
+            <ListSkeleton label="Carregando clientes" />
+          ) : estado === "erro" ? (
+            <ListError noun="os clientes" />
+          ) : !visible.length ? (
+            <Empty
+              title="Nenhum cliente ainda"
+              hint="Crie a primeira conta ou importe a base do seu CRM. Novas contas começam em trial de 14 dias."
+              action={
+                <Button onClick={() => setCreating(true)}>
+                  <Plus /> Novo cliente
+                </Button>
+              }
+            />
+          ) : (
+            <>
+              <DataTable rows={pages.rows} columns={columns} rowKey={(c) => c.id} onRowClick={(c) => go("saas-customer", c.id)} rowLabel={(c) => `Abrir ${c.name}`} empty={<EmptyFilterResult filters={filters} noun="cliente" />} />
+              <Pagination page={pages.page} pageCount={pages.pageCount} onPage={pages.setPage} total={pages.total} pageSize={pages.pageSize} />
+            </>
+          )}
           <BulkBar count={sel.count} noun="cliente" onClear={sel.clear}>
             <button type="button" onClick={() => notify(`E-mail enviado para ${sel.count} clientes`)}>
               <Mail /> Enviar e-mail
@@ -192,7 +252,7 @@ export default function SaasCustomers() {
             <button type="button" onClick={() => notify(`Etiqueta “Renovação 2027” aplicada a ${sel.count} clientes`)}>
               <Tag /> Etiquetar
             </button>
-            <button type="button" onClick={() => (notify(`${sel.count} clientes exportados em CSV`), sel.clear())}>
+            <button type="button" onClick={() => (exportCsv(customers.filter((c) => sel.has(c.id))), sel.clear())}>
               <Download /> Exportar
             </button>
           </BulkBar>

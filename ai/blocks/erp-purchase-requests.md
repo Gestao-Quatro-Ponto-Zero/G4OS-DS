@@ -27,4 +27,4 @@ Fila de aprovação mestre-detalhe: cadeia de aprovadores, itens, comparação d
 
 ## Componentes usados
 
-`Avatar`, `Badge`, `Button`, `Callout`, `Empty`, `Modal`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `Stepper`, `Tabs`, `TextField`, `Tone`, `areaClass`, `formatCurrency`, `notify`
+`Avatar`, `Badge`, `Button`, `Callout`, `Empty`, `Modal`, `NumberField`, `Page`, `PageHeading`, `PropertyList`, `Stepper`, `Tabs`, `TextField`, `areaClass`, `formatCurrency`, `notify`

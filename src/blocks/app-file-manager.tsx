@@ -13,6 +13,7 @@ import {
   SearchInput,
   SegmentedControl,
   Sheet,
+  Skeleton,
   TreeView,
   formatBytes,
   cn,
@@ -22,7 +23,7 @@ import {
   type TreeNode } from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
-import { setFrameQuery, useFrameQuery } from "./shells/frame-route";
+import { setFrameQuery, useFrameParam, useFrameQuery } from "./shells/frame-route";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -65,7 +66,7 @@ const folders: TreeNode[] = [
   { id: "rh", label: "Pessoas", icon: <Folder /> },
 ];
 
-const files: Item[] = [
+const seedFiles: Item[] = [
   { id: "1", name: "proposta-acme-logistica.pdf", size: 482_000, folder: "propostas", owner: "Carla Nogueira", initials: "CN", updated: "ontem" },
   { id: "2", name: "proposta-vertice-saude-v3.docx", size: 96_000, folder: "propostas", owner: "Joana Ribeiro", initials: "JR", updated: "há 2 dias" },
   { id: "3", name: "apresentacao-comercial-2026.pptx", size: 8_200_000, folder: "propostas", owner: "Bruno Takeda", initials: "BT", updated: "12/09" },
@@ -99,7 +100,16 @@ const descendants = (id: string): string[] => {
 
 /* ------------------------------------------------------------------ */
 
+const copyLink = (f: Item) => {
+  const url = `${location.origin}${location.pathname}#/frame/app-file-manager?id=${f.id}`;
+  void navigator.clipboard?.writeText(url).catch(() => undefined);
+  notify("Link copiado");
+};
+
 export default function FileManagerBlock() {
+  // ?estado=carregando|vazio|erro simula os estados da lista.
+  const estado = useFrameParam("estado");
+  const [files, setFiles] = useState<Item[]>(() => (estado === "vazio" ? [] : seedFiles));
   const [folder, setFolder] = useState("comercial");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [q, setQ] = useState("");
@@ -118,7 +128,18 @@ export default function FileManagerBlock() {
     if (shortcut === "compartilhados") return files.filter((f) => f.owner !== me.name && f.owner !== "Sistema");
     const scope = descendants(folder);
     return files.filter((f) => scope.includes(f.folder));
-  }, [folder, q, shortcut, favorites]);
+  }, [files, folder, q, shortcut, favorites]);
+
+  const remove = (f: Item) => {
+    const at = files.findIndex((x) => x.id === f.id);
+    setFiles((xs) => xs.filter((x) => x.id !== f.id));
+    if (open?.id === f.id) setOpen(null);
+    notify(`${f.name} movido para a lixeira`, () => setFiles((xs) => (xs.some((x) => x.id === f.id) ? xs : [...xs.slice(0, at), f, ...xs.slice(at)])));
+  };
+  const clearFilters = () => {
+    setQ("");
+    setShortcut(null);
+  };
 
   const upload = () => {
     const id = String(Date.now());
@@ -130,7 +151,9 @@ export default function FileManagerBlock() {
       if (p >= 100) {
         clearInterval(t);
         setTimeout(() => setUploads((u) => u.filter((x) => x.id !== id)), 400);
-        notify("relatorio-comissoes-set.xlsx enviado");
+        const target = shortcut || q ? "comercial" : folder;
+        setFiles((xs) => [{ id, name: "relatorio-comissoes-set.xlsx", size: 186_000, folder: target, owner: me.name, initials: me.initials, updated: "agora" }, ...xs]);
+        notify(`relatorio-comissoes-set.xlsx enviado para ${label(target)}`);
       }
     }, 350);
   };
@@ -140,9 +163,9 @@ export default function FileManagerBlock() {
       actions={[
         { label: "Abrir detalhes", onSelect: () => setOpen(f) },
         { label: "Baixar", icon: <Download />, onSelect: () => notify(`Baixando ${f.name}`, undefined, "info") },
-        { label: "Copiar link", icon: <Link2 />, onSelect: () => notify("Link copiado") },
+        { label: "Copiar link", icon: <Link2 />, onSelect: () => copyLink(f) },
         { label: favorites.includes(f.id) ? "Remover dos favoritos" : "Favoritar", icon: <Star />, onSelect: () => setFavorites((fs) => (fs.includes(f.id) ? fs.filter((x) => x !== f.id) : [...fs, f.id])) },
-        { label: "Excluir", icon: <Trash2 />, tone: "danger", separator: true, onSelect: () => notify(`${f.name} movido para a lixeira`, () => undefined) },
+        { label: "Excluir", icon: <Trash2 />, tone: "danger", separator: true, onSelect: () => remove(f) },
       ]}
     />
   );
@@ -235,8 +258,30 @@ export default function FileManagerBlock() {
           )}
 
           <div className="mt-4">
-            {shown.length === 0 ? (
-              <Empty title={q ? `Nada encontrado para “${q}”` : "Pasta vazia"} hint={q ? "Tente outro nome ou parte dele." : "Arraste arquivos para cá ou use Enviar arquivo."} action={!q && <Button size="sm" variant="ghost" onClick={upload}><Upload /> Enviar arquivo</Button>} />
+            {estado === "carregando" ? (
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4" aria-busy aria-label="Carregando arquivos">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <div key={i} className="rounded-xl border border-line bg-surface p-3">
+                    <Skeleton className="aspect-[4/3] w-full rounded-lg" />
+                    <Skeleton className="mt-3 h-4 w-3/4" />
+                    <Skeleton className="mt-2 h-3 w-1/3" />
+                  </div>
+                ))}
+              </div>
+            ) : estado === "erro" ? (
+              <Empty title="Não foi possível carregar os arquivos" hint="O armazenamento não respondeu. Seus arquivos continuam salvos." action={<Button size="sm" onClick={() => setFrameQuery({ estado: undefined })}>Tentar novamente</Button>} />
+            ) : files.length === 0 ? (
+              <Empty icon={<FolderOpen />} title="Nenhum arquivo no workspace" hint="Envie propostas, contratos e planilhas para o time encontrar tudo num lugar só." action={<Button size="sm" onClick={upload}><Upload /> Enviar arquivo</Button>} />
+            ) : shown.length === 0 ? (
+              q || shortcut ? (
+                <Empty
+                  title={q ? `Nada encontrado para “${q}”` : shortcut === "favoritos" ? "Nenhum favorito ainda" : "Nada por aqui"}
+                  hint={q ? "Tente outro nome ou parte dele." : "Volte para as pastas para ver todos os arquivos."}
+                  action={<Button size="sm" variant="ghost" onClick={clearFilters}>Limpar busca</Button>}
+                />
+              ) : (
+                <Empty title="Pasta vazia" hint="Arraste arquivos para cá ou use Enviar arquivo." action={<Button size="sm" variant="ghost" onClick={upload}><Upload /> Enviar arquivo</Button>} />
+              )
             ) : view === "grid" ? (
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
                 {shown.map((f) => (
@@ -257,7 +302,7 @@ export default function FileManagerBlock() {
         description={open ? `${label(open.folder)} · ${formatBytes(open.size)}` : undefined}
         footer={
           <>
-            <Button size="sm" variant="ghost" onClick={() => notify("Link copiado")}>
+            <Button size="sm" variant="ghost" onClick={() => open && copyLink(open)}>
               <Link2 /> Copiar link
             </Button>
             <Button size="sm" onClick={() => notify(`Baixando ${open?.name}`, undefined, "info")}>

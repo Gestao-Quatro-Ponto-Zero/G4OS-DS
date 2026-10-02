@@ -1,9 +1,10 @@
 import { Ban, FileText, Printer, ShoppingCart } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Button,
   DataGrid,
+  Empty,
   EmptyFilterResult,
   FilterBar,
   Highlight,
@@ -12,6 +13,12 @@ import {
   SegmentedControl,
   StatCell,
   StatGrid,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   TableSearch,
   Tabs,
   formatCurrency,
@@ -20,9 +27,9 @@ import {
   type FilterField,
   type GridColumn,
 } from "@g4ai/ds";
-import { br, customerById, customers, orderFlow, orderStatus, orderTotal, orders as seed, products, sellers, today, user, type Order, type OrderStatus, type Payment } from "./data/erp";
+import { br, iso, updateOrder, customerById, customers, orderFlow, orderStatus, orderTotal, orders as seed, products, sellers, today, user, type Order, type OrderStatus, type Payment } from "./data/erp";
 import { go } from "./shells/frame-route";
-import { NexoShell } from "./shells/nexo-shell";
+import { NexoShell, demoError, useDemoState } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -66,14 +73,27 @@ const searchText = (o: Order) => {
 
 export default function ErpOrders() {
   const [tab, setTab] = useState<"todos" | OrderStatus>("todos");
-  const [list, setList] = useState(seed);
+  const demo = useDemoState();
+  const [list, setList] = useState<Order[]>(() => (demo === "vazio" ? [] : [...seed]));
+  // Impressão da seleção: monta os espelhos só para a impressão e chama o diálogo do navegador.
+  const [printing, setPrinting] = useState<Order[] | null>(null);
+  useEffect(() => {
+    if (!printing) return;
+    const done = () => setPrinting(null);
+    window.addEventListener("afterprint", done);
+    const t = setTimeout(() => window.print(), 50);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("afterprint", done);
+    };
+  }, [printing]);
   // Aba = recorte principal (situação). Busca e filtros atuam dentro da aba.
   const tabRows = useMemo(() => (tab === "todos" ? list : list.filter((o) => o.status === tab)), [list, tab]);
   const filters = useFilters(tabRows, { fields, search: searchText, now: today, url: true });
   const q = filters.state.query;
   const [grouped, setGrouped] = useState<"sim" | "nao">("sim");
   const count = (s: OrderStatus) => list.filter((o) => o.status === s).length;
-  const todayOrders = list.filter((o) => o.date === seed[0].date && o.status !== "cancelado");
+  const todayOrders = list.filter((o) => o.date === iso(0) && o.status !== "cancelado");
   const month = list.filter((o) => o.status !== "cancelado" && o.status !== "orcamento").reduce((s, o) => s + orderTotal(o), 0);
 
   const columns: GridColumn<Order>[] = [
@@ -117,7 +137,11 @@ export default function ErpOrders() {
   const setStatus = (ids: Set<string>, status: OrderStatus, message: string) => {
     const before = list;
     setList((all) => all.map((o) => (ids.has(o.id) ? { ...o, status } : o)));
-    notify(message, () => setList(before));
+    ids.forEach((id) => updateOrder(id, { status }));
+    notify(message, () => {
+      setList(before);
+      before.filter((o) => ids.has(o.id)).forEach((o) => updateOrder(o.id, { status: o.status }));
+    });
   };
 
   const invoice = (targets: Order[]) => {
@@ -128,13 +152,14 @@ export default function ErpOrders() {
 
   return (
     <NexoShell section="pedidos">
-      <Page>
+      <style>{`@media print { aside[aria-label="Menu principal"], nav[aria-label="Navegação principal"], .no-print { display: none !important; } }`}</style>
+      <Page className={printing ? "print:hidden" : undefined}>
         <PageHeading
           title="Pedidos de venda"
           description="Aprovados viram NF-e ao faturar. Pedidos com crédito bloqueado ficam em Orçamento."
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify(`Lista com ${filters.rows.length} pedidos enviada para impressão`, undefined, "info")}>
+              <Button variant="ghost" onClick={() => window.print()}>
                 <Printer /> Imprimir lista
               </Button>
               <Button onClick={() => go("erp-order", "novo")}>
@@ -192,46 +217,44 @@ export default function ErpOrders() {
             groupOrder={[...orderFlow, "cancelado" as const].map((st) => orderStatus[st].label)}
             defaultCollapsedGroups={[orderStatus.cancelado.label]}
             renderExpanded={(o) => (
-              <div className="max-w-[720px]">
-                <table className="w-full text-[12.5px]">
-                  <thead className="text-[11.5px] text-muted">
-                    <tr>
-                      <th className="pb-1.5 text-left font-medium">Item</th>
-                      <th className="pb-1.5 text-right font-medium">Qtd.</th>
-                      <th className="pb-1.5 text-right font-medium">Unitário</th>
-                      <th className="pb-1.5 text-right font-medium">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {o.items.map((it) => {
-                      const p = products.find((x) => x.sku === it.sku);
-                      return (
-                        <tr key={it.sku}>
-                          <td className="py-1 pr-3">
-                            <span className="font-mono text-[11.5px] text-muted">{it.sku}</span> {p?.name}
-                          </td>
-                          <td className="py-1 text-right tabular-nums">
-                            {it.qty} {p?.unit}
-                          </td>
-                          <td className="py-1 text-right tabular-nums">{formatCurrency(it.price)}</td>
-                          <td className="py-1 text-right font-medium tabular-nums">{formatCurrency(it.qty * it.price)}</td>
-                        </tr>
-                      );
-                    })}
-                    <tr className="text-muted">
-                      <td className="pt-1.5" colSpan={3}>
-                        Frete {o.freight ? "" : "(CIF, por conta da Aço Forte)"}
-                      </td>
-                      <td className="pt-1.5 text-right tabular-nums">{formatCurrency(o.freight)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <Table label={`Itens do pedido ${o.number}`} className="max-w-[720px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Item</TableHead>
+                    <TableHead numeric>Qtd.</TableHead>
+                    <TableHead numeric>Unitário</TableHead>
+                    <TableHead numeric>Subtotal</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {o.items.map((it) => {
+                    const p = products.find((x) => x.sku === it.sku);
+                    return (
+                      <TableRow key={it.sku}>
+                        <TableCell className="text-[12.5px]">
+                          <span className="font-mono text-[11.5px] text-muted">{it.sku}</span> {p?.name}
+                        </TableCell>
+                        <TableCell numeric className="text-[12.5px]">
+                          {it.qty} {p?.unit}
+                        </TableCell>
+                        <TableCell numeric className="text-[12.5px]">{formatCurrency(it.price)}</TableCell>
+                        <TableCell numeric className="text-[12.5px] font-medium">{formatCurrency(it.qty * it.price)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  <TableRow>
+                    <TableCell className="text-[12.5px] text-muted" colSpan={3}>
+                      Frete {o.freight ? "" : "(CIF, por conta da Aço Forte)"}
+                    </TableCell>
+                    <TableCell numeric className="text-[12.5px] text-muted">{formatCurrency(o.freight)}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             )}
             onRowOpen={(o) => go("erp-order", o.id)}
             rowActions={(o) => [
               { label: "Faturar", icon: <FileText />, inline: o.status === "aprovado", disabled: o.status !== "aprovado", onSelect: () => invoice([o]) },
-              { label: "Imprimir", icon: <Printer />, inline: true, onSelect: () => notify(`Pedido ${o.number} enviado para impressão`, undefined, "info") },
+              { label: "Imprimir", icon: <Printer />, inline: true, onSelect: () => go("erp-order", { id: o.id, imprimir: "1" }) },
               { label: "Cancelar pedido", icon: <Ban />, tone: "danger", separator: true, disabled: o.status === "cancelado" || o.status === "entregue", onSelect: () => setStatus(new Set([o.id]), "cancelado", `Pedido ${o.number} cancelado`) },
             ]}
             bulkActions={(rows, { clear }) => (
@@ -239,16 +262,52 @@ export default function ErpOrders() {
                 <button type="button" onClick={() => { invoice(rows); clear(); }}>
                   <FileText /> Faturar
                 </button>
-                <button type="button" onClick={() => { notify(`${rows.length === 1 ? "1 pedido enviado" : `${rows.length} pedidos enviados`} para impressão`, undefined, "info"); clear(); }}>
+                <button type="button" onClick={() => { setPrinting(rows); clear(); }}>
                   <Printer /> Imprimir
                 </button>
               </>
             )}
-            empty={<EmptyFilterResult filters={filters} noun="pedido" />}
+            loading={demo === "carregando"}
+            error={demoError(demo, "os pedidos")}
+            empty={
+              tabRows.length === 0 ? (
+                <Empty framed={false} icon={<ShoppingCart />} title={tab === "todos" ? "Nenhum pedido de venda ainda" : `Nenhum pedido ${orderStatus[tab].label.toLowerCase()}`} hint={tab === "todos" ? "Crie o primeiro pedido: o estoque é conferido na hora e o crédito do cliente também." : "Quando houver, aparecem aqui."} action={tab === "todos" ? <Button size="sm" onClick={() => go("erp-order", "novo")}><ShoppingCart /> Novo pedido</Button> : undefined} />
+              ) : (
+                <EmptyFilterResult filters={filters} noun="pedido" />
+              )
+            }
             mobile="cards"
           />
         </div>
       </Page>
+      {printing && (
+        <section aria-hidden className="hidden print:block">
+          {printing.map((o) => {
+            const c = customerById(o.customerId);
+            return (
+              <article key={o.id} className="mb-8 break-after-page">
+                <h2 className="m-0 text-[18px] font-semibold">Pedido {o.number}</h2>
+                <p className="m-0 mt-1 text-[12.5px]">
+                  {c.name} · CNPJ {c.cnpj} · {c.city}/{c.uf} · emitido em {br(o.date)} · {o.payment}
+                </p>
+                <ul className="m-0 mt-3 list-none p-0 text-[12.5px]">
+                  {o.items.map((it) => (
+                    <li key={it.sku} className="flex justify-between gap-4 border-b border-line py-1">
+                      <span>
+                        {it.sku} · {products.find((p) => p.sku === it.sku)?.name}
+                      </span>
+                      <span className="tabular-nums">
+                        {it.qty} × {formatCurrency(it.price)} = {formatCurrency(it.qty * it.price)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="m-0 mt-2 text-right text-[13.5px] font-semibold tabular-nums">Total {formatCurrency(orderTotal(o))}</p>
+              </article>
+            );
+          })}
+        </section>
+      )}
     </NexoShell>
   );
 }

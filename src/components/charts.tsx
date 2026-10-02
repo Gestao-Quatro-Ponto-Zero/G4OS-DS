@@ -1059,6 +1059,105 @@ export function Sparkline({
 }
 
 /* ------------------------------------------------------------------ */
+/* MiniBarChart                                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Barrinhas de atividade num cartão pequeno (7 dias, 12 meses, 24 horas).
+ * O cabeçalho mostra o valor da barra apontada/focada — ou do último ponto,
+ * em repouso. Barra ativa em tinta, vizinhas mais leves. Teclado: foco no
+ * gráfico e ←/→. `label` é obrigatório (vira o título e o nome acessível).
+ */
+export function MiniBarChart({
+  label,
+  data,
+  format = (n: number) => formatNumber(n),
+  caption,
+  height = 96,
+  framed = true,
+  className,
+}: {
+  label: string;
+  data: { label: string; value: number }[];
+  format?: (n: number) => string;
+  /** Linha abaixo do título ("Últimos 7 dias"). */
+  caption?: ReactNode;
+  height?: number;
+  /** false dentro de um cartão que já tem borda. */
+  framed?: boolean;
+  className?: string;
+}) {
+  const [active, setActive] = useState<number | null>(null);
+  const [focused, setFocused] = useState(false);
+  const max = Math.max(1, ...data.map((d) => d.value));
+  const shown = active ?? data.length - 1;
+  const cur = data[shown];
+  // Muitas barras: rótulo só a cada N (e no último e no ativo), para não encavalar.
+  const every = data.length > 10 ? Math.ceil(data.length / 6) : 1;
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    setActive((a) => {
+      const i = a ?? data.length - 1;
+      if (e.key === "Home") return 0;
+      if (e.key === "End") return data.length - 1;
+      return Math.min(data.length - 1, Math.max(0, i + (e.key === "ArrowLeft" ? -1 : 1)));
+    });
+  };
+  if (!data.length) return null;
+  return (
+    <div className={cn("min-w-0", framed && "surface-card rounded-xl border border-line bg-surface px-4 py-3.5", className)}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-[12.5px] text-muted">{label}</div>
+          {caption && <div className="truncate text-[11px] text-muted">{caption}</div>}
+        </div>
+        {/* Anuncia só quando o teclado navega (não a cada passada do mouse). */}
+        <div className="shrink-0 text-right" aria-live={focused ? "polite" : "off"}>
+          <div className="text-[18px] font-semibold leading-none tabular-nums">{format(cur.value)}</div>
+          <div className="mt-1 text-[11px] text-muted">{cur.label}</div>
+        </div>
+      </div>
+      <div
+        className="mt-3 flex items-end gap-1.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-muted/40"
+        style={{ height: height + 18 }}
+        tabIndex={0}
+        role="group"
+        aria-label={`${label}. Use as setas para ver cada barra.`}
+        onKeyDown={onKey}
+        onFocus={() => setFocused(true)}
+        onBlur={() => {
+          setFocused(false);
+          setActive(null);
+        }}
+        onPointerLeave={() => setActive(null)}
+      >
+        {data.map((d, i) => {
+          const on = active === i;
+          const near = active != null && Math.abs(active - i) === 1;
+          return (
+            <div key={`${d.label}-${i}`} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end" onPointerEnter={() => setActive(i)}>
+              <div
+                aria-hidden
+                className={cn(
+                  "w-full max-w-[28px] rounded-[4px] transition-[background-color,transform] duration-150 motion-reduce:transition-none",
+                  on ? "bg-ink" : near ? "bg-ink/35" : active != null ? "bg-ink/12" : "bg-ink/25",
+                )}
+                style={{ height: Math.max(2, (d.value / max) * height) }}
+              />
+              <span aria-hidden className={cn("mt-1.5 max-w-full whitespace-nowrap text-[10px] leading-none", on ? "font-medium text-ink" : "text-muted", !on && i % every !== 0 && i !== data.length - 1 && "invisible")}>
+                {d.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <SrTable label={label} data={data} index="label" series={[{ key: "value", label }]} format={format} />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* BarList                                                             */
 /* ------------------------------------------------------------------ */
 

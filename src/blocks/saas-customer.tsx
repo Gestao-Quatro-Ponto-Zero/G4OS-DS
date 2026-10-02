@@ -4,16 +4,20 @@ import {
   ActionMenu,
   AreaChart,
   Badge,
+  Banner,
   Button,
   ChartCard,
   ConfirmDialog,
   DataTable,
+  Drawer,
   EntityMark,
   FieldBlock,
   KpiCard,
   KpiGrid,
   Modal,
   NumberField,
+  OperationButton,
+  OperationFeedback,
   Page,
   PageHeading,
   PropertyList,
@@ -21,10 +25,12 @@ import {
   Select,
   SplitLayout,
   Tabs,
+  TextareaField,
   formatCurrency,
   formatDate,
   formatNumber,
   notify,
+  useOperation,
   type Column,
 } from "@g4ai/ds";
 import { customerById, go, healthLabel, healthTone, invoiceLabel, invoices, invoiceTone, personById, planPrice, plans, priorityLabel, priorityTone, ticketLabel, tickets, useFrameParam, type Invoice, type Plan, type Ticket } from "./data/saas";
@@ -54,6 +60,8 @@ export const meta = {
 } as const;
 
 const here = "#/frame/saas-customers";
+const contactKinds = ["Reunião", "Ligação", "E-mail", "Visita"];
+type Contact = { kind: string; note: string; when: string };
 
 export default function SaasCustomer() {
   const id = useFrameParam("id");
@@ -64,6 +72,24 @@ export default function SaasCustomer() {
   const [plan, setPlan] = useState<Plan>(base.plan);
   const [seats, setSeats] = useState<number | null>(base.seats);
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [contactKind, setContactKind] = useState(contactKinds[0]);
+  const [contactNote, setContactNote] = useState("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [asAdmin, setAsAdmin] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const op = useOperation({ busyLabel: "Registrando…" });
+  const saveContact = () =>
+    op.run(
+      () => new Promise((r) => setTimeout(r, 500)),
+      { message: `Contato registrado: ${contactKind.toLowerCase()} com ${customer.contact}`, undo: () => setContacts((all) => all.slice(1)) },
+      { apply: () => setContacts((all) => [{ kind: contactKind, note: contactNote.trim(), when: "agora" }, ...all]), revert: () => setContacts((all) => all.slice(1)) },
+    ).then((err) => {
+      if (!err) {
+        setContactOpen(false);
+        setContactNote("");
+      }
+    });
   useEffect(() => {
     setCustomer(base);
     setPlan(base.plan);
@@ -114,22 +140,39 @@ export default function SaasCustomer() {
           description={`${customer.plan} · ${formatNumber(customer.seats)} usuários · cliente desde ${formatDate(customer.since)}`}
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify(`Contato com ${customer.contact} registrado na linha do tempo`)}>
+              <Button variant="ghost" onClick={() => setContactOpen(true)}>
                 <MessageSquare /> Registrar contato
               </Button>
               <Button onClick={() => setPlanOpen(true)}>Ajustar plano</Button>
               <ActionMenu
                 actions={[
-                  { label: "Entrar como administrador", icon: <LogIn className="h-4 w-4" />, onSelect: () => notify("Exemplo: abre o app como o admin da conta, com aviso no topo e registro em auditoria.", undefined, "info") },
-                  { label: "Pausar cobrança", onSelect: () => notify(`Cobrança de ${customer.name} pausada por 30 dias`, () => notify("Pausa desfeita", undefined, "info")) },
+                  { label: "Entrar como administrador", icon: <LogIn className="h-4 w-4" />, onSelect: () => setAsAdmin(true) },
+                  paused
+                    ? { label: "Retomar cobrança", onSelect: () => (setPaused(false), notify(`Cobrança de ${customer.name} retomada`)) }
+                    : { label: "Pausar cobrança por 30 dias", onSelect: () => (setPaused(true), notify(`Cobrança de ${customer.name} pausada por 30 dias`, () => setPaused(false))) },
                   { label: "Cancelar assinatura", tone: "danger", separator: true, onSelect: () => setCancelOpen(true) },
                 ]}
               />
             </>
           }
         />
+        {asAdmin && (
+          <Banner
+            tone="warn"
+            className="mt-4 rounded-xl border"
+            title={`Você está vendo o Pulso como ${customer.contact}`}
+            action={
+              <Button size="sm" variant="ghost" onClick={() => (setAsAdmin(false), notify("Sessão de administrador encerrada"))}>
+                Sair do modo administrador
+              </Button>
+            }
+          >
+            Tudo o que você fizer fica registrado na auditoria da conta. A sessão expira em 30 minutos.
+          </Banner>
+        )}
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge tone={healthTone[customer.health]}>{healthLabel[customer.health]}</Badge>
+          {paused && <Badge tone="warn">Cobrança pausada até {formatDate(new Date(2026, 9, 30))}</Badge>}
           {customer.status === "trial" && <Badge tone="info">Trial</Badge>}
           {customer.status === "atraso" && <Badge tone="warn">Pagamento em atraso</Badge>}
         </div>
@@ -189,8 +232,12 @@ export default function SaasCustomer() {
                     { label: "Cidade", value: customer.city },
                     { label: "Customer Success", value: personById(customer.owner).name },
                     { label: "Renovação", value: formatDate(new Date(2027, 2, 12)) },
+                    { label: "Último contato", value: contacts[0] ? `${contacts[0].kind} · ${contacts[0].when}` : "Sem registro neste mês" },
                   ]}
                 />
+                <Button size="sm" variant="ghost" className="mt-4" href={`#/frame/saas-usage?id=${customer.id}`}>
+                  Ver uso e limites do plano
+                </Button>
               </section>
             }
           />
@@ -242,6 +289,43 @@ export default function SaasCustomer() {
           </div>
         </div>
       </Modal>
+      <Drawer
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+        kicker={customer.name}
+        title="Registrar contato"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setContactOpen(false)}>
+              Cancelar
+            </Button>
+            <OperationButton operation={op} disabled={!contactNote.trim()} disabledReason="Escreva o que foi conversado" onClick={saveContact}>
+              Registrar contato
+            </OperationButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <OperationFeedback operation={op} />
+          <FieldBlock label="Tipo">
+            <Select label="Tipo" value={contactKind} onValueChange={setContactKind} options={contactKinds.map((k) => ({ value: k, label: k }))} />
+          </FieldBlock>
+          <TextareaField label="O que foi conversado" value={contactNote} onChange={setContactNote} rows={5} placeholder="Ex.: revisão trimestral; pediram treinamento para o time de vendas." />
+          {contacts.length > 0 && (
+            <div>
+              <h3 className="m-0 mb-2 text-[12.5px] font-medium text-muted">Registrados nesta sessão</h3>
+              <ul className="m-0 list-none space-y-2 p-0 text-[13px]">
+                {contacts.map((c, i) => (
+                  <li key={i} className="rounded-lg border border-line px-3 py-2">
+                    <span className="font-medium">{c.kind}</span> · <span className="text-muted">{c.when}</span>
+                    <p className="m-0 mt-0.5 text-ink-soft">{c.note}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </Drawer>
       <ConfirmDialog
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}

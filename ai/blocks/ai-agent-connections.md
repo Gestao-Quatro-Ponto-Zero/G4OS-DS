@@ -28,4 +28,4 @@ Página do agente: o que ele acessa (conexões), quem ele aciona (subagentes com
 
 ## Componentes usados
 
-`AgentConnection`, `AppIcon`, `Button`, `ConnectionsCard`, `Page`, `PageHeading`, `Subagent`, `Switch`, `notify`
+`AgentConnection`, `AppIcon`, `Button`, `ChoiceCards`, `ConnectionsCard`, `Modal`, `Page`, `PageHeading`, `Subagent`, `Switch`, `TextField`, `notify`
