@@ -30,4 +30,4 @@ Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, proprieda
 
 ## Componentes usados
 
-`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `BuilderSection`, `Button`, `ChipPicker`, `MenuEntry`, `Modal`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `TextField`, `ToolGlyph`, `TriggerList`, `notify`
+`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `Banner`, `BuilderSection`, `Button`, `ChipPicker`, `MenuEntry`, `Modal`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `TextField`, `ToolGlyph`, `TriggerList`, `notify`

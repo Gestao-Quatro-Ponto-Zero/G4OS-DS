@@ -7,7 +7,9 @@ import {
   Button,
   ChartCard,
   ChartCardTotals,
+  Empty,
   EntityMark,
+  ErrorState,
   KpiCard,
   KpiGrid,
   ListPanel,
@@ -16,6 +18,8 @@ import {
   Page,
   PageHeading,
   SegmentedControl,
+  Skeleton,
+  cn,
   formatCompact,
   formatCurrency,
   formatDate,
@@ -44,7 +48,7 @@ import {
   today,
   type ContractType,
 } from "./data/contracts";
-import { go } from "./shells/frame-route";
+import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { ClmShell } from "./shells/clm-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -87,6 +91,88 @@ const signedByMonth = [
 const monthKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}`;
 const monthLabel = (d: Date) => d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }).replace(".", "").replace(" de ", "/");
 
+/* ------------------------------------------------------------------ */
+/* Estados do painel. No showcase, `?estado=carregando|erro|vazio`    */
+/* simula cada um; no SEU app troque pelo estado da consulta          */
+/* (isLoading, error, sem dados). O cabeçalho fica visível em todos;  */
+/* no vazio ele não mostra números, período nem exportar.             */
+/* ------------------------------------------------------------------ */
+
+type SkeletonCard = { kind: "chart" | "list"; span?: 1 | 2 | 3; h?: number };
+const skeletonCols = { 1: "", 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 5: "lg:grid-cols-5" } as const;
+const skeletonSpan = { 1: "", 2: "lg:col-span-2", 3: "lg:col-span-3" } as const;
+
+/** Carregando com a forma final: faixa de KPIs, cartões de gráfico e painéis de lista. */
+function PanelSkeleton({ kpis = 4, rows }: { kpis?: 4 | 5; rows: { cols: keyof typeof skeletonCols; cards: SkeletonCard[] }[] }) {
+  return (
+    <div role="status" aria-busy="true" aria-label="Carregando painel" className="space-y-6">
+      <div className={cn("grid grid-cols-1 gap-3 sm:grid-cols-2", kpis === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4")}>
+        {Array.from({ length: kpis }, (_, i) => (
+          <div key={i} className="space-y-3 rounded-xl border border-line bg-surface p-4">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-6 w-28" />
+            <Skeleton className="h-3 w-32 max-w-full" />
+          </div>
+        ))}
+      </div>
+      {rows.map((r, i) => (
+        <div key={i} className={cn("grid items-start gap-6", skeletonCols[r.cols])}>
+          {r.cards.map((c, j) =>
+            c.kind === "chart" ? (
+              <div key={j} className={cn("min-w-0 rounded-xl border border-line bg-surface px-6 py-5", skeletonSpan[c.span ?? 1])}>
+                <Skeleton className="h-4 w-56 max-w-full" />
+                <Skeleton className="mt-2 h-3 w-40 max-w-full" />
+                <div className="mt-5" style={{ height: c.h ?? 220 }}>
+                  <Skeleton className="h-full w-full rounded-lg" />
+                </div>
+              </div>
+            ) : (
+              <div key={j} className={cn("min-w-0 rounded-2xl border border-line bg-soft/70 p-[3px]", skeletonSpan[c.span ?? 1])}>
+                <div className="px-3 py-3">
+                  <Skeleton className="h-3.5 w-36" />
+                </div>
+                <div className="overflow-hidden rounded-card border border-line bg-surface">
+                  {Array.from({ length: 4 }, (_, k) => (
+                    <div key={k} className="flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0">
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <Skeleton className="h-2.5 w-1/4" />
+                        <Skeleton className="h-3 w-2/3" />
+                      </div>
+                      <Skeleton className="h-3 w-14" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Erro ao carregar o painel, com saída: tentar de novo (limpa o estado simulado) ou ir para outra tela. */
+function PanelError({ what, alt }: { what: string; alt?: { label: string; href: string } }) {
+  return (
+    <div className="rounded-xl border border-line bg-surface">
+      <ErrorState
+        size="md"
+        title={`Não foi possível carregar ${what}`}
+        description="O servidor não respondeu. Nada do que você fez foi perdido; tente de novo em instantes."
+        retryLabel="Tentar de novo"
+        onRetry={() => setFrameQuery({ estado: undefined })}
+        secondaryAction={
+          alt && (
+            <Button variant="ghost" href={alt.href}>
+              {alt.label}
+            </Button>
+          )
+        }
+      />
+    </div>
+  );
+}
+
 export default function ClmDashboard() {
   const [horizon, setHorizon] = useState<"6" | "12">("12");
   const [metric, setMetric] = useState("valor");
@@ -122,6 +208,7 @@ export default function ClmDashboard() {
     .filter((x) => x.s && x.s.sentAt && daysFromToday(x.s.sentAt) <= -3);
   const noticeSoon = active.filter((c) => c.renewal !== "nenhuma" && daysFromToday(noticeDeadline(c)) >= 0 && daysFromToday(noticeDeadline(c)) <= 30 && c.owner === me.id);
   const needsMe = mine.length + stalled.length + noticeSoon.length;
+  const estado = useFrameParam("estado");
 
   return (
     <ClmShell section="painel">
@@ -129,10 +216,10 @@ export default function ClmDashboard() {
         <PageHeading
           kicker={`${formatDate(today)} · bom dia, ${me.name.split(" ")[0]}`}
           title="Contratos"
-          description={`${formatNumber(active.length)} contratos vigentes da Vereda Alimentos. Prazos de aviso prévio contam a partir da data de fim.`}
+          description={estado === "vazio" ? "Contratos da Vereda Alimentos. Prazos de aviso prévio contam a partir da data de fim." : `${formatNumber(active.length)} contratos vigentes da Vereda Alimentos. Prazos de aviso prévio contam a partir da data de fim.`}
           actions={
             <>
-              <SegmentedControl label="Horizonte" value={horizon} onChange={setHorizon} options={[{ value: "6", label: "6 meses" }, { value: "12", label: "12 meses" }]} />
+              {estado !== "vazio" && <SegmentedControl label="Horizonte" value={horizon} onChange={setHorizon} options={[{ value: "6", label: "6 meses" }, { value: "12", label: "12 meses" }]} />}
               <Button onClick={() => go("clm-request")}>
                 <FilePlus2 /> Nova solicitação
               </Button>
@@ -140,132 +227,162 @@ export default function ClmDashboard() {
           }
         />
         <div className="space-y-6">
-          <KpiGrid cols={5}>
-            <KpiCard label="Valor sob contrato" value={formatCurrency(underContract, { compact: true })} delta={0.064} period="vs. fim do trimestre anterior" hint={`${formatCurrency(annual, { compact: true })} por ano`} href="#/frame/clm-contracts?visao=vigentes" />
-            <KpiCard label="Vencem em 90 dias" value={in30.length + in60.length + in90.length} hint={`${in30.length} em 30 · ${in60.length} em 60 · ${in90.length} em 90 dias`} href="#/frame/clm-contracts?visao=vencendo" />
-            <KpiCard label="Renovações a decidir" value={toDecide.length} hint={`${toDecide.filter((c) => daysFromToday(noticeDeadline(c)) < 0).length} já passaram do aviso prévio`} href="#/frame/clm-contracts?visao=renovacao" />
-            <KpiCard label="Aguardando assinatura" value={signing.length} hint={stalled.length ? `${plural(stalled.length, "parado", "parados")} há mais de 3 dias` : "Nenhum parado"} href="#/frame/clm-contracts?visao=assinatura" />
-            <KpiCard label="Prazos atrasados" value={late.length} delta={-0.25} goodWhen="down" period="vs. mês anterior" href="#/frame/clm-obligations?filtro=atrasadas" />
-          </KpiGrid>
-
-          <ListPanel title="Precisa de você" icon={<AlarmClock />} count={needsMe} tone="attention" action={<a href="#/frame/clm-approvals">Aprovações</a>}>
-            <ul className="list-none divide-y divide-line p-0">
-              {mine.map((a) => {
-                const c = contractById(a.contractId);
-                const d = daysFromToday(a.due);
-                return (
-                  <li key={a.id}>
-                    <ListRow
-                      onClick={() => go("clm-approvals", a.id)}
-                      leading={<Stamp className="h-4 w-4 text-muted" />}
-                      kicker={`Aprovar · ${c.number} · ${plural(c.deviations.length, "cláusula fora do padrão", "cláusulas fora do padrão")}`}
-                      title={c.title}
-                      meta={<Badge tone={d <= 1 ? "warn" : "neutral"}>{d <= 0 ? "Vence hoje" : d === 1 ? "Até amanhã" : `Até ${formatDate(a.due, { short: true })}`}</Badge>}
-                    />
-                  </li>
-                );
-              })}
-              {stalled.map(({ c, s }) => (
-                <li key={c.id}>
-                  <ListRow
-                    onClick={() => go("clm-contract", { id: c.id, aba: "assinaturas" })}
-                    leading={<PenLine className="h-4 w-4 text-muted" />}
-                    kicker={`Assinatura parada · ${c.number}`}
-                    title={`${s!.name} não assina há ${-daysFromToday(s!.sentAt!)} dias`}
-                    meta={<Badge tone="warn">Parada</Badge>}
-                  />
-                </li>
-              ))}
-              {noticeSoon.map((c) => (
-                <li key={c.id}>
-                  <ListRow
-                    onClick={() => go("clm-contract", c.id)}
-                    leading={<CalendarClock className="h-4 w-4 text-muted" />}
-                    kicker={`Aviso prévio · ${c.number}`}
-                    title={`Decidir se renova: ${c.title}`}
-                    meta={<span className="text-[12px] tabular-nums text-muted">até {formatDate(noticeDeadline(c), { short: true })}</span>}
-                  />
-                </li>
-              ))}
-            </ul>
-          </ListPanel>
-
-          <ChartCard
-            title="Quanto da carteira vence em cada mês?"
-            description={`Contratos vigentes por mês de término · ${metric === "valor" ? "valor anual" : "quantidade"}`}
-            headerAside={
-              <ChartCardTotals
-                value={metric}
-                onChange={setMetric}
-                items={[
-                  { key: "valor", label: "Valor anual", value: formatCurrency(horizonList.reduce((s, c) => s + annualValue(c), 0), { compact: true }) },
-                  { key: "quantidade", label: "Contratos", value: formatNumber(horizonList.length) },
-                ]}
-              />
-            }
-            insight={`${formatCurrency([...in30, ...in60, ...in90].reduce((s, c) => s + annualValue(c), 0), { compact: true })} por ano vencem nos próximos 90 dias`}
-            insightDetail={`${plural(toDecide.length, "renovação automática", "renovações automáticas")} no período · decida antes do aviso prévio`}
-          >
-            <BarChart
-              label={`Contratos vigentes por mês de término nos próximos ${horizon} meses`}
-              data={byMonth}
-              index="mes"
-              series={[
-                { key: "automatica", label: "Renova sozinho" },
-                { key: "aditivo", label: "Precisa de aditivo" },
+          {estado === "carregando" ? (
+            <PanelSkeleton
+              kpis={5}
+              rows={[
+                { cols: 1, cards: [{ kind: "list" }] },
+                { cols: 1, cards: [{ kind: "chart", h: 240 }] },
+                { cols: 2, cards: [{ kind: "list" }, { kind: "list" }] },
               ]}
-              stacked
-              format={(n) => (metric === "valor" ? formatCurrency(n, { cents: false }) : plural(n, "contrato"))}
-              formatAxis={(n) => (metric === "valor" ? formatCompact(n) : formatNumber(n))}
-              height={240}
             />
-          </ChartCard>
+          ) : estado === "erro" ? (
+            <PanelError what="o painel de contratos" alt={{ label: "Ver contratos", href: "#/frame/clm-contracts" }} />
+          ) : estado === "vazio" ? (
+            <Empty
+              icon={<FilePlus2 />}
+              title="Nenhum contrato cadastrado ainda"
+              hint="Vencimentos, renovações e prazos de aviso prévio aparecem aqui quando o primeiro contrato for pedido ou importado."
+              action={
+                <Button onClick={() => go("clm-request")}>
+                  <FilePlus2 /> Pedir o primeiro contrato
+                </Button>
+              }
+            />
+          ) : (
+            <>
+              <KpiGrid cols={5}>
+                <KpiCard label="Valor sob contrato" value={formatCurrency(underContract, { compact: true })} delta={0.064} period="vs. fim do trimestre anterior" hint={`${formatCurrency(annual, { compact: true })} por ano`} href="#/frame/clm-contracts?visao=vigentes" />
+                <KpiCard label="Vencem em 90 dias" value={in30.length + in60.length + in90.length} hint={`${in30.length} em 30 · ${in60.length} em 60 · ${in90.length} em 90 dias`} href="#/frame/clm-contracts?visao=vencendo" />
+                <KpiCard label="Renovações a decidir" value={toDecide.length} hint={`${toDecide.filter((c) => daysFromToday(noticeDeadline(c)) < 0).length} já passaram do aviso prévio`} href="#/frame/clm-contracts?visao=renovacao" />
+                <KpiCard label="Aguardando assinatura" value={signing.length} hint={stalled.length ? `${plural(stalled.length, "parado", "parados")} há mais de 3 dias` : "Nenhum parado"} href="#/frame/clm-contracts?visao=assinatura" />
+                <KpiCard label="Prazos atrasados" value={late.length} delta={-0.25} goodWhen="down" period="vs. mês anterior" href="#/frame/clm-obligations?filtro=atrasadas" />
+              </KpiGrid>
 
-          <div className="grid items-start gap-6 lg:grid-cols-2">
-            <ListPanel title="Renovações automáticas a decidir" icon={<RefreshCw />} count={toDecide.length} action={<a href="#/frame/clm-contracts?visao=renovacao">Ver todas</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                {toDecide.slice(0, 6).map((c) => {
-                  const k = counterpartyById(c.counterpartyId);
-                  const left = daysFromToday(noticeDeadline(c));
-                  return (
+              <ListPanel title="Precisa de você" icon={<AlarmClock />} count={needsMe} tone="attention" action={<a href="#/frame/clm-approvals">Aprovações</a>}>
+                {needsMe ? (
+                <ul className="m-0 list-none divide-y divide-line p-0">
+                  {mine.map((a) => {
+                    const c = contractById(a.contractId);
+                    const d = daysFromToday(a.due);
+                    return (
+                      <li key={a.id}>
+                        <ListRow
+                          onClick={() => go("clm-approvals", a.id)}
+                          leading={<Stamp className="h-4 w-4 text-muted" />}
+                          kicker={`Aprovar · ${c.number} · ${plural(c.deviations.length, "cláusula fora do padrão", "cláusulas fora do padrão")}`}
+                          title={c.title}
+                          meta={<Badge tone={d <= 1 ? "warn" : "neutral"}>{d <= 0 ? "Vence hoje" : d === 1 ? "Até amanhã" : `Até ${formatDate(a.due, { short: true })}`}</Badge>}
+                        />
+                      </li>
+                    );
+                  })}
+                  {stalled.map(({ c, s }) => (
+                    <li key={c.id}>
+                      <ListRow
+                        onClick={() => go("clm-contract", { id: c.id, aba: "assinaturas" })}
+                        leading={<PenLine className="h-4 w-4 text-muted" />}
+                        kicker={`Assinatura parada · ${c.number}`}
+                        title={`${s!.name} não assina há ${-daysFromToday(s!.sentAt!)} dias`}
+                        meta={<Badge tone="warn">Parada</Badge>}
+                      />
+                    </li>
+                  ))}
+                  {noticeSoon.map((c) => (
                     <li key={c.id}>
                       <ListRow
                         onClick={() => go("clm-contract", c.id)}
-                        leading={<EntityMark name={k.short} tint={k.tint} className="h-8 w-8 text-[11px]" />}
-                        kicker={`${k.short} · ${formatCurrency(annualValue(c), { compact: true })}/ano · vence ${formatDate(c.end, { short: true })}`}
-                        title={c.title}
-                        meta={<Badge tone={left < 0 ? "bad" : left <= 15 ? "warn" : "neutral"}>{left < 0 ? "Aviso perdido" : left === 0 ? "Avisar hoje" : `Avisar até ${formatDate(noticeDeadline(c), { short: true })}`}</Badge>}
+                        leading={<CalendarClock className="h-4 w-4 text-muted" />}
+                        kicker={`Aviso prévio · ${c.number}`}
+                        title={`Decidir se renova: ${c.title}`}
+                        meta={<span className="text-[12px] tabular-nums text-muted">até {formatDate(noticeDeadline(c), { short: true })}</span>}
                       />
                     </li>
-                  );
-                })}
-              </ul>
-            </ListPanel>
-            <ListPanel title="Obrigações atrasadas" icon={<CalendarClock />} count={late.length} tone="attention" action={<a href="#/frame/clm-obligations?filtro=atrasadas">Obrigações</a>}>
-              <ul className="list-none divide-y divide-line p-0">
-                {late.map((o) => {
-                  const c = contractById(o.contractId);
-                  return (
-                    <li key={o.id}>
-                      <ListRow
-                        onClick={() => go("clm-contract", { id: c.id, aba: "obrigacoes" })}
-                        kicker={`${c.number} · ${o.party === "Vereda" ? "nossa" : counterpartyById(c.counterpartyId).short} · ${personById(o.owner).name.split(" ")[0]}`}
-                        title={o.title}
-                        meta={<Badge tone="bad">{-daysFromToday(o.due)} {-daysFromToday(o.due) === 1 ? "dia" : "dias"}</Badge>}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            </ListPanel>
-          </div>
+                  ))}
+                </ul>
+                ) : (
+                  <Empty framed={false} icon={<AlarmClock />} title="Nada pedindo ação agora" hint="Aprovações na sua etapa, assinaturas paradas e prazos de aviso prévio aparecem aqui." />
+                )}
+              </ListPanel>
 
-          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <ChartCard title="Onde está o valor da carteira?" description="Valor anual dos contratos vigentes, por tipo">
-              <BarList items={byType} format={(n) => formatCurrency(n, { compact: true })} showShare />
-            </ChartCard>
-            <MiniBarChart label="Contratos assinados por mês" caption="Assinatura eletrônica · últimos 6 meses" data={signedByMonth} format={(n) => plural(n, "contrato")} />
-          </div>
+              <ChartCard
+                title="Quanto da carteira vence em cada mês?"
+                description={`Contratos vigentes por mês de término · ${metric === "valor" ? "valor anual" : "quantidade"}`}
+                headerAside={
+                  <ChartCardTotals
+                    value={metric}
+                    onChange={setMetric}
+                    items={[
+                      { key: "valor", label: "Valor anual", value: formatCurrency(horizonList.reduce((s, c) => s + annualValue(c), 0), { compact: true }) },
+                      { key: "quantidade", label: "Contratos", value: formatNumber(horizonList.length) },
+                    ]}
+                  />
+                }
+                insight={`${formatCurrency([...in30, ...in60, ...in90].reduce((s, c) => s + annualValue(c), 0), { compact: true })} por ano vencem nos próximos 90 dias`}
+                insightDetail={`${plural(toDecide.length, "renovação automática", "renovações automáticas")} no período · decida antes do aviso prévio`}
+              >
+                <BarChart
+                  label={`Contratos vigentes por mês de término nos próximos ${horizon} meses`}
+                  data={byMonth}
+                  index="mes"
+                  series={[
+                    { key: "automatica", label: "Renova sozinho" },
+                    { key: "aditivo", label: "Precisa de aditivo" },
+                  ]}
+                  stacked
+                  format={(n) => (metric === "valor" ? formatCurrency(n, { cents: false }) : plural(n, "contrato"))}
+                  formatAxis={(n) => (metric === "valor" ? formatCompact(n) : formatNumber(n))}
+                  height={240}
+                />
+              </ChartCard>
+
+              <div className="grid items-start gap-6 lg:grid-cols-2">
+                <ListPanel title="Renovações automáticas a decidir" icon={<RefreshCw />} count={toDecide.length} action={<a href="#/frame/clm-contracts?visao=renovacao">Ver todas</a>}>
+                  <ul className="list-none divide-y divide-line p-0">
+                    {toDecide.slice(0, 6).map((c) => {
+                      const k = counterpartyById(c.counterpartyId);
+                      const left = daysFromToday(noticeDeadline(c));
+                      return (
+                        <li key={c.id}>
+                          <ListRow
+                            onClick={() => go("clm-contract", c.id)}
+                            leading={<EntityMark name={k.short} tint={k.tint} className="h-8 w-8 text-[11px]" />}
+                            kicker={`${k.short} · ${formatCurrency(annualValue(c), { compact: true })}/ano · vence ${formatDate(c.end, { short: true })}`}
+                            title={c.title}
+                            meta={<Badge tone={left < 0 ? "bad" : left <= 15 ? "warn" : "neutral"}>{left < 0 ? "Aviso perdido" : left === 0 ? "Avisar hoje" : `Avisar até ${formatDate(noticeDeadline(c), { short: true })}`}</Badge>}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </ListPanel>
+                <ListPanel title="Obrigações atrasadas" icon={<CalendarClock />} count={late.length} action={<a href="#/frame/clm-obligations?filtro=atrasadas">Obrigações</a>}>
+                  <ul className="list-none divide-y divide-line p-0">
+                    {late.map((o) => {
+                      const c = contractById(o.contractId);
+                      return (
+                        <li key={o.id}>
+                          <ListRow
+                            onClick={() => go("clm-contract", { id: c.id, aba: "obrigacoes" })}
+                            kicker={`${c.number} · ${o.party === "Vereda" ? "nossa" : counterpartyById(c.counterpartyId).short} · ${personById(o.owner).name.split(" ")[0]}`}
+                            title={o.title}
+                            meta={<Badge tone="bad">{-daysFromToday(o.due)} {-daysFromToday(o.due) === 1 ? "dia" : "dias"}</Badge>}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </ListPanel>
+              </div>
+
+              <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+                <ChartCard title="Onde está o valor da carteira?" description="Valor anual dos contratos vigentes, por tipo">
+                  <BarList items={byType} format={(n) => formatCurrency(n, { compact: true })} showShare />
+                </ChartCard>
+                <MiniBarChart label="Contratos assinados por mês" caption="Assinatura eletrônica · últimos 6 meses" data={signedByMonth} format={(n) => plural(n, "contrato")} />
+              </div>
+            </>
+          )}
         </div>
       </Page>
     </ClmShell>

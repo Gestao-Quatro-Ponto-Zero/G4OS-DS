@@ -30,4 +30,4 @@ Carteira de contratos em DataGrid: visões salvas (vencendo, renovação automá
 
 ## Componentes usados
 
-`Avatar`, `Button`, `DataGrid`, `Empty`, `EmptyFilterResult`, `EntityMark`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Menu`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `StatCell`, `StatGrid`, `TableSearch`, `formatCurrency`, `formatDate`, `notify`, `plural`, `useFilters`, `useSavedViews`
+`Avatar`, `Button`, `DataGrid`, `Empty`, `EmptyFilterResult`, `EntityMark`, `FileDropzone`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Menu`, `Modal`, `Page`, `PageHeading`, `SavedView`, `SavedViews`, `StatCell`, `StatGrid`, `TableSearch`, `formatCurrency`, `formatDate`, `notify`, `plural`, `useFilters`, `useSavedViews`

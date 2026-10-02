@@ -1,19 +1,23 @@
-import { AlertTriangle, ClipboardCheck, FlaskConical, Globe, History, Wallet, XCircle } from "lucide-react";
+import { AlertTriangle, Bot, ClipboardCheck, FlaskConical, Globe, History, Plus, Wallet, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   BarChart,
   BarList,
   Button,
   ChartCard,
-  Meter,
+  Empty,
+  ErrorState,
   KpiCard,
   KpiGrid,
   ListPanel,
   ListRow,
+  Meter,
   MiniBarChart,
   Page,
   PageHeading,
   SegmentedControl,
+  Skeleton,
+  cn,
   formatCurrency,
   formatDuration,
   formatNumber,
@@ -35,7 +39,7 @@ import {
   suiteScore,
 } from "./data/agents";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
-import { frameHref } from "./shells/frame-route";
+import { frameHref, setFrameQuery, useFrameParam } from "./shells/frame-route";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -67,6 +71,88 @@ export const meta = {
 
 const money = (n: number) => formatCurrency(n, { cents: false });
 
+/* ------------------------------------------------------------------ */
+/* Estados do painel. No showcase, `?estado=carregando|erro|vazio`    */
+/* simula cada um; no SEU app troque pelo estado da consulta          */
+/* (isLoading, error, sem dados). O cabeçalho fica visível em todos;  */
+/* no vazio ele não mostra números, período nem exportar.             */
+/* ------------------------------------------------------------------ */
+
+type SkeletonCard = { kind: "chart" | "list"; span?: 1 | 2 | 3; h?: number };
+const skeletonCols = { 1: "", 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 5: "lg:grid-cols-5" } as const;
+const skeletonSpan = { 1: "", 2: "lg:col-span-2", 3: "lg:col-span-3" } as const;
+
+/** Carregando com a forma final: faixa de KPIs, cartões de gráfico e painéis de lista. */
+function PanelSkeleton({ kpis = 4, rows }: { kpis?: 4 | 5; rows: { cols: keyof typeof skeletonCols; cards: SkeletonCard[] }[] }) {
+  return (
+    <div role="status" aria-busy="true" aria-label="Carregando painel" className="space-y-6">
+      <div className={cn("grid grid-cols-1 gap-3 sm:grid-cols-2", kpis === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4")}>
+        {Array.from({ length: kpis }, (_, i) => (
+          <div key={i} className="space-y-3 rounded-xl border border-line bg-surface p-4">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-6 w-28" />
+            <Skeleton className="h-3 w-32 max-w-full" />
+          </div>
+        ))}
+      </div>
+      {rows.map((r, i) => (
+        <div key={i} className={cn("grid items-start gap-6", skeletonCols[r.cols])}>
+          {r.cards.map((c, j) =>
+            c.kind === "chart" ? (
+              <div key={j} className={cn("min-w-0 rounded-xl border border-line bg-surface px-6 py-5", skeletonSpan[c.span ?? 1])}>
+                <Skeleton className="h-4 w-56 max-w-full" />
+                <Skeleton className="mt-2 h-3 w-40 max-w-full" />
+                <div className="mt-5" style={{ height: c.h ?? 220 }}>
+                  <Skeleton className="h-full w-full rounded-lg" />
+                </div>
+              </div>
+            ) : (
+              <div key={j} className={cn("min-w-0 rounded-2xl border border-line bg-soft/70 p-[3px]", skeletonSpan[c.span ?? 1])}>
+                <div className="px-3 py-3">
+                  <Skeleton className="h-3.5 w-36" />
+                </div>
+                <div className="overflow-hidden rounded-card border border-line bg-surface">
+                  {Array.from({ length: 4 }, (_, k) => (
+                    <div key={k} className="flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0">
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <Skeleton className="h-2.5 w-1/4" />
+                        <Skeleton className="h-3 w-2/3" />
+                      </div>
+                      <Skeleton className="h-3 w-14" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Erro ao carregar o painel, com saída: tentar de novo (limpa o estado simulado) ou ir para outra tela. */
+function PanelError({ what, alt }: { what: string; alt?: { label: string; href: string } }) {
+  return (
+    <div className="rounded-xl border border-line bg-surface">
+      <ErrorState
+        size="md"
+        title={`Não foi possível carregar ${what}`}
+        description="O servidor não respondeu. Nada do que você fez foi perdido; tente de novo em instantes."
+        retryLabel="Tentar de novo"
+        onRetry={() => setFrameQuery({ estado: undefined })}
+        secondaryAction={
+          alt && (
+            <Button variant="ghost" href={alt.href}>
+              {alt.label}
+            </Button>
+          )
+        }
+      />
+    </div>
+  );
+}
+
 export default function AiAgentsDashboard() {
   const [period, setPeriod] = useState<"30" | "7">("30");
   const data = useMemo(() => fleetDaily.slice(-Number(period)), [period]);
@@ -79,14 +165,16 @@ export default function AiAgentsDashboard() {
   const regressions = evalSuites.filter((s) => suiteScore(s) < s.threshold);
   const incidents = runs.filter((r) => r.status === "falhou").slice(0, 5);
   const oldest = approvals[approvals.length - 1];
+  const estado = useFrameParam("estado");
 
   return (
     <AgentShell current={agentRoutes.dashboard}>
       <Page>
         <PageHeading
           title="Painel da frota"
-          description={`${agents.filter((a) => a.status !== "rascunho").length} agentes em produção · setembro de 2026 · atualizado há 2 minutos`}
+          description={estado === "vazio" ? "Execuções, custo e qualidade dos agentes em produção." : `${agents.filter((a) => a.status !== "rascunho").length} agentes em produção · setembro de 2026 · atualizado há 2 minutos`}
           actions={
+            estado === "vazio" ? undefined : (
             <>
               <SegmentedControl
                 label="Período"
@@ -101,109 +189,135 @@ export default function AiAgentsDashboard() {
                 <History /> Ver execuções
               </Button>
             </>
+            )
           }
         />
         <div className="space-y-6">
-          <KpiGrid cols={5}>
-            <KpiCard label="Execuções" value={formatNumber(fleetTotals.runs30d)} delta={fleetTotals.runs30d / fleetTotals.runsPrev - 1} period="vs. agosto" spark={fleetDaily.slice(-7).map((d) => d.execucoes + d.falhas)} href={agentRoutes.runs} />
-            <KpiCard label="Taxa de sucesso" value={formatPercent(fleetTotals.success)} delta={fleetTotals.success / fleetTotals.successPrev - 1} period="vs. agosto (98,4 %)" href={frameHref("ai-runs", { status: "falhou" })} />
-            <KpiCard label="Custo no mês" value={money(fleetTotals.cost30d)} delta={fleetTotals.cost30d / fleetTotals.costPrev - 1} goodWhen="down" period="vs. agosto · 3 agentes novos" href={agentRoutes.governance} />
-            <KpiCard label="Latência p95" value={formatDuration(fleetTotals.p95Ms)} delta={fleetTotals.p95Ms / fleetTotals.p95Prev - 1} goodWhen="down" period="vs. agosto" />
-            <KpiCard label="Aprovações pendentes" value={approvals.length} delta={approvals.length / 3 - 1} goodWhen="down" period="vs. ontem (3)" href={agentRoutes.approvals} />
-          </KpiGrid>
-
-          <ChartCard
-            title="A frota está rodando mais sem falhar mais?"
-            description={`Execuções concluídas e falhas por dia · últimos ${period} dias`}
-            value={formatNumber(total)}
-            insight={`${formatPercent(fails / total)} falharam no período`}
-            insightDetail="Pico em 28–30/09: extrato do Itaú mudou de formato e o Notion limitou a triagem"
-            insightTrend="up"
-          >
-            <BarChart
-              label={`Execuções concluídas e falhas por dia nos últimos ${period} dias`}
-              data={data}
-              index="dia"
-              series={[
-                { key: "execucoes", label: "Concluídas", color: "var(--ds-chart-1)" },
-                { key: "falhas", label: "Falhas", color: "var(--ds-rose)" },
+          {estado === "carregando" ? (
+            <PanelSkeleton
+              kpis={5}
+              rows={[
+                { cols: 1, cards: [{ kind: "chart", h: 240 }] },
+                { cols: 5, cards: [{ kind: "list", span: 3 }, { kind: "chart", span: 2, h: 120 }] },
               ]}
-              stacked
-              height={240}
-              formatAxis={(n) => formatNumber(n)}
             />
-          </ChartCard>
+          ) : estado === "erro" ? (
+            <PanelError what="o painel da frota" alt={{ label: "Ver execuções", href: agentRoutes.runs }} />
+          ) : estado === "vazio" ? (
+            <Empty
+              icon={<Bot />}
+              title="Nenhum agente em produção ainda"
+              hint="Execuções, custo e o que pede uma pessoa aparecem aqui quando o primeiro agente for publicado."
+              action={
+                <Button href={frameHref("ai-agent-builder", { novo: "1" })}>
+                  <Plus /> Criar o primeiro agente
+                </Button>
+              }
+            />
+          ) : (
+            <>
+              <KpiGrid cols={5}>
+                <KpiCard label="Execuções" value={formatNumber(fleetTotals.runs30d)} delta={fleetTotals.runs30d / fleetTotals.runsPrev - 1} period="vs. agosto" spark={fleetDaily.slice(-7).map((d) => d.execucoes + d.falhas)} href={agentRoutes.runs} />
+                <KpiCard label="Taxa de sucesso" value={formatPercent(fleetTotals.success)} delta={fleetTotals.success / fleetTotals.successPrev - 1} period="vs. agosto (98,4 %)" href={frameHref("ai-runs", { status: "falhou" })} />
+                <KpiCard label="Custo no mês" value={money(fleetTotals.cost30d)} delta={fleetTotals.cost30d / fleetTotals.costPrev - 1} goodWhen="down" period="vs. agosto · 3 agentes novos" href={agentRoutes.governance} />
+                <KpiCard label="Latência p95" value={formatDuration(fleetTotals.p95Ms)} delta={fleetTotals.p95Ms / fleetTotals.p95Prev - 1} goodWhen="down" period="vs. agosto" />
+                <KpiCard label="Aprovações pendentes" value={approvals.length} delta={approvals.length / 3 - 1} goodWhen="down" period="vs. ontem (3)" href={agentRoutes.approvals} />
+              </KpiGrid>
 
-          <div className="grid gap-6 lg:grid-cols-5">
-            <div className="space-y-6 lg:col-span-3">
-              <ListPanel title="Precisa de você" tone="attention" count={approvals.length + withError.length + nearBudget.length + outside.length + regressions.length} icon={<AlertTriangle />}>
-                <ListRow
-                  leading={<ClipboardCheck className="h-4 w-4 text-amber" />}
-                  kicker="Aprovações"
-                  title={`${approvals.length} ações esperando decisão humana`}
-                  meta={`mais antiga: ${runWhen(oldest.requestedAt)}`}
-                  href={agentRoutes.approvals}
-                />
-                {withError.map((a) => (
-                  <ListRow key={a.id} leading={<XCircle className="h-4 w-4 text-rose" />} kicker={`${a.name} · com erro`} title={a.issue ?? "Execuções falhando"} meta="abrir agente" href={frameHref("ai-agent", a.id)} />
-                ))}
-                {nearBudget.map((a) => (
-                  <ListRow key={a.id} leading={<Wallet className="h-4 w-4 text-amber" />} kicker={`${a.name} · orçamento`} title={`${formatPercent(budgetUse(a), 0)} do orçamento usado (${money(a.cost30d)} de ${money(a.budget)})`} meta="ajustar limite" href={frameHref("ai-agent-governance", { secao: "orcamento" })} />
-                ))}
-                {outside.map((a) => (
-                  <ListRow key={a.id} leading={<Globe className="h-4 w-4 text-amber" />} kicker={`${a.name} · LGPD`} title={a.issue ?? `Roda em ${a.region.place}`} meta="revisar dados" href={frameHref("ai-agent-governance", { secao: "dados" })} />
-                ))}
-                {regressions.map((s) => (
-                  <ListRow key={s.id} leading={<FlaskConical className="h-4 w-4 text-rose" />} kicker={`${agentById(s.agentId)?.name} · avaliação`} title={`${s.name} abaixo do mínimo: ${formatPercent(suiteScore(s), 0)} (mínimo ${formatPercent(s.threshold, 0)})`} meta="ver casos" href={frameHref("ai-agent-evals", { agente: s.agentId })} />
-                ))}
-              </ListPanel>
-
-              <ListPanel title="Incidentes recentes" icon={<XCircle />} action={<Button size="sm" variant="ghost" href={frameHref("ai-runs", { status: "falhou" })}>Ver falhas</Button>}>
-                {incidents.map((r) => (
-                  <ListRow
-                    key={r.id}
-                    leading={<XCircle className="h-4 w-4 text-rose" aria-label={runStatusLabel[r.status]} />}
-                    kicker={`${r.id} · ${agentById(r.agentId)?.name}`}
-                    title={r.error ?? r.subject}
-                    meta={runWhen(r.startedAt)}
-                    href={frameHref("ai-agent-run", r.id)}
-                  />
-                ))}
-              </ListPanel>
-            </div>
-
-            <div className="space-y-6 lg:col-span-2">
-              <section className="rounded-xl border border-line bg-surface p-4">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <h2 className="m-0 text-[13px] font-medium">Créditos do mês</h2>
-                  <Button size="sm" variant="quiet" href={frameHref("ai-agent-governance", { secao: "orcamento" })}>
-                    Ver uso
-                  </Button>
-                </div>
-                <p className="m-0 flex items-baseline justify-between gap-2 text-[12.5px] text-muted">
-                  <span>{creditPlan.plan}</span>
-                  <span className="tabular-nums">
-                    <span className="text-[15px] font-semibold text-ink">{money(creditPlan.used)}</span> de {money(creditPlan.limit)}
-                  </span>
-                </p>
-                <div className="mt-2">
-                  <Meter value={(creditPlan.used / creditPlan.limit) * 100} tone={creditPlan.used / creditPlan.limit >= 0.9 ? "warn" : "ink"} label={`${formatPercent(creditPlan.used / creditPlan.limit, 0)} dos créditos usados`} />
-                </div>
-                <p className="m-0 mt-2 text-[12px] text-muted">{formatPercent(creditPlan.used / creditPlan.limit, 0)} usados com 1 dia para renovar (01/10). Ao passar de 90 %, os donos recebem aviso no Slack.</p>
-              </section>
-              <MiniBarChart label="Custo por área" caption="Setembro · R$" data={costByArea.filter((d) => d.value > 0)} format={money} />
-              <ChartCard title="Quais agentes mais rodam?" description="Execuções em 30 dias">
-                <BarList
-                  items={[...agents]
-                    .filter((a) => a.runs30d > 0)
-                    .sort((a, b) => b.runs30d - a.runs30d)
-                    .slice(0, 6)
-                    .map((a) => ({ label: a.name, value: a.runs30d, href: frameHref("ai-agent", a.id) }))}
-                  showShare
+              <ChartCard
+                title="A frota está rodando mais sem falhar mais?"
+                description={`Execuções concluídas e falhas por dia · últimos ${period} dias`}
+                value={formatNumber(total)}
+                insight={`${formatPercent(fails / total)} falharam no período`}
+                insightDetail="Pico em 28–30/09: extrato do Itaú mudou de formato e o Notion limitou a triagem"
+                insightTrend="up"
+              >
+                <BarChart
+                  label={`Execuções concluídas e falhas por dia nos últimos ${period} dias`}
+                  data={data}
+                  index="dia"
+                  series={[
+                    { key: "execucoes", label: "Concluídas", color: "var(--ds-chart-1)" },
+                    { key: "falhas", label: "Falhas", color: "var(--ds-rose)" },
+                  ]}
+                  stacked
+                  height={240}
+                  formatAxis={(n) => formatNumber(n)}
                 />
               </ChartCard>
-            </div>
-          </div>
+
+              <div className="grid gap-6 lg:grid-cols-5">
+                <div className="space-y-6 lg:col-span-3">
+                  <ListPanel title="Precisa de você" tone="attention" count={approvals.length + withError.length + nearBudget.length + outside.length + regressions.length} icon={<AlertTriangle />}>
+                    <ListRow
+                      leading={<ClipboardCheck className="h-4 w-4 text-amber" />}
+                      kicker="Aprovações"
+                      title={`${approvals.length} ações esperando decisão humana`}
+                      meta={`mais antiga: ${runWhen(oldest.requestedAt)}`}
+                      href={agentRoutes.approvals}
+                    />
+                    {withError.map((a) => (
+                      <ListRow key={a.id} leading={<XCircle className="h-4 w-4 text-rose" />} kicker={`${a.name} · com erro`} title={a.issue ?? "Execuções falhando"} meta="abrir agente" href={frameHref("ai-agent", a.id)} />
+                    ))}
+                    {nearBudget.map((a) => (
+                      <ListRow key={a.id} leading={<Wallet className="h-4 w-4 text-amber" />} kicker={`${a.name} · orçamento`} title={`${formatPercent(budgetUse(a), 0)} do orçamento usado (${money(a.cost30d)} de ${money(a.budget)})`} meta="ajustar limite" href={frameHref("ai-agent-governance", { secao: "orcamento" })} />
+                    ))}
+                    {outside.map((a) => (
+                      <ListRow key={a.id} leading={<Globe className="h-4 w-4 text-amber" />} kicker={`${a.name} · LGPD`} title={a.issue ?? `Roda em ${a.region.place}`} meta="revisar dados" href={frameHref("ai-agent-governance", { secao: "dados" })} />
+                    ))}
+                    {regressions.map((s) => (
+                      <ListRow key={s.id} leading={<FlaskConical className="h-4 w-4 text-rose" />} kicker={`${agentById(s.agentId)?.name} · avaliação`} title={`${s.name} abaixo do mínimo: ${formatPercent(suiteScore(s), 0)} (mínimo ${formatPercent(s.threshold, 0)})`} meta="ver casos" href={frameHref("ai-agent-evals", { agente: s.agentId })} />
+                    ))}
+                  </ListPanel>
+
+                  <ListPanel title="Incidentes recentes" icon={<XCircle />} action={<Button size="sm" variant="ghost" href={frameHref("ai-runs", { status: "falhou" })}>Ver falhas</Button>}>
+                    {incidents.map((r) => (
+                      <ListRow
+                        key={r.id}
+                        leading={<XCircle className="h-4 w-4 text-rose" aria-label={runStatusLabel[r.status]} />}
+                        kicker={`${r.id} · ${agentById(r.agentId)?.name}`}
+                        title={r.error ?? r.subject}
+                        meta={runWhen(r.startedAt)}
+                        href={frameHref("ai-agent-run", r.id)}
+                      />
+                    ))}
+                  </ListPanel>
+                </div>
+
+                <div className="space-y-6 lg:col-span-2">
+                  <section className="rounded-xl border border-line bg-surface p-4">
+                    <div className="mb-3 flex items-center justify-between gap-2">
+                      <h2 className="m-0 text-[13px] font-medium">Créditos do mês</h2>
+                      <Button size="sm" variant="quiet" href={frameHref("ai-agent-governance", { secao: "orcamento" })}>
+                        Ver uso
+                      </Button>
+                    </div>
+                    <p className="m-0 flex items-baseline justify-between gap-2 text-[12.5px] text-muted">
+                      <span>{creditPlan.plan}</span>
+                      <span className="tabular-nums">
+                        <span className="text-[15px] font-semibold text-ink">{money(creditPlan.used)}</span> de {money(creditPlan.limit)}
+                      </span>
+                    </p>
+                    <div className="mt-2">
+                      <Meter value={(creditPlan.used / creditPlan.limit) * 100} tone={creditPlan.used / creditPlan.limit >= 0.9 ? "warn" : "ink"} label={`${formatPercent(creditPlan.used / creditPlan.limit, 0)} dos créditos usados`} />
+                    </div>
+                    <p className="m-0 mt-2 text-[12px] text-muted">{formatPercent(creditPlan.used / creditPlan.limit, 0)} usados com 1 dia para renovar (01/10). Ao passar de 90 %, os donos recebem aviso no Slack.</p>
+                  </section>
+                  <MiniBarChart label="Custo por área" caption="Setembro · R$" data={costByArea.filter((d) => d.value > 0)} format={money} />
+                  <ChartCard title="Quais agentes mais rodam?" description="Execuções em 30 dias">
+                    <BarList
+                      items={[...agents]
+                        .filter((a) => a.runs30d > 0)
+                        .sort((a, b) => b.runs30d - a.runs30d)
+                        .slice(0, 6)
+                        .map((a) => ({ label: a.name, value: a.runs30d, href: frameHref("ai-agent", a.id) }))}
+                      showShare
+                    />
+                  </ChartCard>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </Page>
     </AgentShell>

@@ -220,6 +220,7 @@ Campo de sessão no formato do app: anexo (clipe), pasta de contexto, agentes, m
 | `className` | `string \| undefined` |  |  |
 | `commands` | `SlashCommand[] \| undefined` |  |  |
 | `onAgentChange` | `((id: string) => void) \| undefined` |  |  |
+| `onAttachFiles` | `((files: File[]) => void) \| undefined` |  | Arquivos escolhidos no clipe (seletor do sistema). |
 | `onContext` | `(() => void) \| undefined` |  |  |
 | `onManageTools` | `(() => void) \| undefined` |  |  |
 | `onStop` | `(() => void) \| undefined` |  |  |
@@ -252,6 +253,7 @@ Conteúdo de detalhes da sessão (modo, criador, nome, etiquetas, notas) e arqui
 | `className` | `string \| undefined` |  |  |
 | `defaultSection` | `"detalhes" \| "arquivos" \| undefined` | `"detalhes"` |  |
 | `files` | `SessionFile[] \| undefined` | `[]` |  |
+| `onOpenFile` | `((file: SessionFile) => void) \| undefined` |  | Abre um arquivo da lista (prévia, download). |
 | `show` | `"both" \| "detalhes" \| "arquivos" \| undefined` | `"both"` | "both" (padrão) com sub-abas; "detalhes" ou "arquivos" mostra só uma seção, sem sub-abas. |
 | `tagSuggestions` | `string[] \| undefined` | `[]` |  |
 | `title` | `ReactNode` | `"Informações da sessão"` |  |
@@ -316,6 +318,7 @@ Painel lateral da sessão: abas Informações | Navegador.
 | `className` | `string \| undefined` |  |  |
 | `files` | `SessionFile[] \| undefined` | `[]` |  |
 | `onMinimize` | `(() => void) \| undefined` |  |  |
+| `onOpenFile` | `((file: SessionFile) => void) \| undefined` |  | Abre um arquivo da lista (prévia, download). |
 | `tagSuggestions` | `string[] \| undefined` | `[]` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.

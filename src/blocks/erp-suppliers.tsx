@@ -244,7 +244,7 @@ function SupplierDrawer({ s, onClose }: { s: Supplier; onClose: () => void }) {
         <div className="space-y-6">
           {hasHistory(s) ? (
             <div className="space-y-3">
-              <BulletChart label="OTIF" hint="últimos 90 dias" value={Math.round(s.otif * 100)} target={95} max={100} format={(n) => `${n}%`} />
+              <BulletChart label="OTIF" hint="últimos 90 dias" value={Math.round(s.otif * 100)} target={95} max={100} format={(n) => formatPercent(n / 100, 0)} />
               <BulletChart label="Prazo" hint="dias úteis · meta 5" value={s.leadTime} target={5} max={15} format={(n) => `${n} d`} />
             </div>
           ) : (

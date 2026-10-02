@@ -1618,7 +1618,7 @@ export function ProgressRing({
         />
       </svg>
       <span className="relative text-[11px] font-semibold tabular-nums" style={{ fontSize: size < 40 ? 9.5 : size > 64 ? 15 : 11 }}>
-        {children ?? `${Math.round(pct)}%`}
+        {children ?? `${Math.round(pct)}\u00A0%`}
       </span>
     </span>
   );

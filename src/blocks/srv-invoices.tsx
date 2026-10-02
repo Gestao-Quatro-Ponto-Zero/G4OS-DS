@@ -1,4 +1,4 @@
-import { Ban, Download, FileText, Mail, RotateCw, Send } from "lucide-react";
+import { Ban, Download, FileText, Mail, Printer, RotateCw, Send } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   Badge,
@@ -11,6 +11,7 @@ import {
   EmptyFilterResult,
   FilterBar,
   Highlight,
+  Modal,
   OperationButton,
   OperationFeedback,
   Page,
@@ -30,7 +31,8 @@ import {
   type FilterField,
   type GridColumn,
 } from "@g4ai/ds";
-import { clientById, clients, company, invoiceStatus, invoices as seed, issOf, type Invoice, type InvoiceStatus } from "./data/servicos";
+import { clientById, clients, company, invoiceStatus, invoices as seed, issOf, services, type Invoice, type InvoiceStatus } from "./data/servicos";
+import { machineDecimal, saveText, xmlEscape } from "./shells/download";
 import { frameHref, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { LoadError, LoadingTable, ServicosShell, useListState } from "./shells/servicos-shell";
 
@@ -73,6 +75,139 @@ const fields: FilterField<Invoice>[] = [
 ];
 const searchText = (n: Invoice) => [n.number, n.rps, n.origin.label, clientById(n.clientId).name, clientById(n.clientId).cnpj.replace(/\D/g, "")];
 
+/* XML e DANFSe gerados no navegador a partir dos dados da nota (sem servidor). */
+const xmlEsc = xmlEscape;
+const dec = machineDecimal;
+const digits = (s: string) => s.replace(/\D/g, "");
+const serviceName = (code: string) => services.find((s) => s.code === code)?.name ?? `Item ${code}`;
+
+/** XML no leiaute ABRASF (CompNfse), montado com os dados da nota. */
+function nfseXml(n: Invoice) {
+  const k = clientById(n.clientId);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<CompNfse xmlns="http://www.abrasf.org.br/nfse.xsd">
+  <Nfse versao="2.04">
+    <InfNfse Id="NFSe${digits(n.number ?? n.rps)}">
+      <Numero>${xmlEsc(n.number ?? "")}</Numero>
+      <CodigoVerificacao>${xmlEsc(n.verification ?? "")}</CodigoVerificacao>
+      <DataEmissao>${n.issuedAt.slice(0, 10)}T10:00:00-03:00</DataEmissao>
+      <Competencia>${n.competence.split("/").reverse().join("-")}-01</Competencia>
+      <IdentificacaoRps><Numero>${digits(n.rps)}</Numero><Serie>A</Serie><Tipo>1</Tipo></IdentificacaoRps>
+      <Servico>
+        <Valores>
+          <ValorServicos>${dec(n.value)}</ValorServicos>
+          <ValorIss>${dec(issOf(n))}</ValorIss>
+          <Aliquota>${dec(n.issRate * 100)}</Aliquota>
+          <ValorLiquidoNfse>${dec(n.value - (n.issWithheld ? issOf(n) : 0))}</ValorLiquidoNfse>
+        </Valores>
+        <IssRetido>${n.issWithheld ? 1 : 2}</IssRetido>
+        <ItemListaServico>${xmlEsc(n.serviceCode)}</ItemListaServico>
+        <Discriminacao>${xmlEsc(`${serviceName(n.serviceCode)} · ${n.origin.label}`)}</Discriminacao>
+        <CodigoMunicipio>3550308</CodigoMunicipio>
+      </Servico>
+      <PrestadorServico>
+        <IdentificacaoPrestador><Cnpj>${digits(company.cnpj)}</Cnpj><InscricaoMunicipal>${digits(company.im)}</InscricaoMunicipal></IdentificacaoPrestador>
+        <RazaoSocial>${xmlEsc(company.name)}</RazaoSocial>
+      </PrestadorServico>
+      <TomadorServico>
+        <IdentificacaoTomador><CpfCnpj><Cnpj>${digits(k.cnpj)}</Cnpj></CpfCnpj></IdentificacaoTomador>
+        <RazaoSocial>${xmlEsc(k.name)}</RazaoSocial>
+        <Endereco><Endereco>${xmlEsc(k.address)}</Endereco><Bairro>${xmlEsc(k.district)}</Bairro><CodigoMunicipio>3550308</CodigoMunicipio><Uf>SP</Uf></Endereco>
+        <Contato><Email>${xmlEsc(k.email)}</Email></Contato>
+      </TomadorServico>
+    </InfNfse>
+  </Nfse>
+</CompNfse>
+`;
+}
+
+function downloadXml(n: Invoice) {
+  saveText(`nfse-${digits(n.number ?? n.rps)}.xml`, nfseXml(n), "application/xml");
+  notify(`XML da NFS-e ${n.number} baixado`);
+}
+
+/** DANFSe: visão de impressão da nota. "Imprimir ou salvar PDF" usa o diálogo do navegador. */
+function DanfseModal({ n, onClose }: { n: Invoice | null; onClose: () => void }) {
+  const k = n ? clientById(n.clientId) : undefined;
+  return (
+    <Modal
+      open={!!n}
+      onClose={onClose}
+      size="lg"
+      kicker="DANFSe · documento auxiliar"
+      title={n ? `NFS-e ${n.number}` : "NFS-e"}
+      description="Confira e imprima. No diálogo de impressão, escolha “Salvar como PDF” para guardar o arquivo."
+      footer={
+        n && (
+          <>
+            <Button variant="ghost" onClick={() => downloadXml(n)}>
+              <Download /> Baixar XML
+            </Button>
+            <Button onClick={() => window.print()}>
+              <Printer /> Imprimir ou salvar PDF
+            </Button>
+          </>
+        )
+      }
+    >
+      {/* Impressão: só o documento, sem a página por trás nem o diálogo. */}
+      <style>{`@media print { body * { visibility: hidden !important; } .danfse-doc, .danfse-doc * { visibility: visible !important; } .danfse-doc { position: fixed; inset: 0; border: 0 !important; } }`}</style>
+      {n && k && (
+        <article className="danfse-doc rounded-lg border border-line bg-surface text-[12.5px]">
+          <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-4 py-3">
+            <div>
+              <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted">Prefeitura do Município de São Paulo</div>
+              <div className="mt-0.5 text-[15px] font-semibold">Nota fiscal eletrônica de serviços · NFS-e</div>
+            </div>
+            <div className="text-right">
+              <div className="font-mono text-[13px] font-semibold">{n.number}</div>
+              <div className="text-muted">Emissão {formatDate(n.issuedAt)} · competência {n.competence}</div>
+              <div className="text-muted">
+                Verificação <span className="font-mono">{n.verification}</span>
+              </div>
+            </div>
+          </header>
+          <div className="grid gap-px bg-line sm:grid-cols-2">
+            {[
+              { title: "Prestador", lines: [company.name, `CNPJ ${company.cnpj} · IM ${company.im}`, `${company.city} · ${company.regime}`] },
+              { title: "Tomador", lines: [k.name, `CNPJ ${k.cnpj}`, `${k.address} · ${k.district}`, k.email] },
+            ].map((b) => (
+              <section key={b.title} className="bg-surface px-4 py-3">
+                <h3 className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted">{b.title}</h3>
+                {b.lines.map((l, i) => (
+                  <p key={l} className={i ? "mt-0.5 text-ink-soft" : "mt-1 font-medium"}>
+                    {l}
+                  </p>
+                ))}
+              </section>
+            ))}
+          </div>
+          <section className="border-t border-line px-4 py-3">
+            <h3 className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted">Discriminação dos serviços</h3>
+            <p className="mt-1">
+              {serviceName(n.serviceCode)} · {n.origin.label}
+            </p>
+            <p className="mt-0.5 text-muted">Item {n.serviceCode} da LC 116/2003 · município de incidência {n.city}</p>
+          </section>
+          <dl className="grid grid-cols-2 gap-px border-t border-line bg-line sm:grid-cols-4">
+            {[
+              ["Valor dos serviços", formatCurrency(n.value)],
+              [`ISS (${formatPercent(n.issRate, 1)})`, formatCurrency(issOf(n))],
+              ["ISS retido", n.issWithheld ? "Sim, pelo tomador" : "Não"],
+              ["Valor líquido", formatCurrency(n.value - (n.issWithheld ? issOf(n) : 0))],
+            ].map(([label, value]) => (
+              <div key={label} className="bg-surface px-4 py-2.5">
+                <dt className="text-[11px] text-muted">{label}</dt>
+                <dd className="mt-0.5 font-medium tabular-nums">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </article>
+      )}
+    </Modal>
+  );
+}
+
 export default function SrvInvoices() {
   const estado = useListState();
   const id = useFrameParam("id");
@@ -83,6 +218,7 @@ export default function SrvInvoices() {
   const filters = useFilters(tabRows, { fields, search: searchText });
   const q = filters.state.query;
   const [canceling, setCanceling] = useState<Invoice | null>(null);
+  const [danfse, setDanfse] = useState<Invoice | null>(null);
   const batch = useOperation({ busyLabel: "Emitindo…" });
   const opened = list.find((n) => n.id === id);
   const count = (s: InvoiceStatus) => list.filter((n) => n.status === s).length;
@@ -215,7 +351,8 @@ export default function SrvInvoices() {
               rowActions={(n) => [
                 { label: "Corrigir e reenviar", icon: <RotateCw />, inline: n.status === "rejeitada", disabled: n.status !== "rejeitada", onSelect: () => setFrameQuery({ id: n.id }) },
                 { label: "Emitir agora", icon: <Send />, inline: n.status === "pendente", disabled: n.status !== "pendente", onSelect: () => emit([n]) },
-                { label: "Baixar PDF e XML", icon: <Download />, disabled: n.status !== "emitida", onSelect: () => notify(`PDF e XML da NFS-e ${n.number} baixados`, undefined, "info") },
+                { label: "Ver DANFSe (PDF)", icon: <FileText />, disabled: n.status !== "emitida", onSelect: () => setDanfse(n) },
+                { label: "Baixar XML", icon: <Download />, disabled: n.status !== "emitida", onSelect: () => downloadXml(n) },
                 { label: "Cancelar nota", icon: <Ban />, tone: "danger", separator: true, disabled: n.status !== "emitida", onSelect: () => setCanceling(n) },
               ]}
               bulkActions={(rows, { clear }) => (
@@ -252,8 +389,10 @@ export default function SrvInvoices() {
           n={opened}
           onChange={(next) => setList((all) => all.map((x) => (x.id === next.id ? next : x)))}
           onCancel={() => setCanceling(opened)}
+          onDanfse={() => setDanfse(opened)}
         />
       )}
+      <DanfseModal n={danfse} onClose={() => setDanfse(null)} />
       <ConfirmDialog
         open={!!canceling}
         onClose={() => setCanceling(null)}
@@ -273,7 +412,7 @@ export default function SrvInvoices() {
   );
 }
 
-function InvoiceDrawer({ n, onChange, onCancel }: { n: Invoice; onChange: (n: Invoice) => void; onCancel: () => void }) {
+function InvoiceDrawer({ n, onChange, onCancel, onDanfse }: { n: Invoice; onChange: (n: Invoice) => void; onCancel: () => void; onDanfse: () => void }) {
   const k = clientById(n.clientId);
   const [value, setValue] = useState(n.rejection?.current ?? "");
   const resend = useOperation({ busyLabel: "Reenviando…" });
@@ -335,9 +474,14 @@ function InvoiceDrawer({ n, onChange, onCancel }: { n: Invoice; onChange: (n: In
           ]}
         />
         {n.status === "emitida" && (
-          <Button variant="ghost" onClick={() => notify(`PDF e XML da NFS-e ${n.number} baixados`, undefined, "info")}>
-            <FileText /> Baixar PDF e XML
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="ghost" onClick={onDanfse}>
+              <FileText /> Ver DANFSe (PDF)
+            </Button>
+            <Button variant="ghost" onClick={() => downloadXml(n)}>
+              <Download /> Baixar XML
+            </Button>
+          </div>
         )}
       </div>
     </Drawer>

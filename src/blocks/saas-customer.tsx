@@ -29,6 +29,7 @@ import {
   formatCurrency,
   formatDate,
   formatNumber,
+  formatPercent,
   notify,
   useOperation,
   type Column,
@@ -179,7 +180,7 @@ export default function SaasCustomer() {
 
         <KpiGrid className="mt-6">
           <KpiCard label="MRR" value={formatCurrency(customer.mrr, { cents: false })} hint={`${formatCurrency(planPrice[customer.plan], { cents: false })} por usuário`} />
-          <KpiCard label="Uso nos últimos 30 dias" value={`${customer.usage}%`} spark={customer.trend} delta={customer.usage > 50 ? 0.08 : -0.12} period="dos usuários ativos" />
+          <KpiCard label="Uso nos últimos 30 dias" value={formatPercent(customer.usage / 100, 0)} spark={customer.trend} delta={customer.usage > 50 ? 0.08 : -0.12} period="dos usuários ativos" />
           <KpiCard label="NPS da conta" value={String(customer.nps)} hint={customer.nps >= 9 ? "promotor" : customer.nps >= 7 ? "neutro" : "detrator"} />
           <KpiCard label="Chamados abertos" value={String(calls.filter((t) => t.status !== "resolvido").length)} hint={`${calls.length} no trimestre`} />
         </KpiGrid>

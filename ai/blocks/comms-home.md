@@ -12,10 +12,10 @@ Início da intranet: leituras obrigatórias pendentes, comunicados fixados, feed
 
 **Padrões aplicados**
 
-- Anatomia B · Painel de leitura: cabeçalho fixo; o que pede ação (leitura obrigatória) antes do feed
+- Anatomia B · Painel de leitura: cabeçalho fixo; “Precisa de você” (leitura obrigatória) antes do feed
 - Fixados no topo; feed de comunicados com autor, público, reações e quantas pessoas leram
 - Coluna lateral com o que é da semana: eventos, enquete aberta, aniversários e novos colegas
-- Cinco estados no feed: ?estado=carregando|vazio|erro simula; aba Não lidos vazia oferece Ver todos
+- Cinco estados: ?estado=carregando (forma final da página), erro (com saída) e vazio (feed sem comunicados); aba Não lidos vazia oferece Ver todos
 
 **Quando usar e o que adaptar**
 
@@ -28,4 +28,4 @@ Início da intranet: leituras obrigatórias pendentes, comunicados fixados, feed
 
 ## Componentes usados
 
-`Avatar`, `AvatarGroup`, `Badge`, `Button`, `Empty`, `ListPanel`, `ListRow`, `Meter`, `Page`, `PageHeading`, `Tabs`, `formatDate`, `formatNumber`, `formatPercent`, `formatRelative`, `notify`, `plural`
+`Avatar`, `AvatarGroup`, `Badge`, `Button`, `Empty`, `ErrorState`, `ListPanel`, `ListRow`, `Meter`, `Page`, `PageHeading`, `Skeleton`, `Tabs`, `formatDate`, `formatNumber`, `formatPercent`, `formatRelative`, `notify`, `plural`

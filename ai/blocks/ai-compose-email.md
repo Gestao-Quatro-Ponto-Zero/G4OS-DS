@@ -26,4 +26,4 @@ Rascunhos preparados pelo agente: destinatários com busca e sugestões, modelo,
 
 ## Componentes usados
 
-`AiBadge`, `Button`, `ComposeEmail`, `ComposeEmailDialog`, `ComposeStatus`, `MenuEntry`, `Page`, `PageHeading`, `Person`, `notify`
+`AiBadge`, `Button`, `ComposeEmail`, `ComposeEmailDialog`, `ComposeStatus`, `ComposerChip`, `DateTimePicker`, `MenuEntry`, `Modal`, `Page`, `PageHeading`, `Person`, `formatDate`, `notify`

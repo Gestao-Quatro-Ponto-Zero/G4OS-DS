@@ -14,7 +14,7 @@ Início no estilo Conta Azul: saldo em caixa, a receber e a pagar do mês, recei
 
 - Anatomia B · Painel: cabeçalho fixo, 5 KPIs com base explícita, um gráfico por pergunta
 - Fluxo de caixa previsto em barras com entradas e saídas (negativas) por semana; insight do menor saldo
-- “Precisa de você” em quatro filas: cobranças vencidas, OS sem técnico, NFS-e rejeitadas, contratos a renovar
+- “Precisa de você” logo abaixo dos KPIs, num só painel: cobranças vencidas, OS sem técnico, NFS-e rejeitadas e contratos a renovar, cada linha com o tipo no topo
 - MiniBarChart de OS concluídas por dia; técnicos em campo em StackedList
 - Cada linha abre o registro certo (OS, cobrança, nota, contrato)
 
@@ -30,4 +30,4 @@ Início no estilo Conta Azul: saldo em caixa, a receber e a pagar do mês, recei
 
 ## Componentes usados
 
-`Badge`, `BarChart`, `Button`, `ChartCard`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `MiniBarChart`, `Page`, `PageHeading`, `StackedList`, `formatCompact`, `formatCurrency`, `formatNumber`
+`Badge`, `BarChart`, `Button`, `ChartCard`, `Empty`, `ErrorState`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `MiniBarChart`, `Page`, `PageHeading`, `Skeleton`, `StackedList`, `formatCompact`, `formatCurrency`, `formatNumber`

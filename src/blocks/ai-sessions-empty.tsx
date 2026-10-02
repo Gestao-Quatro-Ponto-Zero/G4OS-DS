@@ -1,9 +1,10 @@
-import { CalendarDays, FileText, Mail, MessageSquareText, Search, Sparkles } from "lucide-react";
+import { CalendarDays, FileText, FolderOpen, Mail, MessageSquareText, Paperclip, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Disclaimer, FileCard, Page, SessionComposer, SessionStatusChip, ToolsBar, VoiceModeButton, notify, type SlashCommand } from "@g4ai/ds";
-import { agents, osUser, sessions, tools } from "./data/os-sessions";
+import { ComposerChip, Disclaimer, FileCard, Page, SessionComposer, SessionStatusChip, ToolsBar, VoiceModeButton, notify, type SlashCommand } from "@g4ai/ds";
+import { agents, osUser, sessions, tools as seedTools, type ContextSource } from "./data/os-sessions";
 import { frameHref, go } from "./shells/frame-route";
 import { OsShell, osRoutes } from "./shells/os-shell";
+import { ContextPicker, ToolsModal } from "./shells/os-pickers";
 
 export const meta = {
   title: "Nova sessão do G4 OS",
@@ -38,8 +39,15 @@ const commands: SlashCommand[] = [
 
 export default function AiSessionsEmpty() {
   const [draft, setDraft] = useState("");
+  const [attached, setAttached] = useState<File[]>([]);
   const [agent, setAgent] = useState("os");
-  const start = (text: string) => go("ai-sessions", { novo: text });
+  const [tools, setTools] = useState(seedTools);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [contextOpen, setContextOpen] = useState(false);
+  const [context, setContext] = useState<ContextSource | null>(null);
+  // A pasta escolhida vai junto para a sessão nova (?contexto=).
+  const start = (text: string) => go("ai-sessions", context ? { novo: text, contexto: context.id } : { novo: text });
+  const agendaError = tools.some((t) => t.id === "agenda" && t.status === "error");
   const hour = 9;
   const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
   const live = sessions.filter((s) => s.status === "working" || s.status === "ready");
@@ -67,9 +75,30 @@ export default function AiSessionsEmpty() {
               agent={agent}
               onAgentChange={setAgent}
               commands={commands}
-              onManageTools={() => notify("Exemplo: abriria Ferramentas conectadas", undefined, "info")}
-              onContext={() => notify("Exemplo: escolheria uma pasta de contexto", undefined, "info")}
+              onManageTools={() => setToolsOpen(true)}
+              onContext={() => setContextOpen(true)}
+              onAttachFiles={(files) => {
+                setAttached((a) => [...a, ...files]);
+                notify(files.length === 1 ? `${files[0].name} anexado` : `${files.length} arquivos anexados`);
+              }}
             />
+            {attached.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Anexos">
+                {attached.map((f, i) => (
+                  <ComposerChip key={`${f.name}-${i}`} icon={<Paperclip />} onRemove={() => setAttached((a) => a.filter((_, j) => j !== i))}>
+                    {f.name}
+                  </ComposerChip>
+                ))}
+              </div>
+            )}
+            {context && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-[12px] text-muted">Contexto:</span>
+                <ComposerChip icon={<FolderOpen className="h-3 w-3" />} onRemove={() => setContext(null)}>
+                  {context.name}
+                </ComposerChip>
+              </div>
+            )}
             <Disclaimer className="mt-2" />
           </div>
 
@@ -124,14 +153,26 @@ export default function AiSessionsEmpty() {
           </div>
 
           <section aria-label="Ferramentas conectadas" className="rounded-2xl border border-line bg-surface px-4 py-3">
-            <ToolsBar tools={tools} max={6} onManage={() => notify("Exemplo: abriria Ferramentas conectadas", undefined, "info")} />
-            <p className="m-0 mt-2 flex items-center gap-1.5 text-[12px] text-muted">
-              <FileText className="h-3.5 w-3.5" aria-hidden /> O Google Agenda precisa ser reconectado para as rotinas de agenda funcionarem.
-            </p>
+            <ToolsBar tools={tools} max={6} onManage={() => setToolsOpen(true)} />
+            {agendaError && (
+              <p className="m-0 mt-2 flex items-center gap-1.5 text-[12px] text-muted">
+                <FileText className="h-3.5 w-3.5" aria-hidden /> O Google Agenda precisa ser reconectado para as rotinas de agenda funcionarem.
+              </p>
+            )}
           </section>
         </div>
         <VoiceModeButton onClick={() => go("ai-sessions", { id: "mcp-notion" })} className="fixed bottom-[96px] right-5 md:bottom-6" label="Conversar por voz (abre a última sessão)" />
       </Page>
+      <ToolsModal
+        open={toolsOpen}
+        onClose={() => setToolsOpen(false)}
+        tools={tools}
+        onReconnect={(t) => {
+          setTools((all) => all.map((x) => (x.id === t.id ? { ...x, status: "ok" } : x)));
+          notify(`${t.name} reconectado`);
+        }}
+      />
+      <ContextPicker open={contextOpen} onClose={() => setContextOpen(false)} onPick={setContext} />
     </OsShell>
   );
 }

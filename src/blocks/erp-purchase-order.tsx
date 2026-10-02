@@ -34,7 +34,8 @@ import {
   type TimelineItem,
 } from "@g4ai/ds";
 import { br, daysAgo, iso, poLate, poSubtotal, poTotal, productBySku, purchaseOrderById, requestById, supplierById, updatePurchaseOrder, user, warehouses, type PurchaseOrder } from "./data/erp";
-import { go, useFrameParam } from "./shells/frame-route";
+import { addPayable, paymentTerms, payablesFromPurchaseOrder, payablesOfPurchaseOrder, removePayables, type Payable } from "./data/fin";
+import { frameHref, go, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -91,6 +92,8 @@ function OrderRecord({ initial }: { initial: PurchaseOrder }) {
   const [confirming, setConfirming] = useState(false);
   const [ref, setRef] = useState("");
   const [promised, setPromised] = useState(initial.expected);
+  // Títulos em Contas a pagar gerados por este pedido (store do Nexo, compartilhado com o Financeiro).
+  const [titles, setTitles] = useState<Payable[]>(() => payablesOfPurchaseOrder(initial.id));
   const sendOp = useOperation({ busyLabel: "Enviando…" });
   const confirmOp = useOperation({ busyLabel: "Registrando…" });
   const s = supplierById(o.supplierId);
@@ -109,11 +112,37 @@ function OrderRecord({ initial }: { initial: PurchaseOrder }) {
   };
   const send = () =>
     sendOp.run(() => wait(900), { message: `Pedido ${o.number} enviado para ${s.email}`, undo: () => patch({ status: "rascunho", sentAt: undefined }) }, { apply: () => patch({ status: "enviado", sentAt: iso(0) }), revert: () => patch({ status: "rascunho", sentAt: undefined }) });
+  const terms = paymentTerms(o.payment);
+  const previewDue = terms.map((d) => {
+    const x = new Date(`${promised}T00:00:00`);
+    x.setDate(x.getDate() + d);
+    return `${String(x.getDate()).padStart(2, "0")}/${String(x.getMonth() + 1).padStart(2, "0")}`;
+  });
   const confirm = async () => {
-    const failed = await confirmOp.run(() => wait(700), `Confirmação de ${s.name} registrada · entrega em ${br(promised)}`, { apply: () => patch({ status: "confirmado", confirmedAt: iso(0), supplierRef: ref || undefined, expected: promised }), revert: () => patch({ status: "enviado", confirmedAt: undefined }) });
+    let created: Payable[] = [];
+    const undoTitles = () => {
+      removePayables(created.map((t) => t.id));
+      setTitles(payablesOfPurchaseOrder(o.id));
+    };
+    const failed = await confirmOp.run(
+      () => wait(700),
+      {
+        message: `Confirmação de ${s.name} registrada · ${terms.length === 1 ? "título gerado" : `${terms.length} títulos gerados`} em Contas a pagar`,
+        undo: () => (undoTitles(), patch({ status: "enviado", confirmedAt: undefined })),
+        action: { label: "Ver em Contas a pagar", onClick: () => go("fin-payables", created[0]?.id) },
+      },
+      {
+        apply: () => {
+          const next = patch({ status: "confirmado", confirmedAt: iso(0), supplierRef: ref || undefined, expected: promised });
+          // A compra confirmada vira compromisso no Financeiro: uma parcela por prazo da condição.
+          created = payablesFromPurchaseOrder(next);
+          setTitles(payablesOfPurchaseOrder(o.id));
+        },
+        revert: () => (undoTitles(), patch({ status: "enviado", confirmedAt: undefined })),
+      },
+    );
     if (!failed) setConfirming(false);
   };
-
   const action = () => {
     switch (o.status) {
       case "rascunho":
@@ -302,6 +331,26 @@ function OrderRecord({ initial }: { initial: PurchaseOrder }) {
                     <Mail /> Escrever para o fornecedor
                   </Button>
                 </section>
+                {titles.length > 0 && (
+                  <section className="rounded-xl border border-line bg-surface p-4">
+                    <h2 className="m-0 text-[13.5px] font-medium">Contas a pagar</h2>
+                    <ul className="m-0 mt-2 list-none divide-y divide-line p-0">
+                      {titles.map((t) => (
+                        <li key={t.id} className="flex items-center justify-between gap-3 py-2 text-[13px]">
+                          <span className="min-w-0">
+                            <span className="block tabular-nums">{formatCurrency(t.value)}</span>
+                            <span className="block text-[12px] text-muted">
+                              {t.installment ? `Parcela ${t.installment} · ` : ""}vence {br(t.due)}
+                            </span>
+                          </span>
+                          <a className="shrink-0 font-medium text-blue hover:underline" href={frameHref("fin-payables", t.id)}>
+                            Ver título
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
                 <section className="rounded-xl border border-line bg-surface p-4">
                   <PropertyList
                     items={[
@@ -331,8 +380,16 @@ function OrderRecord({ initial }: { initial: PurchaseOrder }) {
         onConfirm={() => {
           setCancel(false);
           const before = o;
+          const dropped = titles;
           patch({ status: "cancelado" });
-          notify(`Pedido ${o.number} cancelado`, () => patch(before));
+          // Títulos ainda não pagos do pedido saem de Contas a pagar junto.
+          removePayables(dropped.map((t) => t.id));
+          setTitles([]);
+          notify(`Pedido ${o.number} cancelado${dropped.length ? ` · ${dropped.length === 1 ? "título removido" : `${dropped.length} títulos removidos`} de Contas a pagar` : ""}`, () => {
+            patch(before);
+            dropped.forEach(addPayable);
+            setTitles(payablesOfPurchaseOrder(o.id));
+          });
         }}
       />
       <Modal
@@ -354,6 +411,9 @@ function OrderRecord({ initial }: { initial: PurchaseOrder }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField label="Nº do pedido no fornecedor" value={ref} onChange={setRef} placeholder="Ex.: USI-88131" optional />
           <DatePicker label="Entrega prometida" value={promised} onValueChange={setPromised} min={iso(0)} businessDaysOnly hint={promised !== initial.expected ? `Muda a previsão de ${br(initial.expected)}` : undefined} />
+          <p className="m-0 text-[12.5px] text-muted sm:col-span-2">
+            Gera {terms.length === 1 ? "1 título" : `${terms.length} títulos`} de {formatCurrency(poTotal(o) / terms.length)} em Contas a pagar, aguardando aprovação: vencimento {previewDue.join(" e ")} ({o.payment} da entrega).
+          </p>
           <div className="sm:col-span-2">
             <OperationFeedback operation={confirmOp} />
           </div>

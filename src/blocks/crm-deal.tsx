@@ -1,4 +1,4 @@
-import { CalendarClock, FileText, KanbanSquare, Mail, MessageSquare, Phone, Plus, Trophy, X } from "lucide-react";
+import { CalendarClock, Download, KanbanSquare, Mail, MessageSquare, Phone, Plus, Trophy, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActionMenu,
@@ -15,6 +15,9 @@ import {
   Empty,
   EntityMark,
   FieldBlock,
+  FileCard,
+  IconButton,
+  Lightbox,
   Modal,
   Page,
   PageHeading,
@@ -22,17 +25,26 @@ import {
   Select,
   SplitLayout,
   StagePath,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tabs,
   TextField,
   areaClass,
   formatCurrency,
+  formatBytes,
   formatDate,
+  formatNumber,
   formatPercent,
   notify,
   type ActivityItem,
 } from "@g4ai/ds";
 import { activities, addDeal, companyById, contactById, contacts, daysFromToday, dealById, go, iso, lostReasons, me, repById, reps, stageById, stages, useFrameParam, type Activity, type Deal } from "./data/crm";
 import { CrmShell } from "./shells/crm-shell";
+import { pdfBlob, saveBlob, saveText } from "./shells/download";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -84,6 +96,57 @@ const feedFor = (d: Deal): ActivityItem[] => {
   ];
 };
 
+/* Arquivos do negócio: prévia e download gerados no navegador (sem servidor). */
+type DealFile = { name: string; size: number; by: string; when: string };
+const dealFiles = (d: Deal): DealFile[] => [
+  { name: "Proposta v2.pdf", size: 1_240_000, by: repById(d.owner).name, when: iso(-3) },
+  { name: "Cálculo de ROI.csv", size: 18_400, by: repById(d.owner).name, when: iso(-5) },
+  { name: "Minuta de contrato.doc", size: 84_000, by: "Jurídico", when: iso(-2) },
+  { name: "Foto do quadro · workshop.png", size: 912_000, by: repById(d.owner).name, when: iso(-8) },
+];
+const extOf = (name: string) => name.split(".").pop()?.toLowerCase() ?? "";
+const isImage = (f: DealFile) => ["png", "jpg", "jpeg"].includes(extOf(f.name));
+
+/** Imagem de exemplo desenhada com os tokens do tema (segue claro/escuro e a marca). */
+function boardImage() {
+  // Resolve o token pela cor computada (cobre var(), color-mix e o tema atual).
+  const probe = document.createElement("span");
+  document.body.append(probe);
+  const v = (n: string) => {
+    probe.style.color = `var(${n})`;
+    return getComputedStyle(probe).color;
+  };
+  const c = document.createElement("canvas");
+  c.width = 1200;
+  c.height = 800;
+  const g = c.getContext("2d");
+  if (!g) {
+    probe.remove();
+    return "";
+  }
+  g.fillStyle = v("--ds-soft");
+  g.fillRect(0, 0, 1200, 800);
+  g.fillStyle = v("--ds-surface");
+  g.fillRect(60, 60, 1080, 680);
+  const notes: [number, number, string, string][] = [
+    [120, 140, "--ds-accent-soft", "Dor: retrabalho"],
+    [420, 140, "--ds-info-soft", "Meta: -30 % prazo"],
+    [720, 140, "--ds-ok-soft", "Piloto em 60 dias"],
+    [120, 420, "--ds-rose-soft", "Risco: TI interna"],
+    [420, 420, "--ds-amber-soft", "Decisor: diretoria"],
+    [720, 420, "--ds-accent-soft", "Próximo: escopo"],
+  ];
+  g.font = "600 30px Figtree, system-ui, sans-serif";
+  for (const [x, y, token, label] of notes) {
+    g.fillStyle = v(token);
+    g.fillRect(x, y, 260, 220);
+    g.fillStyle = v("--ds-ink");
+    g.fillText(label, x + 22, y + 60, 220);
+  }
+  probe.remove();
+  return c.toDataURL("image/png");
+}
+
 export default function CrmDeal() {
   const id = useFrameParam("id");
   const base = dealById(id);
@@ -101,6 +164,8 @@ export default function CrmDeal() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [linking, setLinking] = useState(false);
   const [linkId, setLinkId] = useState("");
+  const [preview, setPreview] = useState<DealFile | null>(null);
+  const [image, setImage] = useState<{ src: string; file: DealFile } | null>(null);
 
   // Outro ?id= na mesma tela (ex.: busca ⌘K): recarrega o registro.
   useEffect(() => {
@@ -134,6 +199,34 @@ export default function CrmDeal() {
     setLinking(false);
     setLinkId("");
     notify(`${p.name} vinculado ao negócio`, () => setDeal((d) => ({ ...d, contactIds: d.contactIds.filter((x) => x !== p.id) })));
+  };
+
+  const files = dealFiles(deal);
+  const roi: [string, number, number][] = [
+    ["Horas de retrabalho por mês", 320, 120],
+    ["Prazo médio de entrega (dias)", 18, 12],
+    ["Custo operacional mensal (R$)", Math.round(deal.value / 6), Math.round(deal.value / 9)],
+  ];
+  const docLines = (f: DealFile) =>
+    extOf(f.name) === "pdf"
+      ? [`Proposta comercial · ${deal.title}`, `Cliente: ${company.name}`, `Investimento: ${formatCurrency(deal.value, { cents: false })}`, `Previsão de fechamento: ${formatDate(deal.close)}`, `Responsável: ${owner.name}`, "Validade da proposta: 15 dias"]
+      : [`Minuta de contrato · ${company.name}`, `Objeto: ${deal.title}`, `Valor global: ${formatCurrency(deal.value, { cents: false })}`, "Vigência: 12 meses, renovação automática", "Foro: comarca de São Paulo (SP)"];
+  const openFile = (f: DealFile) => (isImage(f) ? setImage({ src: boardImage(), file: f }) : setPreview(f));
+  const download = (f: DealFile) => {
+    const ext = extOf(f.name);
+    if (isImage(f)) {
+      const a = document.createElement("a");
+      a.href = image?.file.name === f.name ? image.src : boardImage();
+      a.download = f.name;
+      a.click();
+    } else if (ext === "pdf") saveBlob(f.name, pdfBlob(docLines(f)));
+    else if (ext === "csv") {
+      saveText(f.name, ["Indicador;Hoje;Com a solução", ...roi.map((r) => r.join(";"))].join("\r\n"), "text/csv");
+    } else {
+      const html = `<html><head><meta charset="utf-8"><title>${f.name}</title></head><body>${docLines(f).map((l, i) => (i ? `<p>${l}</p>` : `<h1>${l}</h1>`)).join("")}</body></html>`;
+      saveBlob(f.name, new Blob([html], { type: "application/msword" }));
+    }
+    notify(`${f.name} baixado`);
   };
 
   const log = (item: Omit<ActivityItem, "id" | "actor" | "time">) => setFeed((f) => [{ id: `n${Date.now()}`, actor: repById(me), time: "Agora", ...item }, ...f]);
@@ -246,18 +339,20 @@ export default function CrmDeal() {
                       </ul>
                     </div>
                   ) : tab === "arquivos" ? (
-                    <ul className="m-0 list-none divide-y divide-line rounded-xl border border-line bg-surface p-0 text-[13.5px]">
-                      {[
-                        ["Proposta v2.pdf", "1,2 MB"],
-                        ["Minuta de contrato.docx", "84 KB"],
-                        ["Escopo de implantação.pdf", "640 KB"],
-                      ].map(([f, size]) => (
-                        <li key={f}>
-                          <button type="button" onClick={() => notify(`Exemplo: abre a prévia de ${f}.`, undefined, "info")} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-soft/50">
-                            <FileText className="h-4 w-4 text-muted" />
-                            <span className="flex-1">{f}</span>
-                            <span className="text-[12px] text-muted">{size}</span>
-                          </button>
+                    <ul className="m-0 grid list-none gap-2 p-0">
+                      {files.map((f) => (
+                        <li key={f.name}>
+                          <FileCard
+                            name={f.name}
+                            size={f.size}
+                            meta={`${f.by} · ${formatDate(f.when, { short: true })}`}
+                            onOpen={() => openFile(f)}
+                            actions={
+                              <IconButton label={`Baixar ${f.name}`} onClick={() => download(f)}>
+                                <Download />
+                              </IconButton>
+                            }
+                          />
                         </li>
                       ))}
                     </ul>
@@ -470,6 +565,61 @@ export default function CrmDeal() {
         confirmLabel="Excluir negócio"
         tone="danger"
       />
+      {/* Prévia de documento: página renderizada + metadados; "Baixar" gera o arquivo de verdade. */}
+      <Modal
+        open={!!preview}
+        onClose={() => setPreview(null)}
+        size="lg"
+        kicker="Arquivo do negócio"
+        title={preview?.name ?? "Arquivo"}
+        description={preview ? `${formatBytes(preview.size)} · enviado por ${preview.by} em ${formatDate(preview.when)}` : undefined}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setPreview(null)}>
+              Fechar
+            </Button>
+            <Button onClick={() => preview && download(preview)}>
+              <Download /> Baixar
+            </Button>
+          </>
+        }
+      >
+        {preview && extOf(preview.name) === "csv" ? (
+          <Table label={`Prévia de ${preview.name}`}>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Indicador</TableHead>
+                <TableHead numeric>Hoje</TableHead>
+                <TableHead numeric>Com a solução</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {roi.map(([label, now, next]) => (
+                <TableRow key={label}>
+                  <TableCell>{label}</TableCell>
+                  <TableCell numeric>{formatNumber(now)}</TableCell>
+                  <TableCell numeric>{formatNumber(next)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : preview ? (
+          <div className="rounded-lg border border-line bg-soft p-4 sm:p-6">
+            <div className="mx-auto max-w-[460px] rounded-md border border-line bg-surface px-6 py-7">
+              {docLines(preview).map((l, i) =>
+                i === 0 ? (
+                  <h3 key={l} className="mb-4 text-[15px] font-semibold">{l}</h3>
+                ) : (
+                  <p key={l} className="mt-1.5 text-[13px] text-ink-soft">{l}</p>
+                ),
+              )}
+              <p className="mt-5 text-[12px] text-muted">Página 1 de {extOf(preview.name) === "pdf" ? 4 : 7}</p>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+
+      <Lightbox images={image ? [{ src: image.src, alt: image.file.name, caption: `${image.file.name} · ${image.file.by}, ${formatDate(image.file.when)}` }] : []} index={image ? 0 : null} onIndexChange={(i) => i == null && setImage(null)} />
     </CrmShell>
   );
 }

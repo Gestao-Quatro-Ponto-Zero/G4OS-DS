@@ -14,7 +14,7 @@ Vendas do dia contra a meta, OTIF por semana, causas de atraso (Pareto), maiores
 
 - Anatomia B · Painel: cabeçalho fixo com período
 - Vendas × meta diária, OTIF, causas de atraso (Pareto)
-- Filas de ação antes dos detalhes
+- “Precisa de você” num só painel (compras na sua etapa, estoque crítico, compras e entregas atrasadas); a faturar em painel neutro ao lado
 
 **Quando usar e o que adaptar**
 
@@ -26,4 +26,4 @@ Vendas do dia contra a meta, OTIF por semana, causas de atraso (Pareto), maiores
 
 ## Componentes usados
 
-`AreaChart`, `Badge`, `BarList`, `ChartCard`, `Empty`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `formatCompact`, `formatCurrency`, `formatNumber`
+`AreaChart`, `Badge`, `BarList`, `Button`, `ChartCard`, `Empty`, `ErrorState`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `Skeleton`, `formatCompact`, `formatCurrency`, `formatNumber`, `formatPercent`

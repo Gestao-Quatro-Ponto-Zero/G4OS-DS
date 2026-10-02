@@ -20,6 +20,7 @@ import {
   formatCurrency,
   formatDuration,
   formatNumber,
+  formatPercent,
   gridToCsv,
   notify,
   useFilters,
@@ -182,7 +183,7 @@ export default function AiRuns() {
             <>
               <StatGrid cols={4}>
                 <StatCell label="Execuções no recorte" value={formatNumber(shown.length)} hint={`${shown.filter((r) => r.status === "executando").length} rodando agora`} />
-                <StatCell label="Falhas" value={formatNumber(failed)} hint={shown.length ? `${Math.round((failed / shown.length) * 100)} % do recorte` : "—"} tone={failed ? "bad" : undefined} />
+                <StatCell label="Falhas" value={formatNumber(failed)} hint={shown.length ? `${formatPercent(failed / shown.length, 0)} do recorte` : "—"} tone={failed ? "bad" : undefined} />
                 <StatCell label="Duração p95" value={shown.length ? formatDuration(p95(shown)) : "—"} hint="95 % terminam abaixo disso" />
                 <StatCell label="Custo" value={formatCurrency(shown.reduce((s, r) => s + r.cost, 0))} hint={`${formatNumber(shown.reduce((s, r) => s + r.tokensIn + r.tokensOut, 0))} tokens`} />
               </StatGrid>

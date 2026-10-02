@@ -5,11 +5,15 @@ import {
   AgentPlan,
   ApprovalRequest,
   ArtifactCard,
+  Button,
   CitationChip,
+  Modal,
   ReasoningBlock,
   RunSummary,
   SourceList,
   SystemMessage,
+  TextField,
+  TextareaField,
   ToolCallsSection,
   formatCurrency,
   notify,
@@ -61,10 +65,18 @@ const calls: ToolCall[] = [
   { id: "t3", name: "drive.ler", label: "Leu a política de cobrança", status: "success", durationMs: 620, input: { arquivo: "Política de cobrança v4.pdf" }, output: { regua: ["D+3 lembrete", "D+15 contato", "D+30 negociação"] } },
 ];
 
+const defaultEmail = {
+  subject: "Lembrete — fatura em aberto",
+  body: "Olá, {nome}. Identificamos a fatura {número} de {valor}, vencida em {data}. Segue a 2ª via atualizada. Se já pagou, desconsidere este e-mail.",
+};
+
 /* ------------------------------------------------------------------ */
 
 export default function AiConversation() {
   const [approval, setApproval] = useState<ApprovalState>("pending");
+  // Modelo do lembrete: "Editar" abre o editor; a prévia e o envio usam o texto salvo.
+  const [email, setEmail] = useState(defaultEmail);
+  const [editing, setEditing] = useState<typeof defaultEmail | null>(null);
   const [draft, setDraft] = useState("");
   const [extra, setExtra] = useState<{ id: string; q: string; done: boolean }[]>([]);
   const end = useRef<HTMLDivElement>(null);
@@ -143,13 +155,13 @@ export default function AiConversation() {
                 state={approval}
                 preview={
                   <>
-                    <p className="m-0 font-medium text-ink">Assunto: Lembrete — fatura em aberto</p>
-                    <p className="m-0 mt-1.5">Olá, {"{nome}"}. Identificamos a fatura {"{número}"} de {"{valor}"}, vencida em {"{data}"}. Segue a 2ª via atualizada. Se já pagou, desconsidere este e-mail.</p>
+                    <p className="m-0 font-medium text-ink">Assunto: {email.subject}</p>
+                    <p className="m-0 mt-1.5 whitespace-pre-line">{email.body}</p>
                   </>
                 }
                 onApprove={() => decide("approved", "Envio aprovado: 42 e-mails na fila")}
                 onApproveAlways={() => decide("always", "Aprovado. Próximos lembretes deste tipo saem sem perguntar.")}
-                onEdit={() => notify("Exemplo: abriria o editor do e-mail", undefined, "info")}
+                onEdit={() => setEditing(email)}
                 onReject={() => decide("rejected", "Envio recusado. Nada foi enviado.")}
               />
             </div>
@@ -196,6 +208,39 @@ export default function AiConversation() {
           </div>
         </div>
       </div>
+      <Modal
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Editar lembrete de pagamento"
+        description="Vale para os 42 e-mails. Os campos entre chaves são preenchidos com os dados de cada cliente."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setEditing(null)}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={!editing?.subject.trim() || !editing?.body.trim()}
+              disabledReason="Preencha o assunto e o texto"
+              onClick={() => {
+                if (!editing) return;
+                const before = email;
+                setEmail({ subject: editing.subject.trim(), body: editing.body.trim() });
+                setEditing(null);
+                notify("Lembrete atualizado", () => setEmail(before));
+              }}
+            >
+              Salvar lembrete
+            </Button>
+          </>
+        }
+      >
+        {editing && (
+          <>
+            <TextField label="Assunto" value={editing.subject} onChange={(v) => setEditing({ ...editing, subject: v })} />
+            <TextareaField label="Texto do e-mail" rows={6} value={editing.body} onChange={(v) => setEditing({ ...editing, body: v })} hint="Use {nome}, {número}, {valor} e {data}." />
+          </>
+        )}
+      </Modal>
     </AgentShell>
   );
 }

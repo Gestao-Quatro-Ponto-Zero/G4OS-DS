@@ -43,7 +43,7 @@ import {
   ThumbsUp,
   X,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { cn } from "../lib/cn";
 import { tintFill } from "../lib/color";
 import { AgentComposer, Waveform, type SlashCommand } from "./ai-workspace";
@@ -1173,6 +1173,7 @@ export function SessionComposer({
   onAgentChange,
   onManageTools,
   onContext,
+  onAttachFiles,
   commands,
   placeholder = "Peça ou pergunte qualquer coisa para o G4 OS",
   className,
@@ -1188,11 +1189,34 @@ export function SessionComposer({
   onAgentChange?: (id: string) => void;
   onManageTools?: () => void;
   onContext?: () => void;
+  /** Arquivos escolhidos no clipe (seletor do sistema). Sem ele, o clipe não aparece. */
+  onAttachFiles?: (files: File[]) => void;
   commands?: SlashCommand[];
   placeholder?: string;
   className?: string;
 }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const pick = (accept: string) => {
+    const input = fileRef.current;
+    if (!input) return;
+    input.accept = accept;
+    input.click();
+  };
   return (
+    <>
+    <input
+      ref={fileRef}
+      type="file"
+      multiple
+      hidden
+      aria-hidden
+      tabIndex={-1}
+      onChange={(e) => {
+        const files = [...(e.target.files ?? [])];
+        e.target.value = "";
+        if (files.length) onAttachFiles?.(files);
+      }}
+    />
     <AgentComposer
       className={className}
       value={value}
@@ -1203,11 +1227,15 @@ export function SessionComposer({
       placeholder={placeholder}
       commands={commands}
       onTranscribe={(ms) => (ms > 600 ? "Resume as pendências da reunião de hoje e manda no canal do time" : "")}
-      attachIcon={<Paperclip className="h-4 w-4" />}
-      attachOptions={[
-        { label: "Arquivo do computador", icon: <Paperclip className="h-4 w-4" />, onSelect: () => notify("Exemplo: abriria o seletor de arquivos", undefined, "info") },
-        { label: "Imagem ou captura", icon: <FileText className="h-4 w-4" />, onSelect: () => notify("Exemplo: colar ou escolher imagem", undefined, "info") },
-      ]}
+      attachIcon={onAttachFiles ? <Paperclip className="h-4 w-4" /> : undefined}
+      attachOptions={
+        onAttachFiles
+          ? [
+              { label: "Arquivo do computador", icon: <Paperclip className="h-4 w-4" />, onSelect: () => pick("") },
+              { label: "Imagem ou captura", icon: <FileText className="h-4 w-4" />, onSelect: () => pick("image/*") },
+            ]
+          : undefined
+      }
       leading={
         <Tooltip content="Pasta de contexto">
           <button type="button" onClick={onContext} aria-label="Escolher pasta de contexto" className="grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-soft hover:text-ink">
@@ -1218,6 +1246,7 @@ export function SessionComposer({
       trailing={agents && agent && onAgentChange ? <AgentPicker agents={agents} value={agent} onChange={onAgentChange} /> : undefined}
       footer={<ToolsBar tools={tools} onManage={onManageTools} />}
     />
+    </>
   );
 }
 
@@ -1362,6 +1391,7 @@ export function SessionDetails({
   notes,
   onNotesChange,
   files = [],
+  onOpenFile,
   title = "Informações da sessão",
   defaultSection = "detalhes",
   show = "both",
@@ -1378,6 +1408,8 @@ export function SessionDetails({
   notes: string;
   onNotesChange: (v: string) => void;
   files?: SessionFile[];
+  /** Abre um arquivo da lista (prévia, download). Sem ele, os cartões não são clicáveis. */
+  onOpenFile?: (file: SessionFile) => void;
   title?: ReactNode;
   defaultSection?: "detalhes" | "arquivos";
   /** "both" (padrão) com sub-abas; "detalhes" ou "arquivos" mostra só uma seção, sem sub-abas. */
@@ -1504,7 +1536,7 @@ export function SessionDetails({
       ) : files.length ? (
         <div className="mt-3 flex flex-col gap-2">
           {files.map((f) => (
-            <FileCard key={f.id} name={f.name} size={f.size} meta={f.meta} onOpen={() => notify(`Exemplo: abriria ${f.name}`, undefined, "info")} />
+            <FileCard key={f.id} name={f.name} size={f.size} meta={f.meta} onOpen={onOpenFile ? () => onOpenFile(f) : undefined} />
           ))}
         </div>
       ) : (
@@ -1531,6 +1563,7 @@ export function SessionInfoPanel({
   notes,
   onNotesChange,
   files = [],
+  onOpenFile,
   browser,
   onMinimize,
   className,
@@ -1546,6 +1579,8 @@ export function SessionInfoPanel({
   notes: string;
   onNotesChange: (v: string) => void;
   files?: SessionFile[];
+  /** Abre um arquivo da lista (prévia, download). */
+  onOpenFile?: (file: SessionFile) => void;
   /** Página aberta pelo agente (aba Navegador). */
   browser?: { url: string; title: string; content?: ReactNode };
   onMinimize?: () => void;
@@ -1585,6 +1620,7 @@ export function SessionInfoPanel({
             notes={notes}
             onNotesChange={onNotesChange}
             files={files}
+            onOpenFile={onOpenFile}
           />
         </div>
       ) : (

@@ -35,10 +35,24 @@ ActivityFeed / Leaderboard / tabela curta com "Ver todos"
 
 ## Blocos de ação
 
-- `ListPanel tone="attention"` com o que está atrasado/parado/em risco, cada linha levando ao registro.
+- **"Precisa de você" é um só `ListPanel tone="attention"`**, logo depois dos KPIs e do gráfico principal, antes dos detalhes (feed, rankings, tabelas). Junte tudo o que pede ação nele em vez de espalhar cards de alerta: agrupe por tipo com o `kicker` da `ListRow` ou com subtítulos.
+  - Cada linha é acionável: leva ao registro ou à ação ("Aprovar", "Responder"), nunca só informa.
+  - O contador do painel conta só o que pede ação, nunca o total de registros.
+  - Sem pendências, o painel diz isso numa linha ("Nada pede sua atenção agora") em vez de sumir sem explicação.
 - `ActivityFeed` para "o que mudou" (quem fez o quê).
 - `Leaderboard` para rankings de pessoas/contas.
 - Tabela curta (5 linhas) com "Ver todos" em vez de tabela inteira.
+
+## Estados do painel
+
+Um painel tem os mesmos [cinco estados](feedback-e-estados.md) de qualquer dado, por região:
+
+- **Carregando:** `Skeleton` com a forma final (cartões de KPI, área do gráfico, linhas do `ListPanel`), nunca um spinner no meio da página.
+- **Erro:** o bloco que falhou diz o que aconteceu e tem saída ("Tentar de novo"); o resto do painel continua de pé.
+- **Vazio**, que muda conforme o tipo de painel:
+  - **Painel operacional** (início de CRM, ERP, financeiro, serviços, frota de agentes): **vazio de conta nova**. Em vez de KPIs zerados e gráficos planos, um `Empty` com a próxima ação que gera os dados ("Conectar a primeira conta bancária", "Cadastrar o primeiro produto", "Criar o primeiro negócio"), ou um checklist de primeiros passos.
+  - **Painel analítico ou relatório** (alcance, aquisição, relatórios de recrutamento): **sem dados no período**. Um `Empty` "Ainda não há dados no período" que explica de onde os números vêm e leva à tela de origem ("Escrever comunicado", "Ver vagas", "Conectar o rastreamento").
+- **O cabeçalho não contradiz o corpo.** No vazio, a descrição não traz contagens nem "atualizado há…", e somem os controles que dependem de dados: período, horizonte, time, exportar, atalhos para relatórios. A ação de criar continua no cabeçalho.
 
 ## Por tipo de app
 

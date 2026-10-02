@@ -3265,7 +3265,19 @@
           "name": "notify",
           "kind": "function",
           "summary": "Dispara um toast de qualquer lugar (não precisa de contexto React).",
-          "signature": "notify(message, undo?, tone?): void"
+          "signature": "notify(message, undoOrOptions?, tone?): void"
+        },
+        {
+          "name": "NotifyAction",
+          "kind": "type",
+          "summary": "Ação do toast que leva ao resultado (\"Ver título\", \"Abrir pedido\").",
+          "definition": "{ label: string; onClick: () => void }"
+        },
+        {
+          "name": "NotifyOptions",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ undo?: () => void; action?: NotifyAction; tone?: Notice[\"tone\"] }"
         },
         {
           "name": "Operation",
@@ -3349,7 +3361,7 @@
           "name": "OperationSuccess",
           "kind": "type",
           "summary": null,
-          "definition": "{ message: string; undo?: () => void }"
+          "definition": "{ message: string; undo?: () => void; action?: NotifyAction }"
         },
         {
           "name": "Skeleton",
@@ -17884,6 +17896,13 @@
               "description": null
             },
             {
+              "name": "onAttachFiles",
+              "type": "((files: File[]) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Arquivos escolhidos no clipe (seletor do sistema)."
+            },
+            {
               "name": "onContext",
               "type": "(() => void) | undefined",
               "required": false,
@@ -18002,6 +18021,13 @@
               "required": false,
               "default": "[]",
               "description": null
+            },
+            {
+              "name": "onOpenFile",
+              "type": "((file: SessionFile) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Abre um arquivo da lista (prévia, download)."
             },
             {
               "name": "show",
@@ -18249,6 +18275,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "onOpenFile",
+              "type": "((file: SessionFile) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Abre um arquivo da lista (prévia, download)."
             },
             {
               "name": "tagSuggestions",
@@ -25323,6 +25356,7 @@
         "AgentInstructions",
         "AgentMessage",
         "AgentStatus",
+        "Banner",
         "BuilderSection",
         "Button",
         "ChipPicker",
@@ -25671,6 +25705,8 @@
         "BarList",
         "Button",
         "ChartCard",
+        "Empty",
+        "ErrorState",
         "KpiCard",
         "KpiGrid",
         "ListPanel",
@@ -25680,6 +25716,7 @@
         "Page",
         "PageHeading",
         "SegmentedControl",
+        "Skeleton",
         "formatCurrency",
         "formatDuration",
         "formatNumber",
@@ -25915,16 +25952,22 @@
         "AgentAppLayout",
         "AgentComposer",
         "AnswerCard",
+        "Badge",
         "BottomNav",
+        "Button",
+        "CommandPalette",
+        "ComposerChip",
         "Disclaimer",
         "InputModal",
         "ListToggle",
         "MenuEntry",
         "MessageActions",
+        "Modal",
         "ModelEffort",
         "ModelPicker",
         "PermissionMode",
         "PermissionModeChip",
+        "PropertyList",
         "RunSummary",
         "SessionQuickSwitcher",
         "SessionSidebar",
@@ -25965,10 +26008,14 @@
         "ComposeEmail",
         "ComposeEmailDialog",
         "ComposeStatus",
+        "ComposerChip",
+        "DateTimePicker",
         "MenuEntry",
+        "Modal",
         "Page",
         "PageHeading",
         "Person",
+        "formatDate",
         "notify"
       ]
     },
@@ -26001,11 +26048,15 @@
         "ApprovalRequest",
         "ApprovalState",
         "ArtifactCard",
+        "Button",
         "CitationChip",
+        "Modal",
         "ReasoningBlock",
         "RunSummary",
         "SourceList",
         "SystemMessage",
+        "TextField",
+        "TextareaField",
         "ToolCall",
         "ToolCallsSection",
         "formatCurrency",
@@ -26104,6 +26155,7 @@
         "formatCurrency",
         "formatDuration",
         "formatNumber",
+        "formatPercent",
         "gridToCsv",
         "notify",
         "useFilters",
@@ -26212,6 +26264,7 @@
         ]
       },
       "uses": [
+        "ComposerChip",
         "Disclaimer",
         "FileCard",
         "Page",
@@ -26254,6 +26307,7 @@
       },
       "uses": [
         "AnswerCard",
+        "ComposerChip",
         "Disclaimer",
         "InputModal",
         "ListToggle",
@@ -26384,9 +26438,11 @@
         "ArtifactKind",
         "ArtifactPanel",
         "ArtifactTab",
+        "CommandPalette",
         "ComposerChip",
         "ContextItem",
         "ContextView",
+        "InputModal",
         "InsightCard",
         "JsonView",
         "KpiPair",
@@ -26399,6 +26455,7 @@
         "RunSummary",
         "SheetArtifact",
         "formatCurrency",
+        "formatPercent",
         "notify"
       ]
     },
@@ -27145,7 +27202,7 @@
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo com período, KPIs no topo",
           "Um gráfico por pergunta: meta, tempo × SLA, funil, aceite, origem",
-          "Fila 'o que pede ação hoje' antes dos detalhes; “Precisa de você” leva a cada fila",
+          "“Precisa de você” antes dos detalhes: avaliações pendentes, propostas e requisições para aprovar, cada linha abre o registro",
           "KPIs abrem o detalhe (relatórios, propostas)"
         ],
         "adapt": [
@@ -27164,6 +27221,8 @@
         "DataTable",
         "DonutChart",
         "DumbbellChart",
+        "Empty",
+        "ErrorState",
         "FunnelChart",
         "KpiCard",
         "KpiGrid",
@@ -27172,6 +27231,7 @@
         "Page",
         "PageHeading",
         "SegmentedControl",
+        "Skeleton",
         "formatCurrency",
         "formatNumber",
         "formatPercent"
@@ -27434,6 +27494,8 @@
         "Column",
         "DataTable",
         "DumbbellChart",
+        "Empty",
+        "ErrorState",
         "FunnelChart",
         "KpiCard",
         "KpiGrid",
@@ -27441,6 +27503,7 @@
         "PageHeading",
         "ParetoChart",
         "SegmentedControl",
+        "Skeleton",
         "downloadCsv",
         "formatCurrency",
         "formatNumber",
@@ -27750,11 +27813,13 @@
         "Empty",
         "EmptyFilterResult",
         "EntityMark",
+        "FileDropzone",
         "FilterBar",
         "FilterField",
         "GridColumn",
         "Highlight",
         "Menu",
+        "Modal",
         "Page",
         "PageHeading",
         "SavedView",
@@ -27853,7 +27918,9 @@
         "Button",
         "ChartCard",
         "ChartCardTotals",
+        "Empty",
         "EntityMark",
+        "ErrorState",
         "KpiCard",
         "KpiGrid",
         "ListPanel",
@@ -27862,6 +27929,7 @@
         "Page",
         "PageHeading",
         "SegmentedControl",
+        "Skeleton",
         "formatCompact",
         "formatCurrency",
         "formatDate",
@@ -28057,16 +28125,20 @@
         "ChartCard",
         "Column",
         "DataTable",
+        "Empty",
+        "ErrorState",
         "HeatmapMatrix",
         "KpiCard",
         "KpiGrid",
         "LineChart",
         "ListPanel",
+        "ListRow",
         "MiniBarChart",
         "OperationButton",
         "Page",
         "PageHeading",
         "SegmentedControl",
+        "Skeleton",
         "downloadCsv",
         "formatDate",
         "formatNumber",
@@ -28297,10 +28369,10 @@
       "concept": {
         "goal": "Em um minuto, saber o que a empresa precisa que eu leia, o que mudou e o que está acontecendo com as pessoas.",
         "patterns": [
-          "Anatomia B · Painel de leitura: cabeçalho fixo; o que pede ação (leitura obrigatória) antes do feed",
+          "Anatomia B · Painel de leitura: cabeçalho fixo; “Precisa de você” (leitura obrigatória) antes do feed",
           "Fixados no topo; feed de comunicados com autor, público, reações e quantas pessoas leram",
           "Coluna lateral com o que é da semana: eventos, enquete aberta, aniversários e novos colegas",
-          "Cinco estados no feed: ?estado=carregando|vazio|erro simula; aba Não lidos vazia oferece Ver todos"
+          "Cinco estados: ?estado=carregando (forma final da página), erro (com saída) e vazio (feed sem comunicados); aba Não lidos vazia oferece Ver todos"
         ],
         "adapt": [
           "Portal do franqueado (comunicados da franqueadora), portal do parceiro, intranet de escola"
@@ -28316,11 +28388,13 @@
         "Badge",
         "Button",
         "Empty",
+        "ErrorState",
         "ListPanel",
         "ListRow",
         "Meter",
         "Page",
         "PageHeading",
+        "Skeleton",
         "Tabs",
         "formatDate",
         "formatNumber",
@@ -28704,6 +28778,9 @@
         "Empty",
         "EntityMark",
         "FieldBlock",
+        "FileCard",
+        "IconButton",
+        "Lightbox",
         "Modal",
         "Page",
         "PageHeading",
@@ -28711,11 +28788,19 @@
         "Select",
         "SplitLayout",
         "StagePath",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHead",
+        "TableHeader",
+        "TableRow",
         "Tabs",
         "TextField",
         "areaClass",
+        "formatBytes",
         "formatCurrency",
         "formatDate",
+        "formatNumber",
         "formatPercent",
         "notify"
       ]
@@ -28890,7 +28975,7 @@
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo com seletor de time",
           "KPIs levam à lista já filtrada (drill-down)",
-          "“Precisa de você” logo abaixo dos KPIs: negócios parados, atividades atrasadas, leads e propostas vencendo",
+          "“Precisa de você” num só painel logo abaixo dos KPIs: atividades atrasadas, negócios parados, propostas vencendo e leads novos",
           "Meta com ritmo esperado (GoalMeter)",
           "Receita × meta, funil, ranking e motivos de perda (Pareto)"
         ],
@@ -28903,8 +28988,11 @@
       },
       "uses": [
         "BarChart",
+        "Button",
         "ChartCard",
         "CompareStat",
+        "Empty",
+        "ErrorState",
         "FunnelChart",
         "GaugeChart",
         "GoalMeter",
@@ -28917,6 +29005,7 @@
         "PageHeading",
         "ParetoChart",
         "SegmentedControl",
+        "Skeleton",
         "formatCurrency",
         "formatNumber",
         "formatPercent"
@@ -29065,7 +29154,7 @@
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo com período",
           "Vendas × meta diária, OTIF, causas de atraso (Pareto)",
-          "Filas de ação antes dos detalhes"
+          "“Precisa de você” num só painel (compras na sua etapa, estoque crítico, compras e entregas atrasadas); a faturar em painel neutro ao lado"
         ],
         "adapt": [
           "Painel financeiro, de atendimento ou de recrutamento"
@@ -29078,8 +29167,10 @@
         "AreaChart",
         "Badge",
         "BarList",
+        "Button",
         "ChartCard",
         "Empty",
+        "ErrorState",
         "KpiCard",
         "KpiGrid",
         "LineChart",
@@ -29089,9 +29180,11 @@
         "PageHeading",
         "ParetoChart",
         "SegmentedControl",
+        "Skeleton",
         "formatCompact",
         "formatCurrency",
-        "formatNumber"
+        "formatNumber",
+        "formatPercent"
       ]
     },
     {
@@ -29960,7 +30053,7 @@
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo com período",
           "KPIs de liquidez, aging e caixa contra o mínimo",
-          "Filas de ação (aprovar, conciliar) antes dos detalhes"
+          "“Precisa de você” (aprovar pagamentos, cobrar vencidos sem promessa) ao lado da conciliação, antes dos detalhes"
         ],
         "adapt": [
           "Painel de operações, de RH"
@@ -29974,6 +30067,7 @@
         "Button",
         "ChartCard",
         "Empty",
+        "ErrorState",
         "GaugeChart",
         "KpiCard",
         "KpiGrid",
@@ -29984,8 +30078,10 @@
         "Page",
         "PageHeading",
         "ProportionBar",
+        "Skeleton",
         "formatCurrency",
-        "formatPercent"
+        "formatDelta",
+        "formatNumber"
       ]
     },
     {
@@ -30332,6 +30428,8 @@
         "ChartCard",
         "DataTable",
         "DonutChart",
+        "Empty",
+        "ErrorState",
         "FunnelChart",
         "KpiCard",
         "KpiGrid",
@@ -30340,6 +30438,7 @@
         "PageHeading",
         "SankeyChart",
         "SegmentedControl",
+        "Skeleton",
         "formatCurrency",
         "formatDelta",
         "formatNumber",
@@ -30455,6 +30554,7 @@
         "formatCurrency",
         "formatDate",
         "formatNumber",
+        "formatPercent",
         "notify",
         "useOperation"
       ]
@@ -30502,6 +30602,7 @@
         "PageHeading",
         "PageToolbar",
         "Pagination",
+        "Popover",
         "SavedView",
         "SavedViews",
         "Select",
@@ -30551,7 +30652,9 @@
         "ChartCard",
         "Column",
         "DataTable",
+        "Empty",
         "EntityMark",
+        "ErrorState",
         "GridColumn",
         "KpiCard",
         "KpiGrid",
@@ -30559,10 +30662,12 @@
         "Page",
         "PageHeading",
         "SegmentedControl",
+        "Skeleton",
         "Tabs",
         "downloadCsv",
         "formatCurrency",
         "formatNumber",
+        "formatPercent",
         "gridToCsv",
         "notify"
       ]
@@ -31517,7 +31622,7 @@
         "patterns": [
           "Anatomia B · Painel: cabeçalho fixo, 5 KPIs com base explícita, um gráfico por pergunta",
           "Fluxo de caixa previsto em barras com entradas e saídas (negativas) por semana; insight do menor saldo",
-          "“Precisa de você” em quatro filas: cobranças vencidas, OS sem técnico, NFS-e rejeitadas, contratos a renovar",
+          "“Precisa de você” logo abaixo dos KPIs, num só painel: cobranças vencidas, OS sem técnico, NFS-e rejeitadas e contratos a renovar, cada linha com o tipo no topo",
           "MiniBarChart de OS concluídas por dia; técnicos em campo em StackedList",
           "Cada linha abre o registro certo (OS, cobrança, nota, contrato)"
         ],
@@ -31535,6 +31640,8 @@
         "BarChart",
         "Button",
         "ChartCard",
+        "Empty",
+        "ErrorState",
         "KpiCard",
         "KpiGrid",
         "LineChart",
@@ -31543,6 +31650,7 @@
         "MiniBarChart",
         "Page",
         "PageHeading",
+        "Skeleton",
         "StackedList",
         "formatCompact",
         "formatCurrency",
@@ -31586,6 +31694,7 @@
         "FilterField",
         "GridColumn",
         "Highlight",
+        "Modal",
         "OperationButton",
         "OperationFeedback",
         "Page",
@@ -31765,6 +31874,7 @@
         "Page",
         "PageHeading",
         "PropertyList",
+        "SegmentedControl",
         "Select",
         "SplitLayout",
         "StagePath",

@@ -1350,7 +1350,7 @@ export function FileDropzone({
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="truncate text-[13px] font-medium">{it.name}</span>
                   <span className={cn("shrink-0 text-[11.5px] tabular-nums", it.error ? "text-rose" : "text-muted")}>
-                    {it.error ? "Falhou" : it.progress != null ? `${Math.round(it.progress)}%` : fmtSize(it.size)}
+                    {it.error ? "Falhou" : it.progress != null ? `${Math.round(it.progress)}\u00A0%` : fmtSize(it.size)}
                   </span>
                 </div>
                 {it.error ? (

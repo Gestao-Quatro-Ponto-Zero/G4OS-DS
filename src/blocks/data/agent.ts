@@ -167,3 +167,12 @@ export const slashCommands = [
 ];
 
 export const followUps = ["Compare com o mesmo mês de 2025", "Quais vendedores foram mais afetados?", "Crie o e-mail para o time de marketing"];
+
+/** Fontes que ainda não estão no contexto e podem ser adicionadas ("+ Adicionar fonte"). */
+export const extraSources: ContextItem[] = [
+  { id: "x1", kind: "record", title: "Negócios de Mid-market · setembro", detail: "188 negócios · CRM Acme" },
+  { id: "x2", kind: "table", title: "Receita por plano · 2026", detail: "analytics.receita_planos" },
+  { id: "x3", kind: "doc", title: "Pesquisa de preço com clientes · Q2", detail: "Drive · 24 entrevistas" },
+  { id: "x4", kind: "web", title: "Página de preços da Acme · versão de agosto", detail: "acme.com.br/precos · arquivo de 31/08" },
+  { id: "x5", kind: "doc", title: "Política comercial de descontos", detail: "Notion · atualizada em 15/09" },
+];

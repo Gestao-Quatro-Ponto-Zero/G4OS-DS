@@ -33,6 +33,25 @@ notify("Candidato arquivado", () => restaurar(candidato));`}>
         </Demo>
       </DocSection>
 
+      <DocSection title="Ação que leva ao resultado" rule="Quando a ação criou algo em outro lugar (título no Financeiro, pedido gerado), o toast oferece ir até lá: verbo + objeto. Uma ação por toast além do Desfazer. Também vale em useOperation: `{ message, undo, action }`.">
+        <Demo code={`notify("Confirmação registrada · 2 títulos gerados em Contas a pagar", {
+  undo: () => desfazer(),
+  action: { label: "Ver em Contas a pagar", onClick: () => router.push("/financeiro/pagar") },
+});`}>
+          <Button
+            size="sm"
+            onClick={() =>
+              notify("Confirmação registrada · 2 títulos gerados em Contas a pagar", {
+                undo: () => notify("Confirmação desfeita", undefined, "info"),
+                action: { label: "Ver em Contas a pagar", onClick: () => notify("Abriria Contas a pagar", undefined, "info") },
+              })
+            }
+          >
+            Registrar confirmação
+          </Button>
+        </Demo>
+      </DocSection>
+
       <DocSection title="Operações demoradas: notifyPromise" rule="Para ações de segundo plano (exportar, importar, gerar relatório): mostra “…ando” enquanto roda e troca pelo resultado. Para salvar formulário, prefira OperationButton — quem informa é o botão.">
         <Demo
           code={`await notifyPromise(exportar(), {
@@ -69,6 +88,7 @@ notify("Proposta enviada para Ana Lima");`} />
         <PropsTable
           rows={[
             ["notify(message, undo?, tone?)", "(string, () => void, \"ok\" | \"info\" | \"bad\")", 'tone="ok"', "Dispara o toast. Substitui o anterior."],
+            ["notify(message, options)", "{ undo?, action?: { label, onClick }, tone? }", "—", "Mesma coisa com opções: ação que leva ao resultado."],
             ["notifyPromise(promise, messages)", "{ loading, success, error, undo? }", "—", "Acompanha a promessa. Retorna o valor; relança o erro."],
             ["Toaster.duration", "number", "6500", "Milissegundos até sumir (pausa no hover/foco)."],
           ]}

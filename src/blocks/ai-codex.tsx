@@ -1,16 +1,22 @@
-import { Archive, CheckCircle2, Ellipsis, FolderClosed, GitCommitHorizontal, GitPullRequest, Globe, Pencil, Rocket, SquarePen, Trash2 } from "lucide-react";
+import { Archive, CheckCircle2, Download, FileCode2, FolderClosed, GitCommitHorizontal, GitPullRequest, Globe, Link2, Pencil, Rocket, SquarePen, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   AgentAppLayout,
   AgentComposer,
   AnswerCard,
+  Badge,
   BottomNav,
+  Button,
+  CommandPalette,
+  ComposerChip,
   Disclaimer,
   InputModal,
   ListToggle,
   MessageActions,
+  Modal,
   ModelPicker,
   PermissionModeChip,
+  PropertyList,
   RunSummary,
   SessionQuickSwitcher,
   SessionSidebar,
@@ -29,6 +35,7 @@ import {
   type StepItem,
 } from "@g4ai/ds";
 import { codexModels, codexProjects, codexRun, codexSessions, type CodexEntry, type CodexResult, type CodexSession } from "./data/codex";
+import { saveText } from "./shells/download";
 import { frameHref, useFrameParam } from "./shells/frame-route";
 import { OsRail, osTabs } from "./shells/os-shell";
 
@@ -63,9 +70,27 @@ const uid = (p: string) => `${p}-${Date.now().toString(36)}-${++seq}`;
 const isMobile = () => typeof window !== "undefined" && window.matchMedia("(max-width: 767.98px)").matches;
 
 const resultIcon: Record<CodexResult["kind"], typeof Rocket> = { commit: GitCommitHorizontal, deploy: Rocket, tests: CheckCircle2, pr: GitPullRequest, link: Globe };
+const resultKind: Record<CodexResult["kind"], string> = { commit: "Commit", deploy: "Deploy", tests: "Testes", pr: "Pull request", link: "Endereço publicado" };
+
+/* Referências que o "+" do campo oferece (no app real: busca na API do repositório). */
+type CodeRef = { id: string; label: string; kind: "arquivo" | "issue" | "pr"; hint?: string };
+const repoFiles: CodeRef[] = [
+  { id: "f-perm", label: "src/auth/permissions.ts", kind: "arquivo" },
+  { id: "f-roles", label: "src/auth/roles.ts", kind: "arquivo" },
+  { id: "f-agenda", label: "src/agenda/meeting-title.ts", kind: "arquivo" },
+  { id: "f-agenda-test", label: "src/agenda/meeting-title.test.ts", kind: "arquivo" },
+  { id: "f-deploy", label: ".github/workflows/deploy.yml", kind: "arquivo" },
+  { id: "f-readme", label: "README.md", kind: "arquivo" },
+];
+const repoIssues: CodeRef[] = [
+  { id: "i-212", label: "#212 Gestor não consegue editar a conta", kind: "issue", hint: "aberta" },
+  { id: "i-198", label: "#198 Reuniões futuras sem título automático", kind: "issue", hint: "aberta" },
+  { id: "p-215", label: "#215 feat: papel de gestor nas permissões", kind: "pr", hint: "em revisão" },
+  { id: "p-209", label: "#209 fix: fuso fixo nos testes de agenda", kind: "pr", hint: "mesclado" },
+];
 
 /** Lista de resultados verificáveis (commit, deploy, testes) de uma execução. */
-function Results({ items }: { items: CodexResult[] }) {
+function Results({ items, onOpen }: { items: CodexResult[]; onOpen: (r: CodexResult) => void }) {
   return (
     <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
       {items.map((r, i) => {
@@ -79,7 +104,7 @@ function Results({ items }: { items: CodexResult[] }) {
                   href={r.href}
                   onClick={(e) => {
                     e.preventDefault();
-                    notify(`Exemplo: abriria ${r.text}`, undefined, "info");
+                    onOpen(r);
                   }}
                 >
                   {r.text}
@@ -118,6 +143,10 @@ export default function AiCodex() {
   const [model, setModel] = useState("sol-light");
   const [effort, setEffort] = useState<ModelEffort>("leve");
   const [voice, setVoice] = useState(false);
+  const [refs, setRefs] = useState<CodeRef[]>([]);
+  const [picker, setPicker] = useState<null | "arquivo" | "issue">(null);
+  const [detail, setDetail] = useState<CodexResult | null>(null);
+  const [workspace, setWorkspace] = useState("G4 OS · Engenharia");
   const [renaming, setRenaming] = useState<{ kind: "session" | "project"; id: string } | null>(null);
   const [running, setRunning] = useState<{ sessionId: string; entryId: string; startedAt: number; steps: StepItem[]; shown: number; full: string[] } | null>(null);
   const timers = useRef<number[]>([]);
@@ -146,8 +175,11 @@ export default function AiCodex() {
   };
 
   const send = (text: string) => {
-    const t = text.trim();
-    if (!t || !active || running) return;
+    const typed = text.trim();
+    if (!typed || !active || running) return;
+    // Referências escolhidas no "+" vão junto do pedido.
+    const t = refs.length ? `${typed}\n\nContexto: ${refs.map((r) => r.label).join(", ")}` : typed;
+    setRefs([]);
     const sid = active.id;
     const run = codexRun(t);
     const entryId = uid("a");
@@ -245,7 +277,7 @@ export default function AiCodex() {
         {e.paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
-        {e.results && <Results items={e.results} />}
+        {e.results && <Results items={e.results} onOpen={setDetail} />}
       </AnswerCard>
     ),
   );
@@ -281,6 +313,28 @@ export default function AiCodex() {
         }
         menu={[
           { label: "Renomear", icon: <Pencil className="h-4 w-4" />, onSelect: () => setRenaming({ kind: "session", id: active.id }) },
+          {
+            label: "Copiar link da sessão",
+            icon: <Link2 className="h-4 w-4" />,
+            onSelect: () =>
+              navigator.clipboard
+                ?.writeText(`${location.href.split("#")[0]}${frameHref("ai-codex", active.id)}`)
+                .then(() => notify("Link da sessão copiado"))
+                .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info")),
+          },
+          {
+            label: "Exportar em Markdown",
+            icon: <Download className="h-4 w-4" />,
+            onSelect: () => {
+              const md = [
+                `# ${active.title}`,
+                ...active.thread.map((e) => (e.kind === "user" ? `**Você:** ${e.text}` : [...e.paragraphs, ...(e.results ?? []).map((r) => `- ${r.text}${r.code ? ` \`${r.code}\`` : ""}`)].join("\n\n"))),
+              ].join("\n\n");
+              const name = `${active.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "sessao"}.md`;
+              saveText(name, md, "text/markdown");
+              notify(`${name} baixado`);
+            },
+          },
           { label: "Arquivar", icon: <Archive className="h-4 w-4" />, onSelect: () => (patch(active.id, { archived: true }), notify("Sessão arquivada", () => patch(active.id, { archived: false }))) },
         ]}
         onBack={() => setMobileView("list")}
@@ -298,7 +352,6 @@ export default function AiCodex() {
             />
           </>
         }
-        actions={[{ id: "more", label: "Mais ações", icon: <Ellipsis />, onClick: () => notify("Exemplo: abriria abrir no editor, ver diff, copiar link", undefined, "info"), hideOnMobile: true }]}
       />
       <ThreadView
         follow={`${entries.length}:${running?.shown ?? 0}:${running?.steps.length ?? 0}`}
@@ -327,9 +380,20 @@ export default function AiCodex() {
             busy={!!running}
             placeholder="Peça qualquer coisa ao agente"
             attachOptions={[
-              { label: "Arquivo do repositório", icon: <FolderClosed className="h-4 w-4" />, onSelect: () => notify("Exemplo: escolheria um arquivo do repositório", undefined, "info") },
-              { label: "Issue ou PR", icon: <GitPullRequest className="h-4 w-4" />, onSelect: () => notify("Exemplo: buscaria uma issue ou PR", undefined, "info") },
+              { label: "Arquivo do repositório", icon: <FolderClosed className="h-4 w-4" />, onSelect: () => setPicker("arquivo") },
+              { label: "Issue ou PR", icon: <GitPullRequest className="h-4 w-4" />, onSelect: () => setPicker("issue") },
             ]}
+            contextChips={
+              refs.length ? (
+                <>
+                  {refs.map((r) => (
+                    <ComposerChip key={r.id} icon={r.kind === "arquivo" ? <FileCode2 className="h-3 w-3" /> : <GitPullRequest className="h-3 w-3" />} onRemove={() => setRefs((l) => l.filter((x) => x.id !== r.id))}>
+                      {r.label}
+                    </ComposerChip>
+                  ))}
+                </>
+              ) : undefined
+            }
             leading={
               <PermissionModeChip
                 value={permission}
@@ -381,11 +445,10 @@ export default function AiCodex() {
       ]}
       footer={
         <WorkspaceSwitcher
-          name="G4 OS · Engenharia"
+          name={workspace}
           items={[
             { type: "label", label: "Workspaces" },
-            { type: "checkbox", label: "G4 OS · Engenharia", checked: true, onCheckedChange: () => undefined },
-            { type: "checkbox", label: "Pessoal", checked: false, onCheckedChange: () => notify("Exemplo: trocaria de workspace", undefined, "info") },
+            ...["G4 OS · Engenharia", "Pessoal"].map((w) => ({ type: "checkbox" as const, label: w, checked: workspace === w, onCheckedChange: () => setWorkspace(w) })),
           ]}
         />
       }
@@ -418,6 +481,42 @@ export default function AiCodex() {
           notify("Renomeado");
         }}
       />
+      <CommandPalette
+        open={!!picker}
+        onClose={() => setPicker(null)}
+        placeholder={picker === "arquivo" ? `Buscar arquivo em ${projectName ?? "o repositório"}…` : "Buscar issue ou PR…"}
+        emptyLabel="Nada encontrado no repositório"
+        commands={(picker === "arquivo" ? repoFiles : repoIssues)
+          .filter((r) => !refs.some((x) => x.id === r.id))
+          .map((r) => ({
+            id: r.id,
+            label: r.label,
+            group: r.kind === "arquivo" ? "Arquivos" : r.kind === "pr" ? "Pull requests" : "Issues",
+            hint: r.hint,
+            icon: r.kind === "arquivo" ? <FileCode2 className="h-4 w-4" /> : <GitPullRequest className="h-4 w-4" />,
+            onSelect: () => setRefs((l) => [...l, r]),
+          }))}
+      />
+      <Modal
+        open={!!detail}
+        onClose={() => setDetail(null)}
+        kicker={detail ? resultKind[detail.kind] : undefined}
+        title={detail?.text ?? ""}
+        size="sm"
+        footer={<Button onClick={() => setDetail(null)}>Fechar</Button>}
+      >
+        {detail && (
+          <PropertyList
+            items={[
+              { label: "Situação", value: <Badge tone={detail.ok ? "ok" : undefined}>{detail.ok ? "Concluído" : "Pendente"}</Badge> },
+              ...(detail.code ? [{ label: "Referência", value: <code>{detail.code}</code> }] : []),
+              ...(detail.kind === "deploy" ? [{ label: "Ambiente", value: "Produção" }] : []),
+              { label: "Projeto", value: projectName ?? "—" },
+              { label: "Sessão", value: active?.title ?? "—" },
+            ]}
+          />
+        )}
+      </Modal>
       <VoiceOverlay
         open={voice}
         agentName="Agente de código"

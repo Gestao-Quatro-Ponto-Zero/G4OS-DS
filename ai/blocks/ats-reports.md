@@ -28,4 +28,4 @@ Funil de contratação com conversão entre etapas, qualidade e custo por origem
 
 ## Componentes usados
 
-`BarChart`, `Button`, `ChartCard`, `Column`, `DataTable`, `DumbbellChart`, `FunnelChart`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `downloadCsv`, `formatCurrency`, `formatNumber`, `formatPercent`, `notify`
+`BarChart`, `Button`, `ChartCard`, `Column`, `DataTable`, `DumbbellChart`, `Empty`, `ErrorState`, `FunnelChart`, `KpiCard`, `KpiGrid`, `Page`, `PageHeading`, `ParetoChart`, `SegmentedControl`, `Skeleton`, `downloadCsv`, `formatCurrency`, `formatNumber`, `formatPercent`, `notify`

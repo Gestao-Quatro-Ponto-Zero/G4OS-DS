@@ -1,4 +1,4 @@
-import { ArrowLeft, Hash, Info, Lock, Megaphone, MessageSquarePlus, MessagesSquare, Pin, X } from "lucide-react";
+import { ArrowLeft, Download, Hash, Info, Lock, Megaphone, MessageSquarePlus, MessagesSquare, Pin, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ActionRequiredBanner,
@@ -25,6 +25,7 @@ import {
   plural,
 } from "@g4ai/ds";
 import { announcementById, chatChannels, chatReplies, cityById, firstName, me, people, personById, threadReplies, type ChatChannel, type ChatMsg } from "./data/comms";
+import { saveSample } from "./shells/download";
 import { frameHref, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { CommsShell, LoadError, ReactionRow, toggleReaction, useListState } from "./shells/comms-shell";
 
@@ -101,6 +102,7 @@ export default function CommsChannels() {
   const [typing, setTyping] = useState<string | null>(null);
   const [info, setInfo] = useState(false);
   const [uploaded, setUploaded] = useState<string | null>(null);
+  const [filePreview, setFilePreview] = useState<{ name: string; size: string; author: string; time: string; day?: string } | null>(null);
   const [newDm, setNewDm] = useState(false);
   const [dmPerson, setDmPerson] = useState("");
   const end = useRef<HTMLDivElement>(null);
@@ -319,7 +321,7 @@ export default function CommsChannels() {
                             </span>
                           </a>
                         )}
-                        {m.file && <FileCard className="mt-2" name={m.file.name} meta={m.file.size} onOpen={() => notify(`Exemplo: abre a prévia de ${m.file!.name}`, undefined, "info")} />}
+                        {m.file && <FileCard className="mt-2" name={m.file.name} meta={m.file.size} onOpen={() => setFilePreview({ ...m.file!, author: author.name, time: m.time, day: m.day })} />}
                         {m.reactions && (
                           <ReactionRow
                             className="mt-2"
@@ -472,6 +474,33 @@ export default function CommsChannels() {
         }
       >
         <Combobox label="Para" value={dmPerson} onValueChange={(v: string) => setDmPerson(v)} options={people.filter((p) => p.id !== me.id).map((p) => ({ value: p.id, label: p.name, description: `${p.role} · ${cityById(p.city).label}` }))} placeholder="Buscar pessoa…" />
+      </Modal>
+      {/* Arquivo do canal: metadados + download (gerado no navegador neste exemplo). */}
+      <Modal
+        open={!!filePreview}
+        onClose={() => setFilePreview(null)}
+        kicker="Arquivo do canal"
+        title={filePreview?.name ?? "Arquivo"}
+        description={filePreview ? `Enviado por ${filePreview.author}${filePreview.day ? ` · ${filePreview.day.toLowerCase()}` : ""} às ${filePreview.time}` : undefined}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setFilePreview(null)}>
+              Fechar
+            </Button>
+            <Button
+              onClick={() => {
+                if (!filePreview) return;
+                const saved = saveSample(filePreview.name, [filePreview.name, `Compartilhado por ${filePreview.author} às ${filePreview.time}`, `Tamanho original: ${filePreview.size}`]);
+                notify(`${saved} baixado`);
+                setFilePreview(null);
+              }}
+            >
+              <Download /> Baixar
+            </Button>
+          </>
+        }
+      >
+        {filePreview && <FileCard name={filePreview.name} meta={`${filePreview.size} · ${filePreview.author}`} />}
       </Modal>
     </CommsShell>
   );

@@ -121,6 +121,7 @@ function AgentRecord({ base }: { base: FleetAgent }) {
   const [prod, setProd] = useState(base.version);
   const [tab, setTab] = useState("visao");
   const [confirm, setConfirm] = useState<null | "pausar" | "arquivar" | { restore: string }>(null);
+  const [rolloutHalf, setRolloutHalf] = useState(false);
   const a = base;
   const owner = ownerOfAgent(a);
   const model = modelById(a.model);
@@ -313,8 +314,17 @@ function AgentRecord({ base }: { base: FleetAgent }) {
                             late={a.rollout.late}
                             milestones={a.rollout.milestones}
                             action={
-                              <Button size="sm" variant="ghost" onClick={() => notify(`v${a.rollout?.version} agora atende 50 % dos gatilhos`, () => undefined)}>
-                                Liberar para 50 %
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={rolloutHalf}
+                                disabledReason="Já atende 50 % dos gatilhos"
+                                onClick={() => {
+                                  setRolloutHalf(true);
+                                  notify(`v${a.rollout?.version} agora atende 50 % dos gatilhos`, () => setRolloutHalf(false));
+                                }}
+                              >
+                                {rolloutHalf ? "Liberado para 50 %" : "Liberar para 50 %"}
                               </Button>
                             }
                           />

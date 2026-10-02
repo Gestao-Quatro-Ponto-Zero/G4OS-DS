@@ -36,6 +36,7 @@ import {
   type FilterField, PageToolbar
 } from "@g4ai/ds";
 import { addInvoice, br, carriers, customerById, iso, invoiceStatus, invoices as seed, orderById, orderTotal, orders, products, today, updateOrder, warehouses, type Invoice, type InvoiceStatus, type Order } from "./data/erp";
+import { machineDecimal, saveText, xmlEscape } from "./shells/download";
 import { go, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { NexoShell, demoError, useDemoState } from "./shells/nexo-shell";
 
@@ -205,7 +206,19 @@ export default function ErpInvoices() {
               }
             />
             <BulkBar count={sel.count} noun="nota" onClear={sel.clear}>
-              <button type="button" onClick={() => { notify(`${sel.count} XML baixados (ZIP)`, undefined, "info"); sel.clear(); }}>
+              <button
+                type="button"
+                onClick={() => {
+                  // Um arquivo de lote com as notas selecionadas (no app real, o ZIP vem da API).
+                  const picked = list.filter((n) => sel.has(n.id));
+                  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<loteNFe qtd="${picked.length}">\n${picked
+                    .map((n) => `  <nfeProc versao="4.00"><chNFe>${n.key}</chNFe><nNF>${n.number.replace(/\D/g, "")}</nNF><serie>${n.series}</serie><dhEmi>${n.issuedAt.slice(0, 10)}</dhEmi><CNPJDest>${customerById(n.customerId).cnpj.replace(/\D/g, "")}</CNPJDest><vNF>${machineDecimal(n.total)}</vNF><situacao>${xmlEscape(invoiceStatus[n.status].label)}</situacao></nfeProc>`)
+                    .join("\n")}\n</loteNFe>\n`;
+                  saveText(`nfe-lote-${iso(0)}.xml`, xml, "application/xml");
+                  notify(`${picked.length === 1 ? "XML de 1 nota baixado" : `XML de ${picked.length} notas baixado em lote`}`);
+                  sel.clear();
+                }}
+              >
                 <Download /> Baixar XML
               </button>
             </BulkBar>

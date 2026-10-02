@@ -30,4 +30,4 @@ NFS-e da Prefeitura de São Paulo em DataGrid: a emitir, na prefeitura, emitidas
 
 ## Componentes usados
 
-`Badge`, `Button`, `Callout`, `ConfirmDialog`, `DataGrid`, `Drawer`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `StatCell`, `StatGrid`, `TableSearch`, `Tabs`, `TextField`, `formatCurrency`, `formatDate`, `formatPercent`, `notify`, `useFilters`, `useOperation`
+`Badge`, `Button`, `Callout`, `ConfirmDialog`, `DataGrid`, `Drawer`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Modal`, `OperationButton`, `OperationFeedback`, `Page`, `PageHeading`, `PropertyList`, `StatCell`, `StatGrid`, `TableSearch`, `Tabs`, `TextField`, `formatCurrency`, `formatDate`, `formatPercent`, `notify`, `useFilters`, `useOperation`

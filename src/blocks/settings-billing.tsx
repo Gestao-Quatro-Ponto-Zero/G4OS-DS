@@ -21,6 +21,7 @@ import {
   type Column } from "@g4ai/ds";
 import { plans as sharedPlans, type PlanId } from "./data/plans";
 import { org } from "./data/workspace";
+import { savePdf } from "./shells/download";
 import { SettingsShell } from "./shells/settings-shell";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -69,6 +70,21 @@ const invoices: Invoice[] = [
   { id: "NF-2026-07", date: "15/07/2026", description: "Pro · mensal · 12 licenças", amount: 169 * 12, status: "falhou" },
   { id: "NF-2026-06", date: "15/06/2026", description: "Essencial · mensal · 5 licenças", amount: 89 * 5, status: "paga" },
 ];
+
+const invoiceStatus: Record<Invoice["status"], string> = { paga: "Paga", aberta: "Em aberto", falhou: "Pagamento falhou" };
+
+/** Baixa a fatura em PDF (gerado no navegador; no app real, o PDF vem da API). */
+function downloadInvoice(i: Invoice) {
+  savePdf(`fatura-${i.id}`, [
+    `Fatura ${i.id}`,
+    `${org.name} · ${org.domain}`,
+    "",
+    `Emissão: ${i.date}`,
+    `Descrição: ${i.description}`,
+    `Valor: ${formatCurrency(i.amount)}`,
+    `Situação: ${invoiceStatus[i.status]}`,
+  ]);
+}
 
 /** Uso contra um limite do plano (não é meta: perto do limite = âmbar). */
 function UsageMeter({ label, value, limit, format = (n: number) => n.toLocaleString("pt-BR") }: { label: string; value: number; limit: number; format?: (n: number) => string }) {
@@ -230,7 +246,7 @@ export default function SettingsBillingBlock() {
       action: true,
       align: "right",
       cell: (i) => (
-        <Button size="sm" variant="quiet" aria-label={`Baixar fatura ${i.id}`} onClick={() => notify(`Baixando fatura ${i.id} (PDF)`, undefined, "info")}>
+        <Button size="sm" variant="quiet" aria-label={`Baixar fatura ${i.id}`} onClick={() => downloadInvoice(i)}>
           <Download /> PDF
         </Button>
       ),
@@ -317,7 +333,7 @@ export default function SettingsBillingBlock() {
             onChange={setCycle}
             options={[
               { value: "mensal", label: "Mensal" },
-              { value: "anual", label: "Anual · −17%" },
+              { value: "anual", label: "Anual · −17 %" },
             ]}
           />
         </div>
