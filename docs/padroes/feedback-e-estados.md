@@ -10,6 +10,8 @@ Toda tela e todo componente de dado tem **cinco estados**. Desenhe os cinco ante
 | Erro | o que aconteceu + saída | `Callout tone="bad"` / estado de erro |
 | Com dados | o conteúdo | — |
 
+Nos blocos de exemplo, os estados se simulam pelo endereço: `?estado=carregando`, `?estado=vazio` ou `?estado=erro` (por exemplo `#/frame/erp-orders?estado=vazio`). Isso existe só para o showcase conferir as telas; no app, o estado vem da consulta (carregando, erro, lista vazia), não de um parâmetro.
+
 Estados de página inteira em `states.tsx`: `NotFoundState` (404), `ErrorState`, `ForbiddenState` (sem permissão), `OfflineState`, `MaintenanceState`, `SuccessState` (fluxo concluído), `LoadingState`; base genérica `StateView`. Avisos: `Banner` (faixa na página), `InlineMessage` (dentro de card/formulário), `AlertCard`. Exemplo completo no bloco `app-error-pages`.
 
 ## Hierarquia de feedback

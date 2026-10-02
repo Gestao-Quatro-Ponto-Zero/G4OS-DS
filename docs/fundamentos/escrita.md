@@ -73,7 +73,7 @@ Três partes: **o que aconteceu, por quê (se souber), o que fazer.**
 - `formatCurrency`, `formatNumber`, `formatPercent`, `formatDate`, `formatRelative` (em `lib/format.ts`).
 - Datas relativas até 30 dias ("há 5 min", "ontem", "em 3 dias"); depois, data curta ("12 set") ou completa ("12/09/2026").
 - Plural correto com `plural(n, "tarefa")` → "1 tarefa", "3 tarefas".
-- Espaço antes de % (padrão pt-BR do Intl): "12,5 %".
+- Espaço antes de % (norma brasileira): "12,5 %". `formatPercent` e `formatDelta` já põem o espaço inseparável; o Intl pt-BR sozinho não põe.
 
 ## Glossário por produto
 

@@ -15,6 +15,7 @@ import {
   notify,
 } from "@g4ai/ds";
 import { br, company, customerById, invoiceById, invoiceStatus, orderById, productBySku, type Invoice } from "./data/erp";
+import { machineDecimal, saveText, xmlEscape } from "./shells/download";
 import { go, useFrameParam } from "./shells/frame-route";
 import { NexoShell } from "./shells/nexo-shell";
 
@@ -74,6 +75,22 @@ function InvoiceDoc({ invoice }: { invoice: Invoice }) {
     { label: "PIS (0,65 %)", value: subtotal * 0.0065 },
     { label: "COFINS (3 %)", value: subtotal * 0.03 },
   ];
+  const digits = (v: string) => v.replace(/\D/g, "");
+  /** XML da NF-e (leiaute 4.00, resumido) montado com os dados da nota. */
+  const nfeXml = () => `<?xml version="1.0" encoding="UTF-8"?>
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <NFe>
+    <infNFe Id="NFe${invoice.key}" versao="4.00">
+      <ide><serie>${invoice.series}</serie><nNF>${digits(invoice.number)}</nNF><dhEmi>${invoice.issuedAt.slice(0, 10)}T09:00:00-03:00</dhEmi><tpNF>1</tpNF></ide>
+      <emit><CNPJ>${digits(company.cnpj)}</CNPJ><xNome>${xmlEscape(company.name)}</xNome><IE>${digits(company.ie)}</IE></emit>
+      <dest><CNPJ>${digits(c.cnpj)}</CNPJ><xNome>${xmlEscape(c.name)}</xNome><enderDest><xMun>${xmlEscape(c.city)}</xMun><UF>${c.uf}</UF></enderDest></dest>
+${items.map((it, i) => `      <det nItem="${i + 1}"><prod><cProd>${xmlEscape(it.sku)}</cProd><xProd>${xmlEscape(it.p.name)}</xProd><NCM>${digits(it.p.ncm)}</NCM><CFOP>${invoice.cfop}</CFOP><uCom>${xmlEscape(it.p.unit)}</uCom><qCom>${it.qty}</qCom><vUnCom>${machineDecimal(it.price)}</vUnCom><vProd>${machineDecimal(it.qty * it.price)}</vProd></prod></det>`).join("\n")}
+      <total><ICMSTot><vBC>${machineDecimal(taxes[0].value)}</vBC><vICMS>${machineDecimal(taxes[1].value)}</vICMS><vProd>${machineDecimal(subtotal)}</vProd><vFrete>${machineDecimal(order.freight)}</vFrete><vDesc>${machineDecimal(discount)}</vDesc><vPIS>${machineDecimal(taxes[3].value)}</vPIS><vCOFINS>${machineDecimal(taxes[4].value)}</vCOFINS><vNF>${machineDecimal(total)}</vNF></ICMSTot></total>
+    </infNFe>
+  </NFe>
+  <protNFe versao="4.00"><infProt><chNFe>${invoice.key}</chNFe><cStat>${status === "autorizada" ? 100 : 101}</cStat><xMotivo>${status === "autorizada" ? "Autorizado o uso da NF-e" : "Cancelamento de NF-e homologado"}</xMotivo></infProt></protNFe>
+</nfeProc>
+`;
   const keyGroups = invoice.key.match(/.{1,4}/g)?.join(" ");
   return (
     <NexoShell section="notas">
@@ -91,7 +108,13 @@ function InvoiceDoc({ invoice }: { invoice: Invoice }) {
             description={`Série ${invoice.series} · emitida em ${br(invoice.issuedAt)} · ${c.name}`}
             actions={
               <>
-                <Button variant="ghost" onClick={() => notify(`XML da NF-e ${invoice.number} baixado`, undefined, "info")}>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    saveText(`NFe${invoice.key}.xml`, nfeXml(), "application/xml");
+                    notify(`XML da NF-e ${invoice.number} baixado`);
+                  }}
+                >
                   <Download /> XML
                 </Button>
                 <Button onClick={() => window.print()}>

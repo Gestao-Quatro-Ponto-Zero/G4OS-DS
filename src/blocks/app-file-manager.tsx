@@ -23,6 +23,7 @@ import {
   type TreeNode } from "@g4ai/ds";
 import { me } from "./data/workspace";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
+import { saveSample } from "./shells/download";
 import { setFrameQuery, useFrameParam, useFrameQuery } from "./shells/frame-route";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
@@ -158,11 +159,17 @@ export default function FileManagerBlock() {
     }, 350);
   };
 
+  // Arquivo de exemplo gerado no navegador (no app real, a URL assinada do storage).
+  const download = (f: Item) => {
+    const saved = saveSample(f.name, [f.name, `Pasta: ${label(f.folder)}`, `Dono: ${f.owner}`, `Atualizado: ${f.updated}`, `Tamanho original: ${formatBytes(f.size)}`]);
+    notify(`${saved} baixado`);
+  };
+
   const menu = (f: Item) => (
     <ActionMenu
       actions={[
         { label: "Abrir detalhes", onSelect: () => setOpen(f) },
-        { label: "Baixar", icon: <Download />, onSelect: () => notify(`Baixando ${f.name}`, undefined, "info") },
+        { label: "Baixar", icon: <Download />, onSelect: () => download(f) },
         { label: "Copiar link", icon: <Link2 />, onSelect: () => copyLink(f) },
         { label: favorites.includes(f.id) ? "Remover dos favoritos" : "Favoritar", icon: <Star />, onSelect: () => setFavorites((fs) => (fs.includes(f.id) ? fs.filter((x) => x !== f.id) : [...fs, f.id])) },
         { label: "Excluir", icon: <Trash2 />, tone: "danger", separator: true, onSelect: () => remove(f) },
@@ -305,7 +312,7 @@ export default function FileManagerBlock() {
             <Button size="sm" variant="ghost" onClick={() => open && copyLink(open)}>
               <Link2 /> Copiar link
             </Button>
-            <Button size="sm" onClick={() => notify(`Baixando ${open?.name}`, undefined, "info")}>
+            <Button size="sm" onClick={() => open && download(open)}>
               <Download /> Baixar
             </Button>
           </>

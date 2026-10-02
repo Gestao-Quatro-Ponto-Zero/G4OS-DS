@@ -64,6 +64,6 @@ Também em `charts-advanced.tsx`: `ComboChart` (barras + linha no mesmo eixo), `
 ## Números
 
 - Moeda: `formatCurrency(1234.5)` → `R$ 1.234,50`; compacto `R$ 1,2 mil`.
-- Porcentagem recebe **fração**: `formatPercent(0.123)` → `12,3 %`.
+- Porcentagem recebe **fração**: `formatPercent(0.123)` → `12,3 %`, com espaço inseparável antes do sinal (norma brasileira). Texto escrito à mão segue a mesma forma: "12 %", nunca "12%". Nada de `Math.round(x * 100) + "%"`.
 - Variação: `formatDelta(0.125)` → `+12,5 %`. Em `KpiCard`, passe `delta={0.125}` e `goodWhen` (`"down"` para custo, churn, tempo de resposta, inadimplência).
 - Sempre `tabular-nums` em colunas e totais.

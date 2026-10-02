@@ -29,4 +29,4 @@ Todas as execuções da frota: agente, status com palavra, gatilho, início, dur
 
 ## Componentes usados
 
-`Button`, `Column`, `DataTable`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Page`, `PageHeading`, `PageToolbar`, `Pagination`, `SavedView`, `SavedViews`, `SortHeader`, `StatCell`, `StatGrid`, `TableSearch`, `downloadCsv`, `formatCurrency`, `formatDuration`, `formatNumber`, `gridToCsv`, `notify`, `useFilters`, `usePagination`, `useSavedViews`, `useSort`
+`Button`, `Column`, `DataTable`, `Empty`, `EmptyFilterResult`, `FilterBar`, `FilterField`, `GridColumn`, `Highlight`, `Page`, `PageHeading`, `PageToolbar`, `Pagination`, `SavedView`, `SavedViews`, `SortHeader`, `StatCell`, `StatGrid`, `TableSearch`, `downloadCsv`, `formatCurrency`, `formatDuration`, `formatNumber`, `formatPercent`, `gridToCsv`, `notify`, `useFilters`, `usePagination`, `useSavedViews`, `useSort`

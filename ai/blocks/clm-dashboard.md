@@ -30,4 +30,4 @@ Valor sob contrato, janela de vencimentos (30/60/90 dias), renovações automát
 
 ## Componentes usados
 
-`Badge`, `BarChart`, `BarList`, `Button`, `ChartCard`, `ChartCardTotals`, `EntityMark`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `MiniBarChart`, `Page`, `PageHeading`, `SegmentedControl`, `formatCompact`, `formatCurrency`, `formatDate`, `formatNumber`, `plural`
+`Badge`, `BarChart`, `BarList`, `Button`, `ChartCard`, `ChartCardTotals`, `Empty`, `EntityMark`, `ErrorState`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `MiniBarChart`, `Page`, `PageHeading`, `SegmentedControl`, `Skeleton`, `formatCompact`, `formatCurrency`, `formatDate`, `formatNumber`, `plural`

@@ -435,3 +435,54 @@ export const osModels: ModelOption[] = [
   { id: "claude-opus", name: "Claude Opus", group: "Externos", description: "Raciocínio e escrita longa" },
   { id: "gpt", name: "GPT", group: "Externos", description: "Compatível com fluxos legados" },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Fontes de contexto e registros citados                              */
+/* ------------------------------------------------------------------ */
+
+/** Pastas e páginas que podem virar contexto da sessão (busca do "+" e da pasta). */
+export type ContextSource = { id: string; name: string; from: "Google Drive" | "Notion" | "GitHub"; kind: "pasta" | "página" | "documento" };
+export const contextSources: ContextSource[] = [
+  { id: "drive-comercial", name: "Comercial · Playbooks", from: "Google Drive", kind: "pasta" },
+  { id: "drive-direx", name: "DIREX · Atas 2026", from: "Google Drive", kind: "pasta" },
+  { id: "drive-financeiro", name: "Financeiro · Fechamentos", from: "Google Drive", kind: "pasta" },
+  { id: "drive-gav", name: "GAV por unidade · setembro.xlsx", from: "Google Drive", kind: "documento" },
+  { id: "notion-fg", name: "Field Guide FC", from: "Notion", kind: "página" },
+  { id: "notion-rituais", name: "Rituais do time de produto", from: "Notion", kind: "página" },
+  { id: "notion-mcp", name: "MCP · decisões de arquitetura", from: "Notion", kind: "página" },
+  { id: "notion-cx", name: "Base de conhecimento de CX", from: "Notion", kind: "página" },
+  { id: "gh-os", name: "g4-os · README e docs/", from: "GitHub", kind: "pasta" },
+];
+
+/** Registros citados nas respostas (links como GD-545 abrem esta prévia). */
+export type RecordLink = { title: string; from: string; status: string; updated: string; lines: string[] };
+export const recordLinks: Record<string, RecordLink> = {
+  "#gd-545": {
+    title: "GD-545 · Validar leitura de páginas grandes no MCP do Notion",
+    from: "Linear",
+    status: "Em revisão",
+    updated: "hoje, 14:08",
+    lines: ["Responsável: João Vitor", "Último comentário: validação da página do Field Guide (75 imagens, 18 tabelas) nas duas conexões.", "Pendente: testar escrita."],
+  },
+  "#gh-1116": {
+    title: "GitHub #1116 · OAuth do MCP perde o token após reconectar",
+    from: "GitHub · g4-os",
+    status: "Aberta",
+    updated: "hoje, 14:10",
+    lines: ["Rótulos: mcp, oauth, bug", "Patch proposto; falta validar no fluxo OAuth da interface com um build corrigido."],
+  },
+  "#slack": {
+    title: "Mensagem em #os-mcp",
+    from: "Slack",
+    status: "Enviada",
+    updated: "30/09, 14:12",
+    lines: ["Validação do MCP do Notion: as duas conexões leram a página do Field Guide por inteiro.", "Única diferença: prévia de link para planilha. Issue #1116 segue aberta."],
+  },
+  "#linear": {
+    title: "Linear · time Produto",
+    from: "Linear",
+    status: "Sem tarefa criada",
+    updated: "agora",
+    lines: ["Nenhuma tarefa foi criada ainda. Peça na conversa: “cria a tarefa no Linear”."],
+  },
+};

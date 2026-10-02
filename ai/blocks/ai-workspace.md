@@ -31,4 +31,4 @@ Conversa com o agente à esquerda e artefatos à direita (relatório, contexto, 
 
 ## Componentes usados
 
-`AgentComposer`, `AgentMessage`, `AgentTrace`, `ArtifactCard`, `ArtifactKind`, `ArtifactPanel`, `ArtifactTab`, `ComposerChip`, `ContextItem`, `ContextView`, `InsightCard`, `JsonView`, `KpiPair`, `LineChart`, `Menu`, `MetricBar`, `RankedList`, `ReportSection`, `ResizableSplit`, `RunSummary`, `SheetArtifact`, `formatCurrency`, `notify`
+`AgentComposer`, `AgentMessage`, `AgentTrace`, `ArtifactCard`, `ArtifactKind`, `ArtifactPanel`, `ArtifactTab`, `CommandPalette`, `ComposerChip`, `ContextItem`, `ContextView`, `InputModal`, `InsightCard`, `JsonView`, `KpiPair`, `LineChart`, `Menu`, `MetricBar`, `RankedList`, `ReportSection`, `ResizableSplit`, `RunSummary`, `SheetArtifact`, `formatCurrency`, `formatPercent`, `notify`

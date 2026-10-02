@@ -73,7 +73,7 @@ export default function MarketingPricing() {
             onChange={setCycle}
             options={[
               { value: "mensal", label: "Mensal" },
-              { value: "anual", label: "Anual · 17% off" },
+              { value: "anual", label: "Anual · 17 % de desconto" },
             ]}
           />
           <div className="w-[180px] text-left [&_label]:sr-only [&>div]:mb-0">

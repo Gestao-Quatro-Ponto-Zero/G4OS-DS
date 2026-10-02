@@ -31,4 +31,4 @@ Saúde de todos os agentes num olhar: execuções, sucesso, custo e latência p9
 
 ## Componentes usados
 
-`BarChart`, `BarList`, `Button`, `ChartCard`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `Meter`, `MiniBarChart`, `Page`, `PageHeading`, `SegmentedControl`, `formatCurrency`, `formatDuration`, `formatNumber`, `formatPercent`
+`BarChart`, `BarList`, `Button`, `ChartCard`, `Empty`, `ErrorState`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `Meter`, `MiniBarChart`, `Page`, `PageHeading`, `SegmentedControl`, `Skeleton`, `formatCurrency`, `formatDuration`, `formatNumber`, `formatPercent`

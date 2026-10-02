@@ -46,7 +46,7 @@ const docs: Record<Doc, { title: string; summary: string; sections: Section[] }>
       { id: "pagamento", title: "Planos e pagamento", body: p("Os preços por licença estão na página de preços. A cobrança é mensal ou anual, por cartão ou boleto. Mudanças de plano no meio do ciclo são calculadas proporcionalmente na próxima fatura.") },
       { id: "dados", title: "Seus dados", body: p("Os dados que você cadastra continuam seus. Usamos esses dados só para prestar o serviço, conforme a Política de privacidade. Você pode exportar tudo a qualquer momento em Configurações › Dados e privacidade.") },
       { id: "cancelamento", title: "Cancelamento", body: p("Você pode cancelar quando quiser em Configurações › Plano e cobrança. O acesso continua até o fim do ciclo pago; depois disso o workspace fica só leitura por 30 dias e então é excluído.") },
-      { id: "responsabilidade", title: "Limitação de responsabilidade", body: p("Mantemos disponibilidade mensal de 99,9%. Em caso de indisponibilidade acima disso, o crédito é proporcional ao tempo fora do ar, limitado ao valor pago no mês.") },
+      { id: "responsabilidade", title: "Limitação de responsabilidade", body: p("Mantemos disponibilidade mensal de 99,9 %. Em caso de indisponibilidade acima disso, o crédito é proporcional ao tempo fora do ar, limitado ao valor pago no mês.") },
       { id: "alteracoes", title: "Alterações nestes termos", body: p("Avisamos por e-mail e no próprio produto com 30 dias de antecedência sempre que uma mudança afetar seus direitos.") },
     ],
   },

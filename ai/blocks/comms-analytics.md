@@ -28,4 +28,4 @@ Painel de alcance: taxa de leitura contra a meta, tempo até a leitura, confirma
 
 ## Componentes usados
 
-`Badge`, `BarChart`, `BarList`, `Button`, `ChartCard`, `Column`, `DataTable`, `HeatmapMatrix`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `MiniBarChart`, `OperationButton`, `Page`, `PageHeading`, `SegmentedControl`, `downloadCsv`, `formatDate`, `formatNumber`, `formatPercent`, `plural`, `useOperation`, `useSort`
+`Badge`, `BarChart`, `BarList`, `Button`, `ChartCard`, `Column`, `DataTable`, `Empty`, `ErrorState`, `HeatmapMatrix`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `MiniBarChart`, `OperationButton`, `Page`, `PageHeading`, `SegmentedControl`, `Skeleton`, `downloadCsv`, `formatDate`, `formatNumber`, `formatPercent`, `plural`, `useOperation`, `useSort`

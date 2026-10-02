@@ -5,7 +5,7 @@
  */
 
 import type { Tone } from "@g4ai/ds";
-import { iso } from "./erp";
+import { iso, poTotal, supplierById, type PurchaseOrder } from "./erp";
 
 export { br, company, customerById, customers, daysAgo, iso, supplierById, suppliers, today } from "./erp";
 
@@ -119,11 +119,76 @@ export function addPayable(p: Payable) {
   payables.unshift(p);
   return p;
 }
+/** Remove títulos (desfazer a geração a partir de um pedido). */
+export function removePayables(ids: string[]) {
+  for (const id of ids) {
+    const i = payables.findIndex((p) => p.id === id);
+    if (i >= 0) payables.splice(i, 1);
+  }
+}
+/** Prazos em dias da condição de pagamento: "28/56 dias" → [28, 56]; "À vista" → [0]. */
+export const paymentTerms = (payment: string) => {
+  const days = payment.match(/\d+/g)?.map(Number) ?? [];
+  return days.length ? days : [0];
+};
+/** Data ISO + n dias. */
+const addDays = (isoDate: string, n: number) => {
+  const d = new Date(`${isoDate.slice(0, 10)}T00:00:00`);
+  d.setDate(d.getDate() + n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+/**
+ * Gera em Contas a pagar os títulos de um pedido de compra confirmado: uma
+ * parcela por prazo da condição, contada da data de entrega (faturamento na
+ * entrega), aguardando aprovação. Devolve os títulos criados.
+ */
+export function payablesFromPurchaseOrder(o: PurchaseOrder, base = o.expected): Payable[] {
+  const terms = paymentTerms(o.payment);
+  const total = poTotal(o);
+  const share = Math.floor((total / terms.length) * 100) / 100;
+  const s = supplierById(o.supplierId);
+  return terms.map((days, i) =>
+    addPayable({
+      id: `po${o.id}-${i + 1}`,
+      doc: `${o.number}${terms.length > 1 ? ` · ${i + 1}/${terms.length}` : ""}`,
+      supplier: s.name,
+      supplierId: s.id,
+      category: "Fornecedores",
+      costCenter: "1.02 · Estoque de revenda",
+      due: addDays(base, days),
+      // Última parcela leva o arredondamento.
+      value: i === terms.length - 1 ? Math.round((total - share * (terms.length - 1)) * 100) / 100 : share,
+      status: "aprovacao",
+      method: "Boleto",
+      approver: "Helena Duarte",
+      purchaseOrderId: o.id,
+      installment: terms.length > 1 ? `${i + 1}/${terms.length}` : undefined,
+    }),
+  );
+}
+export const payablesOfPurchaseOrder = (orderId: string) => payables.filter((p) => p.purchaseOrderId === orderId);
+
 export const costCenters = ["1.02 · Estoque de revenda", "3.01 · Comercial", "3.02 · Logística", "4.01 · Ocupação", "4.02 · Administrativo", "5.01 · Pessoal", "6.01 · Tributos"];
 export const payableCategories = ["Fornecedores", "Frete", "Utilidades", "Pessoal", "Impostos", "Despesas fixas", "TI"];
 
 export type PayableStatus = "aprovacao" | "agendado" | "pago" | "atrasado";
-export type Payable = { id: string; doc: string; supplier: string; supplierId?: string; category: string; costCenter: string; due: string; value: number; status: PayableStatus; method: "Boleto" | "Pix" | "TED" | "DARF"; approver?: string };
+export type Payable = {
+  id: string;
+  doc: string;
+  supplier: string;
+  supplierId?: string;
+  category: string;
+  costCenter: string;
+  due: string;
+  value: number;
+  status: PayableStatus;
+  method: "Boleto" | "Pix" | "TED" | "DARF";
+  approver?: string;
+  /** Pedido de compra que gerou o título (Operações → Financeiro). */
+  purchaseOrderId?: string;
+  /** Parcela, quando a condição divide o pagamento ("1/2"). */
+  installment?: string;
+};
 export const payableStatus: Record<PayableStatus, { label: string; tone: Tone }> = {
   aprovacao: { label: "Aguardando aprovação", tone: "info" },
   agendado: { label: "Agendado", tone: "neutral" },

@@ -34,9 +34,12 @@ export function formatCurrency(n: number, options: { compact?: boolean; currency
 export const formatCompact = (n: number) =>
   nf("compact", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 
-/** 0.1234 → "12,3 %". Recebe fração (0–1), não porcentagem. */
+/**
+ * 0.1234 → "12,3 %". Recebe fração (0–1), não porcentagem.
+ * Espaço inseparável antes do % (norma brasileira; o Intl pt-BR cola o sinal ao número).
+ */
 export const formatPercent = (fraction: number, digits = 1) =>
-  nf(`p${digits}`, { style: "percent", maximumFractionDigits: digits }).format(fraction);
+  nf(`p${digits}`, { style: "percent", maximumFractionDigits: digits }).format(fraction).replace(/\s?%/, "\u00A0%");
 
 /** Variação assinada: 0.125 → "+12,5 %", -0.2 → "−20 %" (sinal de menos tipográfico). */
 export const formatDelta = (fraction: number, digits = 1) => {

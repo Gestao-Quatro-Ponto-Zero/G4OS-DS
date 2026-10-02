@@ -7,9 +7,11 @@ import {
   Empty,
   EmptyFilterResult,
   EntityMark,
+  FileDropzone,
   FilterBar,
   Highlight,
   Menu,
+  Modal,
   Page,
   PageHeading,
   SavedViews,
@@ -48,6 +50,7 @@ import {
   type ContractStatus,
   type ContractType,
 } from "./data/contracts";
+import { savePdf } from "./shells/download";
 import { go, useFrameParam } from "./shells/frame-route";
 import { ClmShell, ContractStatusBadge, EndsIn, LoadError, LoadingRows, useListState } from "./shells/clm-shell";
 
@@ -114,6 +117,7 @@ export default function ClmContracts() {
   const estado = useListState();
   const visao = useFrameParam("visao");
   const [rows, setRows] = useState(seed);
+  const [importing, setImporting] = useState(false);
   const filters = useFilters(rows, { fields, search: searchText, me: me.id, now: today, url: "c_" });
   const saved = useSavedViews(filters, views, "pacto-contratos-visoes");
   const counts = Object.fromEntries(saved.views.map((v) => [v.id, filters.countFor(v.state)]));
@@ -258,7 +262,7 @@ export default function ClmContracts() {
           description="Toda a carteira da Vereda: o que está em negociação, o que vale hoje e o que vence. Clique numa linha para abrir o contrato."
           actions={
             <>
-              <Button variant="ghost" onClick={() => notify("Exemplo: abre o importador de PDFs assinados (a IA extrai partes, valores e prazos)", undefined, "info")}>
+              <Button variant="ghost" onClick={() => setImporting(true)}>
                 <FileUp /> Importar assinados
               </Button>
               <Button onClick={() => go("clm-request")}>
@@ -316,7 +320,7 @@ export default function ClmContracts() {
                 onRowOpen={(c) => go("clm-contract", c.id)}
                 rowActions={(c) => [
                   { label: "Renovar", icon: <RefreshCw />, inline: c.status === "vigente" || c.status === "vencido", disabled: !(c.status === "vigente" || c.status === "vencido"), onSelect: () => go("clm-contract", { id: c.id, acao: "renovar" }) },
-                  { label: "Baixar PDF", icon: <Download />, inline: true, onSelect: () => notify(`${c.number}.pdf baixado`, undefined, "info") },
+                  { label: "Baixar PDF", icon: <Download />, inline: true, onSelect: () => (savePdf(`${c.number}.pdf`, [`${c.number} · ${c.title}`, `Contraparte: ${counterpartyById(c.counterpartyId).name}`, `Vigência: ${formatDate(c.start)} a ${formatDate(c.end)}`, `Valor total: ${formatCurrency(c.value)}`]), notify(`${c.number}.pdf baixado`)) },
                   { label: "Duplicar como rascunho", icon: <Copy />, onSelect: () => duplicate(c) },
                   { label: "Lembrar o responsável", icon: <BellRing />, separator: true, onSelect: () => notify(`Lembrete enviado para ${personById(c.owner).name}`) },
                 ]}
@@ -345,6 +349,24 @@ export default function ClmContracts() {
           )}
         </div>
       </Page>
+      <Modal
+        open={importing}
+        onClose={() => setImporting(false)}
+        title="Importar contratos assinados"
+        description="Envie os PDFs que já estão assinados. A IA extrai partes, valores e prazos; você revisa cada um antes de entrar na carteira."
+      >
+        <FileDropzone
+          label="PDFs assinados"
+          accept=".pdf"
+          multiple
+          maxSize={20 * 1_048_576}
+          hint="PDF até 20 MB cada. Contratos digitalizados também funcionam."
+          onFiles={(files) => {
+            setImporting(false);
+            notify(`${files.length === 1 ? `${files[0].name} enviado` : `${files.length} PDFs enviados`} para extração · você é avisado quando estiverem prontos para revisar`);
+          }}
+        />
+      </Modal>
     </ClmShell>
   );
 }

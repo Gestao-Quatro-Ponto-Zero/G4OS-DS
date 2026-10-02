@@ -1,13 +1,17 @@
 import { CalendarClock, Clock, FileText, ListPlus, Paperclip, Plus, Sparkles, Wand2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AiBadge,
   Button,
   ComposeEmail,
   ComposeEmailDialog,
+  ComposerChip,
+  DateTimePicker,
+  Modal,
   Page,
   PageHeading,
   cn,
+  formatDate,
   notify,
   type ComposeStatus,
   type MenuEntry,
@@ -44,7 +48,22 @@ const directory: Person[] = contacts.map((c) => ({ id: c.id, name: c.name, email
 const find = (id: string) => directory.find((p) => p.id === id)!;
 const from: Person = { id: me.id, name: me.name, email: me.email, initials: me.initials, tint: me.tint, verified: true };
 
-type Draft = { id: string; reason: string; to: Person[]; subject: string; body: string; status: ComposeStatus; when: string };
+type Draft = { id: string; reason: string; to: Person[]; subject: string; body: string; status: ComposeStatus; when: string; attachments?: string[] };
+
+/** "Deixar mais curto": mantém saudação, o primeiro parágrafo e a despedida. */
+function shorten(body: string) {
+  const parts = body.split(/\n\n+/);
+  if (parts.length <= 3) return body;
+  return [parts[0], parts[1], parts[parts.length - 1]].join("\n\n");
+}
+
+/** Dia útil a N dias de hoje (pula sábado e domingo), às 08:00. */
+function businessDay(n: number) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  return `${formatDate(d, { short: true })}, 08:00`;
+}
 
 const seed: Draft[] = [
   {
@@ -92,14 +111,24 @@ export default function AiComposeEmail() {
     return () => mq.removeEventListener("change", on);
   }, []);
 
+  const [scheduling, setScheduling] = useState<{ d: Draft; onPatch: (p: Partial<Draft>) => void } | null>(null);
+  const [when, setWhen] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
+  const attachTarget = useRef<{ d: Draft; onPatch: (p: Partial<Draft>) => void } | null>(null);
+
   const draft = drafts.find((d) => d.id === current) ?? drafts[0];
   const patch = (id: string, p: Partial<Draft>) => setDrafts((list) => list.map((d) => (d.id === id ? { ...d, ...p } : d)));
 
-  const send = (d: Draft, onPatch: (p: Partial<Draft>) => void) => {
+  const send = (d: Draft, onPatch: (p: Partial<Draft>) => void, followUp?: Draft) => {
     onPatch({ status: "sending" });
     setTimeout(() => {
       onPatch({ status: "sent", when: "agora" });
-      notify(`E-mail enviado para ${d.to.map((p) => p.name.split(" ")[0]).join(", ")}`, () => onPatch({ status: "draft" }));
+      if (followUp) setDrafts((list) => [...list, followUp]);
+      const to = d.to.map((p) => p.name.split(" ")[0]).join(", ");
+      notify(followUp ? `E-mail enviado para ${to} · follow-up agendado para ${followUp.when}` : `E-mail enviado para ${to}`, () => {
+        onPatch({ status: "draft" });
+        if (followUp) setDrafts((list) => list.filter((x) => x.id !== followUp.id));
+      });
     }, 700);
   };
   const sendOptions = (d: Draft, onPatch: (p: Partial<Draft>) => void): MenuEntry[] => [
@@ -111,23 +140,60 @@ export default function AiComposeEmail() {
         notify("Envio agendado para amanhã às 08:00", () => onPatch({ status: "draft" }));
       },
     },
-    { label: "Escolher data e hora…", icon: <Clock className="h-4 w-4" />, onSelect: () => notify("Exemplo: abre o seletor de data e hora (DateTimePicker)", undefined, "info") },
+    {
+      label: "Escolher data e hora…",
+      icon: <Clock className="h-4 w-4" />,
+      onSelect: () => {
+        setWhen("");
+        setScheduling({ d, onPatch });
+      },
+    },
     { type: "separator" },
     {
       label: "Enviar e criar follow-up em 3 dias",
       icon: <ListPlus className="h-4 w-4" />,
-      onSelect: () => {
-        send(d, onPatch);
-        notify("Follow-up criado para segunda-feira", undefined, "info");
-      },
+      onSelect: () =>
+        send(d, onPatch, {
+          id: `fu-${d.id}-${Date.now()}`,
+          reason: `Follow-up de “${d.subject || "e-mail enviado"}”`,
+          to: d.to,
+          subject: d.subject ? `Re: ${d.subject}` : "Retomando nossa conversa",
+          body: `Olá,\n\nRetomando o e-mail que enviei há alguns dias. Conseguiram avaliar?\n\nAbraço,\n${from.name.split(" ")[0]}`,
+          status: "scheduled",
+          when: businessDay(3),
+        }),
     },
   ];
-  const addOptions: MenuEntry[] = [
-    { label: "Anexar arquivo", icon: <Paperclip className="h-4 w-4" />, onSelect: () => notify("Exemplo: abre o seletor de arquivos", undefined, "info") },
-    { label: "Inserir proposta do Drive", icon: <FileText className="h-4 w-4" />, onSelect: () => notify("Proposta-Aurora-v3.pdf anexada") },
-    { type: "separator" },
-    { label: "Pedir à IA: deixar mais curto", icon: <Wand2 className="h-4 w-4" />, onSelect: () => notify("Exemplo: o agente reescreve o corpo com metade do tamanho", undefined, "info") },
-  ];
+  const addOptions = (d: Draft, onPatch: (p: Partial<Draft>) => void): MenuEntry[] => {
+    const attach = (name: string) => {
+      const before = d.attachments ?? [];
+      if (before.includes(name)) return notify(`${name} já está anexado`, undefined, "info");
+      onPatch({ attachments: [...before, name] });
+      notify(`${name} anexado`, () => onPatch({ attachments: before }));
+    };
+    return [
+      {
+        label: "Anexar arquivo",
+        icon: <Paperclip className="h-4 w-4" />,
+        onSelect: () => {
+          attachTarget.current = { d, onPatch };
+          fileInput.current?.click();
+        },
+      },
+      { label: "Inserir proposta do Drive", icon: <FileText className="h-4 w-4" />, onSelect: () => attach("Proposta-Aurora-v3.pdf") },
+      { type: "separator" },
+      {
+        label: "Pedir à IA: deixar mais curto",
+        icon: <Wand2 className="h-4 w-4" />,
+        disabled: shorten(d.body) === d.body,
+        onSelect: () => {
+          const before = d.body;
+          onPatch({ body: shorten(before) });
+          notify("Texto encurtado", () => onPatch({ body: before }));
+        },
+      },
+    ];
+  };
   const modelMenu = { name: model, options: [{ type: "radio" as const, value: model, onValueChange: setModel, options: ["Opus 4.5", "Sonnet 4.5", "Haiku 4.5"].map((m) => ({ value: m, label: m })) }] };
 
   const composeFor = (d: Draft, onPatch: (p: Partial<Draft>) => void, onClose?: () => void) => ({
@@ -144,13 +210,27 @@ export default function AiComposeEmail() {
     status: d.status,
     onSend: () => send(d, onPatch),
     sendOptions: sendOptions(d, onPatch),
-    addOptions,
+    addOptions: addOptions(d, onPatch),
     onClose,
-    notice: d.reason ? (
-      <span className="inline-flex items-center gap-1.5">
-        <Sparkles className="h-3.5 w-3.5 text-accent" /> Rascunho do agente Williams · {d.reason}
-      </span>
-    ) : undefined,
+    notice:
+      d.reason || d.attachments?.length ? (
+        <span className="flex flex-col gap-2">
+          {d.reason && (
+            <span className="inline-flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-accent" /> Rascunho do agente Williams · {d.reason}
+            </span>
+          )}
+          {!!d.attachments?.length && (
+            <span className="flex flex-wrap gap-1.5" aria-label="Anexos">
+              {d.attachments.map((a) => (
+                <ComposerChip key={a} icon={<Paperclip className="h-3 w-3" />} onRemove={() => onPatch({ attachments: d.attachments?.filter((x) => x !== a) })}>
+                  {a}
+                </ComposerChip>
+              ))}
+            </span>
+          )}
+        </span>
+      ) : undefined,
   });
 
   return (
@@ -214,6 +294,52 @@ export default function AiComposeEmail() {
         title={compose === "draft" ? "Rascunho" : "Escrever e-mail"}
         onClose={() => setCompose(null)}
       />
+      <input
+        ref={fileInput}
+        type="file"
+        hidden
+        multiple
+        onChange={(e) => {
+          const names = Array.from(e.target.files ?? []).map((f) => f.name);
+          e.target.value = "";
+          const t = attachTarget.current;
+          if (!t || !names.length) return;
+          const before = t.d.attachments ?? [];
+          t.onPatch({ attachments: [...before, ...names.filter((n) => !before.includes(n))] });
+          notify(names.length === 1 ? `${names[0]} anexado` : `${names.length} arquivos anexados`, () => t.onPatch({ attachments: before }));
+        }}
+      />
+      <Modal
+        open={!!scheduling}
+        onClose={() => setScheduling(null)}
+        title="Agendar envio"
+        description="O e-mail sai no horário escolhido. Até lá, dá para editar ou cancelar o agendamento."
+        size="sm"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setScheduling(null)}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={!when}
+              disabledReason="Escolha a data e a hora"
+              onClick={() => {
+                if (!scheduling || !when) return;
+                const [date, time] = when.split("T");
+                const label = `${formatDate(`${date}T12:00:00`, { short: true })}, ${time}`;
+                const { onPatch } = scheduling;
+                onPatch({ status: "scheduled", when: label });
+                setScheduling(null);
+                notify(`Envio agendado para ${label}`, () => onPatch({ status: "draft" }));
+              }}
+            >
+              Agendar envio
+            </Button>
+          </>
+        }
+      >
+        <DateTimePicker label="Data e hora do envio" value={when} onChange={setWhen} className="mb-0" />
+      </Modal>
     </StudioShell>
   );
 }

@@ -77,7 +77,12 @@ export default function TaskProposals() {
         </span>
         <span className="ml-auto flex items-center gap-2">
           <AvatarGroup people={meeting.attendees} max={4} />
-          <button type="button" onClick={() => notify("Link do resumo copiado", undefined, "info")} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] ring-1 ring-line hover:bg-soft">
+          <button type="button" onClick={() =>
+              navigator.clipboard
+                ?.writeText(location.href)
+                .then(() => notify("Link do resumo copiado"))
+                .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info"))
+            } className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] ring-1 ring-line hover:bg-soft">
             <Share2 className="h-3.5 w-3.5" /> Compartilhar
           </button>
         </span>

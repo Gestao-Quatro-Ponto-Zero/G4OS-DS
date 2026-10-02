@@ -22,6 +22,7 @@ import {
   notify,
 } from "@g4ai/ds";
 import { candidateById, interviewsOf, iso, jobById, person, scorecardsOf, shortDate, stageLabel, stages, team, verdictInfo, type Candidate } from "./data/ats";
+import { savePdf } from "./shells/download";
 import { go, useFrameParam } from "./shells/frame-route";
 import { TalentosShell } from "./shells/talentos-shell";
 
@@ -302,7 +303,11 @@ function Profile({ candidate: c }: { candidate: Candidate }) {
                     ]}
                   />
                   <div className="mt-4 flex gap-2">
-                    <Button size="sm" variant="ghost" className="flex-1" onClick={() => notify(`Baixando currículo de ${first} (PDF)`, undefined, "info")}>
+                    <Button size="sm" variant="ghost" className="flex-1" onClick={() => {
+                        const file = `curriculo-${c.name.toLowerCase().normalize("NFD").replace(/[^a-z ]/g, "").trim().replace(/\s+/g, "-")}.pdf`;
+                        savePdf(file, [c.name, c.headline, `${c.city} · ${c.email} · ${c.phone}`, "", `Candidatura: ${job.title}`, `Origem: ${c.referral ? `indicação de ${c.referral}` : c.source}`, `Disponibilidade: ${c.notice}`]);
+                        notify(`Currículo de ${first} baixado`);
+                      }}>
                       <Download /> Currículo
                     </Button>
                     <Button size="sm" variant="ghost" className="flex-1" href={`mailto:${c.email}`}>

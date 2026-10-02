@@ -28,7 +28,7 @@ Exemplo (showcase `#/p/fb-avisos`):
 Dispara um toast de qualquer lugar (não precisa de contexto React).
 
 ```ts
-notify(message, undo?, tone?): void
+notify(message, undoOrOptions?, tone?): void
 ```
 
 Exemplo (showcase `#/p/fb-toasts`):
@@ -36,6 +36,20 @@ Exemplo (showcase `#/p/fb-toasts`):
 ```tsx
 arquivar(candidato);
 notify("Candidato arquivado", () => restaurar(candidato));
+```
+
+## NotifyAction (type)
+
+Ação do toast que leva ao resultado ("Ver título", "Abrir pedido").
+
+```ts
+type NotifyAction = { label: string; onClick: () => void }
+```
+
+## NotifyOptions (type)
+
+```ts
+type NotifyOptions = { undo?: () => void; action?: NotifyAction; tone?: Notice["tone"] }
 ```
 
 ## Operation (type)
@@ -73,7 +87,7 @@ Bloco de erro com a saída certa.
 ## OperationSuccess (type)
 
 ```ts
-type OperationSuccess = { message: string; undo?: () => void }
+type OperationSuccess = { message: string; undo?: () => void; action?: NotifyAction }
 ```
 
 ## Skeleton

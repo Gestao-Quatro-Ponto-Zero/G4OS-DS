@@ -43,6 +43,7 @@ import {
   type FilterField, PageToolbar
 } from "@g4ai/ds";
 import { addPayable, br, company, costCenters, iso, payableCategories, payableStatus, payables as seed, suppliers, today, type Payable } from "./data/fin";
+import { saveText } from "./shells/download";
 import { setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { NexoShell, demoError, useDemoState } from "./shells/nexo-shell";
 
@@ -240,7 +241,7 @@ export default function FinPayables() {
               <Send /> Pagar agora
             </Button>
           ) : (
-            <Button variant="ghost" onClick={() => notify("Comprovante baixado (PDF)", undefined, "info")}>
+            <Button variant="ghost" onClick={() => downloadReceipt(p)}>
               Baixar comprovante
             </Button>
           ))
@@ -258,6 +259,7 @@ export default function FinPayables() {
                 { label: "Forma", value: p.method },
                 { label: "Centro de custo", value: p.costCenter },
                 { label: "Fornecedor", value: p.supplierId ? <a className="text-blue hover:underline" href={`#/frame/erp-suppliers?id=${p.supplierId}`}>Ver cadastro</a> : undefined },
+                { label: "Origem", value: p.purchaseOrderId ? <a className="font-medium text-blue hover:underline" href={`#/frame/erp-purchase-order?id=${p.purchaseOrderId}`}>Pedido de compra {p.doc.split(" · ")[0]}</a> : undefined, hint: p.installment ? `parcela ${p.installment} · gerada na confirmação do fornecedor` : p.purchaseOrderId ? "gerado na confirmação do fornecedor" : undefined },
                 { label: "Aprovador", value: p.approver },
               ]}
             />
@@ -279,6 +281,14 @@ export default function FinPayables() {
       )}
     </NexoShell>
   );
+}
+
+/** Comprovante gerado no navegador (HTML para abrir, imprimir ou salvar em PDF). */
+function downloadReceipt(p: Payable) {
+  const rows = [["Favorecido", p.supplier], ["Documento", p.doc], ["Vencimento", br(p.due)], ["Valor", formatCurrency(p.value)], ["Forma", p.method], ["Centro de custo", p.costCenter], ["Pagador", company.name]];
+  const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Comprovante ${p.doc}</title></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:40px auto"><h1 style="font-size:20px">Comprovante de pagamento</h1><table>${rows.map(([k, v]) => `<tr><th align="left" style="padding:4px 16px 4px 0">${k}</th><td>${v}</td></tr>`).join("")}</table></body></html>`;
+  saveText(`comprovante-${p.doc.replace(/\W+/g, "-").toLowerCase()}.html`, html, "text/html");
+  notify(`Comprovante de ${p.doc} baixado`);
 }
 
 /* ------------------------------------------------------------------ */

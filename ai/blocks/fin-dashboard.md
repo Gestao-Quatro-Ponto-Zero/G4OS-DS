@@ -14,7 +14,7 @@ O dia da controladoria em uma tela: caixa e projeção contra o mínimo, liquide
 
 - Anatomia B · Painel: cabeçalho fixo com período
 - KPIs de liquidez, aging e caixa contra o mínimo
-- Filas de ação (aprovar, conciliar) antes dos detalhes
+- “Precisa de você” (aprovar pagamentos, cobrar vencidos sem promessa) ao lado da conciliação, antes dos detalhes
 
 **Quando usar e o que adaptar**
 
@@ -26,4 +26,4 @@ O dia da controladoria em uma tela: caixa e projeção contra o mínimo, liquide
 
 ## Componentes usados
 
-`BarList`, `Button`, `ChartCard`, `Empty`, `GaugeChart`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Meter`, `Page`, `PageHeading`, `ProportionBar`, `formatCurrency`, `formatPercent`
+`BarList`, `Button`, `ChartCard`, `Empty`, `ErrorState`, `GaugeChart`, `KpiCard`, `KpiGrid`, `LineChart`, `ListPanel`, `ListRow`, `Meter`, `Page`, `PageHeading`, `ProportionBar`, `Skeleton`, `formatCurrency`, `formatDelta`, `formatNumber`

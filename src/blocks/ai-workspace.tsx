@@ -1,4 +1,4 @@
-import { ChevronRight, Database, Link, Paperclip, PanelRightOpen, Sparkles } from "lucide-react";
+import { ChevronRight, Database, FileText, Globe, Link, Paperclip, PanelRightOpen, Sparkles, Table2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AgentComposer,
@@ -6,8 +6,10 @@ import {
   AgentTrace,
   ArtifactCard,
   ArtifactPanel,
+  CommandPalette,
   ComposerChip,
   ContextView,
+  InputModal,
   InsightCard,
   JsonView,
   KpiPair,
@@ -24,10 +26,12 @@ import {
   type ArtifactKind,
   type ArtifactTab,
   type ContextItem,
+  formatPercent,
 } from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
-import { useFrameParam } from "./shells/frame-route";
-import { answer, context as baseContext, followUps, insights, projectById, sheetChanged, sheetColumns, sheetRows, slashCommands, traceFor, visibility } from "./data/agent";
+import { saveText } from "./shells/download";
+import { frameHref, useFrameParam } from "./shells/frame-route";
+import { answer, context as baseContext, extraSources, followUps, insights, projectById, sheetChanged, sheetColumns, sheetRows, slashCommands, traceFor, visibility } from "./data/agent";
 
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
@@ -86,6 +90,16 @@ export default function AiWorkspace() {
   const [active, setActive] = useState("report");
   const [ctx, setCtx] = useState<ContextItem[]>(baseContext);
   const [draft, setDraft] = useState("");
+  const [agentName, setAgentName] = useState<string>(project.agent);
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+  /** Fonte nova entra no contexto já fixada (vira chip no campo). */
+  const addContext = (items: ContextItem[], label: string) => {
+    const ids = items.map((i) => i.id);
+    setCtx((x) => [...x.filter((i) => !ids.includes(i.id)), ...items.map((i) => ({ ...i, pinned: true }))]);
+    notify(label, () => setCtx((x) => x.filter((i) => !ids.includes(i.id))));
+  };
   const [msgs, setMsgs] = useState<Msg[]>(() => [
     { id: "u1", role: "user", text: project.question },
     {
@@ -195,7 +209,16 @@ export default function AiWorkspace() {
                 }
                 suggestions={m.status === "done" ? m.suggestions : undefined}
                 onSuggestion={(s) => (s === "Abrir no painel" ? m.artifacts[0] && openArtifact(m.artifacts[0].id, m.artifacts[0].kind, m.artifacts[0].title) : send(s))}
-                onRetry={m.status === "done" ? () => notify("Refazendo com os mesmos dados…", undefined, "info") : undefined}
+                onRetry={
+                  m.status === "done" && !running
+                    ? () => {
+                        // Refaz: reenvia a pergunta que gerou esta resposta.
+                        const i = msgs.findIndex((x) => x.id === m.id);
+                        const q = msgs.slice(0, i).reverse().find((x) => x.role === "user");
+                        if (q && q.role === "user") send(q.text);
+                      }
+                    : undefined
+                }
                 onFeedback={(v) => notify(v === "up" ? "Obrigado pelo retorno" : "Vamos usar isso para melhorar", undefined, "info")}
                 copyText={m.text.join("\n\n")}
               >
@@ -218,9 +241,9 @@ export default function AiWorkspace() {
             commands={slashCommands}
             placeholder="Pergunte ou dê uma tarefa ao agente… ( / para comandos)"
             attachOptions={[
-              { label: "Arquivo do computador", icon: <Paperclip className="h-4 w-4" />, onSelect: () => notify("Exemplo: abriria o seletor de arquivos", undefined, "info") },
-              { label: "Dados do CRM", icon: <Database className="h-4 w-4" />, onSelect: () => openArtifact("context", "context", "Contexto") },
-              { label: "Link (URL)", icon: <Link className="h-4 w-4" />, onSelect: () => notify("Exemplo: pediria a URL", undefined, "info") },
+              { label: "Arquivo do computador", icon: <Paperclip className="h-4 w-4" />, onSelect: () => fileInput.current?.click() },
+              { label: "Dados do CRM", icon: <Database className="h-4 w-4" />, onSelect: () => setSourcesOpen(true) },
+              { label: "Link (URL)", icon: <Link className="h-4 w-4" />, onSelect: () => setLinkOpen(true) },
             ]}
             agentChip={
               <Menu
@@ -229,10 +252,10 @@ export default function AiWorkspace() {
                 triggerClassName="!h-8 !gap-1.5 !rounded-full !px-2.5 !text-[12px] !font-normal !text-ink-soft [&_svg]:!h-3.5 [&_svg]:!w-3.5"
                 trigger={
                   <>
-                    <Sparkles className="h-3.5 w-3.5 text-accent-deep" /> {project.agent}
+                    <Sparkles className="h-3.5 w-3.5 text-accent-deep" /> {agentName}
                   </>
                 }
-                items={["Analista de receita", "Analista financeiro", "Pesquisa de mercado", "Operações"].map((a) => ({ label: a, onSelect: () => notify(`Agente: ${a}`, undefined, "info") }))}
+                items={["Analista de receita", "Analista financeiro", "Pesquisa de mercado", "Operações"].map((a) => ({ type: "checkbox" as const, label: a, checked: a === agentName, onCheckedChange: () => setAgentName(a) }))}
               />
             }
             contextChips={
@@ -266,7 +289,7 @@ export default function AiWorkspace() {
           className="mt-5"
           items={ctx}
           onPinChange={(cid, pinned) => setCtx((x) => x.map((i) => (i.id === cid ? { ...i, pinned } : i)))}
-          onAdd={() => notify("Exemplo: abriria a busca de fontes", undefined, "info")}
+          onAdd={() => setSourcesOpen(true)}
         />
       </div>
     ),
@@ -275,18 +298,7 @@ export default function AiWorkspace() {
         <ReportSection title="Saída estruturada">
           <p>O mesmo resultado em formato de dados, para automações e integrações.</p>
         </ReportSection>
-        <JsonView
-          maxHeight={420}
-          value={{
-            projeto: project.title,
-            conclusao: "Queda de conversão PME ligada à página de preços sem valor final",
-            evidencias: { conversao_pme: { agosto: 0.141, setembro: 0.092 }, objecao_principal: "preço pouco claro", mencoes: 17 },
-            acoes: [
-              { acao: "Publicar preço final", paginas: 7, prioridade: "alta" },
-              { acao: "Preço no e-mail pós-demo", prioridade: "alta" },
-            ],
-          }}
-        />
+        <JsonView maxHeight={420} value={structuredOutput(project.title)} />
       </div>
     ),
     sheet: (
@@ -314,7 +326,7 @@ export default function AiWorkspace() {
               { key: "conv", label: "2026" },
               { key: "ano", label: "2025", dashed: true, color: "var(--ds-chart-6)" },
             ]}
-            format={(n) => `${n.toFixed(1).replace(".", ",")}%`}
+            format={(n) => formatPercent(n / 100, 1)}
             height={220}
           />
         </div>
@@ -342,19 +354,107 @@ export default function AiWorkspace() {
         setPanelOpen(false);
         setExpanded(false);
       }}
-      onCopy={() => notify("Conteúdo da aba copiado", undefined, "info")}
-      onExport={() => notify(`Exportando “${activeTab?.title}”…`, undefined, "info")}
-      onShare={() => notify("Link de visualização copiado", undefined, "info")}
+      onCopy={() => {
+        const out = tabExport(activeTab ?? tabs[0], project.title, ctx);
+        navigator.clipboard
+          ?.writeText(out.text)
+          .then(() => notify("Conteúdo da aba copiado"))
+          .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info"));
+      }}
+      onExport={() => {
+        const out = tabExport(activeTab ?? tabs[0], project.title, ctx);
+        saveText(out.name, out.text, out.type);
+        notify(`${out.name} baixado`);
+      }}
+      onShare={() => {
+        const link = `${location.href.split("#")[0]}${frameHref("ai-workspace", project.id)}`;
+        navigator.clipboard
+          ?.writeText(link)
+          .then(() => notify("Link do projeto copiado"))
+          .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info"));
+      }}
     >
       {view}
     </ArtifactPanel>
   );
 
+  const sourceIcon = { record: Database, table: Table2, doc: FileText, web: Globe, tool: Database } as const;
+  const dialogs = (
+    <>
+      <input
+        ref={fileInput}
+        type="file"
+        hidden
+        multiple
+        onChange={(e) => {
+          const files = Array.from(e.target.files ?? []);
+          e.target.value = "";
+          if (!files.length) return;
+          addContext(
+            files.map((f, i) => ({ id: `file-${Date.now()}-${i}`, kind: "doc" as const, title: f.name, detail: "Arquivo anexado agora" })),
+            files.length === 1 ? `${files[0].name} adicionado ao contexto` : `${files.length} arquivos adicionados ao contexto`,
+          );
+        }}
+      />
+      <InputModal
+        open={linkOpen}
+        onClose={() => setLinkOpen(false)}
+        title="Adicionar link ao contexto"
+        description="O agente lê a página e usa nas próximas respostas."
+        icon={<Link aria-hidden />}
+        placeholder="acme.com.br/precos"
+        submitLabel="Adicionar link"
+        onSubmit={(v) => {
+          const url = v.trim().replace(/^https?:\/\//, "");
+          addContext([{ id: `web-${Date.now()}`, kind: "web", title: url, detail: "Link adicionado agora" }], "Link adicionado ao contexto");
+        }}
+      />
+      <CommandPalette
+        open={sourcesOpen}
+        onClose={() => setSourcesOpen(false)}
+        placeholder="Buscar registro, tabela ou documento…"
+        emptyLabel="Nenhuma fonte com esse nome"
+        commands={extraSources
+          .filter((x) => !ctx.some((c) => c.id === x.id))
+          .map((x) => {
+            const Icon = sourceIcon[x.kind];
+            return { id: x.id, label: x.title, group: "Fontes disponíveis", hint: typeof x.detail === "string" ? x.detail : undefined, icon: <Icon className="h-4 w-4" />, onSelect: () => addContext([x], `“${x.title}” adicionado ao contexto`) };
+          })}
+      />
+    </>
+  );
+
   return (
     <AgentShell current={agentRoutes.workspace}>
       {expanded && panelOpen && !mobile ? panel : <ResizableSplit left={conversation} right={panel} rightOpen={panelOpen} storageKey="ai-workspace" defaultSize={0.46} />}
+      {dialogs}
     </AgentShell>
   );
+}
+
+/** Mesma saída da aba Saída, para exibir e exportar. */
+function structuredOutput(title: string) {
+  return {
+    projeto: title,
+    conclusao: "Queda de conversão PME ligada à página de preços sem valor final",
+    evidencias: { conversao_pme: { agosto: 0.141, setembro: 0.092 }, objecao_principal: "preço pouco claro", mencoes: 17 },
+    acoes: [
+      { acao: "Publicar preço final", paginas: 7, prioridade: "alta" },
+      { acao: "Preço no e-mail pós-demo", prioridade: "alta" },
+    ],
+  };
+}
+
+const csvCell = (c: unknown) => (/[",;\n]/.test(String(c)) ? `"${String(c).replace(/"/g, '""')}"` : String(c));
+
+/** Conteúdo da aba como arquivo: planilha em CSV, saída em JSON, o resto em Markdown. */
+function tabExport(tab: ArtifactTab, title: string, ctx: ContextItem[]): { name: string; text: string; type: string } {
+  if (tab.id === "sheet") return { name: "paginas-com-preco.csv", type: "text/csv", text: [sheetColumns.map((c) => csvCell(c.label)).join(","), ...sheetRows.map((r) => sheetColumns.map((c) => csvCell(r[c.key as keyof typeof r])).join(","))].join("\r\n") };
+  if (tab.id === "output") return { name: "saida.json", type: "application/json", text: JSON.stringify(structuredOutput(title), null, 2) };
+  if (tab.kind === "chart") return { name: "comparativo-2025-2026.csv", type: "text/csv", text: ["dia,conversao_2026", ...visibility.map((v) => `${v.dia},${v.conv}`)].join("\r\n") };
+  if (tab.id === "context") return { name: "contexto.md", type: "text/markdown", text: [`# Contexto · ${title}`, "", ...ctx.map((c) => `- ${c.title}${typeof c.detail === "string" ? ` (${c.detail})` : ""}${c.pinned ? " · fixado" : ""}`)].join("\n") };
+  if (tab.id === "report") return { name: "relatorio.md", type: "text/markdown", text: [`# ${title}`, "", ...answer].join("\n\n") };
+  return { name: `${tab.id}.md`, type: "text/markdown", text: [`# ${tab.title}`, "", ...answer].join("\n\n") };
 }
 
 /** Aba Relatório: resumo, dois achados, descrição e o indicador no tempo. */
@@ -389,7 +489,7 @@ function ReportPane() {
           { label: "Negócios afetados", value: "121", hint: "perdidos em setembro" },
         ]}
       >
-        <LineChart label="Conversão PME por dia, setembro" data={visibility} index="dia" series={[{ key: "conv", label: "Conversão PME", color: "var(--ds-ok)" }]} reference={{ value: 15, label: "Meta 15 %" }} format={(n) => `${n.toFixed(1).replace(".", ",")}%`} formatAxis={(n) => `${n}%`} height={200} />
+        <LineChart label="Conversão PME por dia, setembro" data={visibility} index="dia" series={[{ key: "conv", label: "Conversão PME", color: "var(--ds-ok)" }]} reference={{ value: 15, label: "Meta 15 %" }} format={(n) => formatPercent(n / 100, 1)} formatAxis={(n) => `${n}%`} height={200} />
       </KpiPair>
     </div>
   );

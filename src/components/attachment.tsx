@@ -158,7 +158,7 @@ export function AttachmentDescription({ children, className }: { children?: Reac
   if (size === "xs") return null;
   const text =
     state === "uploading" && !children ? (
-      <span className="tabular-nums">Enviando…{progress != null ? ` ${Math.round(progress)}%` : ""}</span>
+      <span className="tabular-nums">Enviando…{progress != null ? ` ${Math.round(progress)}\u00A0%` : ""}</span>
     ) : state === "processing" && !children ? (
       <span className="ds-shimmer">Processando…</span>
     ) : (

@@ -34,6 +34,8 @@ Exemplos vivos e mini-diagramas: showcase › Navegação › Anatomia de págin
 
 **A · Lista.** A barra de filtros gruda **colada** ao cabeçalho quando a lista passa de uma tela: use `<PageToolbar>` envolvendo `SavedViews` + `FilterBar`. Abaixo de uma tela, não precisa. Escolha a rolagem pela forma da lista: tabela comum rola com a página; `DataGrid` com rolagem interna (`maxHeight="calc(100dvh - …)"`) quando há colunas fixas, totais no rodapé ou virtualização — aí a página praticamente não rola e o cabeçalho da grade fica fixo dentro dela.
 
+Faixa de números (`StatGrid`/`KpiGrid`) numa lista: **acima da `PageToolbar`** por padrão, logo abaixo do cabeçalho. Ali ela descreve a coleção inteira e não muda com o filtro. Ponha a faixa **abaixo** da `PageToolbar` só quando os números descrevem o recorte filtrado (mudam com cada filtro); nesse caso o rótulo ou a legenda diz "no recorte" ("Execuções no recorte", "12 % do recorte"), para ninguém ler o total do recorte como total geral. Referência: `ai-runs` (abaixo, recorte) e `erp-orders` (acima, geral).
+
 **B · Painel.** KPIs no topo (3–5), um gráfico por pergunta, filas de ação ("o que pede atenção") antes de detalhes. Período no cabeçalho, não espalhado pelos cards.
 
 **C · Registro.** A trilha leva de volta à lista. Ações mudam com o estado do registro (ganhar/perder, aprovar, faturar). A coluna de propriedades gruda abaixo do cabeçalho no desktop e vira seção no celular. Edição longa abre em `Drawer`, nunca em outra página.

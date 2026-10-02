@@ -39,6 +39,7 @@ import {
   type TaskStatus,
 } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./shells/atlas-shell";
+import { saveSample } from "./shells/download";
 import { setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { cases as initial, categories, categoryColor, notes, personOf, qaLabels, sharingLabel, statuses, type QaCase, type QaSharing } from "./data/qa-tracker";
 import { people } from "./data/workspace";
@@ -419,7 +420,9 @@ export default function RecordTracker() {
           <Button
             variant="ghost"
             onClick={() => {
-              notify(`${preview?.name} baixado`);
+              if (!preview) return;
+              const saved = saveSample(preview.name, [preview.name, `Evidência do caso ${open.code} · ${open.title}`, preview.meta ?? ""]);
+              notify(`${saved} baixado`);
               setPreview(null);
             }}
           >

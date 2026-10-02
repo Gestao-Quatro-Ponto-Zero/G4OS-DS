@@ -14,7 +14,7 @@ Contratações contra a meta, tempo até contratar por área contra o SLA, funil
 
 - Anatomia B · Painel: cabeçalho fixo com período, KPIs no topo
 - Um gráfico por pergunta: meta, tempo × SLA, funil, aceite, origem
-- Fila 'o que pede ação hoje' antes dos detalhes; “Precisa de você” leva a cada fila
+- “Precisa de você” antes dos detalhes: avaliações pendentes, propostas e requisições para aprovar, cada linha abre o registro
 - KPIs abrem o detalhe (relatórios, propostas)
 
 **Quando usar e o que adaptar**
@@ -27,4 +27,4 @@ Contratações contra a meta, tempo até contratar por área contra o SLA, funil
 
 ## Componentes usados
 
-`AreaChart`, `Avatar`, `Button`, `ChartCard`, `Column`, `DataTable`, `DonutChart`, `DumbbellChart`, `FunnelChart`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `SegmentedControl`, `formatCurrency`, `formatNumber`, `formatPercent`
+`AreaChart`, `Avatar`, `Button`, `ChartCard`, `Column`, `DataTable`, `DonutChart`, `DumbbellChart`, `Empty`, `ErrorState`, `FunnelChart`, `KpiCard`, `KpiGrid`, `ListPanel`, `ListRow`, `Page`, `PageHeading`, `SegmentedControl`, `Skeleton`, `formatCurrency`, `formatNumber`, `formatPercent`

@@ -40,6 +40,7 @@ import {
   type GridColumn,
   type SavedView,
   PageToolbar,
+  Popover,
 } from "@g4ai/ds";
 import { customers as baseCustomers, go, healthLabel, healthTone, iso, personById, planPrice, plans, segments, team, useFrameParam, type Customer, type Health, type Plan } from "./data/saas";
 import { ListError, ListSkeleton, SaasShell, useDemoState } from "./shells/saas-shell";
@@ -108,8 +109,15 @@ const exportCsv = (rows: Customer[]) => {
 
 const here = "#/frame/saas-customers";
 
+/** Etiquetas de exemplo: livres, criadas pela equipe (não confundir com plano ou saúde). */
+const seedLabels = ["Renovação 2027", "Expansão", "Case de sucesso", "Onboarding assistido"];
+const seedTags: Record<string, string[]> = { "1": ["Case de sucesso"], "4": ["Renovação 2027"], "9": ["Expansão"], "12": ["Onboarding assistido"] };
+
 export default function SaasCustomers() {
   const [customers, setCustomers] = useState(baseCustomers);
+  const [labels, setLabels] = useState(seedLabels);
+  const [tags, setTags] = useState(seedTags);
+  const [newLabel, setNewLabel] = useState("");
   const [creating, setCreating] = useState(false);
   const novo = useFrameParam("novo");
   const estado = useDemoState();
@@ -143,6 +151,24 @@ export default function SaasCustomers() {
   const pages = usePagination(sort.rows, 10, { resetKey: [filters.state, sort.sort] });
   const sel = useSelection(pages.rows.map((c) => c.id));
 
+  /** Aplica a etiqueta às selecionadas (cria se for nova) e oferece Desfazer. */
+  const applyLabel = (raw: string) => {
+    const label = raw.trim();
+    if (!label) return;
+    const ids = customers.filter((c) => sel.has(c.id)).map((c) => c.id);
+    const before = { tags, labels };
+    const existing = labels.find((l) => l.toLowerCase() === label.toLowerCase());
+    const name = existing ?? label;
+    if (!existing) setLabels((all) => [...all, name]);
+    setTags((all) => ({ ...all, ...Object.fromEntries(ids.map((id) => [id, all[id]?.includes(name) ? all[id] : [...(all[id] ?? []), name]])) }));
+    setNewLabel("");
+    sel.clear();
+    notify(`Etiqueta “${name}” aplicada a ${ids.length === 1 ? "1 cliente" : `${formatNumber(ids.length)} clientes`}`, () => {
+      setTags(before.tags);
+      setLabels(before.labels);
+    });
+  };
+
   const columns: Column<Customer>[] = [
     selectionColumn<Customer>(sel, (c) => c.id, (c) => c.name),
     {
@@ -155,6 +181,13 @@ export default function SaasCustomers() {
           <span className="min-w-0">
             <Highlight text={c.name} query={q} className="block truncate" />
             <Highlight text={`${c.segment} · ${c.city}`} query={q} className="block truncate text-[12px] font-normal text-muted" />
+            {!!tags[c.id]?.length && (
+              <span className="mt-1 flex flex-wrap gap-1">
+                {tags[c.id].map((t) => (
+                  <Badge key={t}>{t}</Badge>
+                ))}
+              </span>
+            )}
           </span>
         </span>
       ),
@@ -249,9 +282,45 @@ export default function SaasCustomers() {
             <button type="button" onClick={() => notify(`E-mail enviado para ${sel.count} clientes`)}>
               <Mail /> Enviar e-mail
             </button>
-            <button type="button" onClick={() => notify(`Etiqueta “Renovação 2027” aplicada a ${sel.count} clientes`)}>
-              <Tag /> Etiquetar
-            </button>
+            <Popover
+              trigger={
+                <>
+                  <Tag /> Etiquetar
+                </>
+              }
+              triggerLabel="Etiquetar clientes selecionados"
+              triggerClassName="text-on-ink hover:bg-on-ink/10 data-popup-open:bg-on-ink/10"
+              title={`Etiquetar ${sel.count === 1 ? "1 cliente" : `${formatNumber(sel.count)} clientes`}`}
+              side="top"
+              width={280}
+            >
+              <ul className="m-0 -mx-2 list-none p-0">
+                {labels.map((l) => {
+                  const all = customers.filter((c) => sel.has(c.id)).every((c) => tags[c.id]?.includes(l));
+                  return (
+                    <li key={l}>
+                      <button type="button" disabled={all} onClick={() => applyLabel(l)} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] hover:bg-soft disabled:cursor-default disabled:text-muted disabled:hover:bg-transparent">
+                        <Tag className="h-3.5 w-3.5 text-muted" aria-hidden />
+                        <span className="flex-1">{l}</span>
+                        {all && <span className="text-[11px] text-muted">já aplicada</span>}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <form
+                className="mt-3 border-t border-line pt-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  applyLabel(newLabel);
+                }}
+              >
+                <TextField label="Nova etiqueta" value={newLabel} onChange={setNewLabel} placeholder="Ex.: Renovação 2027" />
+                <Button type="submit" size="sm" className="mt-2 w-full" disabled={!newLabel.trim()} disabledReason="Digite o nome da etiqueta.">
+                  <Plus /> Criar e aplicar
+                </Button>
+              </form>
+            </Popover>
             <button type="button" onClick={() => (exportCsv(customers.filter((c) => sel.has(c.id))), sel.clear())}>
               <Download /> Exportar
             </button>

@@ -84,6 +84,7 @@ import {
   type Renewal,
   type Signer,
 } from "./data/contracts";
+import { saveSample } from "./shells/download";
 import { frameHref, go, setFrameQuery, useFrameParam } from "./shells/frame-route";
 import { ClmShell, ContractStatusBadge, EndsIn } from "./shells/clm-shell";
 
@@ -182,6 +183,11 @@ export default function ClmContract() {
   const requester = personById(c.requester);
   const clauses = useMemo(() => keyClauses(c), [c]);
   const versions = useMemo(() => versionsFor(c), [c]);
+  // Arquivo de exemplo gerado no navegador (no app real, a URL assinada do repositório de contratos).
+  const downloadDoc = (file: string, subtitle?: string, extra: string[] = []) => {
+    const saved = saveSample(file, [`${c.number} · ${c.title}`, subtitle ?? file, `Contraparte: ${k.name}`, `Vigência: ${formatDate(c.start)} a ${formatDate(c.end)}`, ...extra]);
+    notify(`${saved} baixado`);
+  };
   const docs = useMemo(() => documentsFor(c), [c]);
   const approval = approvals.find((a) => a.contractId === c.id && a.status === "pendente");
   const pendingApprovers = approval?.chain.filter((s) => s.state !== "done").map((s) => personById(s.who).name.split(" ")[0]) ?? [];
@@ -297,7 +303,7 @@ export default function ClmContract() {
               <ActionMenu
                 actions={[
                   { label: c.status === "vigente" ? "Editar dados (gera aditivo)" : "Editar dados", disabled: c.status === "encerrado", onSelect: () => setEditOpen(true) },
-                  { label: "Baixar PDF da última versão", onSelect: () => notify(`${versions[versions.length - 1].file} baixado`, undefined, "info") },
+                  { label: "Baixar PDF da última versão", onSelect: () => downloadDoc(versions[versions.length - 1].file) },
                   { label: "Duplicar como rascunho", onSelect: duplicate },
                   { label: "Encerrar contrato", tone: "danger", separator: true, disabled: !(c.status === "vigente" || c.status === "vencido"), onSelect: () => setEndOpen(true) },
                 ]}
@@ -486,7 +492,7 @@ export default function ClmContract() {
                                   <li key={ch}>{ch}</li>
                                 ))}
                               </ul>
-                              <button type="button" onClick={() => notify(`${v.file} baixado`, undefined, "info")} className="mt-3 text-[12.5px] font-medium text-blue hover:underline">
+                              <button type="button" onClick={() => downloadDoc(v.file, `${v.version} · ${v.title}`, v.changes)} className="mt-3 text-[12.5px] font-medium text-blue hover:underline">
                                 Baixar {v.file}
                               </button>
                             </>
@@ -613,7 +619,7 @@ export default function ClmContract() {
                       <FilesList
                         files={docs.map((d) => ({ id: d.id, name: d.name, kind: d.kind, meta: d.meta }))}
                         rowMenu={(f) => [
-                          { label: "Baixar", onSelect: () => notify(`${f.name} baixado`, undefined, "info") },
+                          { label: "Baixar", onSelect: () => downloadDoc(f.name) },
                           { label: "Copiar link", onSelect: () => notify("Link copiado", undefined, "info") },
                         ]}
                       />

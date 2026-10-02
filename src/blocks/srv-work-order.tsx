@@ -1,5 +1,5 @@
-import { CalendarClock, Camera, CheckCircle2, ClipboardCheck, Clock, FileText, Package, PenLine, Play, Plus, Printer, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CalendarClock, Camera, CheckCircle2, ClipboardCheck, Clock, Eraser, FileText, Keyboard, Package, PenLine, Play, Plus, Printer, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
   ActionMenu,
   Attachment,
@@ -27,6 +27,7 @@ import {
   Page,
   PageHeading,
   PropertyList,
+  SegmentedControl,
   Select,
   SplitLayout,
   StagePath,
@@ -87,6 +88,7 @@ function WorkOrderRecord({ initial, fresh }: { initial: WorkOrder; fresh: boolea
   const [scheduling, setScheduling] = useState(false);
   const [billing, setBilling] = useState(false);
   const [signing, setSigning] = useState(false);
+  const [signature, setSignature] = useState<Signature | null>(null);
   const [cancel, setCancel] = useState(false);
   const [addingHours, setAddingHours] = useState(false);
   const [history, setHistory] = useState<TimelineItem[]>(() => historyOf(initial));
@@ -156,6 +158,8 @@ function WorkOrderRecord({ initial, fresh }: { initial: WorkOrder; fresh: boolea
 
   return (
     <ServicosShell section="os">
+      {/* Impressão: o registro da OS vira o relatório (sem navegação nem botões). */}
+      <style>{`@media print { aside[aria-label="Menu principal"], nav[aria-label="Navegação principal"], [role="tablist"], button { display: none !important; } }`}</style>
       <Page>
         <PageHeading
           crumbs={[{ label: "Ordens de serviço", href: frameHref("srv-work-orders") }]}
@@ -167,7 +171,7 @@ function WorkOrderRecord({ initial, fresh }: { initial: WorkOrder; fresh: boolea
               <ActionMenu
                 actions={[
                   ...(w.stage === "agendada" ? [{ label: "Reagendar", icon: <CalendarClock />, onSelect: () => setScheduling(true) }] : []),
-                  { label: "Imprimir relatório da OS", icon: <Printer />, onSelect: () => notify(`Relatório da ${w.number} enviado para impressão`, undefined, "info") },
+                  { label: "Imprimir relatório da OS", icon: <Printer />, onSelect: () => setTimeout(() => window.print(), 50) },
                   { label: "Cancelar OS", tone: "danger", separator: true, disabled: w.stage === "faturada", onSelect: () => setCancel(true) },
                 ]}
               />
@@ -242,11 +246,15 @@ function WorkOrderRecord({ initial, fresh }: { initial: WorkOrder; fresh: boolea
                         </div>
                         {w.signedBy ? (
                           <div className="mt-3 rounded-lg border border-line bg-soft px-4 py-3">
-                            <p className="m-0 text-[20px] italic leading-tight text-ink" style={{ fontFamily: "cursive" }}>
-                              {w.signedBy}
-                            </p>
+                            {signature?.image ? (
+                              <img src={signature.image} alt={`Assinatura de ${w.signedBy}`} className="h-20 w-auto max-w-full" />
+                            ) : (
+                              <p className="m-0 text-[20px] italic leading-tight text-ink" style={{ fontFamily: "cursive" }}>
+                                {w.signedBy}
+                              </p>
+                            )}
                             <p className="m-0 mt-1 text-[12px] text-muted">
-                              Assinado no app do técnico · {w.schedule ? `${dm(w.schedule.date)} às ${w.schedule.end}` : "hoje"} · confirmou o serviço executado
+                              {signature ? `${w.signedBy} · ${signature.image ? "desenhada" : "digitada"} hoje às ${signature.at}` : `Assinado no app do técnico · ${w.schedule ? `${dm(w.schedule.date)} às ${w.schedule.end}` : "hoje"}`} · confirmou o serviço executado
                             </p>
                           </div>
                         ) : (
@@ -366,16 +374,21 @@ function WorkOrderRecord({ initial, fresh }: { initial: WorkOrder; fresh: boolea
           ]}
         />
       </Modal>
-      <SignatureModal
-        open={signing}
-        onClose={() => setSigning(false)}
-        contact={k.contact}
-        onSign={(name) => {
-          setW((x) => ({ ...x, signedBy: name }));
-          log(`${name} assinou a OS no local`, "ok");
-          notify(`Assinatura de ${name} registrada`);
-        }}
-      />
+      {signing && (
+        <SignatureModal
+          onClose={() => setSigning(false)}
+          contact={k.contact}
+          onSign={(sig) => {
+            setW((x) => ({ ...x, signedBy: sig.name }));
+            setSignature(sig);
+            log(`${sig.name} assinou a OS no local${sig.image ? "" : " (assinatura digitada)"}`, "ok");
+            notify(`Assinatura de ${sig.name} registrada`, () => {
+              setW((x) => ({ ...x, signedBy: undefined }));
+              setSignature(null);
+            });
+          }}
+        />
+      )}
       {addingHours && (
         <HoursModal
           onClose={() => setAddingHours(false)}
@@ -575,14 +588,118 @@ function Photos({ w }: { w: WorkOrder }) {
   );
 }
 
-function SignatureModal({ open, onClose, contact, onSign }: { open: boolean; onClose: () => void; contact: string; onSign: (name: string) => void }) {
+type Signature = { name: string; image?: string; at: string };
+
+/**
+ * Área de assinatura em <canvas>: pointer events (mouse, toque e caneta, com
+ * pressão quando houver), traço na cor do token --ds-ink (segue o tema).
+ * Quem não usa ponteiro assina pela aba "Digitar nome" (assinatura tipográfica).
+ */
+function SignaturePad({ onChange, label }: { onChange: (image: string | null) => void; label: string }) {
+  const canvas = useRef<HTMLCanvasElement | null>(null);
+  const drawing = useRef(false);
+  const last = useRef<{ x: number; y: number } | null>(null);
+  const [inked, setInked] = useState(false);
+
+  // Ajusta a resolução ao tamanho exibido (nítido em telas de alta densidade).
+  useEffect(() => {
+    const el = canvas.current;
+    if (!el) return;
+    const fit = () => {
+      const dpr = window.devicePixelRatio || 1;
+      el.width = Math.round(el.clientWidth * dpr);
+      el.height = Math.round(el.clientHeight * dpr);
+      setInked(false);
+      onChange(null);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [onChange]);
+
+  const point = (e: PointerEvent<HTMLCanvasElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const dpr = e.currentTarget.width / r.width;
+    return { x: (e.clientX - r.left) * dpr, y: (e.clientY - r.top) * dpr, dpr };
+  };
+  const stroke = (e: PointerEvent<HTMLCanvasElement>) => {
+    const g = e.currentTarget.getContext("2d");
+    const p = point(e);
+    if (!g || !last.current) return;
+    g.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--ds-ink").trim() || getComputedStyle(e.currentTarget).color;
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    // Caneta: espessura pela pressão; mouse e dedo: traço uniforme.
+    g.lineWidth = (e.pointerType === "pen" && e.pressure ? 1.2 + e.pressure * 2.6 : 2.4) * p.dpr;
+    g.beginPath();
+    g.moveTo(last.current.x, last.current.y);
+    g.lineTo(p.x, p.y);
+    g.stroke();
+    last.current = p;
+  };
+  const clear = () => {
+    const el = canvas.current;
+    el?.getContext("2d")?.clearRect(0, 0, el.width, el.height);
+    setInked(false);
+    onChange(null);
+  };
+
+  return (
+    <div>
+      <div className="relative">
+        <canvas
+          ref={canvas}
+          role="img"
+          aria-label={label}
+          className="block h-36 w-full cursor-crosshair touch-none rounded-lg border border-line-strong bg-surface text-ink"
+          onPointerDown={(e) => {
+            e.currentTarget.setPointerCapture(e.pointerId);
+            drawing.current = true;
+            last.current = point(e);
+          }}
+          onPointerMove={(e) => drawing.current && stroke(e)}
+          onPointerUp={(e) => {
+            if (!drawing.current) return;
+            stroke(e);
+            drawing.current = false;
+            last.current = null;
+            setInked(true);
+            onChange(e.currentTarget.toDataURL("image/png"));
+          }}
+          onPointerCancel={() => {
+            drawing.current = false;
+            last.current = null;
+          }}
+        />
+        {!inked && (
+          <span aria-hidden className="pointer-events-none absolute inset-x-6 bottom-6 border-t border-dashed border-line-strong pt-1 text-center text-[12px] text-muted">
+            Assine aqui com o dedo, a caneta ou o mouse
+          </span>
+        )}
+      </div>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <span className="text-[12px] text-muted">{inked ? "Assinatura desenhada" : "Nenhum traço ainda"}</span>
+        <Button size="sm" variant="quiet" onClick={clear} disabled={!inked} disabledReason="Nada para limpar.">
+          <Eraser /> Limpar
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function SignatureModal({ onClose, contact, onSign }: { onClose: () => void; contact: string; onSign: (s: Signature) => void }) {
   const [name, setName] = useState(contact);
+  const [mode, setMode] = useState<"desenhar" | "digitar">("desenhar");
+  const [image, setImage] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const signed = mode === "desenhar" ? !!image : !!name.trim();
+  const reason = !name.trim() ? "Preencha o nome de quem assina." : !signed ? "Desenhe a assinatura ou use “Digitar nome”." : !ok ? "Confirme o serviço executado." : undefined;
   return (
     <Modal
-      open={open}
+      open
       onClose={onClose}
-      size="sm"
+      size="md"
       title="Coletar assinatura"
       description="Entregue o celular ao responsável no local. A assinatura vai no relatório da OS e na NFS-e."
       footer={
@@ -591,10 +708,10 @@ function SignatureModal({ open, onClose, contact, onSign }: { open: boolean; onC
             Cancelar
           </Button>
           <Button
-            disabled={!name.trim() || !ok}
-            disabledReason="Preencha o nome e confirme o serviço."
+            disabled={!!reason}
+            disabledReason={reason}
             onClick={() => {
-              onSign(name.trim());
+              onSign({ name: name.trim(), image: mode === "desenhar" ? (image ?? undefined) : undefined, at: nowTime });
               onClose();
             }}
           >
@@ -605,9 +722,25 @@ function SignatureModal({ open, onClose, contact, onSign }: { open: boolean; onC
     >
       <div className="space-y-4">
         <TextField label="Nome de quem assina" value={name} onChange={setName} />
-        <div className="flex h-28 items-center justify-center rounded-lg border border-dashed border-line-strong bg-soft text-[12.5px] text-muted" aria-hidden>
-          Área de assinatura com o dedo
-        </div>
+        <SegmentedControl
+          label="Forma de assinar"
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: "desenhar", label: "Desenhar", icon: <PenLine /> },
+            { value: "digitar", label: "Digitar nome", icon: <Keyboard /> },
+          ]}
+        />
+        {mode === "desenhar" ? (
+          <SignaturePad onChange={setImage} label={`Área de assinatura de ${name.trim() || "quem assina"}. Sem mouse ou toque, use “Digitar nome”.`} />
+        ) : (
+          <div className="rounded-lg border border-line bg-soft px-4 py-4">
+            <p className="m-0 text-[12px] text-muted">Assinatura tipográfica: o nome digitado acima vale como assinatura, com data, hora e o aparelho registrados.</p>
+            <p className="m-0 mt-2 min-h-8 text-[24px] italic leading-tight text-ink" style={{ fontFamily: "cursive" }} aria-live="polite">
+              {name.trim() || "Seu nome aparece aqui"}
+            </p>
+          </div>
+        )}
         <Checkbox label="Confirmo que o serviço foi executado conforme o checklist" checked={ok} onCheckedChange={setOk} />
       </div>
     </Modal>

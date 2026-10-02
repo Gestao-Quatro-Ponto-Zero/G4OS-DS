@@ -15,14 +15,24 @@ import { Button, type ButtonVariant } from "./primitives";
  *    "Verificar alteração" (resposta incerta).
  */
 
-type Notice = { id: number; message: string; undo?: () => void; tone?: "ok" | "info" | "bad" };
+type Notice = { id: number; message: string; undo?: () => void; tone?: "ok" | "info" | "bad"; action?: NotifyAction };
+
+/** Ação do toast que leva ao resultado ("Ver título", "Abrir pedido"). Verbo + objeto. */
+export type NotifyAction = { label: string; onClick: () => void };
+export type NotifyOptions = { undo?: () => void; action?: NotifyAction; tone?: Notice["tone"] };
 const EVENT = "g4os-ds:feedback";
 let seq = 0;
 
-/** Dispara um toast de qualquer lugar (não precisa de contexto React). */
-export function notify(message: string, undo?: () => void, tone: Notice["tone"] = "ok") {
+/**
+ * Dispara um toast de qualquer lugar (não precisa de contexto React).
+ * `notify("Pedido salvo")`, `notify("Ciclo arquivado", desfazer)` ou, com
+ * opções, `notify("Pedido confirmado", { action: { label: "Ver título", onClick } })`.
+ * Uma ação por toast: "Desfazer" (undo) vem antes da ação, se houver as duas.
+ */
+export function notify(message: string, undoOrOptions?: (() => void) | NotifyOptions, tone: Notice["tone"] = "ok") {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent<Notice>(EVENT, { detail: { id: ++seq, message, undo, tone } }));
+  const opts: NotifyOptions = typeof undoOrOptions === "function" ? { undo: undoOrOptions } : (undoOrOptions ?? {});
+  window.dispatchEvent(new CustomEvent<Notice>(EVENT, { detail: { id: ++seq, message, undo: opts.undo, action: opts.action, tone: opts.tone ?? tone } }));
 }
 
 /** Monte uma vez perto da raiz (AppShell já monta). Um toast por vez, 6,5 s, pausa no hover/foco. */
@@ -63,6 +73,18 @@ export function Toaster({ duration = 6500 }: { duration?: number }) {
               }}
             >
               Desfazer
+            </button>
+          )}
+          {notice.action && (
+            <button
+              type="button"
+              className="whitespace-nowrap font-medium text-blue"
+              onClick={() => {
+                notice.action?.onClick();
+                setNotice(null);
+              }}
+            >
+              {notice.action.label}
             </button>
           )}
           <button
@@ -118,7 +140,7 @@ export function Callout({
 /** Falha em que não se sabe se o servidor gravou (rede caiu, timeout). */
 export class UncertainFailure extends Error {}
 
-export type OperationSuccess = { message: string; undo?: () => void };
+export type OperationSuccess = { message: string; undo?: () => void; /** Leva ao resultado ("Ver título"). */ action?: NotifyAction };
 
 /**
  * Um gesto que espera confirmação, com a mesma forma em todo o produto.
@@ -176,7 +198,7 @@ export function useOperation(options: { busyLabel?: string; fallback?: string } 
         throw e;
       }
       const s = typeof success === "string" ? { message: success } : success;
-      if (s) notify(s.message, s.undo);
+      if (s) notify(s.message, { undo: s.undo, action: s.action });
     };
     return execute();
   }

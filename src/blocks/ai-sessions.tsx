@@ -1,4 +1,4 @@
-import { Archive, Download, FolderInput, Pencil, Plus, Star, Trash2 } from "lucide-react";
+import { Archive, Download, FolderInput, Paperclip, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AnswerCard,
@@ -19,15 +19,18 @@ import {
   VoiceOverlay,
   WorkspaceSwitcher,
   cn,
+  ComposerChip,
   notify,
   type MenuEntry,
   type MinimapItem,
   type SlashCommand,
   inertProps,
 } from "@g4ai/ds";
-import { agents, cannedReply, markdown, osProjects, osUser, osWorkspace, plain, sessions as seed, tagSuggestions, tools, type OsSession, type Rich, type ThreadEntry } from "./data/os-sessions";
+import { agents, cannedReply, contextSources, markdown, osProjects, osUser, osWorkspace, plain, sessions as seed, tagSuggestions, tools as seedTools, type ContextSource, type OsSession, type Rich, type ThreadEntry } from "./data/os-sessions";
+import { saveSample } from "./shells/download";
 import { useFrameParam } from "./shells/frame-route";
 import { OsShell, osRoutes } from "./shells/os-shell";
+import { ContextPicker, RecordModal, ThreadSearch, ToolsModal } from "./shells/os-pickers";
 
 export const meta = {
   title: "Sessões do G4 OS (app agêntico)",
@@ -59,7 +62,7 @@ export const meta = {
 /* Texto rico das respostas                                           */
 /* ------------------------------------------------------------------ */
 
-function RichText({ body }: { body: Rich }) {
+function RichText({ body, onOpen }: { body: Rich; onOpen: (href: string, label: string) => void }) {
   return (
     <>
       {body.map((p, i) => (
@@ -73,7 +76,7 @@ function RichText({ body }: { body: Rich }) {
                 href={s.href}
                 onClick={(e) => {
                   e.preventDefault();
-                  notify(`Exemplo: abriria ${s.t}`, undefined, "info");
+                  onOpen(s.href!, s.t);
                 }}
               >
                 {s.t}
@@ -121,10 +124,17 @@ export default function AiSessions() {
   // No celular o painel abre por cima de tudo: começa fechado e só abre pelo botão ⓘ.
   const [infoOpen, setInfoOpen] = useState(() => typeof window === "undefined" || !window.matchMedia("(max-width: 767.98px)").matches);
   const [draft, setDraft] = useState("");
+  const [attached, setAttached] = useState<File[]>([]);
   const [agent, setAgent] = useState("os");
   const [recording, setRecording] = useState(false);
   const [voice, setVoice] = useState(false);
   const [renaming, setRenaming] = useState(false);
+  const [tools, setTools] = useState(seedTools);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [contextOpen, setContextOpen] = useState(false);
+  const [record, setRecord] = useState<{ href: string; label: string } | null>(null);
+  const [workspace, setWorkspace] = useState(osWorkspace);
   // Lista recolhível (⌘\): estado lembrado entre visitas.
   const [listOpen, setListOpenState] = useState(() => {
     try {
@@ -170,6 +180,11 @@ export default function AiSessions() {
   const patch = useCallback((id: string, p: Partial<OsSession> | ((s: OsSession) => Partial<OsSession>)) => {
     setList((l) => l.map((s) => (s.id === id ? { ...s, ...(typeof p === "function" ? p(s) : p) } : s)));
   }, []);
+
+  /** Pasta/página escolhida vira arquivo de contexto da sessão (aparece no painel). */
+  const addContext = (sessionId: string, c: ContextSource) => {
+    patch(sessionId, (s) => (s.files.some((f) => f.id === c.id) ? {} : { files: [...s.files, { id: c.id, name: c.name, meta: `Contexto · ${c.from}` }] }));
+  };
 
   const select = (id: string) => {
     setActiveId(id);
@@ -282,16 +297,19 @@ export default function AiSessions() {
 
   // Vindo da tela inicial (#/frame/ai-sessions?novo=…): cria a sessão e já envia o pedido.
   const novo = useFrameParam("novo");
+  const novoContext = useFrameParam("contexto");
   const handledNovo = useRef<string | null>(null);
   useEffect(() => {
     if (!novo || handledNovo.current === novo) return;
     handledNovo.current = novo;
-    const s: OsSession = { id: uid("s"), title: novo.slice(0, 48), time: "agora", status: "idle", day: "Hoje", mode: "executar", createdBy: osUser.name, notes: "", files: [], thread: [] };
+    const ctx = contextSources.find((c) => c.id === novoContext);
+    const files = ctx ? [{ id: ctx.id, name: ctx.name, meta: `Contexto · ${ctx.from}` }] : [];
+    const s: OsSession = { id: uid("s"), title: novo.slice(0, 48), time: "agora", status: "idle", day: "Hoje", mode: "executar", createdBy: osUser.name, notes: "", files, thread: [] };
     setList((l) => [s, ...l]);
     setActiveId(s.id);
     setMobileView("thread");
     window.setTimeout(() => sendRef.current(novo, s.id), 50);
-  }, [novo]);
+  }, [novo, novoContext]);
   const sendRef = useRef(send);
   sendRef.current = send;
 
@@ -357,10 +375,16 @@ export default function AiSessions() {
         recording={recording}
         onRecordToggle={() => {
           setRecording((r) => !r);
-          notify(recording ? "Gravação encerrada: a ata vai aparecer em Arquivos" : "Gravando a reunião (áudio do sistema e microfone)", undefined, "info");
+          if (recording) {
+            // Ao parar, a ata entra nos arquivos da sessão (painel de informações).
+            const ata = { id: uid("ata"), name: `ata-reuniao-${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }).replace(":", "h")}.md`, meta: "Gravação · agora" };
+            patch(active.id, (s) => ({ files: [...s.files, ata] }));
+            setInfoOpen(true);
+            notify("Gravação encerrada: ata adicionada aos arquivos da sessão");
+          } else notify("Gravando a reunião (áudio do sistema e microfone)", undefined, "info");
         }}
         onBrowser={() => setInfoOpen(true)}
-        onSearch={() => notify("Exemplo: buscaria dentro desta conversa (⌘F)", undefined, "info")}
+        onSearch={() => setSearchOpen(true)}
         onShare={() => {
           navigator.clipboard?.writeText(location.href).catch(() => undefined);
           notify("Link da sessão copiado");
@@ -403,7 +427,7 @@ export default function AiSessions() {
                   streaming={isStreaming}
                   actions={<MessageActions text={plain(e.body)} markdown={markdown(e.body)} onRetry={() => send("Refaça a última resposta")} onFeedback={(v) => notify(v === "up" ? "Obrigado pelo retorno" : "Vamos melhorar: conte o que faltou", undefined, "info")} onBranch={() => branch(e.id)} />}
                 >
-                  {isStreaming ? <p>{streaming!.full.slice(0, streaming!.shown)}</p> : <RichText body={e.body} />}
+                  {isStreaming ? <p>{streaming!.full.slice(0, streaming!.shown)}</p> : <RichText body={e.body} onOpen={(href, label) => setRecord({ href, label })} />}
                 </AnswerCard>
               );
             })}
@@ -428,10 +452,23 @@ export default function AiSessions() {
               setAgent(id);
               notify(`Agente: ${agents.find((a) => a.id === id)?.name}`, undefined, "info");
             }}
-            onManageTools={() => notify("Exemplo: abriria Ferramentas conectadas (Google Agenda precisa reconectar)", undefined, "info")}
-            onContext={() => notify("Exemplo: escolheria uma pasta do Drive ou do Notion como contexto", undefined, "info")}
+            onManageTools={() => setToolsOpen(true)}
+            onContext={() => setContextOpen(true)}
             commands={commands}
+            onAttachFiles={(files) => {
+              setAttached((a) => [...a, ...files]);
+              notify(files.length === 1 ? `${files[0].name} anexado` : `${files.length} arquivos anexados`);
+            }}
           />
+          {attached.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Anexos">
+              {attached.map((f, i) => (
+                <ComposerChip key={`${f.name}-${i}`} icon={<Paperclip />} onRemove={() => setAttached((a) => a.filter((_, j) => j !== i))}>
+                  {f.name}
+                </ComposerChip>
+              ))}
+            </div>
+          )}
             <Disclaimer className="mt-2" />
           </div>
           <VoiceModeButton onClick={() => setVoice(true)} className="mb-7 hidden shrink-0 sm:grid" />
@@ -454,6 +491,7 @@ export default function AiSessions() {
       notes={active?.notes ?? ""}
       onNotesChange={(v) => patch(active.id, { notes: v })}
       files={active?.files ?? []}
+      onOpenFile={(f) => notify(`${saveSample(f.name, [f.name, `Arquivo da sessão “${active?.title ?? ""}”`, f.meta ?? ""])} baixado`)}
       browser={active?.browser}
       onMinimize={() => setInfoOpen(false)}
     />
@@ -489,11 +527,10 @@ export default function AiSessions() {
       ]}
       footer={
         <WorkspaceSwitcher
-          name={osWorkspace}
+          name={workspace}
           items={[
             { type: "label", label: "Workspaces" },
-            { type: "checkbox", label: "G4 OS", checked: true, onCheckedChange: () => undefined },
-            { type: "checkbox", label: "G4 Educação · Comercial", checked: false, onCheckedChange: () => notify("Exemplo: trocaria de workspace", undefined, "info") },
+            ...[osWorkspace, "G4 Educação · Comercial"].map((w) => ({ type: "checkbox" as const, label: w, checked: workspace === w, onCheckedChange: () => setWorkspace(w) })),
             { type: "separator" },
             { label: "Configurações do workspace", href: osRoutes.settings },
           ]}
@@ -551,6 +588,30 @@ export default function AiSessions() {
           notify("Projeto renomeado");
         }}
       />
+      <ToolsModal
+        open={toolsOpen}
+        onClose={() => setToolsOpen(false)}
+        tools={tools}
+        onReconnect={(t) => {
+          setTools((all) => all.map((x) => (x.id === t.id ? { ...x, status: "ok" } : x)));
+          notify(`${t.name} reconectado`);
+        }}
+      />
+      <ContextPicker
+        open={contextOpen}
+        onClose={() => setContextOpen(false)}
+        onPick={(c) => {
+          addContext(active.id, c);
+          setInfoOpen(true);
+          notify(`“${c.name}” adicionado como contexto`, () => patch(active.id, (s) => ({ files: s.files.filter((f) => f.id !== c.id) })));
+        }}
+      />
+      <ThreadSearch
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        items={(active?.thread ?? []).filter((e) => e.kind !== "steps").map((e) => ({ id: `msg-${e.id}`, role: e.kind === "user" ? "user" : "assistant", text: e.kind === "user" ? e.text : e.kind === "answer" ? plain(e.body) : "" }))}
+      />
+      <RecordModal href={record?.href ?? null} label={record?.label} onClose={() => setRecord(null)} />
       <VoiceOverlay
         open={voice}
         agentName="G4 OS"

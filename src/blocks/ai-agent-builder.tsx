@@ -6,6 +6,7 @@ import {
   AgentHeader,
   AgentInstructions,
   AgentMessage,
+  Banner,
   BuilderSection,
   ChipPicker,
   PropertyRow,
@@ -72,6 +73,10 @@ export const meta = {
 
 type Msg = { id: string; role: "user"; text: string } | { id: string; role: "agent"; text: string[]; status: RunStatus; startedAt: number; durationMs: number };
 
+const skillOptions: Prop[] = [
+  { id: "escrita", label: "Escrita persuasiva" },
+  { id: "seo", label: "SEO para redes" },
+];
 const glyph = (p: Prop | Trigger) => ("app" in p && p.app ? <ToolGlyph name={apps[p.app].name} color={apps[p.app].color} /> : <FileText className="h-3.5 w-3.5 text-muted" />);
 
 type Seed = {
@@ -191,6 +196,10 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
   const [outputs, setOutputs] = useState(seed.outputs);
   const [inputs, setInputs] = useState(seed.inputs);
   const [checks, setChecks] = useState(seed.checks);
+  const [skills, setSkills] = useState<Prop[]>([]);
+  const [files, setFiles] = useState<Prop[]>([]);
+  const [archived, setArchived] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
   const [instructions, setInstructions] = useState(seed.instructions);
   const [enhancing, setEnhancing] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -281,8 +290,13 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
       ],
     },
     { label: "Verificações de qualidade", icon: <ListChecks className="h-4 w-4" />, onSelect: () => addProp(checks, setChecks, { id: `chk${Date.now()}`, label: "Revisão humana antes de publicar" }) },
-    { type: "submenu", label: "Skills", icon: <Sparkles className="h-4 w-4" />, items: [{ label: "Escrita persuasiva", onSelect: () => notify("Skill “Escrita persuasiva” adicionada") }, { label: "SEO para redes", onSelect: () => notify("Skill “SEO para redes” adicionada") }] },
-    { type: "submenu", label: "Arquivos", icon: <FolderOpen className="h-4 w-4" />, items: [{ label: "Guia de voz da marca.pdf", onSelect: () => notify("Arquivo anexado ao agente") }, { label: "Do computador…", onSelect: () => notify("Exemplo: abriria o seletor de arquivos", undefined, "info") }] },
+    { type: "submenu", label: "Skills", icon: <Sparkles className="h-4 w-4" />, items: skillOptions.map((o) => ({ label: o.label, onSelect: () => addProp(skills, setSkills, o) })) },
+    {
+      type: "submenu",
+      label: "Arquivos",
+      icon: <FolderOpen className="h-4 w-4" />,
+      items: [{ label: "Guia de voz da marca.pdf", onSelect: () => addProp(files, setFiles, { id: "guia-voz", label: "Guia de voz da marca.pdf" }) }, { label: "Do computador…", onSelect: () => fileInput.current?.click() }],
+    },
   ];
 
   const busy = msgs.some((m) => m.role === "agent" && m.status === "running");
@@ -348,7 +362,12 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
         <PublishBar
           status={status}
           testing={testing}
-          onShare={() => notify("Link de edição copiado · só pessoas da Acme acessam", undefined, "info")}
+          onShare={() =>
+            navigator.clipboard
+              ?.writeText(location.href)
+              .then(() => notify("Link de edição copiado · só pessoas da Acme acessam"))
+              .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info"))
+          }
           onTest={test}
           onPublish={() => {
             setStatus("publicado");
@@ -363,10 +382,30 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
               : []),
             { label: "Ver execuções", onSelect: () => (seed.fleetId ? go("ai-runs", { agente: seed.fleetId }) : go("ai-runs")) },
             { type: "separator" },
-            { label: "Arquivar", tone: "danger", onSelect: () => notify("Agente arquivado", () => undefined) },
+            {
+              label: archived ? "Restaurar agente" : "Arquivar",
+              tone: archived ? undefined : "danger",
+              onSelect: () => {
+                setArchived(!archived);
+                notify(archived ? "Agente restaurado" : "Agente arquivado · gatilhos desligados", () => setArchived(archived));
+              },
+            },
           ]}
         />
       </header>
+      {archived && (
+        <Banner
+          tone="warn"
+          title="Agente arquivado."
+          action={
+            <Button size="sm" variant="ghost" onClick={() => (setArchived(false), notify("Agente restaurado"))}>
+              Restaurar agente
+            </Button>
+          }
+        >
+          Os gatilhos estão desligados e ele não roda até ser restaurado.
+        </Banner>
+      )}
       <div className="min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-info-soft/40 to-page to-[220px]">
         <div className="mx-auto max-w-[760px] space-y-8 px-5 py-8 sm:px-8">
           <AgentHeader icon={<Sparkles />} title={name} description={description} onTitleChange={touched(setName)} onDescriptionChange={touched(setDescription)} />
@@ -422,6 +461,16 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
               <PropertyRow label="Saída">
                 <ChipPicker chips={outputs.map((t) => ({ id: t.id, label: t.label, icon: glyph(t) }))} onRemove={removeProp(outputs, setOutputs)} addItems={asItems(outputOptions, outputs, setOutputs)} />
               </PropertyRow>
+              {skills.length > 0 && (
+                <PropertyRow label="Skills">
+                  <ChipPicker chips={skills.map((t) => ({ id: t.id, label: t.label, icon: <Sparkles className="h-3.5 w-3.5 text-muted" /> }))} onRemove={removeProp(skills, setSkills)} addItems={skillOptions.map((o) => ({ label: o.label, onSelect: () => addProp(skills, setSkills, o) }))} />
+                </PropertyRow>
+              )}
+              {files.length > 0 && (
+                <PropertyRow label="Arquivos" hint="o agente consulta">
+                  <ChipPicker chips={files.map((t) => ({ id: t.id, label: t.label, icon: <FileText className="h-3.5 w-3.5 text-muted" /> }))} onRemove={removeProp(files, setFiles)} />
+                </PropertyRow>
+              )}
               <PropertyRow label="Verificações" hint="antes de entregar">
                 <ChipPicker chips={checks.map((t) => ({ id: t.id, label: t.label, icon: <ListChecks className="h-3.5 w-3.5 text-ok" /> }))} onRemove={removeProp(checks, setChecks)} empty="Nenhuma" />
               </PropertyRow>
@@ -458,6 +507,20 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
       ) : (
         <ResizableSplit left={chat} right={builder} storageKey="ai-agent-builder" defaultSize={0.4} min={0.3} max={0.6} />
       )}
+      <input
+        ref={fileInput}
+        type="file"
+        hidden
+        multiple
+        onChange={(e) => {
+          const picked = Array.from(e.target.files ?? []).map((f, i) => ({ id: `file-${Date.now()}-${i}`, label: f.name }));
+          e.target.value = "";
+          if (!picked.length) return;
+          const before = files;
+          touched(setFiles)([...files, ...picked.filter((p) => !files.some((x) => x.label === p.label))]);
+          notify(picked.length === 1 ? `${picked[0].label} adicionado ao agente` : `${picked.length} arquivos adicionados ao agente`, () => setFiles(before));
+        }}
+      />
       <Modal
         open={!!editingTrigger}
         onClose={() => setEditingTrigger(null)}

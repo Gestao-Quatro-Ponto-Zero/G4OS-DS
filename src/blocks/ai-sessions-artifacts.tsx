@@ -82,7 +82,8 @@ import {
   sessions as seed,
   tagSuggestions,
   tokensByTask,
-  tools,
+  tools as seedTools,
+  type ContextSource,
   type OsSession,
   type Rich,
   type RunInfo,
@@ -90,7 +91,9 @@ import {
   type ThreadEntry,
 } from "./data/os-sessions";
 import { frameHref, useFrameParam } from "./shells/frame-route";
+import { saveSample, saveText } from "./shells/download";
 import { OsRail, osRoutes, osTabs } from "./shells/os-shell";
+import { ContextPicker, RecordModal, ThreadSearch, ToolsModal, useFilePicker } from "./shells/os-pickers";
 
 export const meta = {
   title: "Sessões com artefatos",
@@ -130,7 +133,7 @@ const commands: SlashCommand[] = [
 /* Texto rico das respostas                                            */
 /* ------------------------------------------------------------------ */
 
-function RichText({ body }: { body: Rich }) {
+function RichText({ body, onOpen }: { body: Rich; onOpen: (href: string, label: string) => void }) {
   return (
     <>
       {body.map((p, i) => (
@@ -144,7 +147,7 @@ function RichText({ body }: { body: Rich }) {
                 href={s.href}
                 onClick={(e) => {
                   e.preventDefault();
-                  notify(`Exemplo: abriria ${s.t}`, undefined, "info");
+                  onOpen(s.href!, s.t);
                 }}
               >
                 {s.t}
@@ -238,6 +241,12 @@ export default function AiSessionsArtifacts() {
   const [recording, setRecording] = useState(false);
   const [voice, setVoice] = useState(false);
   const [renaming, setRenaming] = useState(false);
+  const [tools, setTools] = useState(seedTools);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [picker, setPicker] = useState<null | "any" | "Notion">(null);
+  const [record, setRecord] = useState<{ href: string; label: string } | null>(null);
+  const [workspace, setWorkspace] = useState(osWorkspace);
   const [streaming, setStreaming] = useState<{ sessionId: string; entryId: string; shown: number; full: string } | null>(null);
   const timers = useRef<number[]>([]);
   const active = list.find((s) => s.id === activeId) ?? list[0];
@@ -254,6 +263,24 @@ export default function AiSessionsArtifacts() {
       return { ...x, [k]: { ...cur, ...(typeof p === "function" ? p(cur) : p) } };
     });
   }, []);
+
+  /** Fonte escolhida entra no contexto da sessão já fixada (vira chip no campo). */
+  const addContext = (c: ContextSource) => {
+    const sid = active.id;
+    const item: ContextItem = { id: c.id, kind: "doc", title: c.name, detail: `${c.from} · adicionado agora`, pinned: true };
+    setCtx((m) => ({ ...m, [sid]: [...(m[sid] ?? []).filter((i) => i.id !== c.id), item] }));
+    notify(`“${c.name}” adicionado ao contexto`, () => setCtx((m) => ({ ...m, [sid]: (m[sid] ?? []).filter((i) => i.id !== c.id) })));
+  };
+  const reconnect = (t: { id: string; name: string }) => {
+    setTools((all) => all.map((x) => (x.id === t.id ? { ...x, status: "ok" } : x)));
+    notify(`${t.name} reconectado`);
+  };
+  const [fileInput, pickFiles] = useFilePicker((files) => {
+    const sid = active.id;
+    const added = files.map((f) => ({ id: uid("f"), name: f.name, size: f.size, meta: "Anexado agora" }));
+    patch(sid, (s) => ({ files: [...s.files, ...added] }));
+    notify(files.length === 1 ? `${files[0].name} anexado à sessão` : `${files.length} arquivos anexados à sessão`, () => patch(sid, (s) => ({ files: s.files.filter((f) => !added.some((a) => a.id === f.id)) })));
+  });
 
   /** Artefatos da sessão (todas as respostas), do mais novo ao mais antigo. */
   const sessionArtifacts = useMemo(() => {
@@ -556,7 +583,7 @@ export default function AiSessionsArtifacts() {
               : undefined
           }
         >
-          {isStreaming ? <p>{streaming!.full.slice(0, streaming!.shown)}</p> : <RichText body={e.body} />}
+          {isStreaming ? <p>{streaming!.full.slice(0, streaming!.shown)}</p> : <RichText body={e.body} onOpen={(href, label) => setRecord({ href, label })} />}
         </AnswerCard>,
       );
     }
@@ -589,14 +616,21 @@ export default function AiSessionsArtifacts() {
           icon: recording ? <span aria-hidden className="h-2 w-2 rounded-full bg-rose motion-safe:animate-pulse" /> : <Mic />,
           onClick: () => {
             setRecording((r) => !r);
-            notify(recording ? "Gravação encerrada: a ata vai aparecer em Arquivos" : "Gravando a reunião (áudio do sistema e microfone)", undefined, "info");
+            if (recording) {
+              // Ao parar, a ata entra nos arquivos da sessão (aba Arquivos do painel).
+              const ata = { id: uid("ata"), name: `ata-reuniao-${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }).replace(":", "h")}.md`, meta: "Gravação · agora" };
+              patch(active.id, (s) => ({ files: [...s.files, ata] }));
+              setActiveTab("files");
+              setPanelOpen(true);
+              notify("Gravação encerrada: ata adicionada aos arquivos da sessão");
+            } else notify("Gravando a reunião (áudio do sistema e microfone)", undefined, "info");
           },
           active: recording,
           tone: "danger",
           showLabel: true,
           hideOnMobile: true,
         },
-        { id: "search", label: "Buscar na conversa", icon: <Search />, onClick: () => notify("Exemplo: buscaria dentro desta conversa (⌘F)", undefined, "info"), hideOnMobile: true },
+        { id: "search", label: "Buscar na conversa", icon: <Search />, onClick: () => setSearchOpen(true), hideOnMobile: true },
         {
           id: "share",
           label: "Compartilhar",
@@ -639,9 +673,9 @@ export default function AiSessionsArtifacts() {
               </span>
             }
             attachOptions={[
-              { label: "Anexar arquivo", icon: <Paperclip className="h-4 w-4" />, onSelect: () => notify("Exemplo: abriria o seletor de arquivos", undefined, "info") },
-              { label: "Contexto de uma pasta", icon: <FolderOpen className="h-4 w-4" />, onSelect: () => notify("Exemplo: escolheria uma pasta como contexto", undefined, "info") },
-              { label: "Página do Notion", icon: <FileText className="h-4 w-4" />, onSelect: () => notify("Exemplo: buscaria uma página do Notion", undefined, "info") },
+              { label: "Anexar arquivo", icon: <Paperclip className="h-4 w-4" />, onSelect: pickFiles },
+              { label: "Contexto de uma pasta", icon: <FolderOpen className="h-4 w-4" />, onSelect: () => setPicker("any") },
+              { label: "Página do Notion", icon: <FileText className="h-4 w-4" />, onSelect: () => setPicker("Notion") },
               { type: "separator" },
               {
                 type: "submenu",
@@ -650,11 +684,12 @@ export default function AiSessionsArtifacts() {
                 items: [
                   ...tools.map((t) =>
                     t.status === "error"
-                      ? { label: `${t.name} · reconectar`, tone: "danger" as const, onSelect: () => notify(`Exemplo: reconectaria ${t.name}`, undefined, "info") }
-                      : { label: t.name, onSelect: () => notify(`${t.name} conectada`, undefined, "info") },
+                      ? { label: `${t.name} · reconectar`, tone: "danger" as const, onSelect: () => reconnect(t) }
+                      : // Escolher uma ferramenta pede ao agente que a use: menciona no campo.
+                        { label: `Usar ${t.name}`, onSelect: () => setDraft((d) => `${d}${d && !d.endsWith(" ") ? " " : ""}@${t.name} `) },
                   ),
                   { type: "separator" as const },
-                  { label: "Gerenciar ferramentas", icon: <Settings2 className="h-4 w-4" />, onSelect: () => notify("Exemplo: abriria Ferramentas conectadas", undefined, "info") },
+                  { label: "Gerenciar ferramentas", icon: <Settings2 className="h-4 w-4" />, onSelect: () => setToolsOpen(true) },
                 ],
               },
             ]}
@@ -785,6 +820,7 @@ export default function AiSessionsArtifacts() {
           notes=""
           onNotesChange={() => undefined}
           files={active?.files ?? []}
+          onOpenFile={(f) => notify(`${saveSample(f.name, [f.name, `Arquivo da sessão “${active?.title ?? ""}”`, f.meta ?? ""])} baixado`)}
         />
       </div>
     ) : current.id === "context" ? (
@@ -797,7 +833,7 @@ export default function AiSessionsArtifacts() {
             className="mt-5"
             items={ctx[active.id]}
             onPinChange={(cid, pin) => setCtx((m) => ({ ...m, [active.id]: (m[active.id] ?? []).map((i) => (i.id === cid ? { ...i, pinned: pin } : i)) }))}
-            onAdd={() => notify("Exemplo: abriria a busca de fontes", undefined, "info")}
+            onAdd={() => setPicker("any")}
           />
         ) : (
           <p className="m-0 mt-5 rounded-xl border border-dashed border-line px-3 py-6 text-center text-[12.5px] text-muted">Nenhuma fonte usada ainda nesta sessão.</p>
@@ -817,9 +853,25 @@ export default function AiSessionsArtifacts() {
         if (activeTab === tid) setActiveTab("details");
       }}
       onClose={() => setPanelOpen(false)}
-      onCopy={() => notify("Conteúdo da aba copiado", undefined, "info")}
-      onExport={() => notify(`Exportando “${current.title}”…`, undefined, "info")}
-      onShare={() => notify("Link de visualização copiado", undefined, "info")}
+      onCopy={() => {
+        const out = tabExport(current, active, ctx[active.id] ?? [], sessionArtifacts);
+        navigator.clipboard
+          ?.writeText(out.text)
+          .then(() => notify("Conteúdo da aba copiado"))
+          .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info"));
+      }}
+      onExport={() => {
+        const out = tabExport(current, active, ctx[active.id] ?? [], sessionArtifacts);
+        saveText(out.name, out.text, out.type);
+        notify(`${out.name} baixado`);
+      }}
+      onShare={() => {
+        const link = `${location.href.split("#")[0]}${frameHref("ai-sessions-artifacts", active.id)}`;
+        navigator.clipboard
+          ?.writeText(link)
+          .then(() => notify("Link da sessão copiado"))
+          .catch(() => notify("Não deu para copiar: o navegador bloqueou a área de transferência", undefined, "info"));
+      }}
     >
       {view}
     </ArtifactPanel>
@@ -855,11 +907,10 @@ export default function AiSessionsArtifacts() {
         <div className="flex items-center gap-1">
           <div className="min-w-0 flex-1">
             <WorkspaceSwitcher
-              name={osWorkspace}
+              name={workspace}
               items={[
                 { type: "label", label: "Workspaces" },
-                { type: "checkbox", label: "G4 OS", checked: true, onCheckedChange: () => undefined },
-                { type: "checkbox", label: "G4 Educação · Comercial", checked: false, onCheckedChange: () => notify("Exemplo: trocaria de workspace", undefined, "info") },
+                ...[osWorkspace, "G4 Educação · Comercial"].map((w) => ({ type: "checkbox" as const, label: w, checked: workspace === w, onCheckedChange: () => setWorkspace(w) })),
                 { type: "separator" },
                 { label: "Configurações do workspace", href: osRoutes.settings },
               ]}
@@ -899,6 +950,15 @@ export default function AiSessionsArtifacts() {
           notify("Sessão renomeada");
         }}
       />
+      {fileInput}
+      <ToolsModal open={toolsOpen} onClose={() => setToolsOpen(false)} tools={tools} onReconnect={reconnect} />
+      <ContextPicker open={!!picker} onClose={() => setPicker(null)} only={picker === "Notion" ? "Notion" : undefined} onPick={addContext} />
+      <ThreadSearch
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        items={(active?.thread ?? []).filter((e) => e.kind !== "steps").map((e) => ({ id: `msg-${e.id}`, role: e.kind === "user" ? "user" : "assistant", text: e.kind === "user" ? e.text : e.kind === "answer" ? plain(e.body) : "" }))}
+      />
+      <RecordModal href={record?.href ?? null} label={record?.label} onClose={() => setRecord(null)} />
       <VoiceOverlay
         open={voice}
         agentName="G4 OS"
@@ -1085,6 +1145,41 @@ function ArtifactView({ artifact, session }: { artifact: LiveArtifact; session: 
           <div className="rounded-xl border border-line bg-surface p-4 text-[14px] leading-relaxed text-ink-soft">{text || "Sem conteúdo ainda."}</div>
         </div>
       );
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Copiar e exportar a aba do painel                                   */
+/* ------------------------------------------------------------------ */
+
+const csv = (rows: (string | number)[][]) => rows.map((r) => r.map((c) => (/[",;\n]/.test(String(c)) ? `"${String(c).replace(/"/g, '""')}"` : String(c))).join(",")).join("\r\n");
+const slug = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+
+/** Conteúdo da aba como arquivo: planilhas em CSV, o resto em Markdown. */
+function tabExport(tab: ArtifactTab, session: OsSession, context: ContextItem[], artifacts: LiveArtifact[]): { name: string; text: string; type: string } {
+  const md = (lines: string[]) => ({ name: `${slug(tab.title)}.md`, text: lines.join("\n"), type: "text/markdown" });
+  const sheet = (rows: (string | number)[][]) => ({ name: `${slug(tab.title)}.csv`, text: csv(rows), type: "text/csv" });
+  switch (tab.id) {
+    case "details":
+      return md([`# ${session.title}`, "", `- Modo: ${session.mode}`, `- Criada por: ${session.createdBy}`, `- Etiquetas: ${(session.tags ?? []).join(", ") || "nenhuma"}`, "", session.notes || "Sem notas."]);
+    case "context":
+      return md([`# Contexto · ${session.title}`, "", ...(context.length ? context.map((c) => `- ${c.title}${typeof c.detail === "string" ? ` (${c.detail})` : ""}${c.pinned ? " · fixado" : ""}`) : ["Nenhuma fonte usada ainda."])]);
+    case "files":
+      return md([`# Arquivos · ${session.title}`, "", ...artifacts.map((a) => `- ${a.title} (gerado: ${a.meta})`), ...session.files.map((f) => `- ${f.name}${f.meta ? ` (${f.meta})` : ""}`)]);
+    case "mcp-sheet":
+      return sheet([["Critério", "notion", "notion-official", "Resultado"], ...connectionCompare.map((r) => [r.criterio, r.notion, r.oficial, r.ok ? "Igual" : "Diverge"])]);
+    case "gav-sheet":
+      return sheet([["Unidade", "Agosto", "Setembro"], ...gavByUnit.map((r) => [r.unidade, r.agosto, r.setembro])]);
+    case "tok-report":
+      return sheet([["Tarefa", "Opus", "Sonnet", "Haiku"], ...tokensByTask.map((r) => [r.tarefa, r.opus, r.sonnet, r.haiku])]);
+    case "cx-report":
+      return sheet([["Tema", "Tickets"], ...cxThemes.map((r) => [r.label, r.value])]);
+    case "fg-doc":
+      return md(["# Field Guide FC v12", "", "1. Qualificação: BANT completo obrigatório antes de avançar.", "2. SLA de primeiro contato: de 24 h para 4 h, com alerta no Slack.", "3. Perguntas de descoberta: 6 novas, por segmento.", "4. Passagem para CS: checklist de 5 itens."]);
+    default: {
+      const last = [...session.thread].reverse().find((e) => e.kind === "answer");
+      return md([`# ${tab.title}`, "", last && last.kind === "answer" ? markdown(last.body) : "Sem conteúdo ainda."]);
     }
   }
 }
