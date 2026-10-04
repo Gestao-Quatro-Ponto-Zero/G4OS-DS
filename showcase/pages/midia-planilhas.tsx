@@ -40,7 +40,7 @@ export default function Page() {
         </Demo>
       </DocSection>
 
-      <DocSection title="De um arquivo .xlsx" rule="O mesmo visualizador lê o arquivo real: valores, fórmulas (com o resultado salvo pelo Excel), formatos de R$, % e data, negrito, larguras, células mescladas no título, painéis congelados e abas ocultas (não aparecem). Gráficos, imagens e formatação condicional ficam de fora.">
+      <DocSection title="De um arquivo .xlsx" rule="O mesmo visualizador lê o arquivo real (.xlsx ou .csv): valores, fórmulas com o resultado salvo, formatos, cores de célula, mesclas, linhas e colunas ocultas, painéis congelados e gráficos (botão Gráficos ao lado do título). Até 50 mil linhas: só as visíveis são desenhadas. Mais exemplos em Arquivos do Office.">
         <Demo
           bare
           code={`// Arquivo enviado pela pessoa, anexo ou URL: OfficeFileView detecta o tipo

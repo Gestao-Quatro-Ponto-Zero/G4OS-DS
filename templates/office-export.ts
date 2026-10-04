@@ -266,10 +266,24 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
   const line = (c: string, size = 4) => ({ style: BorderStyle.SINGLE, size, color: hex(c) });
 
   const runs = (text: DocText, base: { size?: number; color?: string; bold?: boolean } = {}) =>
-    docRuns(text).map((r) => {
-      const run = new TextRun({ text: r.text, bold: r.bold ?? base.bold, italics: r.italic, size: base.size, color: r.href ? hex(t.ink) : base.color, underline: r.href ? {} : undefined });
-      return r.href ? new ExternalHyperlink({ link: r.href, children: [run] }) : run;
-    });
+    docRuns(text).flatMap((r) =>
+      // Quebra de linha dentro do parágrafo ("\n") vira quebra do Word.
+      r.text.split("\n").map((part, i) => {
+        const run = new TextRun({
+          text: part,
+          break: i > 0 ? 1 : undefined,
+          bold: r.bold ?? base.bold,
+          italics: r.italic,
+          strike: r.strike,
+          size: base.size,
+          color: r.color ? hex(r.color) : r.href ? hex(t.ink) : base.color,
+          underline: r.href || r.underline ? {} : undefined,
+          shading: r.highlight ? { type: ShadingType.CLEAR, color: "auto", fill: hex(r.highlight) } : undefined,
+        });
+        return r.href ? new ExternalHyperlink({ link: r.href, children: [run] }) : run;
+      }),
+    );
+  const alignment = (a?: string) => (a === "center" ? AlignmentType.CENTER : a === "right" ? AlignmentType.RIGHT : a === "justify" ? AlignmentType.JUSTIFIED : undefined);
 
   // Imagens: baixa antes (block é síncrono). Aceita data: URL ou URL do mesmo site.
   const imageData = new Map<number, { data: Uint8Array; type: "png" | "jpg" | "gif" | "bmp" }>();
@@ -287,9 +301,11 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
   const anchor = (index: number) => `ds_h${index}`;
   let listInstance = 0;
 
-  const tableCell = (children: InstanceType<DocxModule["Paragraph"]>[], opts: { fill?: string; width: number; borders?: Record<string, unknown> }) =>
+  const tableCell = (children: InstanceType<DocxModule["Paragraph"]>[], opts: { fill?: string; width: number; borders?: Record<string, unknown>; columnSpan?: number; verticalMerge?: "restart" | "continue" }) =>
     new TableCell({
       children,
+      columnSpan: opts.columnSpan,
+      verticalMerge: opts.verticalMerge,
       width: { size: opts.width, type: WidthType.DXA },
       shading: opts.fill ? { type: ShadingType.CLEAR, color: "auto", fill: hex(opts.fill) } : undefined,
       margins: { top: 80, bottom: 80, left: 120, right: 120 },
@@ -297,49 +313,68 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
       borders: opts.borders as never,
     });
 
-  function block(b: DocBlock, index: number): (InstanceType<DocxModule["Paragraph"]> | InstanceType<DocxModule["Table"]>)[] {
+  function block(b: DocBlock, index: number): (InstanceType<DocxModule["Paragraph"]> | InstanceType<DocxModule["Table"]> | InstanceType<DocxModule["TableOfContents"]>)[] {
     switch (b.type) {
       case "heading": {
         const level = b.level ?? 1;
         const text = new TextRun({ text: b.text });
-        return [new Paragraph({ heading: heading[level], children: level <= 2 ? [new Bookmark({ id: anchor(index), children: [text] })] : [text] })];
+        return [new Paragraph({ heading: heading[level], alignment: alignment(b.align), children: level <= 2 ? [new Bookmark({ id: anchor(index), children: [text] })] : [text] })];
       }
       case "paragraph":
-        return [new Paragraph({ children: runs(b.text) })];
+        return [new Paragraph({ alignment: alignment(b.align), children: runs(b.text) })];
+      case "toc":
+        return tocBlock();
       case "list": {
         const instance = ++listInstance;
-        return b.items.map((it) => new Paragraph({ children: runs(it), numbering: { reference: b.ordered ? "ds-ordered" : "ds-bullet", level: 0, instance }, spacing: { after: 60 } }));
+        // Marcador pronto (do .docx) vai como texto; sem ele, numeração do Word por nível (1., 1.1., 1.1.1.).
+        return b.items.map((it, i) => {
+          const level = Math.min(b.levels?.[i] ?? 0, 2);
+          const marker = b.markers?.[i];
+          return marker && marker.length > 1
+            ? new Paragraph({ indent: { left: 400 + level * 360, hanging: 360 }, spacing: { after: 60 }, children: [new TextRun({ text: `${marker}\t`, bold: true, color: hex(t.accentDeep) }), ...runs(it)] })
+            : new Paragraph({ children: runs(it), numbering: { reference: b.ordered ? "ds-ordered" : "ds-bullet", level, instance }, spacing: { after: 60 } });
+        });
       }
       case "table": {
         const weights = b.columns.map((c) => c.width ?? 1);
         const sum = weights.reduce((a, x) => a + x, 0);
         const widths = weights.map((w) => Math.floor((w / sum) * contentWidth));
         const align = (i: number) => (isNumericFormat(b.columns[i].format ?? "text") ? AlignmentType.RIGHT : AlignmentType.LEFT);
-        const header = new TableRow({
-          tableHeader: true,
-          children: b.columns.map((c, i) =>
-            tableCell([new Paragraph({ alignment: align(i), spacing: { after: 0 }, children: [new TextRun({ text: c.header, bold: true, size: pt(9), color: hex(t.onBrand) })] })], {
-              width: widths[i],
-              fill: t.brand,
-              borders: { bottom: line(t.accent, 12) },
-            }),
-          ),
-        });
-        const body = b.rows.map((row, r) => {
-          const total = b.totalRow && r === b.rows.length - 1;
-          return new TableRow({
+        // Mesmo visual da tela: cabeçalho em gelo com divisória, linhas só com divisória horizontal.
+        const headerRows = b.headerRows ?? -1;
+        const covered = new Map<string, "continue" | "skip">();
+        for (const [key, [rs, cs]] of Object.entries(b.spans ?? {})) {
+          const [r, c] = key.split(":").map(Number);
+          for (let y = r; y < r + rs; y++) for (let x = c; x < c + cs; x++) if (y !== r || x !== c) covered.set(`${y}:${x}`, x === c ? "continue" : "skip");
+        }
+        const row = (values: CellValue[], r: number, header: boolean, total: boolean) =>
+          new TableRow({
+            tableHeader: header || undefined,
             cantSplit: true,
-            children: b.columns.map((c, i) =>
-              tableCell([new Paragraph({ alignment: align(i), spacing: { after: 0 }, children: [new TextRun({ text: formatCell({ value: row[i], format: c.format ?? "text", digits: c.digits }), bold: total || undefined, size: pt(9.5) })] })], {
-                width: widths[i],
-                fill: total ? t.soft : undefined,
-                borders: total ? { top: line(t.ink, 8), bottom: line(t.lineStrong) } : { bottom: line(t.line) },
-              }),
-            ),
+            children: b.columns.flatMap((c, i) => {
+              const cov = covered.get(`${r}:${i}`);
+              if (cov === "skip") return [];
+              const [rs, cs] = b.spans?.[`${r}:${i}`] ?? [1, 1];
+              const fill = b.fills?.[`${r}:${i}`] ?? (header || total ? t.soft : undefined);
+              return [
+                tableCell(
+                  cov ? [new Paragraph({ children: [] })] : [new Paragraph({ alignment: align(i), spacing: { after: 0 }, children: [new TextRun({ text: formatCell({ value: values[i], format: c.format ?? "text", digits: c.digits }), bold: header || total || undefined, size: pt(header ? 9 : 9.5) })] })],
+                  {
+                    width: widths.slice(i, i + cs).reduce((a, x) => a + x, 0),
+                    fill,
+                    borders: header ? { bottom: line(t.lineStrong, 6) } : total ? { top: line(t.lineStrong, 6), bottom: line(t.line) } : { bottom: line(t.line) },
+                    columnSpan: cs > 1 ? cs : undefined,
+                    verticalMerge: cov === "continue" ? "continue" : rs > 1 ? "restart" : undefined,
+                  },
+                ),
+              ];
+            }),
           });
-        });
+        const headRows = headerRows > 0 ? b.rows.slice(0, headerRows).map((v, r) => row(v, r, true, false)) : headerRows === 0 ? [] : [row(b.columns.map((c) => c.header), -1, true, false)];
+        const bodyStart = Math.max(0, headerRows);
+        const body = b.rows.slice(bodyStart).map((v, k) => row(v, bodyStart + k, false, !!b.totalRow && bodyStart + k === b.rows.length - 1));
         const out: (InstanceType<DocxModule["Paragraph"]> | InstanceType<DocxModule["Table"]>)[] = [
-          new Table({ rows: [header, ...body], width: { size: contentWidth, type: WidthType.DXA }, columnWidths: widths, layout: TableLayoutType.FIXED, borders: noBorders }),
+          new Table({ rows: [...headRows, ...body], width: { size: contentWidth, type: WidthType.DXA }, columnWidths: widths, layout: TableLayoutType.FIXED, borders: noBorders }),
         ];
         out.push(new Paragraph({ spacing: { before: 80, after: 200 }, children: b.caption ? [new TextRun({ text: b.caption, size: pt(8.5), color: hex(t.muted) })] : [] }));
         return out;
@@ -470,18 +505,20 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
       ]
     : [];
 
-  const toc = doc.toc
-    ? [
-        new Paragraph({ pageBreakBefore: showCover, spacing: { after: 240 }, children: [new TextRun({ text: "Sumário", bold: true, size: pt(18), color: hex(t.brand) })] }),
-        new TableOfContents("Sumário", {
-          hyperlink: true,
-          headingStyleRange: "1-2",
-          cachedEntries: outline.map((h) => ({ title: h.text, level: h.level, page: options.pages?.[h.index], href: anchor(h.index) })),
-        }),
-      ]
-    : [];
+  function tocBlock(pageBreakBefore = false) {
+    return [
+      new Paragraph({ pageBreakBefore, spacing: { after: 240 }, children: [new TextRun({ text: "Sumário", bold: true, size: pt(18), color: hex(t.brand) })] }),
+      new TableOfContents("Sumário", {
+        hyperlink: true,
+        headingStyleRange: "1-2",
+        cachedEntries: outline.map((h) => ({ title: h.text, level: h.level, page: options.pages?.[h.index], href: anchor(h.index) })),
+      }),
+    ];
+  }
+  const tocInline = doc.blocks.some((b) => b.type === "toc");
+  const toc = doc.toc && !tocInline ? tocBlock(showCover) : [];
 
-  const firstContent = doc.blocks.length ? [new Paragraph({ pageBreakBefore: showCover || doc.toc, spacing: { after: 0 }, children: [] })] : [];
+  const firstContent = doc.blocks.length ? [new Paragraph({ pageBreakBefore: showCover || (!!doc.toc && !tocInline), spacing: { after: 0 }, children: [] })] : [];
   const body = doc.blocks.flatMap((b, i) => block(b, i));
 
   const headerText = doc.header ?? doc.title;
@@ -499,8 +536,8 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
     },
     numbering: {
       config: [
-        { reference: "ds-bullet", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 400, hanging: 260 } }, run: { color: hex(t.accent) } } }] },
-        { reference: "ds-ordered", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 400, hanging: 300 } }, run: { color: hex(t.accentDeep), bold: true } } }] },
+        { reference: "ds-bullet", levels: ["•", "◦", "▪"].map((text, level) => ({ level, format: LevelFormat.BULLET, text, alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 400 + level * 360, hanging: 260 } }, run: { color: hex(t.accent) } } })) },
+        { reference: "ds-ordered", levels: ["%1.", "%1.%2.", "%1.%2.%3."].map((text, level) => ({ level, format: LevelFormat.DECIMAL, text, alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 400 + level * 360, hanging: 300 + level * 160 } }, run: { color: hex(t.accentDeep), bold: true } } })) },
       ],
     },
     sections: [

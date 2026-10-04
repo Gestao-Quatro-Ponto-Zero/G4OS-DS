@@ -54,7 +54,7 @@ export default function Page() {
         />
       </DocSection>
 
-      <DocSection title="De um arquivo .docx" rule="O mesmo visualizador lê o documento real: título, títulos 1 a 3 (viram sumário), parágrafos com negrito, itálico e link, listas com marcador e numeradas, tabelas (números à direita), imagens e quebras de página. A diagramação é a do DS; colunas, caixas de texto, cabeçalhos do Word e comentários ficam de fora.">
+      <DocSection title="De um arquivo .docx" rule="O mesmo visualizador lê o documento real: títulos (viram sumário), listas em níveis com a numeração do Word, alinhamento, ênfases, cor e realce, tabelas mescladas e sombreadas, imagens, cabeçalho e rodapé. A diagramação é a do DS; colunas, caixas de texto e notas de rodapé ficam de fora. Contrato com cláusulas em níveis em Arquivos do Office.">
         <Demo
           bare
           code={`<OfficeFileView source={file} className="h-[720px]" />

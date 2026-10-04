@@ -1,35 +1,36 @@
 import { useState } from "react";
-import { FileSpreadsheet, FileText, Presentation } from "lucide-react";
-import { FileDropzone, OfficeFileView, SegmentedControl } from "@g4ai/ds";
+import { FileCard, FileDropzone, OfficeFileView } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
   title: "Arquivos do Office",
   group: "Mídia e conteúdo",
   order: 23,
-  description: "OfficeFileView abre .xlsx, .docx e .pptx no navegador, sem dependências e sem enviar o arquivo a nenhum serviço, e escolhe o visualizador do DS: WorkbookView, DocumentView ou SlideDeck. Cuida de carregando, erro e sem arquivo.",
+  description: "OfficeFileView abre .xlsx, .csv, .docx e .pptx no navegador, sem dependências e sem enviar o arquivo a nenhum serviço, e escolhe o visualizador do DS: WorkbookView, DocumentView ou SlideDeck. Cuida de carregando, erro e sem arquivo.",
 };
 
 const samples = [
-  { label: "Planilha", src: "samples/contas-a-receber.xlsx", icon: <FileSpreadsheet /> },
-  { label: "Documento", src: "samples/proposta-comercial.docx", icon: <FileText /> },
-  { label: "Apresentação", src: "samples/revisao-trimestral.pptx", icon: <Presentation /> },
+  { name: "vendas-2026.xlsx", src: "samples/vendas-2026.xlsx", meta: "20 mil linhas, cores, mesclas, gráficos" },
+  { name: "contas-a-receber.xlsx", src: "samples/contas-a-receber.xlsx", meta: "Fórmulas e painel congelado" },
+  { name: "exportacao-crm.csv", src: "samples/exportacao-crm.csv", meta: "CSV do Excel em português (;)" },
+  { name: "contrato-servicos.docx", src: "samples/contrato-servicos.docx", meta: "Cláusulas em níveis, tabela mesclada" },
+  { name: "proposta-comercial.docx", src: "samples/proposta-comercial.docx", meta: "Listas, imagem e tabela" },
+  { name: "deck-marca.pptx", src: "samples/deck-marca.pptx", meta: "Modelo da marca, gráficos, formas" },
+  { name: "revisao-trimestral.pptx", src: "samples/revisao-trimestral.pptx", meta: "Modelo padrão do PowerPoint" },
 ];
 
 export default function Page() {
-  const [file, setFile] = useState<File | string>(samples[0].src);
+  const [file, setFile] = useState<File | string>(samples[5].src);
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
       <DocSection title="OfficeFileView" rule="Escolha um exemplo ou solte um arquivo seu: ele é lido aqui no navegador. Formatos antigos (.xls, .doc, .ppt) recebem uma mensagem pedindo para salvar no formato novo.">
         <div className="flex flex-col gap-3">
-          <SegmentedControl
-            label="Exemplo"
-            value={typeof file === "string" ? file : ""}
-            onChange={setFile}
-            options={samples.map((s) => ({ value: s.src, label: s.label, icon: s.icon }))}
-            className="self-start"
-          />
-          <FileDropzone label="Abrir arquivo seu" hint=".xlsx, .docx ou .pptx, até 20 MB" accept=".xlsx,.docx,.pptx" multiple={false} maxSize={20 * 1024 * 1024} onFiles={(files) => files[0] && setFile(files[0])} />
+          <div role="group" aria-label="Arquivos de exemplo" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {samples.map((s) => (
+              <FileCard key={s.src} name={s.name} meta={s.meta} selected={file === s.src} onOpen={() => setFile(s.src)} />
+            ))}
+          </div>
+          <FileDropzone label="Abrir arquivo seu" hint=".xlsx, .csv, .docx ou .pptx, até 20 MB" accept=".xlsx,.xlsm,.csv,.tsv,.txt,.docx,.pptx" multiple={false} maxSize={20 * 1024 * 1024} onFiles={(files) => files[0] && setFile(files[0])} />
           <Demo bare code={`const [file, setFile] = useState<File | null>(null);
 <FileDropzone label="Arquivo" accept=".xlsx,.docx,.pptx" multiple={false} onFiles={([f]) => setFile(f)} />
 <OfficeFileView source={file} className="h-[600px]" />`}>
@@ -63,9 +64,9 @@ const state = useOfficeFile(url);`}
       <DocSection title="O que é lido">
         <Rules
           items={[
-            { do: "Planilha: valores, fórmulas com o resultado salvo, R$, %, data, negrito, larguras, mesclas de título, painéis congelados. Até 2.000 linhas e 60 colunas por aba.", dont: "Gráficos, imagens, formatação condicional, validação de dados." },
-            { do: "Documento: título, títulos 1–3, parágrafos com negrito/itálico/link, listas, tabelas, imagens, quebras de página.", dont: "Colunas, caixas de texto, cabeçalho e rodapé do Word, comentários, controle de alterações." },
-            { do: "Apresentação: posição, cores, fundo, imagens, tabelas e notas, herdando layout e mestre.", dont: "Gráficos nativos, SmartArt, animação, vídeo; a fonte é a do DS." },
+            { do: "Planilha (.xlsx, .csv): valores, fórmulas com o resultado salvo, R$/%/data/hora, cores de fundo e de texto, negrito, itálico, alinhamento, quebra de texto, mesclas, linhas e colunas ocultas, cabeçalho por painel, tabela ou filtro, gráficos (barras, linhas, áreas, pizza, rosca, combinado, dispersão) e folhas de gráfico. Até 50 mil linhas; só as visíveis são desenhadas.", dont: "Formatação condicional, imagens na planilha, validação de dados, macros, .xlsb." },
+            { do: "Documento (.docx): título, títulos 1–3, listas em níveis com a numeração do Word (1., 1.1., a)), alinhamento, quebras de linha, negrito, itálico, sublinhado, cor, realce, links, tabelas com mescla e sombreamento, imagens, cabeçalho e rodapé; o sumário do Word vira o sumário do DS.", dont: "Colunas, caixas de texto, notas de rodapé, comentários." },
+            { do: "Apresentação (.pptx): elementos e fundo do modelo (logo, faixas, degradê, imagem), posição herdada do layout, formas comuns, linhas e setas, imagens recortadas e redondas, tabelas com o estilo do PowerPoint, gráficos nativos, fontes do tema (se instaladas), espaçamento, notas.", dont: "SmartArt, animações, vídeo, efeitos 3D e sombras." },
           ]}
         />
       </DocSection>

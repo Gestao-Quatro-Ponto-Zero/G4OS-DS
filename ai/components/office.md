@@ -26,6 +26,19 @@ Exemplo (showcase `#/p/midia-documentos`):
 // Ou: const file = await readOfficeFile(blob)  →  <DocumentView document={file.document} />
 ```
 
+## OfficeChartView
+
+Gráfico do Office (de .xlsx ou .pptx) desenhado com os gráficos do DS: barras, linhas, áreas, rosca, combinado e dispersão.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `chart` * | `OfficeChart` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `height` | `number \| undefined` | `260` |  |
+| `showTitle` | `boolean \| undefined` | `true` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
 ## OfficeFileState (type)
 
 ```ts
@@ -56,7 +69,7 @@ Exemplo (showcase `#/p/midia-documentos`):
 
 ## OfficeSlide
 
-Um slide de .pptx no canvas de 1280×720 do DS: posição, tamanho, cores, imagens e tabelas vêm do arquivo; o texto usa a fonte do DS.
+Um slide de .pptx no canvas de 1280×720 do DS.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |

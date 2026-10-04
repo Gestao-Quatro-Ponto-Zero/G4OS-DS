@@ -88,7 +88,7 @@ export default function Page() {
         />
       </DocSection>
 
-      <DocSection title="De um arquivo .pptx" rule="O SlideDeck também mostra apresentações reais: posição e tamanho de cada elemento, cores, fundo, imagens, tabelas e notas do apresentador vêm do arquivo (inclusive o que o slide herda do layout e do mestre). O texto usa a fonte do DS; gráficos nativos, SmartArt, animações e vídeo ficam de fora.">
+      <DocSection title="De um arquivo .pptx" rule="O SlideDeck também mostra apresentações reais: modelo da marca (logo, faixas, fundo), formas, linhas e setas, imagens recortadas, tabelas, gráficos nativos (desenhados com os gráficos do DS), fontes e notas vêm do arquivo. SmartArt, animações e vídeo ficam de fora. Deck com modelo da marca em Arquivos do Office.">
         <Demo
           bare
           code={`<OfficeFileView source={file} className="h-[640px]" />

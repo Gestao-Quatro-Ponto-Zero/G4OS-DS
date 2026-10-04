@@ -18,7 +18,7 @@ import { formatCurrency, formatDate, formatNumber, formatPercent } from "./forma
 export type CellValue = string | number | boolean | Date | null | undefined;
 
 /** Como a coluna é formatada na tela e no Excel. */
-export type CellFormat = "text" | "integer" | "number" | "currency" | "percent" | "date";
+export type CellFormat = "text" | "integer" | "number" | "currency" | "percent" | "date" | "time" | "datetime";
 
 export type WorkbookAggregate = "sum" | "average" | "count" | "min" | "max";
 
@@ -75,7 +75,15 @@ export type Workbook = {
  * Aba já posicionada (o que vem de um .xlsx). `layout` é a grade final;
  * WorkbookView aceita estas abas ou as WorkbookSheet escritas em código.
  */
-export type GridSheet = { name: string; layout: SheetLayout; freezeColumns?: number; /** Linhas omitidas por limite de exibição. */ truncated?: boolean };
+export type GridSheet = {
+  name: string;
+  layout: SheetLayout;
+  freezeColumns?: number;
+  /** Linhas omitidas por limite de exibição. */
+  truncated?: boolean;
+  /** Gráficos da aba (ou da folha de gráfico), desenhados com os gráficos do DS. */
+  charts?: OfficeChart[];
+};
 export type FileWorkbook = { title: string; sheets: GridSheet[] };
 
 export type LaidCell = {
@@ -91,6 +99,26 @@ export type LaidCell = {
   note?: string;
   /** Negrito definido no arquivo. */
   bold?: boolean;
+  /** Aparência da célula no arquivo (cor de fundo e de texto, alinhamento). */
+  style?: CellStyle;
+  /** Célula mesclada: quantas linhas e colunas ocupa a partir daqui. */
+  merge?: { rows: number; cols: number };
+};
+
+/**
+ * Aparência que vem do arquivo. Cores são dado (o "vermelho = atrasado" de
+ * quem fez a planilha), então aparecem como estão, em hex "#RRGGBB".
+ */
+export type CellStyle = {
+  fill?: string;
+  color?: string;
+  italic?: boolean;
+  underline?: boolean;
+  strike?: boolean;
+  align?: "left" | "center" | "right";
+  wrap?: boolean;
+  /** Número negativo em vermelho (formato "[Vermelho]" do Excel). */
+  negativeRed?: boolean;
 };
 
 export type SheetLayout = {
@@ -102,6 +130,10 @@ export type SheetLayout = {
   lastDataRow: number;
   totalRow: number | null;
   widths: number[];
+  /** Células cobertas por mescla: "r:c" → [linha, coluna] da célula que manda. */
+  covered?: Map<string, [number, number]>;
+  hiddenRows?: Set<number>;
+  hiddenCols?: Set<number>;
 };
 
 /** 0 → "A", 25 → "Z", 26 → "AA". */
@@ -283,14 +315,16 @@ export function formatCell(cell: Pick<LaidCell, "value" | "format" | "digits">):
   const v = cell.value;
   if (v === null || v === undefined || v === "") return "";
   if (typeof v === "boolean") return v ? "Sim" : "Não";
-  if (cell.format === "date") {
+  if (cell.format === "date" || cell.format === "time" || cell.format === "datetime") {
     const d = toCellDate(v);
-    return d ? formatDate(d) : String(v);
+    if (!d) return String(v);
+    const time = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return cell.format === "time" ? time : cell.format === "datetime" ? `${formatDate(d)} ${time}` : formatDate(d);
   }
   if (typeof v !== "number") return v instanceof Date ? formatDate(v) : String(v);
   switch (cell.format) {
     case "currency":
-      return formatCurrency(v);
+      return formatCurrency(v, { cents: (cell.digits ?? 2) > 0 });
     case "percent":
       return formatPercent(v, cell.digits ?? 1);
     case "integer":
@@ -316,35 +350,66 @@ export function excelNumberFormat(format: CellFormat, digits?: number) {
       return `#,##0${dec(digits ?? 2)}`;
     case "date":
       return "dd/mm/yyyy";
+    case "time":
+      return "hh:mm";
+    case "datetime":
+      return "dd/mm/yyyy hh:mm";
     default:
       return undefined;
   }
 }
 
-export const isNumericFormat = (f: CellFormat) => f !== "text" && f !== "date";
+export const isNumericFormat = (f: CellFormat) => f !== "text" && f !== "date" && f !== "time" && f !== "datetime";
 
 /* ------------------------------------------------------------------ */
 /* Documento                                                           */
 /* ------------------------------------------------------------------ */
 
 /** Trecho de texto com ênfase. Um parágrafo é string ou lista de trechos. */
-export type DocRun = { text: string; bold?: boolean; italic?: boolean; href?: string };
+export type DocRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; href?: string; /** Cor do texto no arquivo, "#RRGGBB". */ color?: string; /** Realce (marca-texto), cor CSS. */ highlight?: string };
+export type DocAlign = "left" | "center" | "right" | "justify";
 export type DocText = string | DocRun[];
 
 export type DocTableColumn = { header: string; format?: CellFormat; digits?: number; /** Fração da largura (padrão: igual). */ width?: number };
 
 export type DocBlock =
-  | { type: "heading"; text: string; /** 1 = seção (entra no sumário), 2 = subseção, 3 = tópico. */ level?: 1 | 2 | 3 }
-  | { type: "paragraph"; text: DocText }
-  | { type: "list"; items: DocText[]; ordered?: boolean }
-  | { type: "table"; columns: DocTableColumn[]; rows: CellValue[][]; caption?: string; /** Última linha em negrito, como total. */ totalRow?: boolean }
+  | { type: "heading"; text: string; /** 1 = seção (entra no sumário), 2 = subseção, 3 = tópico. */ level?: 1 | 2 | 3; align?: DocAlign }
+  | { type: "paragraph"; text: DocText; align?: DocAlign }
+  | {
+      type: "list";
+      items: DocText[];
+      ordered?: boolean;
+      /** Nível de cada item (0 = raiz). Numerada com níveis vira 1., 1.1., 1.1.1. */
+      levels?: number[];
+      /** Marcador pronto de cada item (vem do .docx: "1.", "a)", "Cláusula 2"). */
+      markers?: string[];
+    }
+  | {
+      type: "table";
+      columns: DocTableColumn[];
+      rows: CellValue[][];
+      caption?: string;
+      /** Última linha em negrito, como total. */
+      totalRow?: boolean;
+      /**
+       * Linhas de cabeçalho dentro de `rows` (vem do .docx, que pode ter cabeçalho em dois níveis).
+       * Sem isso, o cabeçalho é `columns[].header`; 0 = tabela sem cabeçalho.
+       */
+      headerRows?: number;
+      /** Células mescladas: "linha:coluna" → [linhas, colunas]. As cobertas ficam vazias em `rows`. */
+      spans?: Record<string, [number, number]>;
+      /** Fundo de célula do arquivo: "linha:coluna" → "#RRGGBB". */
+      fills?: Record<string, string>;
+    }
   | { type: "stats"; items: { label: string; value: string; delta?: string; good?: boolean }[] }
   | { type: "callout"; title?: string; text: DocText; tone?: "neutral" | "info" | "ok" | "amber" | "rose" }
   | { type: "quote"; text: string; author?: string; role?: string }
   | { type: "signatures"; people: { name: string; role?: string }[] }
   | { type: "image"; src: string; alt?: string; /** Largura em px na página (até 642; padrão: largura útil). */ width?: number; /** Altura ÷ largura (padrão 9/16). */ ratio?: number; caption?: string }
   | { type: "divider" }
-  | { type: "pageBreak" };
+  | { type: "pageBreak" }
+  /** Sumário neste ponto do documento (com número de página). Sem ele, `toc: true` põe o sumário depois da capa. */
+  | { type: "toc"; title?: string };
 
 export type OfficeDocument = {
   title: string;
@@ -388,19 +453,49 @@ export function fileSlug(title: string) {
 /* Apresentação (lida de .pptx)                                        */
 /* ------------------------------------------------------------------ */
 
-export type PresentationRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; /** Hex "#RRGGBB". */ color?: string; /** Pontos. */ size?: number };
-export type PresentationParagraph = { runs: PresentationRun[]; align?: "left" | "center" | "right" | "justify"; level?: number; bullet?: string; /** Pontos (padrão do parágrafo). */ size?: number; color?: string };
+export type PresentationRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; /** Hex "#RRGGBB" (ou "#RRGGBBAA"). */ color?: string; /** Pontos. */ size?: number; /** Fonte do arquivo; cai na do DS se não estiver instalada. */ font?: string };
+export type PresentationParagraph = {
+  runs: PresentationRun[];
+  align?: "left" | "center" | "right" | "justify";
+  level?: number;
+  bullet?: string;
+  /** Pontos (padrão do parágrafo). */
+  size?: number;
+  color?: string;
+  font?: string;
+  /** Entrelinha em múltiplos do tamanho da fonte (1,2 = simples do PowerPoint). */
+  lineHeight?: number;
+  /** Entrelinha fixa em pontos (tem prioridade). */
+  lineHeightPt?: number;
+  /** Espaço antes e depois do parágrafo, em pontos. */
+  spaceBefore?: number;
+  spaceAfter?: number;
+};
 export type PresentationShape = {
-  kind: "text" | "image" | "table";
+  kind: "text" | "image" | "table" | "line" | "chart";
   /** Posição e tamanho em fração do slide (0–1). */
   x: number;
   y: number;
   w: number;
   h: number;
   rotation?: number;
+  flipH?: boolean;
+  flipV?: boolean;
+  /** Fundo como valor CSS: cor, degradê (linear-gradient) ou imagem. */
   fill?: string;
+  /** Contorno (ou cor da linha). */
   line?: string;
-  geometry?: "rect" | "roundRect" | "ellipse";
+  /** Espessura do contorno ou da linha, em pontos. */
+  lineWidth?: number;
+  lineDash?: boolean;
+  /** Setas nas pontas da linha. */
+  arrowStart?: boolean;
+  arrowEnd?: boolean;
+  /** Linha em cotovelo (conector angulado). */
+  elbow?: boolean;
+  /** Forma do PowerPoint (rect, roundRect, ellipse, triangle, chevron, rightArrow…). */
+  geometry?: string;
+  opacity?: number;
   paragraphs?: PresentationParagraph[];
   anchor?: "top" | "middle" | "bottom";
   /** Margens internas em fração da largura do slide. */
@@ -409,7 +504,37 @@ export type PresentationShape = {
   fontScale?: number;
   src?: string;
   alt?: string;
+  /** Recorte da imagem em fração de cada lado: [esquerda, cima, direita, baixo]. */
+  crop?: [number, number, number, number];
   rows?: string[][];
+  /** Tabela: largura de cada coluna em fração, fundo e estilo de texto por célula. */
+  colWidths?: number[];
+  cells?: ({ fill?: string; color?: string; bold?: boolean; size?: number; span?: [number, number]; covered?: boolean } | undefined)[][];
+  chart?: OfficeChart;
 };
 export type PresentationSlide = { title: string; background?: string; shapes: PresentationShape[]; notes?: string };
 export type Presentation = { title: string; /** Largura ÷ altura (16/9, 4/3…). */ aspect: number; /** Largura do slide em pontos (960 no 16:9 padrão), base dos tamanhos de fonte. */ width: number; slides: PresentationSlide[] };
+
+/* ------------------------------------------------------------------ */
+/* Gráfico (de .xlsx ou .pptx)                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Gráfico do Office reduzido ao que importa para desenhar com os gráficos do
+ * DS: tipo, categorias e séries com os valores salvos no arquivo.
+ */
+export type OfficeChart = {
+  title?: string;
+  kind: "bar" | "line" | "area" | "pie" | "doughnut" | "scatter" | "combo" | "unsupported";
+  /** Barras deitadas (categorias à esquerda). */
+  horizontal?: boolean;
+  stacked?: boolean;
+  /** Empilhado 100 %. */
+  percent?: boolean;
+  categories: string[];
+  series: { name: string; values: (number | null)[]; kind?: "bar" | "line" | "area"; /** Dispersão: valores de X. */ x?: (number | null)[] }[];
+  format?: CellFormat;
+  digits?: number;
+  /** Nome do tipo no Office quando não há equivalente no DS (radar, ações, superfície). */
+  sourceType?: string;
+};

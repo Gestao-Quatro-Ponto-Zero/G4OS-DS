@@ -25338,7 +25338,13 @@
           "name": "CellFormat",
           "kind": "type",
           "summary": "Como a coluna é formatada na tela e no Excel.",
-          "definition": "\"text\" | \"integer\" | \"number\" | \"currency\" | \"percent\" | \"date\""
+          "definition": "\"text\" | \"integer\" | \"number\" | \"currency\" | \"percent\" | \"date\" | \"time\" | \"datetime\""
+        },
+        {
+          "name": "CellStyle",
+          "kind": "type",
+          "summary": "Aparência que vem do arquivo.",
+          "definition": "{ fill?: string; color?: string; italic?: boolean; underline?: boolean; strike?: boolean; align?: \"left\" | \"center\" | \"right\"; wrap?: boolean; negativeRed?: boolean; }"
         },
         {
           "name": "CellValue",
@@ -25353,16 +25359,22 @@
           "signature": "columnLetter(index): string"
         },
         {
+          "name": "DocAlign",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"left\" | \"center\" | \"right\" | \"justify\""
+        },
+        {
           "name": "DocBlock",
           "kind": "type",
           "summary": null,
-          "definition": "| { type: \"heading\"; text: string; level?: 1 | 2 | 3 } | { type: \"paragraph\"; text: DocText } | { type: \"list\"; items: DocText[]; ordered?: boolean } | { type: \"table\"; columns: DocTableColumn[]; rows: CellValue[][]; caption?: string; totalRow?: boolean } | { type: \"stats\"; items: { label: string; value: string; delta?: string; good?: boolean }[] } | { type: \"callout\"; title?: string; text: Doc…"
+          "definition": "| { type: \"heading\"; text: string; level?: 1 | 2 | 3; align?: DocAlign } | { type: \"paragraph\"; text: DocText; align?: DocAlign } | { type: \"list\"; items: DocText[]; ordered?: boolean; levels?: number[]; markers?: string[]; } | { type: \"table\"; columns: DocTableColumn[]; rows: CellValue[][]; caption?: string; totalRow?: boolean; headerRows?: number; spans?: Record<string, [number, number]>; fil…"
         },
         {
           "name": "DocRun",
           "kind": "type",
           "summary": "Trecho de texto com ênfase.",
-          "definition": "{ text: string; bold?: boolean; italic?: boolean; href?: string }"
+          "definition": "{ text: string; bold?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; href?: string; color?: string; highlight?: string }"
         },
         {
           "name": "docRuns",
@@ -25422,7 +25434,7 @@
           "name": "GridSheet",
           "kind": "type",
           "summary": "Aba já posicionada (o que vem de um .xlsx).",
-          "definition": "{ name: string; layout: SheetLayout; freezeColumns?: number; truncated?: boolean }"
+          "definition": "{ name: string; layout: SheetLayout; freezeColumns?: number; truncated?: boolean; charts?: OfficeChart[]; }"
         },
         {
           "name": "isNumericFormat",
@@ -25434,13 +25446,19 @@
           "name": "LaidCell",
           "kind": "type",
           "summary": null,
-          "definition": "{ value: CellValue; formula?: string; role: \"title\" | \"description\" | \"header\" | \"data\" | \"total\"; format: CellFormat; digits?: number; span?: boolean; note?: string; bold?: boolean; }"
+          "definition": "{ value: CellValue; formula?: string; role: \"title\" | \"description\" | \"header\" | \"data\" | \"total\"; format: CellFormat; digits?: number; span?: boolean; note?: string; bold?: boolean; style?: CellStyle; merge?: { rows: number; cols: number }; }"
         },
         {
           "name": "layoutSheet",
           "kind": "function",
           "summary": "Posiciona a aba numa grade com endereços do Excel: título, descrição, cabeçalho, dados e total.",
           "signature": "layoutSheet(sheet): SheetLayout"
+        },
+        {
+          "name": "OfficeChart",
+          "kind": "type",
+          "summary": "Gráfico do Office reduzido ao que importa para desenhar com os gráficos do DS: tipo, categorias e séries com os valores salvos no arquivo.",
+          "definition": "{ title?: string; kind: \"bar\" | \"line\" | \"area\" | \"pie\" | \"doughnut\" | \"scatter\" | \"combo\" | \"unsupported\"; horizontal?: boolean; stacked?: boolean; percent?: boolean; categories: string[]; series: { name: string; values: (number | null)[]; kind?: \"bar\" | \"line\" | \"area\"; x?: (number | null)[] }[]; format?: CellFormat; digits?: number; sourceType?: string; }"
         },
         {
           "name": "OfficeDocument",
@@ -25458,19 +25476,19 @@
           "name": "PresentationParagraph",
           "kind": "type",
           "summary": null,
-          "definition": "{ runs: PresentationRun[]; align?: \"left\" | \"center\" | \"right\" | \"justify\"; level?: number; bullet?: string; size?: number; color?: string }"
+          "definition": "{ runs: PresentationRun[]; align?: \"left\" | \"center\" | \"right\" | \"justify\"; level?: number; bullet?: string; size?: number; color?: string; font?: string; lineHeight?: number; lineHeightPt?: number; spaceBefore?: number; spaceAfter?: number; }"
         },
         {
           "name": "PresentationRun",
           "kind": "type",
           "summary": null,
-          "definition": "{ text: string; bold?: boolean; italic?: boolean; underline?: boolean; color?: string; size?: number }"
+          "definition": "{ text: string; bold?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; color?: string; size?: number; font?: string }"
         },
         {
           "name": "PresentationShape",
           "kind": "type",
           "summary": null,
-          "definition": "{ kind: \"text\" | \"image\" | \"table\"; x: number; y: number; w: number; h: number; rotation?: number; fill?: string; line?: string; geometry?: \"rect\" | \"roundRect\" | \"ellipse\"; paragraphs?: PresentationParagraph[]; anchor?: \"top\" | \"middle\" | \"bottom\"; inset?: [number, number, number, number]; fontScale?: number; src?: string; alt?: string; rows?: string[][]; }"
+          "definition": "{ kind: \"text\" | \"image\" | \"table\" | \"line\" | \"chart\"; x: number; y: number; w: number; h: number; rotation?: number; flipH?: boolean; flipV?: boolean; fill?: string; line?: string; lineWidth?: number; lineDash?: boolean; arrowStart?: boolean; arrowEnd?: boolean; elbow?: boolean; geometry?: string; opacity?: number; paragraphs?: PresentationParagraph[]; anchor?: \"top\" | \"middle\" | \"bottom\"; ins…"
         },
         {
           "name": "PresentationSlide",
@@ -25482,7 +25500,7 @@
           "name": "SheetLayout",
           "kind": "type",
           "summary": null,
-          "definition": "{ rows: (LaidCell | null)[][]; colCount: number; headerRow: number; firstDataRow: number; lastDataRow: number; totalRow: number | null; widths: number[]; }"
+          "definition": "{ rows: (LaidCell | null)[][]; colCount: number; headerRow: number; firstDataRow: number; lastDataRow: number; totalRow: number | null; widths: number[]; covered?: Map<string, [number, number]>; hiddenRows?: Set<number>; hiddenCols?: Set<number>; }"
         },
         {
           "name": "toCellDate",
@@ -25531,13 +25549,13 @@
         {
           "name": "OFFICE_SHEET_LIMITS",
           "kind": "const",
-          "summary": "Limites de exibição de planilha (a grade não é virtualizada)."
+          "summary": "Limites de leitura de planilha."
         },
         {
           "name": "OfficeFile",
           "kind": "type",
           "summary": null,
-          "definition": "{ kind: \"xlsx\"; workbook: FileWorkbook } | { kind: \"docx\"; document: OfficeDocument } | { kind: \"pptx\"; presentation: Presentation }"
+          "definition": "{ kind: \"xlsx\"; workbook: FileWorkbook } | { kind: \"csv\"; workbook: FileWorkbook } | { kind: \"docx\"; document: OfficeDocument } | { kind: \"pptx\"; presentation: Presentation }"
         },
         {
           "name": "OfficeFileError",
@@ -25547,7 +25565,7 @@
         {
           "name": "OfficeFileErrorCode",
           "kind": "type",
-          "summary": "Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt), unsupported (não é Office), corrupt, network.",
+          "summary": "Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt/.xlsb), unsupported (não é Office), corrupt, network.",
           "definition": "\"legacy\" | \"unsupported\" | \"corrupt\" | \"network\""
         },
         {
@@ -25555,6 +25573,12 @@
           "kind": "type",
           "summary": null,
           "definition": "Blob | ArrayBuffer | Uint8Array"
+        },
+        {
+          "name": "readCsv",
+          "kind": "function",
+          "summary": null,
+          "signature": "readCsv(src, options?): Promise<FileWorkbook>"
         },
         {
           "name": "readDocx",
@@ -25565,7 +25589,7 @@
         {
           "name": "readOfficeFile",
           "kind": "function",
-          "summary": "Lê qualquer .xlsx, .docx ou .pptx, detectando o tipo pelo conteúdo.",
+          "summary": "Lê .xlsx, .docx, .pptx ou .csv, detectando o tipo pelo conteúdo.",
           "signature": "readOfficeFile(src, options?): Promise<OfficeFile>"
         },
         {
@@ -25632,6 +25656,42 @@
           "examplePage": "midia-documentos"
         },
         {
+          "name": "OfficeChartView",
+          "kind": "component",
+          "summary": "Gráfico do Office (de .xlsx ou .pptx) desenhado com os gráficos do DS: barras, linhas, áreas, rosca, combinado e dispersão.",
+          "props": [
+            {
+              "name": "chart",
+              "type": "OfficeChart",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "260",
+              "description": null
+            },
+            {
+              "name": "showTitle",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
           "name": "OfficeFileState",
           "kind": "type",
           "summary": null,
@@ -25683,7 +25743,7 @@
         {
           "name": "OfficeSlide",
           "kind": "component",
-          "summary": "Um slide de .pptx no canvas de 1280×720 do DS: posição, tamanho, cores, imagens e tabelas vêm do arquivo; o texto usa a fonte do DS.",
+          "summary": "Um slide de .pptx no canvas de 1280×720 do DS.",
           "props": [
             {
               "name": "slide",

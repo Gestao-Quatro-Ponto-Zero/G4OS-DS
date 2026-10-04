@@ -17,7 +17,15 @@ cellAddress(row, col): string
 Como a coluna é formatada na tela e no Excel.
 
 ```ts
-type CellFormat = "text" | "integer" | "number" | "currency" | "percent" | "date"
+type CellFormat = "text" | "integer" | "number" | "currency" | "percent" | "date" | "time" | "datetime"
+```
+
+## CellStyle (type)
+
+Aparência que vem do arquivo.
+
+```ts
+type CellStyle = { fill?: string; color?: string; italic?: boolean; underline?: boolean; strike?: boolean; align?: "left" | "center" | "right"; wrap?: boolean; negativeRed?: boolean; }
 ```
 
 ## CellValue (type)
@@ -36,10 +44,16 @@ type CellValue = string | number | boolean | Date | null | undefined
 columnLetter(index): string
 ```
 
+## DocAlign (type)
+
+```ts
+type DocAlign = "left" | "center" | "right" | "justify"
+```
+
 ## DocBlock (type)
 
 ```ts
-type DocBlock = | { type: "heading"; text: string; level?: 1 | 2 | 3 } | { type: "paragraph"; text: DocText } | { type: "list"; items: DocText[]; ordered?: boolean } | { type: "table"; columns: DocTableColumn[]; rows: CellValue[][]; caption?: string; totalRow?: boolean } | { type: "stats"; items: { label: string; value: string; delta?: string; good?: boolean }[] } | { type: "callout"; title?: string; text: Doc…
+type DocBlock = | { type: "heading"; text: string; level?: 1 | 2 | 3; align?: DocAlign } | { type: "paragraph"; text: DocText; align?: DocAlign } | { type: "list"; items: DocText[]; ordered?: boolean; levels?: number[]; markers?: string[]; } | { type: "table"; columns: DocTableColumn[]; rows: CellValue[][]; caption?: string; totalRow?: boolean; headerRows?: number; spans?: Record<string, [number, number]>; fil…
 ```
 
 ## DocRun (type)
@@ -47,7 +61,7 @@ type DocBlock = | { type: "heading"; text: string; level?: 1 | 2 | 3 } | { type:
 Trecho de texto com ênfase.
 
 ```ts
-type DocRun = { text: string; bold?: boolean; italic?: boolean; href?: string }
+type DocRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; href?: string; color?: string; highlight?: string }
 ```
 
 ## docRuns (function)
@@ -119,7 +133,7 @@ formatCell(cell): string
 Aba já posicionada (o que vem de um .xlsx).
 
 ```ts
-type GridSheet = { name: string; layout: SheetLayout; freezeColumns?: number; truncated?: boolean }
+type GridSheet = { name: string; layout: SheetLayout; freezeColumns?: number; truncated?: boolean; charts?: OfficeChart[]; }
 ```
 
 ## isNumericFormat (function)
@@ -131,7 +145,7 @@ isNumericFormat(f): boolean
 ## LaidCell (type)
 
 ```ts
-type LaidCell = { value: CellValue; formula?: string; role: "title" | "description" | "header" | "data" | "total"; format: CellFormat; digits?: number; span?: boolean; note?: string; bold?: boolean; }
+type LaidCell = { value: CellValue; formula?: string; role: "title" | "description" | "header" | "data" | "total"; format: CellFormat; digits?: number; span?: boolean; note?: string; bold?: boolean; style?: CellStyle; merge?: { rows: number; cols: number }; }
 ```
 
 ## layoutSheet (function)
@@ -140,6 +154,14 @@ Posiciona a aba numa grade com endereços do Excel: título, descrição, cabeç
 
 ```ts
 layoutSheet(sheet): SheetLayout
+```
+
+## OfficeChart (type)
+
+Gráfico do Office reduzido ao que importa para desenhar com os gráficos do DS: tipo, categorias e séries com os valores salvos no arquivo.
+
+```ts
+type OfficeChart = { title?: string; kind: "bar" | "line" | "area" | "pie" | "doughnut" | "scatter" | "combo" | "unsupported"; horizontal?: boolean; stacked?: boolean; percent?: boolean; categories: string[]; series: { name: string; values: (number | null)[]; kind?: "bar" | "line" | "area"; x?: (number | null)[] }[]; format?: CellFormat; digits?: number; sourceType?: string; }
 ```
 
 ## OfficeDocument (type)
@@ -157,19 +179,19 @@ type Presentation = { title: string; aspect: number; width: number; slides: Pres
 ## PresentationParagraph (type)
 
 ```ts
-type PresentationParagraph = { runs: PresentationRun[]; align?: "left" | "center" | "right" | "justify"; level?: number; bullet?: string; size?: number; color?: string }
+type PresentationParagraph = { runs: PresentationRun[]; align?: "left" | "center" | "right" | "justify"; level?: number; bullet?: string; size?: number; color?: string; font?: string; lineHeight?: number; lineHeightPt?: number; spaceBefore?: number; spaceAfter?: number; }
 ```
 
 ## PresentationRun (type)
 
 ```ts
-type PresentationRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; color?: string; size?: number }
+type PresentationRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; color?: string; size?: number; font?: string }
 ```
 
 ## PresentationShape (type)
 
 ```ts
-type PresentationShape = { kind: "text" | "image" | "table"; x: number; y: number; w: number; h: number; rotation?: number; fill?: string; line?: string; geometry?: "rect" | "roundRect" | "ellipse"; paragraphs?: PresentationParagraph[]; anchor?: "top" | "middle" | "bottom"; inset?: [number, number, number, number]; fontScale?: number; src?: string; alt?: string; rows?: string[][]; }
+type PresentationShape = { kind: "text" | "image" | "table" | "line" | "chart"; x: number; y: number; w: number; h: number; rotation?: number; flipH?: boolean; flipV?: boolean; fill?: string; line?: string; lineWidth?: number; lineDash?: boolean; arrowStart?: boolean; arrowEnd?: boolean; elbow?: boolean; geometry?: string; opacity?: number; paragraphs?: PresentationParagraph[]; anchor?: "top" | "middle" | "bottom"; ins…
 ```
 
 ## PresentationSlide (type)
@@ -181,7 +203,7 @@ type PresentationSlide = { title: string; background?: string; shapes: Presentat
 ## SheetLayout (type)
 
 ```ts
-type SheetLayout = { rows: (LaidCell | null)[][]; colCount: number; headerRow: number; firstDataRow: number; lastDataRow: number; totalRow: number | null; widths: number[]; }
+type SheetLayout = { rows: (LaidCell | null)[][]; colCount: number; headerRow: number; firstDataRow: number; lastDataRow: number; totalRow: number | null; widths: number[]; covered?: Map<string, [number, number]>; hiddenRows?: Set<number>; hiddenCols?: Set<number>; }
 ```
 
 ## toCellDate (function)

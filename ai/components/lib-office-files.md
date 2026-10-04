@@ -6,19 +6,19 @@ Leitura de arquivos reais do Office no navegador, sem dependências: descompacta
 
 ## OFFICE_SHEET_LIMITS (const)
 
-Limites de exibição de planilha (a grade não é virtualizada).
+Limites de leitura de planilha.
 
 ## OfficeFile (type)
 
 ```ts
-type OfficeFile = { kind: "xlsx"; workbook: FileWorkbook } | { kind: "docx"; document: OfficeDocument } | { kind: "pptx"; presentation: Presentation }
+type OfficeFile = { kind: "xlsx"; workbook: FileWorkbook } | { kind: "csv"; workbook: FileWorkbook } | { kind: "docx"; document: OfficeDocument } | { kind: "pptx"; presentation: Presentation }
 ```
 
 ## OfficeFileError (class)
 
 ## OfficeFileErrorCode (type)
 
-Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt), unsupported (não é Office), corrupt, network.
+Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt/.xlsb), unsupported (não é Office), corrupt, network.
 
 ```ts
 type OfficeFileErrorCode = "legacy" | "unsupported" | "corrupt" | "network"
@@ -30,6 +30,12 @@ type OfficeFileErrorCode = "legacy" | "unsupported" | "corrupt" | "network"
 type OfficeSource = Blob | ArrayBuffer | Uint8Array
 ```
 
+## readCsv (function)
+
+```ts
+readCsv(src, options?): Promise<FileWorkbook>
+```
+
 ## readDocx (function)
 
 ```ts
@@ -38,7 +44,7 @@ readDocx(src, options?): Promise<OfficeDocument>
 
 ## readOfficeFile (function)
 
-Lê qualquer .xlsx, .docx ou .pptx, detectando o tipo pelo conteúdo.
+Lê .xlsx, .docx, .pptx ou .csv, detectando o tipo pelo conteúdo.
 
 ```ts
 readOfficeFile(src, options?): Promise<OfficeFile>
