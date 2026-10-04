@@ -143,6 +143,7 @@ Catálogo completo com descrições no [README](README.md#blocos).
 | Componentes | `src/components/*.tsx`, exportados por `src/index.ts` |
 | Formatação pt-BR | `src/lib/format.ts`; texto: `src/lib/text.ts` |
 | Blocos de tela | `src/blocks/*.tsx` |
+| Planilha, documento, apresentação e arquivos .xlsx/.docx/.pptx | `WorkbookView`, `DocumentView`, `SlideDeck`, `OfficeFileView`, `readOfficeFile` (`src/components/office.tsx`, `src/lib/office*.ts`); exportar é opcional: [guia](docs/guias/office.md) + `templates/office-export.ts` |
 | Ponte shadcn / 21st e de/para | `src/styles/shadcn.css`, [docs/guias/shadcn.md](docs/guias/shadcn.md), [equivalências](docs/guias/shadcn-equivalencias.md) (fonte: `scripts/data/shadcn-map.json`) |
 | Cor, tipo, espaço, movimento, dados, ícones, escrita | `docs/fundamentos/` |
 | Layout, densidade, formulários, tabelas, superfícies, feedback, dashboards, pipelines, acessibilidade, responsivo | `docs/padroes/` |

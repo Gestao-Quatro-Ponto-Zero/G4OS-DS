@@ -2,7 +2,7 @@
 
 Arquivo: `src/components/office.tsx` · importe de `@g4ai/ds`.
 
-Planilhas e documentos na linguagem do DS, com exportação real para Office.
+Planilhas, documentos e apresentações na linguagem do DS, escritos em código ou lidos de arquivos reais do Office.
 
 ## DocumentView
 
@@ -10,73 +10,122 @@ Documento paginado em A4, com a mesma estrutura do .docx exportado: capa, sumár
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `document` * | `OfficeDocument` |  |  |
+| `document` * | `OfficeDocument` |  | Escrito em código ou lido de um .docx (readOfficeFile). |
+| `actions` | `ReactNode` |  | Ações na barra do visualizador (ex.: botão "Baixar .docx" do app). |
 | `className` | `string \| undefined` |  |  |
-| `fileName` | `string \| undefined` |  | Nome do arquivo sem extensão (padrão: título sem acento). |
 | `loading` | `boolean \| undefined` |  |  |
 | `showOutline` | `boolean \| undefined` | `true` | Sumário lateral (a partir de 768 px). |
-| `theme` | `Partial<OfficeTheme> \| undefined` |  | Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
 Exemplo (showcase `#/p/midia-documentos`):
 
 ```tsx
-const doc: OfficeDocument = {
-  kicker: "Relatório trimestral · Q3 2026",
-  title: "Vendas cresceram 18 % com o mesmo time",
-  subtitle: "O que funcionou, o que travou e as três apostas para o Q4.",
-  author: "Diretoria Comercial",
-  toc: true,
-  footer: "Uso interno",
-  blocks: [
-    { type: "heading", text: "Resumo" },
-    { type: "paragraph", text: [{ text: "O trimestre fechou com " }, { text: "R$ 4,4 mi", bold: true }, { text: "…" }] },
-    { type: "stats", items: [{ label: "Receita nova", value: "R$ 4,4 mi", delta: "+18 % vs. Q2", good: true }, …] },
-    { type: "table", columns: [{ header: "Produto" }, { header: "Receita", format: "currency" }], rows: [["G4 Scale", 946200], …], totalRow: true },
-    { type: "callout", tone: "amber", title: "Risco para o Q4", text: "…" },
-    { type: "signatures", people: [{ name: "Rafael Lima", role: "Diretor Comercial" }] },
-  ],
-};
-<DocumentView document={doc} className="h-[720px]" />
+<OfficeFileView source={file} className="h-[720px]" />
+
+// Ou: const file = await readOfficeFile(blob)  →  <DocumentView document={file.document} />
+```
+
+## OfficeFileState (type)
+
+```ts
+type OfficeFileState = | { status: "idle" } | { status: "loading" } | { status: "error"; error: string; retryable: boolean } | { status: "ready"; file: OfficeFile }
+```
+
+## OfficeFileView
+
+Mostra um arquivo do Office com o visualizador certo: .xlsx no WorkbookView, .docx no DocumentView, .pptx no SlideDeck.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `source` * | `string \| OfficeSource \| null \| undefined` |  | File/Blob/ArrayBuffer ou URL do arquivo. |
+| `actions` | `ReactNode` |  | Ações na barra (planilha e documento). |
+| `className` | `string \| undefined` |  |  |
+| `empty` | `ReactNode` |  | Conteúdo quando não há arquivo (padrão: aviso curto). |
+| `name` | `string \| undefined` |  | Nome do arquivo (título quando o arquivo não tem um). |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/midia-documentos`):
+
+```tsx
+<OfficeFileView source={file} className="h-[720px]" />
+
+// Ou: const file = await readOfficeFile(blob)  →  <DocumentView document={file.document} />
+```
+
+## OfficeSlide
+
+Um slide de .pptx no canvas de 1280×720 do DS: posição, tamanho, cores, imagens e tabelas vêm do arquivo; o texto usa a fonte do DS.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `slide` * | `PresentationSlide` |  |  |
+| `aspect` | `number \| undefined` | `16 / 9` |  |
+| `width` | `number \| undefined` | `960` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+## presentationSlides (function)
+
+Converte uma apresentação lida de .pptx nos slides do SlideDeck (com as notas do apresentador).
+
+```ts
+presentationSlides(presentation): DeckSlide[]
+```
+
+Exemplo (showcase `#/p/midia-slides`):
+
+```tsx
+<OfficeFileView source={file} className="h-[640px]" />
+
+// Ou: const file = await readOfficeFile(blob)
+//     <SlideDeck title={file.presentation.title} slides={presentationSlides(file.presentation)} />
+```
+
+## useOfficeFile (hook)
+
+Lê um .xlsx, .docx ou .pptx (File, Blob, ArrayBuffer ou URL) e devolve o estado: idle (sem arquivo), loading, error (mensagem pronta) ou ready.
+
+```ts
+useOfficeFile(source, name?): { retry: () => void; status: "idle"; } | { retry: () => void; status: "loading"; } | { retry: () => void; s…
+```
+
+Exemplo (showcase `#/p/midia-office`):
+
+```tsx
+import { readOfficeFile, useOfficeFile, presentationSlides } from "@g4ai/ds";
+
+const file = await readOfficeFile(blob, { name: "contas.xlsx" });
+if (file.kind === "xlsx") file.workbook.sheets[0].layout.rows;   // grade com valores e fórmulas
+if (file.kind === "docx") file.document.blocks;                  // títulos, parágrafos, listas, tabelas, imagens
+if (file.kind === "pptx") presentationSlides(file.presentation); // DeckSlide[] para o SlideDeck
+
+// Hook com os estados (idle, loading, error, ready) e retry
+const state = useOfficeFile(url);
 ```
 
 ## WorkbookView
 
-Planilha na tela, com o mesmo layout do .xlsx exportado: título, fonte, cabeçalho na cor da marca, fórmulas vivas e linha de total.
+Planilha na tela: abas escritas em código (Workbook: título, fonte, cabeçalho na cor da marca, fórmulas e total) ou lidas de um .xlsx (FileWorkbook, de readOfficeFile).
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `workbook` * | `Workbook` |  |  |
+| `workbook` * | `FileWorkbook \| Workbook` |  |  |
+| `actions` | `ReactNode` |  | Ações na barra do visualizador (ex.: botão "Baixar .xlsx" do app). |
 | `className` | `string \| undefined` |  |  |
-| `fileName` | `string \| undefined` |  | Nome do arquivo sem extensão (padrão: título sem acento). |
 | `initialSheet` | `number \| undefined` | `0` |  |
 | `loading` | `boolean \| undefined` |  | Carregando: mostra o esqueleto da grade. |
-| `theme` | `Partial<OfficeTheme> \| undefined` |  | Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
 Exemplo (showcase `#/p/midia-planilhas`):
 
 ```tsx
-const workbook: Workbook = {
-  title: "Fechamento comercial · Q3 2026",
-  sheets: [{
-    name: "Por produto",
-    title: "Skills tem o maior volume e a melhor margem",   // conclusão, como título de slide
-    description: "Fonte: CRM e ERP, 01/07 a 30/09/2026.",
-    totals: true,
-    columns: [
-      { key: "produto", header: "Produto" },
-      { key: "qtd", header: "Vendas", format: "integer", total: "sum" },
-      { key: "preco", header: "Ticket médio", format: "currency", total: "average" },
-      { key: "receita", header: "Receita", format: "currency", formula: "{qtd} * {preco}", total: "sum" },
-      { key: "margem", header: "Margem", format: "percent",
-        formula: "({receita} - {custo}) / {receita}",
-        total: { formula: "({receita} - {custo}) / {receita}" } },   // razão no total, não média
-    ],
-    rows: [{ produto: "G4 Scale", qtd: 38, preco: 24900, custo: 357200 }, …],
-  }],
-};
-<WorkbookView workbook={workbook} className="h-[560px]" />
+// Arquivo enviado pela pessoa, anexo ou URL: OfficeFileView detecta o tipo
+<OfficeFileView source={file} className="h-[520px]" />
+
+// Ou leia e use o WorkbookView direto
+const file = await readOfficeFile(blob);          // { kind: "xlsx", workbook }
+if (file.kind === "xlsx") <WorkbookView workbook={file.workbook} />
 ```

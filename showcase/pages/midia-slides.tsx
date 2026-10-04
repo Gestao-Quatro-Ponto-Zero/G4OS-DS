@@ -1,11 +1,11 @@
-import { SlideBullets, SlideCanvas, SlideDeck, SlideQuote, SlideSplit, SlideStat, SlideTitle, type DeckSlide } from "@g4ai/ds";
+import { OfficeFileView, SlideBullets, SlideCanvas, SlideDeck, SlideQuote, SlideSplit, SlideStat, SlideTitle, type DeckSlide } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
   title: "Slides e apresentações",
   group: "Mídia e conteúdo",
   order: 20,
-  description: "Apresentações como código, na linguagem do DS: slides de 1280×720 montados com SlideTitle, SlideBullets, SlideSplit, SlideStat e SlideQuote, exibidos no SlideDeck (miniaturas, teclado, tela cheia, notas).",
+  description: "Apresentações como código, na linguagem do DS (SlideTitle, SlideBullets, SlideSplit, SlideStat, SlideQuote em 1280×720), ou lidas de um .pptx real; as duas exibidas no SlideDeck (miniaturas, teclado, tela cheia, notas).",
 };
 
 const bars = [42, 55, 61, 58, 72, 80];
@@ -86,6 +86,18 @@ export default function Page() {
             ["Slide*.footer", "ReactNode", "—", "Fonte do dado, nome do deck, número."],
           ]}
         />
+      </DocSection>
+
+      <DocSection title="De um arquivo .pptx" rule="O SlideDeck também mostra apresentações reais: posição e tamanho de cada elemento, cores, fundo, imagens, tabelas e notas do apresentador vêm do arquivo (inclusive o que o slide herda do layout e do mestre). O texto usa a fonte do DS; gráficos nativos, SmartArt, animações e vídeo ficam de fora.">
+        <Demo
+          bare
+          code={`<OfficeFileView source={file} className="h-[640px]" />
+
+// Ou: const file = await readOfficeFile(blob)
+//     <SlideDeck title={file.presentation.title} slides={presentationSlides(file.presentation)} />`}
+        >
+          <OfficeFileView source="samples/revisao-trimestral.pptx" className="h-[640px]" />
+        </Demo>
       </DocSection>
 
       <DocSection title="Regras de apresentação">

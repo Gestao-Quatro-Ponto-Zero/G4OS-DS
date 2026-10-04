@@ -58,16 +58,11 @@ const regen = {
 
 writeRegistry();
 if (process.argv.includes("--registry")) process.exit(0);
-rmSync(join(out, "chunks"), { recursive: true, force: true });
 const options = {
   entryPoints: [join(here, "main.tsx")],
   bundle: true,
   format: "esm",
-  // Código dividido: o que só carrega sob demanda (exceljs e docx ao exportar) vira chunk separado.
-  outdir: out,
-  entryNames: "app",
-  splitting: true,
-  chunkNames: "chunks/[name]-[hash]",
+  outfile: join(out, "app.js"),
   jsx: "automatic",
   minify: !watch,
   alias: { "@g4ai/ds": join(root, "src/index.ts") },
@@ -76,6 +71,9 @@ const options = {
   logLevel: "warning",
 };
 copyFileSync(join(here, "index.html"), join(out, "index.html"));
+// Arquivos de exemplo do Office (.xlsx, .docx, .pptx) lidos pelas páginas de mídia.
+rmSync(join(out, "samples"), { recursive: true, force: true });
+cpSync(join(here, "samples"), join(out, "samples"), { recursive: true });
 writeAgentFiles();
 
 /*

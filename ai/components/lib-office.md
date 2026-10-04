@@ -2,7 +2,7 @@
 
 Arquivo: `src/lib/office.ts` · importe de `@g4ai/ds`.
 
-Modelo de planilha e de documento do DS.
+Modelo de planilha, documento e apresentação do DS.
 
 ## cellAddress (function)
 
@@ -100,12 +100,26 @@ Nome de arquivo seguro a partir do título: "Revisão Q3 · 2026" → "revisao-q
 fileSlug(title): string
 ```
 
+## FileWorkbook (type)
+
+```ts
+type FileWorkbook = { title: string; sheets: GridSheet[] }
+```
+
 ## formatCell (function)
 
 Texto da célula como aparece na tela (pt-BR, mesmas funções de lib/format).
 
 ```ts
 formatCell(cell): string
+```
+
+## GridSheet (type)
+
+Aba já posicionada (o que vem de um .xlsx).
+
+```ts
+type GridSheet = { name: string; layout: SheetLayout; freezeColumns?: number; truncated?: boolean }
 ```
 
 ## isNumericFormat (function)
@@ -117,7 +131,7 @@ isNumericFormat(f): boolean
 ## LaidCell (type)
 
 ```ts
-type LaidCell = { value: CellValue; formula?: string; role: "title" | "description" | "header" | "data" | "total"; format: CellFormat; digits?: number; span?: boolean; note?: string; }
+type LaidCell = { value: CellValue; formula?: string; role: "title" | "description" | "header" | "data" | "total"; format: CellFormat; digits?: number; span?: boolean; note?: string; bold?: boolean; }
 ```
 
 ## layoutSheet (function)
@@ -132,6 +146,36 @@ layoutSheet(sheet): SheetLayout
 
 ```ts
 type OfficeDocument = { title: string; kicker?: string; subtitle?: string; author?: string; date?: Date | string; cover?: boolean; toc?: boolean; header?: string; footer?: string; blocks: DocBlock[]; }
+```
+
+## Presentation (type)
+
+```ts
+type Presentation = { title: string; aspect: number; width: number; slides: PresentationSlide[] }
+```
+
+## PresentationParagraph (type)
+
+```ts
+type PresentationParagraph = { runs: PresentationRun[]; align?: "left" | "center" | "right" | "justify"; level?: number; bullet?: string; size?: number; color?: string }
+```
+
+## PresentationRun (type)
+
+```ts
+type PresentationRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; color?: string; size?: number }
+```
+
+## PresentationShape (type)
+
+```ts
+type PresentationShape = { kind: "text" | "image" | "table"; x: number; y: number; w: number; h: number; rotation?: number; fill?: string; line?: string; geometry?: "rect" | "roundRect" | "ellipse"; paragraphs?: PresentationParagraph[]; anchor?: "top" | "middle" | "bottom"; inset?: [number, number, number, number]; fontScale?: number; src?: string; alt?: string; rows?: string[][]; }
+```
+
+## PresentationSlide (type)
+
+```ts
+type PresentationSlide = { title: string; background?: string; shapes: PresentationShape[]; notes?: string }
 ```
 
 ## SheetLayout (type)

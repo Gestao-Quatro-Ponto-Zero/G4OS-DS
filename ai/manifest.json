@@ -3326,7 +3326,7 @@
               "description": null
             }
           ],
-          "examplePage": "midia-planilhas"
+          "examplePage": null
         },
         {
           "name": "OperationFeedback",
@@ -25326,7 +25326,7 @@
     {
       "name": "lib-office",
       "file": "src/lib/office.ts",
-      "summary": "Modelo de planilha e de documento do DS.",
+      "summary": "Modelo de planilha, documento e apresentação do DS.",
       "exports": [
         {
           "name": "cellAddress",
@@ -25407,10 +25407,22 @@
           "signature": "fileSlug(title): string"
         },
         {
+          "name": "FileWorkbook",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ title: string; sheets: GridSheet[] }"
+        },
+        {
           "name": "formatCell",
           "kind": "function",
           "summary": "Texto da célula como aparece na tela (pt-BR, mesmas funções de lib/format).",
           "signature": "formatCell(cell): string"
+        },
+        {
+          "name": "GridSheet",
+          "kind": "type",
+          "summary": "Aba já posicionada (o que vem de um .xlsx).",
+          "definition": "{ name: string; layout: SheetLayout; freezeColumns?: number; truncated?: boolean }"
         },
         {
           "name": "isNumericFormat",
@@ -25422,7 +25434,7 @@
           "name": "LaidCell",
           "kind": "type",
           "summary": null,
-          "definition": "{ value: CellValue; formula?: string; role: \"title\" | \"description\" | \"header\" | \"data\" | \"total\"; format: CellFormat; digits?: number; span?: boolean; note?: string; }"
+          "definition": "{ value: CellValue; formula?: string; role: \"title\" | \"description\" | \"header\" | \"data\" | \"total\"; format: CellFormat; digits?: number; span?: boolean; note?: string; bold?: boolean; }"
         },
         {
           "name": "layoutSheet",
@@ -25435,6 +25447,36 @@
           "kind": "type",
           "summary": null,
           "definition": "{ title: string; kicker?: string; subtitle?: string; author?: string; date?: Date | string; cover?: boolean; toc?: boolean; header?: string; footer?: string; blocks: DocBlock[]; }"
+        },
+        {
+          "name": "Presentation",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ title: string; aspect: number; width: number; slides: PresentationSlide[] }"
+        },
+        {
+          "name": "PresentationParagraph",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ runs: PresentationRun[]; align?: \"left\" | \"center\" | \"right\" | \"justify\"; level?: number; bullet?: string; size?: number; color?: string }"
+        },
+        {
+          "name": "PresentationRun",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ text: string; bold?: boolean; italic?: boolean; underline?: boolean; color?: string; size?: number }"
+        },
+        {
+          "name": "PresentationShape",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ kind: \"text\" | \"image\" | \"table\"; x: number; y: number; w: number; h: number; rotation?: number; fill?: string; line?: string; geometry?: \"rect\" | \"roundRect\" | \"ellipse\"; paragraphs?: PresentationParagraph[]; anchor?: \"top\" | \"middle\" | \"bottom\"; inset?: [number, number, number, number]; fontScale?: number; src?: string; alt?: string; rows?: string[][]; }"
+        },
+        {
+          "name": "PresentationSlide",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ title: string; background?: string; shapes: PresentationShape[]; notes?: string }"
         },
         {
           "name": "SheetLayout",
@@ -25482,58 +25524,63 @@
       "doc": "components/lib-office.md"
     },
     {
-      "name": "lib-office-export",
-      "file": "src/lib/office-export.ts",
-      "summary": "Exportação real para Office: .xlsx (exceljs) e .docx (docx), com a identidade do DS.",
+      "name": "lib-office-files",
+      "file": "src/lib/office-files.ts",
+      "summary": "Leitura de arquivos reais do Office no navegador, sem dependências: descompacta o .xlsx/.docx/.pptx (DecompressionStream) e lê o XML (DOMParser).",
       "exports": [
         {
-          "name": "documentToBlob",
-          "kind": "function",
-          "summary": "Gera o .docx como Blob: capa, sumário, títulos com estilo (aparecem no painel de navegação do Word), listas, tabelas, números, destaques, citação e assinaturas; cabeçalho e \"Página X de Y\" em todas as páginas depois da c",
-          "signature": "documentToBlob(doc, options?): Promise<Blob>"
-        },
-        {
-          "name": "downloadBlob",
-          "kind": "function",
-          "summary": "Baixa um Blob com o nome dado (no navegador).",
-          "signature": "downloadBlob(blob, fileName): void"
-        },
-        {
-          "name": "exportDocx",
-          "kind": "function",
-          "summary": "Gera e baixa o .docx.",
-          "signature": "exportDocx(doc, options?): Promise<Blob>"
-        },
-        {
-          "name": "exportXlsx",
-          "kind": "function",
-          "summary": "Gera e baixa o .xlsx.",
-          "signature": "exportXlsx(workbook, options?): Promise<Blob>"
-        },
-        {
-          "name": "officeTheme",
+          "name": "OFFICE_SHEET_LIMITS",
           "kind": "const",
-          "summary": null
+          "summary": "Limites de exibição de planilha (a grade não é virtualizada)."
         },
         {
-          "name": "OfficeTheme",
+          "name": "OfficeFile",
           "kind": "type",
-          "summary": "Cores e fonte dos arquivos.",
-          "definition": "{ brand: string; onBrand: string; accent: string; accentDeep: string; ink: string; inkSoft: string; muted: string; line: string; lineStrong: string; soft: string; ok: string; rose: string; font: string; }"
+          "summary": null,
+          "definition": "{ kind: \"xlsx\"; workbook: FileWorkbook } | { kind: \"docx\"; document: OfficeDocument } | { kind: \"pptx\"; presentation: Presentation }"
         },
         {
-          "name": "workbookToBlob",
+          "name": "OfficeFileError",
+          "kind": "class",
+          "summary": "Erro com mensagem pronta para a pessoa (pt-BR)."
+        },
+        {
+          "name": "OfficeSource",
+          "kind": "type",
+          "summary": null,
+          "definition": "Blob | ArrayBuffer | Uint8Array"
+        },
+        {
+          "name": "readDocx",
           "kind": "function",
-          "summary": "Gera o .xlsx como Blob: abas, cabeçalho fixo, filtro, fórmulas vivas, totais e impressão configurada.",
-          "signature": "workbookToBlob(workbook, options?): Promise<Blob>"
+          "summary": null,
+          "signature": "readDocx(src, options?): Promise<OfficeDocument>"
+        },
+        {
+          "name": "readOfficeFile",
+          "kind": "function",
+          "summary": "Lê qualquer .xlsx, .docx ou .pptx, detectando o tipo pelo conteúdo.",
+          "signature": "readOfficeFile(src, options?): Promise<OfficeFile>"
+        },
+        {
+          "name": "readPptx",
+          "kind": "function",
+          "summary": null,
+          "signature": "readPptx(src, options?): Promise<Presentation>"
+        },
+        {
+          "name": "readXlsx",
+          "kind": "function",
+          "summary": null,
+          "signature": "readXlsx(src, options?): Promise<FileWorkbook>"
         }
       ],
-      "doc": "components/lib-office-export.md"
+      "doc": "components/lib-office-files.md"
     },
     {
       "name": "office",
       "file": "src/components/office.tsx",
-      "summary": "Planilhas e documentos na linguagem do DS, com exportação real para Office.",
+      "summary": "Planilhas, documentos e apresentações na linguagem do DS, escritos em código ou lidos de arquivos reais do Office.",
       "exports": [
         {
           "name": "DocumentView",
@@ -25545,7 +25592,14 @@
               "type": "OfficeDocument",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Escrito em código ou lido de um .docx (readOfficeFile)."
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações na barra do visualizador (ex.: botão \"Baixar .docx\" do app)."
             },
             {
               "name": "className",
@@ -25553,13 +25607,6 @@
               "required": false,
               "default": null,
               "description": null
-            },
-            {
-              "name": "fileName",
-              "type": "string | undefined",
-              "required": false,
-              "default": null,
-              "description": "Nome do arquivo sem extensão (padrão: título sem acento)."
             },
             {
               "name": "loading",
@@ -25574,28 +25621,34 @@
               "required": false,
               "default": "true",
               "description": "Sumário lateral (a partir de 768 px)."
-            },
-            {
-              "name": "theme",
-              "type": "Partial<OfficeTheme> | undefined",
-              "required": false,
-              "default": null,
-              "description": "Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro)."
             }
           ],
           "examplePage": "midia-documentos"
         },
         {
-          "name": "WorkbookView",
+          "name": "OfficeFileState",
+          "kind": "type",
+          "summary": null,
+          "definition": "| { status: \"idle\" } | { status: \"loading\" } | { status: \"error\"; error: string; retryable: boolean } | { status: \"ready\"; file: OfficeFile }"
+        },
+        {
+          "name": "OfficeFileView",
           "kind": "component",
-          "summary": "Planilha na tela, com o mesmo layout do .xlsx exportado: título, fonte, cabeçalho na cor da marca, fórmulas vivas e linha de total.",
+          "summary": "Mostra um arquivo do Office com o visualizador certo: .xlsx no WorkbookView, .docx no DocumentView, .pptx no SlideDeck.",
           "props": [
             {
-              "name": "workbook",
-              "type": "Workbook",
+              "name": "source",
+              "type": "string | OfficeSource | null | undefined",
               "required": true,
               "default": null,
-              "description": null
+              "description": "File/Blob/ArrayBuffer ou URL do arquivo."
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações na barra (planilha e documento)."
             },
             {
               "name": "className",
@@ -25605,11 +25658,88 @@
               "description": null
             },
             {
-              "name": "fileName",
+              "name": "empty",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Conteúdo quando não há arquivo (padrão: aviso curto)."
+            },
+            {
+              "name": "name",
               "type": "string | undefined",
               "required": false,
               "default": null,
-              "description": "Nome do arquivo sem extensão (padrão: título sem acento)."
+              "description": "Nome do arquivo (título quando o arquivo não tem um)."
+            }
+          ],
+          "examplePage": "midia-documentos"
+        },
+        {
+          "name": "OfficeSlide",
+          "kind": "component",
+          "summary": "Um slide de .pptx no canvas de 1280×720 do DS: posição, tamanho, cores, imagens e tabelas vêm do arquivo; o texto usa a fonte do DS.",
+          "props": [
+            {
+              "name": "slide",
+              "type": "PresentationSlide",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "aspect",
+              "type": "number | undefined",
+              "required": false,
+              "default": "16 / 9",
+              "description": null
+            },
+            {
+              "name": "width",
+              "type": "number | undefined",
+              "required": false,
+              "default": "960",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "presentationSlides",
+          "kind": "function",
+          "summary": "Converte uma apresentação lida de .pptx nos slides do SlideDeck (com as notas do apresentador).",
+          "signature": "presentationSlides(presentation): DeckSlide[]"
+        },
+        {
+          "name": "useOfficeFile",
+          "kind": "hook",
+          "summary": "Lê um .xlsx, .docx ou .pptx (File, Blob, ArrayBuffer ou URL) e devolve o estado: idle (sem arquivo), loading, error (mensagem pronta) ou ready.",
+          "signature": "useOfficeFile(source, name?): { retry: () => void; status: \"idle\"; } | { retry: () => void; status: \"loading\"; } | { retry: () => void; s…"
+        },
+        {
+          "name": "WorkbookView",
+          "kind": "component",
+          "summary": "Planilha na tela: abas escritas em código (Workbook: título, fonte, cabeçalho na cor da marca, fórmulas e total) ou lidas de um .xlsx (FileWorkbook, de readOfficeFile).",
+          "props": [
+            {
+              "name": "workbook",
+              "type": "FileWorkbook | Workbook",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações na barra do visualizador (ex.: botão \"Baixar .xlsx\" do app)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
             },
             {
               "name": "initialSheet",
@@ -25624,13 +25754,6 @@
               "required": false,
               "default": null,
               "description": "Carregando: mostra o esqueleto da grade."
-            },
-            {
-              "name": "theme",
-              "type": "Partial<OfficeTheme> | undefined",
-              "required": false,
-              "default": null,
-              "description": "Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro)."
             }
           ],
           "examplePage": "midia-planilhas"

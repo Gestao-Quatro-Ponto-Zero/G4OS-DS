@@ -1,4 +1,4 @@
-import { DocumentView } from "@g4ai/ds";
+import { DocumentView, OfficeFileView } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 import { document } from "./_office-data";
 
@@ -6,13 +6,13 @@ export const meta: PageMeta = {
   title: "Documentos (Word)",
   group: "Mídia e conteúdo",
   order: 22,
-  description: "Relatórios, propostas e atas como dado, na linguagem do DS: o DocumentView pagina em A4 com capa, sumário com número de página e tabelas que continuam na página seguinte; exportDocx gera o .docx real com estilos de título, sumário, cabeçalho e “Página X de Y”.",
+  description: "DocumentView pagina em A4 relatórios, propostas e atas escritos em código (OfficeDocument) ou lidos de um .docx real: capa, sumário com número de página, tabelas que continuam na página seguinte, imprimir/PDF. Exportar é opcional e fica no app.",
 };
 
 export default function Page() {
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
-      <DocSection title="DocumentView" rule="Role as páginas ou navegue pelo sumário lateral. A tabela de pipeline não cabe numa página: continua na seguinte com o cabeçalho repetido. Imprimir gera PDF pelo navegador; Baixar .docx gera o arquivo do Word.">
+      <DocSection title="DocumentView" rule="Role as páginas ou navegue pelo sumário lateral. A tabela de pipeline não cabe numa página: continua na seguinte com o cabeçalho repetido. Imprimir gera PDF pelo navegador.">
         <Demo
           bare
           code={`const doc: OfficeDocument = {
@@ -37,7 +37,7 @@ export default function Page() {
         </Demo>
       </DocSection>
 
-      <DocSection title="Blocos" rule="Dez blocos cobrem relatório, proposta, ata, política e contrato simples. Cada um tem a mesma aparência na tela, na impressão e no Word.">
+      <DocSection title="Blocos" rule="Onze blocos cobrem relatório, proposta, ata, política e contrato simples. Os mesmos blocos saem da leitura de um .docx.">
         <PropsTable
           rows={[
             ["heading", "{ text, level?: 1 | 2 | 3 }", "1", "Nível 1 e 2 entram no sumário e no painel de navegação do Word."],
@@ -48,32 +48,39 @@ export default function Page() {
             ["callout", "{ title?, text, tone? }", '"neutral"', "info, ok, amber, rose: o título diz o que é (cor nunca sozinha)."],
             ["quote", "{ text, author?, role? }", "—", "Fala de cliente ou pesquisa."],
             ["signatures", "{ people: { name, role? }[] }", "—", "Linhas de assinatura lado a lado."],
+            ["image", "{ src, alt?, width?, ratio?, caption? }", "—", "Imagem com proporção conhecida (a paginação mede sem esperar carregar)."],
             ["divider · pageBreak", "{}", "—", "Divisória e quebra de página."],
           ]}
         />
       </DocSection>
 
-      <DocSection title="O que vai no .docx" rule="Um documento editável de verdade, não uma imagem da tela.">
-        <Rules
-          items={[
-            { do: "Estilos Título 1/2/3 do Word com a fonte e as cores da marca: o painel de navegação e o sumário funcionam." },
-            { do: "Sumário com links e os números de página calculados pela tela; no Word, “Atualizar sumário” recalcula." },
-            { do: "Capa sem cabeçalho; nas demais, título no cabeçalho e “Página X de Y” no rodapé." },
-            { do: "Tabelas com cabeçalho repetido em cada página, linha que não se parte e números alinhados à direita." },
-            { do: "A4 com margem de 2 cm, igual à tela e à impressão." },
-          ]}
-        />
-        <CodeBlock
-          code={`import { exportDocx, documentToBlob, type OfficeDocument } from "@g4ai/ds";
+      <DocSection title="De um arquivo .docx" rule="O mesmo visualizador lê o documento real: título, títulos 1 a 3 (viram sumário), parágrafos com negrito, itálico e link, listas com marcador e numeradas, tabelas (números à direita), imagens e quebras de página. A diagramação é a do DS; colunas, caixas de texto, cabeçalhos do Word e comentários ficam de fora.">
+        <Demo
+          bare
+          code={`<OfficeFileView source={file} className="h-[720px]" />
 
-await exportDocx(doc);                                   // baixa "vendas-cresceram-18-com-o-mesmo-time.docx"
-await exportDocx(doc, { fileName: "relatorio-q3" });
-const blob = await documentToBlob(doc, { theme: { brand: "#0b5cff", font: "Inter" } });`}
+// Ou: const file = await readOfficeFile(blob)  →  <DocumentView document={file.document} />`}
+        >
+          <OfficeFileView source="samples/proposta-comercial.docx" className="h-[720px]" />
+        </Demo>
+      </DocSection>
+
+      <DocSection title="Exportar para .docx (opcional)" rule="O DS mostra; gerar o arquivo é decisão do app. A receita pronta usa a biblioteca docx e gera estilos de título do Word, sumário, capa, cabeçalho e “Página X de Y”, com as cores dos tokens.">
+        <CodeBlock
+          code={`// 1. pnpm add docx   2. copie node_modules/@g4ai/ds/templates/office-export.ts para o app
+import { exportDocx } from "@/lib/office-export";
+
+<DocumentView
+  document={doc}
+  actions={<Button variant="ghost" size="sm" onClick={() => op.run(() => exportDocx(doc), "Documento baixado")}><Download /> Baixar .docx</Button>}
+/>`}
         />
+        <p className="m-0 text-[13.5px] text-ink-soft">Guia completo: <code>docs/guias/office.md</code>.</p>
         <PropsTable
           rows={[
             ["DocumentView.document", "OfficeDocument", "—", "{ title, kicker?, subtitle?, author?, date?, cover?, toc?, header?, footer?, blocks }."],
-            ["OfficeDocument.cover", "boolean", "true", "Capa em página própria."],
+            ["DocumentView.actions", "ReactNode", "—", "Ações na barra (ex.: Baixar .docx do app)."],
+            ["OfficeDocument.cover", "boolean", "true", "Capa em página própria (falso no que vem de .docx)."],
             ["OfficeDocument.toc", "boolean", "false", "Sumário depois da capa."],
             ["OfficeDocument.header / footer", "string", "título / —", "Texto do cabeçalho e do rodapé (à esquerda do número da página)."],
             ["DocumentView.showOutline", "boolean", "true", "Sumário lateral a partir de 768 px."],

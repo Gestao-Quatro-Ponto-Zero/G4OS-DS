@@ -15,8 +15,7 @@ const list = (dir, ext) => readdirSync(join(root, dir)).filter((f) => ext.some((
 const entryPoints = [join(root, "src/index.ts"), join(root, "src/tokens/index.ts"), ...list("src/components", [".tsx", ".ts"]), ...list("src/lib", [".ts", ".tsx"])];
 
 const pkg = (await import(join(root, "package.json"), { with: { type: "json" } })).default;
-// exceljs e docx (dependencies) ficam de fora: o bundler do app cria um chunk carregado só ao exportar.
-const external = [...Object.keys(pkg.peerDependencies ?? {}), ...Object.keys(pkg.dependencies ?? {}), "react/jsx-runtime", "react-dom/client", "@base-ui/react/*"];
+const external = [...Object.keys(pkg.peerDependencies ?? {}), "react/jsx-runtime", "react-dom/client", "@base-ui/react/*"];
 
 await build({
   entryPoints,

@@ -72,23 +72,6 @@ Botão que conta o progresso ("Salvando…") e se desabilita enquanto confirma o
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/midia-planilhas`):
-
-```tsx
-import { exportXlsx, workbookToBlob, type Workbook } from "@g4ai/ds";
-
-// Botão de exportar (com useOperation para o estado "Gerando…")
-<OperationButton operation={op} variant="ghost" onClick={() => op.run(() => exportXlsx(workbook), "Planilha baixada")}>
-  <Download /> Exportar .xlsx
-</OperationButton>
-
-// Blob para anexar ou enviar ao servidor
-const blob = await workbookToBlob(workbook);
-
-// Marca do cliente: só o que muda
-await exportXlsx(workbook, { theme: { brand: "#0b5cff", font: "Inter" }, fileName: "fechamento-q3" });
-```
-
 ## OperationFeedback
 
 Bloco de erro com a saída certa.

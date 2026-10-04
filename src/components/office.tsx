@@ -1,16 +1,19 @@
 /**
- * Planilhas e documentos na linguagem do DS, com exportação real para Office.
+ * Planilhas, documentos e apresentações na linguagem do DS, escritos em código
+ * ou lidos de arquivos reais do Office.
  *
- * WorkbookView  → abas, grade com endereços A1, barra de fórmula, seleção por
- *                 teclado, soma/média da seleção, copiar para o Excel, .xlsx.
- * DocumentView  → páginas A4 com paginação medida, capa, sumário com página,
- *                 tabelas que quebram repetindo o cabeçalho, imprimir/PDF, .docx.
+ * WorkbookView   → abas, grade com endereços A1, barra de fórmula, seleção por
+ *                  teclado, soma/média da seleção, copiar para o Excel.
+ * DocumentView   → páginas A4 com paginação medida, capa, sumário com página,
+ *                  tabelas que quebram repetindo o cabeçalho, imprimir/PDF.
+ * OfficeSlide    → slide de um .pptx (posições, cores e imagens do arquivo) para o SlideDeck.
+ * OfficeFileView → abre um .xlsx, .docx ou .pptx e escolhe o visualizador, com os estados.
  *
- * O conteúdo é dado (Workbook, OfficeDocument em lib/office): a mesma fonte
- * desenha a tela e gera o arquivo, então o que se vê é o que se baixa.
+ * Exportar (.xlsx/.docx) é opcional e fica no app: `actions` recebe o botão e
+ * a receita está em templates/office-export.ts (docs/guias/office.md).
  */
-import { ChevronRight, Download, FileSpreadsheet, FileText, Printer } from "lucide-react";
-import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { ChevronRight, FileSpreadsheet, FileText, Presentation as PresentationIcon, Printer } from "lucide-react";
+import { Fragment, useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { useIsomorphicLayoutEffect as useLayoutEffect } from "../lib/layout-effect";
 import {
@@ -24,12 +27,20 @@ import {
   type CellFormat,
   type DocBlock,
   type DocText,
+  type FileWorkbook,
+  type GridSheet,
   type LaidCell,
   type OfficeDocument,
+  type Presentation,
+  type PresentationShape,
+  type PresentationSlide,
   type Workbook,
 } from "../lib/office";
-import { exportDocx, exportXlsx, type OfficeTheme } from "../lib/office-export";
-import { OperationButton, OperationFeedback, Skeleton, useOperation } from "./feedback";
+import { OFFICE_SHEET_LIMITS, OfficeFileError, readOfficeFile, type OfficeFile, type OfficeSource } from "../lib/office-files";
+import { formatNumber } from "../lib/format";
+import { Skeleton } from "./feedback";
+import { SLIDE_HEIGHT, SLIDE_WIDTH, SlideDeck, type DeckSlide } from "./media";
+import { Button } from "./primitives";
 
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null);
@@ -59,6 +70,26 @@ function ViewerBar({ icon, title, meta, children }: { icon: ReactNode; title: st
   );
 }
 
+/**
+ * Como no Excel, texto mais largo que a coluna avança pelas células vazias à
+ * direita (só o necessário). Números nunca transbordam.
+ */
+function overflowSpans(row: (LaidCell | null)[], px: number[]) {
+  const out: { c: number; span: number }[] = [];
+  for (let c = 0; c < row.length; c++) {
+    const cell = row[c];
+    let span = 1;
+    if (cell && typeof cell.value === "string" && !isNumericFormat(cell.format) && cell.role !== "header") {
+      const need = formatCell(cell).length * (cell.bold ? 8 : 7.4) + 16;
+      let width = px[c];
+      while (width < need && c + span < row.length && !row[c + span]) width += px[c + span++];
+    }
+    out.push({ c, span });
+    c += span - 1;
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ */
 /* WorkbookView                                                        */
 /* ------------------------------------------------------------------ */
@@ -68,43 +99,43 @@ const ROWNUM = 44;
 const LETTERS_H = 25;
 const pxWidth = (chars: number) => Math.round(Math.max(64, chars * 7.4 + 16));
 
+const toGrid = (wb: Workbook | FileWorkbook): GridSheet[] => wb.sheets.map((s) => ("layout" in s ? s : { name: s.name, layout: layoutSheet(s), freezeColumns: s.freezeColumns ?? 1 }));
+
 /**
- * Planilha na tela, com o mesmo layout do .xlsx exportado: título, fonte,
- * cabeçalho na cor da marca, fórmulas vivas e linha de total. Clique ou use
- * as setas para navegar (Shift seleciona intervalo, Ctrl+C copia para colar
- * no Excel). A barra mostra a fórmula da célula; o rodapé, soma e média da seleção.
+ * Planilha na tela: abas escritas em código (Workbook: título, fonte,
+ * cabeçalho na cor da marca, fórmulas e total) ou lidas de um .xlsx
+ * (FileWorkbook, de readOfficeFile). Clique ou use as setas para navegar
+ * (Shift seleciona intervalo, Ctrl+C copia para colar no Excel). A barra
+ * mostra a fórmula da célula; o rodapé, soma e média da seleção.
  */
 export function WorkbookView({
   workbook,
   initialSheet = 0,
-  fileName,
-  theme,
+  actions,
   loading,
   className,
 }: {
-  workbook: Workbook;
+  workbook: Workbook | FileWorkbook;
   initialSheet?: number;
-  /** Nome do arquivo sem extensão (padrão: título sem acento). */
-  fileName?: string;
-  /** Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro). */
-  theme?: Partial<OfficeTheme>;
+  /** Ações na barra do visualizador (ex.: botão "Baixar .xlsx" do app). */
+  actions?: ReactNode;
   /** Carregando: mostra o esqueleto da grade. */
   loading?: boolean;
   className?: string;
 }) {
   const uid = useId();
+  const grid = useMemo(() => toGrid(workbook), [workbook]);
   const [sheetIndex, setSheetIndex] = useState(Math.min(initialSheet, Math.max(0, workbook.sheets.length - 1)));
-  const sheet = workbook.sheets[sheetIndex];
-  const layout = useMemo(() => (sheet ? layoutSheet(sheet) : null), [sheet]);
+  const sheet = grid[sheetIndex];
+  const layout = sheet?.layout ?? null;
   const start = (): Pos => ({ r: layout ? Math.min(layout.firstDataRow, layout.rows.length - 1) : 0, c: 0 });
   const [active, setActive] = useState<Pos>(start);
   const [anchor, setAnchor] = useState<Pos>(start);
   const gridRef = useRef<HTMLDivElement>(null);
-  const op = useOperation({ busyLabel: "Gerando…", fallback: "Não foi possível gerar a planilha." });
 
   const selectSheet = (i: number) => {
     setSheetIndex(i);
-    const l = workbook.sheets[i] ? layoutSheet(workbook.sheets[i]) : null;
+    const l = grid[i]?.layout;
     const p = { r: l ? Math.min(l.firstDataRow, l.rows.length - 1) : 0, c: 0 };
     setActive(p);
     setAnchor(p);
@@ -114,12 +145,9 @@ export function WorkbookView({
     gridRef.current?.querySelector<HTMLElement>(`[data-cell="${active.r}-${active.c}"]`)?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [active]);
 
-  const download = () => op.run(() => exportXlsx(workbook, { fileName, theme }), "Planilha baixada");
   const bar = (
     <ViewerBar icon={<FileSpreadsheet />} title={workbook.title} meta={workbook.sheets.length > 1 ? `${workbook.sheets.length} abas` : undefined}>
-      <OperationButton operation={op} variant="ghost" size="sm" onClick={download} disabled={loading} disabledReason="Aguarde os dados carregarem">
-        <Download /> Baixar .xlsx
-      </OperationButton>
+      {actions}
     </ViewerBar>
   );
   const frame = cn("flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface", className);
@@ -145,7 +173,7 @@ export function WorkbookView({
     );
 
   const { rows, colCount, headerRow, totalRow, widths } = layout;
-  const freeze = Math.min(sheet.freezeColumns ?? 1, colCount);
+  const freeze = Math.min(sheet.freezeColumns ?? 0, colCount);
   const px = widths.map(pxWidth);
   const leftOf = (c: number) => ROWNUM + px.slice(0, c).reduce((a, b) => a + b, 0);
   const lastRow = rows.length - 1;
@@ -229,6 +257,7 @@ export function WorkbookView({
       role === "description" && "bg-surface text-[12px] text-muted",
       (role === "data" || role === "empty") && "border-b border-r border-line bg-surface text-ink",
       role === "total" && "border-b border-r border-t-2 border-line border-t-ink bg-soft font-semibold text-ink",
+      cell?.bold && "font-semibold",
       c < freeze && !cell?.span && "sticky z-[1]",
       role === "header" && c < freeze && "z-[3]",
       inRange(r, c) && !(r === active.r && c === active.c) && "bg-[color-mix(in_oklab,var(--color-primary)_7%,var(--color-surface))]",
@@ -250,7 +279,6 @@ export function WorkbookView({
           {formulaText}
         </span>
       </div>
-      <OperationFeedback operation={op} inline className="flex flex-wrap items-center gap-3 border-b border-line px-3 py-2 text-[13px] text-rose" />
       <div
         ref={gridRef}
         role="grid"
@@ -311,27 +339,32 @@ export function WorkbookView({
                       {formatCell(spanCell)}
                     </td>
                   ) : (
-                    row.map((cell, c) => (
-                      <td
-                        key={c}
-                        id={`${uid}-${r}-${c}`}
-                        role="gridcell"
-                        aria-selected={inRange(r, c)}
-                        data-cell={`${r}-${c}`}
-                        onMouseDown={(e) => pointer(r, c, e.shiftKey)}
-                        title={cell?.note}
-                        className={cn(cellClass(cell, r, c), cell?.note && "relative")}
-                        style={{ top, left: c < freeze ? leftOf(c) : undefined }}
-                      >
-                        {cell ? formatCell(cell) : ""}
-                        {cell?.note && <span aria-hidden className="absolute right-0 top-0 h-0 w-0 border-l-[6px] border-t-[6px] border-l-transparent border-t-accent" />}
-                      </td>
-                    ))
+                    overflowSpans(row, px).map(({ c, span }) => {
+                      const cell = row[c];
+                      const sticky = c < freeze && span === 1;
+                      return (
+                        <td
+                          key={c}
+                          id={`${uid}-${r}-${c}`}
+                          role="gridcell"
+                          aria-selected={inRange(r, c)}
+                          data-cell={`${r}-${c}`}
+                          colSpan={span > 1 ? span : undefined}
+                          onMouseDown={(e) => pointer(r, c, e.shiftKey)}
+                          title={cell?.note}
+                          className={cn(cellClass(cell, r, c), cell?.note && "relative", !sticky && c < freeze && "static")}
+                          style={{ top, left: sticky ? leftOf(c) : undefined }}
+                        >
+                          {cell ? formatCell(cell) : ""}
+                          {cell?.note && <span aria-hidden className="absolute right-0 top-0 h-0 w-0 border-l-[6px] border-t-[6px] border-l-transparent border-t-accent" />}
+                        </td>
+                      );
+                    })
                   )}
                 </tr>
               );
             })}
-            {sheet.rows.length === 0 && (
+            {layout.lastDataRow < layout.firstDataRow && (
               <tr role="row">
                 <td role="gridcell" colSpan={colCount + 1} className="px-3 py-8 text-center text-[13.5px] text-muted">
                   Nenhuma linha nesta aba.
@@ -359,6 +392,11 @@ export function WorkbookView({
             </button>
           ))}
         </div>
+        {sheet.truncated && (
+          <span className="flex shrink-0 items-center px-3 text-[12px] text-muted max-sm:hidden">
+            Mostrando até {formatNumber(OFFICE_SHEET_LIMITS.rows)} linhas e {OFFICE_SHEET_LIMITS.columns} colunas
+          </span>
+        )}
         {nums.length > 1 && (
           <div className="flex shrink-0 items-center gap-3 px-3 text-[12px] tabular-nums text-muted max-sm:hidden" aria-live="polite">
             <span>
@@ -535,6 +573,15 @@ function DocBlockView({ block, rows, last = true, headingId }: { block: DocBlock
           ))}
         </div>
       );
+    case "image": {
+      const width = Math.min(block.width ?? CONTENT_W, CONTENT_W);
+      return (
+        <figure className="m-0 pb-4">
+          <img src={block.src} alt={block.alt ?? ""} className="block max-w-full rounded-sm object-contain" style={{ width, height: Math.round(width * (block.ratio ?? 9 / 16)) }} />
+          {block.caption && <figcaption className="pt-2 text-[11.5px] text-muted">{block.caption}</figcaption>}
+        </figure>
+      );
+    }
     case "divider":
       return <hr className="m-0 mb-5 mt-2 border-0 border-t border-line" />;
     case "pageBreak":
@@ -632,17 +679,15 @@ function printPages(source: HTMLElement, title: string) {
  */
 export function DocumentView({
   document: doc,
-  fileName,
-  theme,
+  actions,
   loading,
   showOutline = true,
   className,
 }: {
+  /** Escrito em código ou lido de um .docx (readOfficeFile). */
   document: OfficeDocument;
-  /** Nome do arquivo sem extensão (padrão: título sem acento). */
-  fileName?: string;
-  /** Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro). */
-  theme?: Partial<OfficeTheme>;
+  /** Ações na barra do visualizador (ex.: botão "Baixar .docx" do app). */
+  actions?: ReactNode;
   loading?: boolean;
   /** Sumário lateral (a partir de 768 px). */
   showOutline?: boolean;
@@ -654,7 +699,6 @@ export function DocumentView({
   const [stageRef, stageWidth] = useWidth<HTMLDivElement>();
   const [content, setContent] = useState<DocPage[] | null>(null);
   const [current, setCurrent] = useState(0);
-  const op = useOperation({ busyLabel: "Gerando…", fallback: "Não foi possível gerar o documento." });
   const outline = useMemo(() => documentOutline(doc), [doc]);
   const showCover = doc.cover !== false;
 
@@ -706,7 +750,6 @@ export function DocumentView({
   const goTo = (blockIndex: number) => document.getElementById(`${uid}-h${blockIndex}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const date = formatCell({ value: doc.date ?? new Date(), format: "date" });
-  const download = () => op.run(() => exportDocx(doc, { fileName, theme, pages: pageOf }), "Documento baixado");
   const print = () => pagesRef.current && printPages(pagesRef.current, doc.title);
 
   const pageChrome = (i: number, children: ReactNode, chrome = true) => (
@@ -793,11 +836,8 @@ export function DocumentView({
         <button type="button" onClick={print} disabled={loading} className={tool}>
           <Printer /> <span className="max-sm:sr-only">Imprimir</span>
         </button>
-        <OperationButton operation={op} variant="ghost" size="sm" onClick={download} disabled={loading} disabledReason="Aguarde o documento carregar">
-          <Download /> Baixar .docx
-        </OperationButton>
+        {actions}
       </ViewerBar>
-      <OperationFeedback operation={op} inline className="flex flex-wrap items-center gap-3 border-b border-line px-3 py-2 text-[13px] text-rose" />
       <div className="flex min-h-0 flex-1">
         {showOutline && outline.length > 0 && !loading && (
           <nav aria-label="Sumário do documento" className="hidden w-[220px] shrink-0 overflow-y-auto border-r border-line bg-soft/50 p-2.5 md:block">
@@ -851,4 +891,211 @@ export function DocumentView({
       </div>
     </section>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Apresentação lida de .pptx                                          */
+/* ------------------------------------------------------------------ */
+
+const ALIGN = { left: "left", center: "center", right: "right", justify: "justify" } as const;
+
+/**
+ * Um slide de .pptx no canvas de 1280×720 do DS: posição, tamanho, cores,
+ * imagens e tabelas vêm do arquivo; o texto usa a fonte do DS. Slides 4:3
+ * ficam centralizados. Use com SlideDeck via `presentationSlides`.
+ */
+export function OfficeSlide({ slide, aspect = 16 / 9, width = 960 }: { slide: PresentationSlide; aspect?: number; /** Largura do slide em pontos. */ width?: number }) {
+  const wide = aspect >= SLIDE_WIDTH / SLIDE_HEIGHT;
+  const w = wide ? SLIDE_WIDTH : Math.round(SLIDE_HEIGHT * aspect);
+  const h = wide ? Math.round(SLIDE_WIDTH / aspect) : SLIDE_HEIGHT;
+  const k = w / width; // px por ponto
+  const box = (s: PresentationShape): CSSProperties => ({
+    position: "absolute",
+    left: s.x * w,
+    top: s.y * h,
+    width: s.w * w,
+    height: s.h * h,
+    transform: s.rotation ? `rotate(${s.rotation}deg)` : undefined,
+  });
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-graph font-sans">
+      <div className="absolute overflow-hidden" style={{ left: (SLIDE_WIDTH - w) / 2, top: (SLIDE_HEIGHT - h) / 2, width: w, height: h, background: slide.background ?? "var(--color-surface)" }}>
+        {slide.shapes.map((s, i) => {
+          if (s.kind === "image") return <img key={i} src={s.src} alt={s.alt ?? ""} style={{ ...box(s), objectFit: "fill" }} />;
+          if (s.kind === "table")
+            return (
+              <div key={i} style={box(s)} className="overflow-hidden">
+                <table className="h-full w-full border-collapse" style={{ fontSize: 14 * k }}>
+                  <tbody>
+                    {s.rows?.map((row, r) => (
+                      <tr key={r} className={r === 0 ? "bg-brand font-semibold text-on-brand" : "border-b border-line bg-surface text-ink"}>
+                        {row.map((cell, c) => (
+                          <td key={c} className="px-2 py-1 align-middle">
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          const [t, r, b, l] = (s.inset ?? [0, 0, 0, 0]).map((v) => v * w);
+          const scale = s.fontScale ?? 1;
+          return (
+            <div
+              key={i}
+              style={{
+                ...box(s),
+                background: s.fill,
+                border: s.line ? `${Math.max(1, k)}px solid ${s.line}` : undefined,
+                borderRadius: s.geometry === "ellipse" ? "50%" : s.geometry === "roundRect" ? 12 * k : undefined,
+                padding: `${t}px ${r}px ${b}px ${l}px`,
+                justifyContent: s.anchor === "middle" ? "center" : s.anchor === "bottom" ? "flex-end" : "flex-start",
+              }}
+              className="flex flex-col overflow-hidden"
+            >
+              {s.paragraphs?.map((p, j) => (
+                <p
+                  key={j}
+                  className="m-0 flex"
+                  style={{ fontSize: (p.size ?? 18) * k * scale, color: p.color, textAlign: ALIGN[p.align ?? "left"], justifyContent: p.align === "center" ? "center" : p.align === "right" ? "flex-end" : undefined, lineHeight: 1.18, paddingLeft: (p.level ?? 0) * 36 * k, marginTop: j && p.bullet ? 6 * k * scale : 0 }}
+                >
+                  {p.bullet && <span className="shrink-0 pr-[0.5em]">{p.bullet}</span>}
+                  <span className="min-w-0 whitespace-pre-wrap">
+                    {p.runs.length ? (
+                      p.runs.map((run, x) => (
+                        <span key={x} style={{ fontWeight: run.bold ? 700 : undefined, fontStyle: run.italic ? "italic" : undefined, textDecoration: run.underline ? "underline" : undefined, color: run.color, fontSize: run.size ? run.size * k * scale : undefined }}>
+                          {run.text}
+                        </span>
+                      ))
+                    ) : (
+                      " "
+                    )}
+                  </span>
+                </p>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Converte uma apresentação lida de .pptx nos slides do SlideDeck (com as notas do apresentador). */
+export function presentationSlides(presentation: Presentation): DeckSlide[] {
+  return presentation.slides.map((s, i) => ({ id: `slide-${i + 1}`, title: s.title, content: <OfficeSlide slide={s} aspect={presentation.aspect} width={presentation.width} />, notes: s.notes }));
+}
+
+/* ------------------------------------------------------------------ */
+/* Arquivo do Office                                                   */
+/* ------------------------------------------------------------------ */
+
+export type OfficeFileState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "error"; error: string; /** Tentar de novo pode resolver (falha de rede). */ retryable: boolean }
+  | { status: "ready"; file: OfficeFile };
+
+/**
+ * Lê um .xlsx, .docx ou .pptx (File, Blob, ArrayBuffer ou URL) e devolve o
+ * estado: idle (sem arquivo), loading, error (mensagem pronta) ou ready.
+ */
+export function useOfficeFile(source: OfficeSource | string | null | undefined, name?: string) {
+  const [state, setState] = useState<OfficeFileState>({ status: source ? "loading" : "idle" });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!source) {
+      setState({ status: "idle" });
+      return;
+    }
+    let alive = true;
+    setState({ status: "loading" });
+    (async () => {
+      let data: OfficeSource;
+      let fileName = name ?? (typeof File !== "undefined" && source instanceof File ? source.name : undefined);
+      if (typeof source === "string") {
+        const res = await fetch(source).catch(() => null);
+        if (!res?.ok) throw new OfficeFileError("Não foi possível baixar o arquivo. Confira a conexão e tente de novo.", true);
+        data = await res.blob();
+        fileName ??= decodeURIComponent(new URL(source, location.href).pathname.split("/").pop() ?? "");
+      } else data = source;
+      const file = await readOfficeFile(data, { name: fileName });
+      if (alive) setState({ status: "ready", file });
+    })().catch((e: unknown) => {
+      if (alive) setState({ status: "error", error: e instanceof OfficeFileError ? e.message : "Não foi possível abrir o arquivo. Ele pode estar corrompido.", retryable: e instanceof OfficeFileError && e.retryable });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [source, name, attempt]);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  return { ...state, retry };
+}
+
+/**
+ * Mostra um arquivo do Office com o visualizador certo: .xlsx no
+ * WorkbookView, .docx no DocumentView, .pptx no SlideDeck. Cuida de
+ * carregando, erro (com "Tentar novamente") e sem arquivo.
+ */
+export function OfficeFileView({
+  source,
+  name,
+  actions,
+  empty,
+  className,
+}: {
+  /** File/Blob/ArrayBuffer ou URL do arquivo. */
+  source: OfficeSource | string | null | undefined;
+  /** Nome do arquivo (título quando o arquivo não tem um). */
+  name?: string;
+  /** Ações na barra (planilha e documento). */
+  actions?: ReactNode;
+  /** Conteúdo quando não há arquivo (padrão: aviso curto). */
+  empty?: ReactNode;
+  className?: string;
+}) {
+  const state = useOfficeFile(source, name);
+  const frame = cn("flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface", className);
+  if (state.status === "idle")
+    return <div className={cn(frame, "items-center justify-center p-8 text-center text-[13.5px] text-muted")}>{empty ?? "Nenhum arquivo para mostrar."}</div>;
+  if (state.status === "loading")
+    return (
+      <section aria-busy aria-label={name ?? "Abrindo arquivo"} className={frame}>
+        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
+          <Skeleton className="h-4 w-4" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          <Skeleton className="h-6 w-1/3" />
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} className="h-5 w-full" />
+          ))}
+          <span className="sr-only">Abrindo arquivo…</span>
+        </div>
+      </section>
+    );
+  if (state.status === "error")
+    return (
+      <div role="alert" className={cn(frame, "items-center justify-center gap-3 p-8 text-center")}>
+        <p className="m-0 max-w-[420px] text-[13.5px] text-ink">{state.error}</p>
+        {state.retryable && (
+          <Button size="sm" variant="ghost" onClick={state.retry}>
+            Tentar novamente
+          </Button>
+        )}
+      </div>
+    );
+  const { file } = state;
+  if (file.kind === "xlsx") return <WorkbookView workbook={file.workbook} actions={actions} className={className} />;
+  if (file.kind === "docx") return <DocumentView document={file.document} actions={actions} className={className} />;
+  if (!file.presentation.slides.length)
+    return (
+      <div className={cn(frame, "items-center justify-center gap-2 p-8 text-center text-[13.5px] text-muted")}>
+        <PresentationIcon aria-hidden className="h-5 w-5" />
+        Esta apresentação não tem slides visíveis.
+      </div>
+    );
+  return <SlideDeck title={file.presentation.title} slides={presentationSlides(file.presentation)} className={className} />;
 }

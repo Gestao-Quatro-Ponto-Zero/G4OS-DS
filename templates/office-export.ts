@@ -1,4 +1,9 @@
 /**
+ * RECEITA OPCIONAL — copie para o seu app (ex.: src/lib/office-export.ts).
+ * O DS exibe planilhas e documentos; gerar o arquivo é do app. Instale:
+ *   pnpm add exceljs docx
+ * Guia: docs/guias/office.md
+ *
  * Exportação real para Office: .xlsx (exceljs) e .docx (docx), com a
  * identidade do DS. As bibliotecas são carregadas sob demanda, só quando
  * alguém exporta, então não pesam no carregamento do app.
@@ -7,7 +12,6 @@
  *   await exportDocx(documento)           // baixa "relatorio.docx"
  *   const blob = await workbookToBlob(wb) // para anexar, enviar, salvar
  */
-import { color } from "../tokens";
 import {
   cellAddress,
   docRuns,
@@ -23,7 +27,10 @@ import {
   type DocText,
   type OfficeDocument,
   type Workbook,
-} from "./office";
+  tokens,
+} from "@g4ai/ds";
+
+const { color } = tokens;
 
 /**
  * Cores e fonte dos arquivos. Padrão: tokens do tema claro G4. Para a marca
@@ -249,6 +256,7 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
     VerticalAlignTable,
     WidthType,
     HeadingLevel,
+    ImageRun,
     LineRuleType,
   } = d;
 
@@ -262,6 +270,17 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
       const run = new TextRun({ text: r.text, bold: r.bold ?? base.bold, italics: r.italic, size: base.size, color: r.href ? hex(t.ink) : base.color, underline: r.href ? {} : undefined });
       return r.href ? new ExternalHyperlink({ link: r.href, children: [run] }) : run;
     });
+
+  // Imagens: baixa antes (block é síncrono). Aceita data: URL ou URL do mesmo site.
+  const imageData = new Map<number, { data: Uint8Array; type: "png" | "jpg" | "gif" | "bmp" }>();
+  await Promise.all(
+    doc.blocks.map(async (b, i) => {
+      if (b.type !== "image") return;
+      const blob = await (await fetch(b.src)).blob();
+      const type = blob.type.includes("png") ? "png" : blob.type.includes("gif") ? "gif" : blob.type.includes("bmp") ? "bmp" : "jpg";
+      imageData.set(i, { data: new Uint8Array(await blob.arrayBuffer()), type });
+    }),
+  );
 
   const heading = { 1: HeadingLevel.HEADING_1, 2: HeadingLevel.HEADING_2, 3: HeadingLevel.HEADING_3 } as const;
   const outline = documentOutline(doc);
@@ -413,6 +432,16 @@ export async function documentToBlob(doc: OfficeDocument, options: { theme?: Par
               }),
             ],
           }),
+        ];
+      }
+      case "image": {
+        const img = imageData.get(index);
+        if (!img) return [];
+        const width = Math.min(b.width ?? 642, 642); // px na página A4 (largura útil), igual ao DocumentView
+        const height = Math.round(width * (b.ratio ?? 9 / 16));
+        return [
+          new Paragraph({ spacing: { after: b.caption ? 60 : 200 }, children: [new ImageRun({ type: img.type, data: img.data, transformation: { width, height }, altText: b.alt ? { name: b.alt, description: b.alt, title: b.alt } : undefined })] }),
+          ...(b.caption ? [new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: b.caption, size: pt(8.5), color: hex(t.muted) })] })] : []),
         ];
       }
       case "divider":

@@ -1,8 +1,12 @@
 /**
- * Modelo de planilha e de documento do DS. Um único objeto descreve o arquivo:
- * o visualizador (WorkbookView, DocumentView) desenha a partir dele e a
- * exportação (exportXlsx, exportDocx em lib/office-export) gera o .xlsx/.docx
- * a partir dele. O que aparece na tela é o que sai no arquivo.
+ * Modelo de planilha, documento e apresentação do DS. O conteúdo vem de
+ * código (Workbook, OfficeDocument, slides com Slide*) ou de um arquivo real
+ * (.xlsx, .docx, .pptx lidos por lib/office-files). Os visualizadores
+ * (WorkbookView, DocumentView, SlideDeck) desenham os dois do mesmo jeito.
+ *
+ * Gerar o arquivo é opcional e fica no app: receita com exceljs/docx em
+ * templates/office-export.ts (guia docs/guias/office.md), que usa
+ * layoutSheet e excelNumberFormat daqui para sair igual à tela.
  */
 import { formatCurrency, formatDate, formatNumber, formatPercent } from "./format";
 
@@ -67,6 +71,13 @@ export type Workbook = {
   sheets: WorkbookSheet[];
 };
 
+/**
+ * Aba já posicionada (o que vem de um .xlsx). `layout` é a grade final;
+ * WorkbookView aceita estas abas ou as WorkbookSheet escritas em código.
+ */
+export type GridSheet = { name: string; layout: SheetLayout; freezeColumns?: number; /** Linhas omitidas por limite de exibição. */ truncated?: boolean };
+export type FileWorkbook = { title: string; sheets: GridSheet[] };
+
 export type LaidCell = {
   /** Valor final (fórmulas já calculadas). */
   value: CellValue;
@@ -78,6 +89,8 @@ export type LaidCell = {
   /** Ocupa todas as colunas (título e descrição). */
   span?: boolean;
   note?: string;
+  /** Negrito definido no arquivo. */
+  bold?: boolean;
 };
 
 export type SheetLayout = {
@@ -329,6 +342,7 @@ export type DocBlock =
   | { type: "callout"; title?: string; text: DocText; tone?: "neutral" | "info" | "ok" | "amber" | "rose" }
   | { type: "quote"; text: string; author?: string; role?: string }
   | { type: "signatures"; people: { name: string; role?: string }[] }
+  | { type: "image"; src: string; alt?: string; /** Largura em px na página (até 642; padrão: largura útil). */ width?: number; /** Altura ÷ largura (padrão 9/16). */ ratio?: number; caption?: string }
   | { type: "divider" }
   | { type: "pageBreak" };
 
@@ -369,3 +383,33 @@ export function fileSlug(title: string) {
       .replace(/^-+|-+$/g, "") || "arquivo"
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Apresentação (lida de .pptx)                                        */
+/* ------------------------------------------------------------------ */
+
+export type PresentationRun = { text: string; bold?: boolean; italic?: boolean; underline?: boolean; /** Hex "#RRGGBB". */ color?: string; /** Pontos. */ size?: number };
+export type PresentationParagraph = { runs: PresentationRun[]; align?: "left" | "center" | "right" | "justify"; level?: number; bullet?: string; /** Pontos (padrão do parágrafo). */ size?: number; color?: string };
+export type PresentationShape = {
+  kind: "text" | "image" | "table";
+  /** Posição e tamanho em fração do slide (0–1). */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  rotation?: number;
+  fill?: string;
+  line?: string;
+  geometry?: "rect" | "roundRect" | "ellipse";
+  paragraphs?: PresentationParagraph[];
+  anchor?: "top" | "middle" | "bottom";
+  /** Margens internas em fração da largura do slide. */
+  inset?: [number, number, number, number];
+  /** Escala do autoajuste do PowerPoint (0–1). */
+  fontScale?: number;
+  src?: string;
+  alt?: string;
+  rows?: string[][];
+};
+export type PresentationSlide = { title: string; background?: string; shapes: PresentationShape[]; notes?: string };
+export type Presentation = { title: string; /** Largura ÷ altura (16/9, 4/3…). */ aspect: number; /** Largura do slide em pontos (960 no 16:9 padrão), base dos tamanhos de fonte. */ width: number; slides: PresentationSlide[] };
