@@ -18,11 +18,15 @@ import { type CellFormat, type DocBlock, type DocRun, type DocTableColumn, type 
 export type OfficeSource = Blob | ArrayBuffer | Uint8Array;
 export type OfficeFile = { kind: "xlsx"; workbook: FileWorkbook } | { kind: "docx"; document: OfficeDocument } | { kind: "pptx"; presentation: Presentation };
 
-/** Erro com mensagem pronta para a pessoa (pt-BR). `retryable`: tentar de novo pode resolver (rede). */
+/**
+ * Erro de leitura com motivo, para a tela escolher título e saída:
+ * legacy (.xls/.doc/.ppt), unsupported (não é Office), corrupt, network.
+ */
+export type OfficeFileErrorCode = "legacy" | "unsupported" | "corrupt" | "network";
 export class OfficeFileError extends Error {
   constructor(
+    readonly code: OfficeFileErrorCode,
     message: string,
-    readonly retryable = false,
   ) {
     super(message);
   }
@@ -53,7 +57,7 @@ class Zip {
         eocd = i;
         break;
       }
-    if (eocd < 0) throw new OfficeFileError("O arquivo está corrompido ou não é do Office.");
+    if (eocd < 0) throw new OfficeFileError("corrupt", "O arquivo está corrompido ou incompleto.");
     const count = v.getUint16(eocd + 10, true);
     let p = v.getUint32(eocd + 16, true);
     const dec = new TextDecoder();
@@ -71,7 +75,7 @@ class Zip {
     const hit = this.cache.get(name);
     if (hit) return hit;
     const e = this.entries.get(name);
-    if (!e) return Promise.reject(new OfficeFileError(`Parte ausente no arquivo: ${name}`));
+    if (!e) return Promise.reject(new OfficeFileError("corrupt", `Parte ausente no arquivo: ${name}`));
     const v = new DataView(this.data.buffer, this.data.byteOffset, this.data.byteLength);
     const start = e.offset + 30 + v.getUint16(e.offset + 26, true) + v.getUint16(e.offset + 28, true);
     const raw = this.data.slice(start, start + e.size);
@@ -80,7 +84,7 @@ class Zip {
         ? Promise.resolve(raw)
         : e.method === 8
           ? new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer().then((b) => new Uint8Array(b))
-          : Promise.reject(new OfficeFileError("Compressão não suportada neste arquivo."));
+          : Promise.reject(new OfficeFileError("corrupt", "Compressão não suportada neste arquivo."));
     this.cache.set(name, out);
     return out;
   }
@@ -89,7 +93,7 @@ class Zip {
   }
   async xml(name: string) {
     const doc = new DOMParser().parseFromString(await this.text(name), "application/xml");
-    if (doc.getElementsByTagName("parsererror").length) throw new OfficeFileError(`XML inválido em ${name}.`);
+    if (doc.getElementsByTagName("parsererror").length) throw new OfficeFileError("corrupt", `XML inválido em ${name}.`);
     return doc;
   }
   async dataUrl(name: string) {
@@ -149,13 +153,13 @@ async function coreTitle(zip: Zip) {
 export async function readOfficeFile(src: OfficeSource, options: { name?: string } = {}): Promise<OfficeFile> {
   const data = await toBytes(src);
   if (data[0] === 0xd0 && data[1] === 0xcf && data[2] === 0x11 && data[3] === 0xe0)
-    throw new OfficeFileError("Formato antigo do Office (.xls, .doc ou .ppt). Salve como .xlsx, .docx ou .pptx e abra de novo.");
-  if (data[0] !== 0x50 || data[1] !== 0x4b) throw new OfficeFileError("Este arquivo não é uma planilha, documento ou apresentação do Office.");
+    throw new OfficeFileError("legacy", "Abra no Excel, Word ou PowerPoint e salve como .xlsx, .docx ou .pptx.");
+  if (data[0] !== 0x50 || data[1] !== 0x4b) throw new OfficeFileError("unsupported", "Abra uma planilha (.xlsx), um documento (.docx) ou uma apresentação (.pptx).");
   const zip = new Zip(data);
   if (zip.has("xl/workbook.xml")) return { kind: "xlsx", workbook: await parseXlsx(zip, options.name) };
   if (zip.has("word/document.xml")) return { kind: "docx", document: await parseDocx(zip, options.name) };
   if (zip.has("ppt/presentation.xml")) return { kind: "pptx", presentation: await parsePptx(zip, options.name) };
-  throw new OfficeFileError("Este arquivo não é uma planilha, documento ou apresentação do Office.");
+  throw new OfficeFileError("unsupported", "Abra uma planilha (.xlsx), um documento (.docx) ou uma apresentação (.pptx).");
 }
 
 const titleFromName = (name?: string) => (name ? name.replace(/\.[^.]+$/, "") : "");

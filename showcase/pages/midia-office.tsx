@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FileDropzone, OfficeFileView } from "@g4ai/ds";
+import { FileSpreadsheet, FileText, Presentation } from "lucide-react";
+import { FileDropzone, OfficeFileView, SegmentedControl } from "@g4ai/ds";
 import { CodeBlock, Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -10,9 +11,9 @@ export const meta: PageMeta = {
 };
 
 const samples = [
-  { label: "Planilha", src: "samples/contas-a-receber.xlsx" },
-  { label: "Documento", src: "samples/proposta-comercial.docx" },
-  { label: "Apresentação", src: "samples/revisao-trimestral.pptx" },
+  { label: "Planilha", src: "samples/contas-a-receber.xlsx", icon: <FileSpreadsheet /> },
+  { label: "Documento", src: "samples/proposta-comercial.docx", icon: <FileText /> },
+  { label: "Apresentação", src: "samples/revisao-trimestral.pptx", icon: <Presentation /> },
 ];
 
 export default function Page() {
@@ -21,19 +22,13 @@ export default function Page() {
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
       <DocSection title="OfficeFileView" rule="Escolha um exemplo ou solte um arquivo seu: ele é lido aqui no navegador. Formatos antigos (.xls, .doc, .ppt) recebem uma mensagem pedindo para salvar no formato novo.">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Exemplos">
-            {samples.map((s) => (
-              <button
-                key={s.src}
-                type="button"
-                aria-pressed={file === s.src}
-                onClick={() => setFile(s.src)}
-                className="rounded-full border border-line px-3 py-1.5 text-[13px] text-ink-soft hover:bg-soft aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-on-primary"
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            label="Exemplo"
+            value={typeof file === "string" ? file : ""}
+            onChange={setFile}
+            options={samples.map((s) => ({ value: s.src, label: s.label, icon: s.icon }))}
+            className="self-start"
+          />
           <FileDropzone label="Abrir arquivo seu" hint=".xlsx, .docx ou .pptx, até 20 MB" accept=".xlsx,.docx,.pptx" multiple={false} maxSize={20 * 1024 * 1024} onFiles={(files) => files[0] && setFile(files[0])} />
           <Demo bare code={`const [file, setFile] = useState<File | null>(null);
 <FileDropzone label="Arquivo" accept=".xlsx,.docx,.pptx" multiple={false} onFiles={([f]) => setFile(f)} />

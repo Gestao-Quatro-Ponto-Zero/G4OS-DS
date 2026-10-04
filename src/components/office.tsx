@@ -12,7 +12,7 @@
  * Exportar (.xlsx/.docx) é opcional e fica no app: `actions` recebe o botão e
  * a receita está em templates/office-export.ts (docs/guias/office.md).
  */
-import { ChevronRight, FileSpreadsheet, FileText, Presentation as PresentationIcon, Printer } from "lucide-react";
+import { FileSpreadsheet, FileText, FileWarning, Presentation as PresentationIcon, Printer, RotateCw } from "lucide-react";
 import { Fragment, useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { useIsomorphicLayoutEffect as useLayoutEffect } from "../lib/layout-effect";
@@ -34,13 +34,16 @@ import {
   type Presentation,
   type PresentationShape,
   type PresentationSlide,
+  type SheetLayout,
   type Workbook,
 } from "../lib/office";
-import { OFFICE_SHEET_LIMITS, OfficeFileError, readOfficeFile, type OfficeFile, type OfficeSource } from "../lib/office-files";
+import { OFFICE_SHEET_LIMITS, OfficeFileError, readOfficeFile, type OfficeFile, type OfficeFileErrorCode, type OfficeSource } from "../lib/office-files";
 import { formatNumber } from "../lib/format";
 import { Skeleton } from "./feedback";
+import { Tabs } from "./navigation";
+import { LoadingState, StateView } from "./states";
 import { SLIDE_HEIGHT, SLIDE_WIDTH, SlideDeck, type DeckSlide } from "./media";
-import { Button } from "./primitives";
+import { Button, Empty } from "./primitives";
 
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null);
@@ -56,19 +59,34 @@ function useWidth<T extends HTMLElement>() {
   return [ref, width] as const;
 }
 
-/** Barra superior comum aos dois visualizadores. */
+/**
+ * Barra superior dos visualizadores. Mesma do SlideDeck: 48 px, ícone,
+ * título, contador e ferramentas à direita depois de um separador.
+ */
 function ViewerBar({ icon, title, meta, children }: { icon: ReactNode; title: string; meta?: ReactNode; children?: ReactNode }) {
   return (
-    <header className="flex min-h-12 shrink-0 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-line px-3 py-1.5">
-      <span className="shrink-0 text-muted [&_svg]:h-4 [&_svg]:w-4" aria-hidden>
+    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
+      <span aria-hidden className="shrink-0 text-muted [&_svg]:h-4 [&_svg]:w-4">
         {icon}
       </span>
       <p className="m-0 min-w-0 flex-1 truncate text-[13.5px] font-medium">{title}</p>
-      {meta && <span className="text-[12px] tabular-nums text-muted max-sm:hidden">{meta}</span>}
-      {children}
+      {meta && (
+        <span className="text-[12px] tabular-nums text-muted max-sm:hidden" aria-live="polite">
+          {meta}
+        </span>
+      )}
+      {children && (
+        <>
+          <span aria-hidden className="mx-1 h-4 w-px bg-line max-sm:hidden" />
+          {children}
+        </>
+      )}
     </header>
   );
 }
+
+/** Ferramenta da barra (texto + ícone), igual às do SlideDeck. */
+const viewerTool = "inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-muted hover:bg-soft hover:text-ink aria-pressed:bg-soft aria-pressed:text-ink disabled:opacity-50 [&_svg]:h-4 [&_svg]:w-4";
 
 /**
  * Como no Excel, texto mais largo que a coluna avança pelas células vazias à
@@ -80,7 +98,7 @@ function overflowSpans(row: (LaidCell | null)[], px: number[]) {
     const cell = row[c];
     let span = 1;
     if (cell && typeof cell.value === "string" && !isNumericFormat(cell.format) && cell.role !== "header") {
-      const need = formatCell(cell).length * (cell.bold ? 8 : 7.4) + 16;
+      const need = formatCell(cell).length * (cell.bold ? 7.6 : 7.1) + 24;
       let width = px[c];
       while (width < need && c + span < row.length && !row[c + span]) width += px[c + span++];
     }
@@ -95,18 +113,40 @@ function overflowSpans(row: (LaidCell | null)[], px: number[]) {
 /* ------------------------------------------------------------------ */
 
 type Pos = { r: number; c: number };
-const ROWNUM = 44;
-const LETTERS_H = 25;
-const pxWidth = (chars: number) => Math.round(Math.max(64, chars * 7.4 + 16));
+const ROWNUM = 48;
+const pxWidth = (chars: number) => Math.round(Math.max(72, chars * 7.2 + 24));
 
 const toGrid = (wb: Workbook | FileWorkbook): GridSheet[] => wb.sheets.map((s) => ("layout" in s ? s : { name: s.name, layout: layoutSheet(s), freezeColumns: s.freezeColumns ?? 1 }));
 
 /**
- * Planilha na tela: abas escritas em código (Workbook: título, fonte,
- * cabeçalho na cor da marca, fórmulas e total) ou lidas de um .xlsx
- * (FileWorkbook, de readOfficeFile). Clique ou use as setas para navegar
- * (Shift seleciona intervalo, Ctrl+C copia para colar no Excel). A barra
- * mostra a fórmula da célula; o rodapé, soma e média da seleção.
+ * Linhas de abertura da aba (título, fonte, linha em branco) saem da grade e
+ * viram o cabeçalho da seção, como em qualquer tabela do DS. Vale para o que
+ * foi escrito em código (title/description) e para o título mesclado de um .xlsx.
+ */
+function sheetIntro(layout: SheetLayout) {
+  const limit = layout.headerRow >= 0 ? layout.headerRow : Math.min(3, layout.rows.length);
+  const lines: LaidCell[] = [];
+  let start = 0;
+  for (let r = 0; r < limit; r++) {
+    const filled = layout.rows[r].filter(Boolean) as LaidCell[];
+    const onlyFirst = filled.length === 0 || (filled.length === 1 && layout.rows[r][0] && typeof layout.rows[r][0]!.value === "string");
+    if (!onlyFirst) break;
+    if (filled[0]) lines.push(filled[0]);
+    start = r + 1;
+  }
+  // Sem cabeçalho fixo, só tira do corpo se a primeira linha parece título (mesclada ou em negrito).
+  if (layout.headerRow < 0 && !(lines[0]?.span || lines[0]?.bold || lines[0]?.role === "title")) return { title: undefined, notes: [], start: 0 };
+  const [title, ...notes] = lines;
+  return { title, notes, start };
+}
+
+/**
+ * Planilha na linguagem do DS (mesmo visual do DataGrid): abas no topo,
+ * título e fonte acima da tabela, cabeçalho e total fixos, colunas fixas.
+ * Conteúdo escrito em código (Workbook: colunas, fórmulas, total) ou lido de
+ * um .xlsx (FileWorkbook, de readOfficeFile). Setas navegam, Shift seleciona
+ * intervalo, Ctrl+C copia para colar no Excel. O rodapé mostra o endereço e a
+ * fórmula da célula e soma, média e contagem da seleção.
  */
 export function WorkbookView({
   workbook,
@@ -119,60 +159,79 @@ export function WorkbookView({
   initialSheet?: number;
   /** Ações na barra do visualizador (ex.: botão "Baixar .xlsx" do app). */
   actions?: ReactNode;
-  /** Carregando: mostra o esqueleto da grade. */
+  /** Carregando: mostra o esqueleto da tabela. */
   loading?: boolean;
   className?: string;
 }) {
   const uid = useId();
   const grid = useMemo(() => toGrid(workbook), [workbook]);
-  const [sheetIndex, setSheetIndex] = useState(Math.min(initialSheet, Math.max(0, workbook.sheets.length - 1)));
+  const [sheetIndex, setSheetIndex] = useState(Math.min(initialSheet, Math.max(0, grid.length - 1)));
   const sheet = grid[sheetIndex];
   const layout = sheet?.layout ?? null;
-  const start = (): Pos => ({ r: layout ? Math.min(layout.firstDataRow, layout.rows.length - 1) : 0, c: 0 });
-  const [active, setActive] = useState<Pos>(start);
-  const [anchor, setAnchor] = useState<Pos>(start);
+  const intro = useMemo(() => (layout ? sheetIntro(layout) : { title: undefined, notes: [], start: 0 }), [layout]);
+  const firstCell = (l: SheetLayout | null, start: number): Pos => ({ r: l ? Math.min(Math.max(l.firstDataRow, start), l.rows.length - 1) : 0, c: 0 });
+  const [active, setActive] = useState<Pos>(() => firstCell(layout, intro.start));
+  const [anchor, setAnchor] = useState<Pos>(() => firstCell(layout, intro.start));
   const gridRef = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled] = useState({ x: false, y: false });
 
-  const selectSheet = (i: number) => {
+  const selectSheet = (id: string) => {
+    const i = Number(id);
     setSheetIndex(i);
-    const l = grid[i]?.layout;
-    const p = { r: l ? Math.min(l.firstDataRow, l.rows.length - 1) : 0, c: 0 };
+    const l = grid[i]?.layout ?? null;
+    const p = firstCell(l, l ? sheetIntro(l).start : 0);
     setActive(p);
     setAnchor(p);
+    gridRef.current?.scrollTo({ top: 0, left: 0 });
   };
 
   useEffect(() => {
     gridRef.current?.querySelector<HTMLElement>(`[data-cell="${active.r}-${active.c}"]`)?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [active]);
 
+  const frame = cn("flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface", className);
   const bar = (
-    <ViewerBar icon={<FileSpreadsheet />} title={workbook.title} meta={workbook.sheets.length > 1 ? `${workbook.sheets.length} abas` : undefined}>
+    <ViewerBar icon={<FileSpreadsheet />} title={workbook.title} meta={grid.length > 1 ? `${grid.length} abas` : undefined}>
       {actions}
     </ViewerBar>
   );
-  const frame = cn("flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface", className);
 
   if (loading || !layout || !sheet)
     return (
       <section aria-label={workbook.title} aria-busy={loading || undefined} className={frame}>
         {bar}
-        <div className="flex flex-col gap-2 p-4">
-          {loading ? (
-            <>
-              <Skeleton className="h-5 w-1/3" />
-              <Skeleton className="h-8 w-full" />
+        {loading ? (
+          <div className="flex flex-col">
+            <div className="flex gap-4 border-b border-line px-4 py-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <div className="px-4 py-4">
+              <Skeleton className="h-5 w-64" />
+              <Skeleton className="mt-2 h-3.5 w-48" />
+            </div>
+            <div className="border-t border-line">
               {Array.from({ length: 7 }, (_, i) => (
-                <Skeleton key={i} className="h-6 w-full" />
+                <div key={i} className="flex h-9 items-center gap-6 border-b border-line px-4">
+                  <Skeleton className="h-3.5 w-6" />
+                  <Skeleton className="h-3.5 w-40" />
+                  <Skeleton className="h-3.5 w-24" />
+                  <Skeleton className="ml-auto h-3.5 w-20" />
+                </div>
               ))}
-            </>
-          ) : (
-            <p className="m-0 py-10 text-center text-[13.5px] text-muted">Esta planilha não tem abas.</p>
-          )}
-        </div>
+            </div>
+          </div>
+        ) : (
+          <Empty title="Planilha sem abas" hint="O arquivo não tem nenhuma aba visível." framed={false} />
+        )}
       </section>
     );
 
   const { rows, colCount, headerRow, totalRow, widths } = layout;
+  const start = intro.start;
+  const hasHeader = headerRow >= 0 && headerRow === start;
+  const bodyFrom = hasHeader ? headerRow + 1 : start;
+  const bodyTo = totalRow !== null ? totalRow - 1 : rows.length - 1;
   const freeze = Math.min(sheet.freezeColumns ?? 0, colCount);
   const px = widths.map(pxWidth);
   const leftOf = (c: number) => ROWNUM + px.slice(0, c).reduce((a, b) => a + b, 0);
@@ -183,9 +242,9 @@ export function WorkbookView({
   const c1 = Math.max(active.c, anchor.c);
   const inRange = (r: number, c: number) => r >= r0 && r <= r1 && c >= c0 && c <= c1;
   const cellAt = (r: number, c: number): LaidCell | null => rows[r]?.[c] ?? null;
-  const activeCell = cellAt(active.r, active.c) ?? (rows[active.r]?.[0]?.span ? rows[active.r][0] : null);
-  const address = r0 === r1 && c0 === c1 ? cellAddress(active.r, active.c) : `${cellAddress(r0, c0)}:${cellAddress(r1, c1)}`;
-  const formulaText = activeCell ? (activeCell.formula ? `=${activeCell.formula}` : formatCell(activeCell)) : "";
+  const activeCell = cellAt(active.r, active.c);
+  const single = r0 === r1 && c0 === c1;
+  const address = single ? cellAddress(active.r, active.c) : `${cellAddress(r0, c0)}:${cellAddress(r1, c1)}`;
 
   // Soma, média e contagem da seleção (como a barra de status do Excel).
   const picked: LaidCell[] = [];
@@ -196,10 +255,9 @@ export function WorkbookView({
   const sum = nums.reduce((a, p) => a + (p.value as number), 0);
   const filled = picked.filter((p) => p.value !== null && p.value !== undefined && p.value !== "").length;
 
+  const minRow = hasHeader ? headerRow : start;
   const move = (r: number, c: number, extend: boolean) => {
-    const next = { r: Math.max(0, Math.min(lastRow, r)), c: Math.max(0, Math.min(colCount - 1, c)) };
-    // Título e descrição ocupam a linha toda: a célula é sempre a coluna A.
-    if (rows[next.r]?.[0]?.span) next.c = 0;
+    const next = { r: Math.max(minRow, Math.min(lastRow, r)), c: Math.max(0, Math.min(colCount - 1, c)) };
     setActive(next);
     if (!extend) setAnchor(next);
   };
@@ -217,25 +275,22 @@ export function WorkbookView({
     const mod = e.ctrlKey || e.metaKey;
     const map: Record<string, () => void> = {
       ArrowDown: () => move(mod ? lastRow : r + 1, c, e.shiftKey),
-      ArrowUp: () => move(mod ? 0 : r - 1, c, e.shiftKey),
+      ArrowUp: () => move(mod ? minRow : r - 1, c, e.shiftKey),
       ArrowRight: () => move(r, mod ? colCount - 1 : c + 1, e.shiftKey),
       ArrowLeft: () => move(r, mod ? 0 : c - 1, e.shiftKey),
       Enter: () => move(r + 1, c, false),
-      Tab: () => move(r, c + (e.shiftKey ? -1 : 1), false),
       PageDown: () => move(r + 10, c, e.shiftKey),
       PageUp: () => move(r - 10, c, e.shiftKey),
-      Home: () => move(mod ? 0 : r, 0, e.shiftKey),
+      Home: () => move(mod ? minRow : r, 0, e.shiftKey),
       End: () => move(mod ? lastRow : r, colCount - 1, e.shiftKey),
     };
     if (mod && e.key.toLowerCase() === "c") return copy();
     if (mod && e.key.toLowerCase() === "a") {
       e.preventDefault();
-      setAnchor({ r: 0, c: 0 });
+      setAnchor({ r: minRow, c: 0 });
       setActive({ r: lastRow, c: colCount - 1 });
       return;
     }
-    // Tab na última coluna sai da grade, como em qualquer controle.
-    if (e.key === "Tab" && ((c === colCount - 1 && !e.shiftKey) || (c === 0 && e.shiftKey))) return;
     if (map[e.key]) {
       e.preventDefault();
       map[e.key]();
@@ -245,53 +300,79 @@ export function WorkbookView({
     gridRef.current?.focus({ preventScroll: true });
     move(r, c, shift);
   };
-
-  const cellClass = (cell: LaidCell | null, r: number, c: number) => {
-    const numeric = cell ? isNumericFormat(cell.format) : false;
-    const role = cell?.role ?? (r > headerRow && (totalRow === null || r < totalRow) ? "data" : "empty");
-    return cn(
-      "h-7 cursor-cell overflow-hidden text-ellipsis whitespace-nowrap px-2 py-0 align-middle",
-      numeric && "text-right tabular-nums",
-      role === "header" && "sticky z-[2] h-8 border-b-2 border-r border-b-accent border-r-on-brand/15 bg-brand text-[12.5px] font-semibold text-on-brand",
-      role === "title" && "h-11 bg-surface text-[18px] font-semibold tracking-[-0.01em] text-ink",
-      role === "description" && "bg-surface text-[12px] text-muted",
-      (role === "data" || role === "empty") && "border-b border-r border-line bg-surface text-ink",
-      role === "total" && "border-b border-r border-t-2 border-line border-t-ink bg-soft font-semibold text-ink",
-      cell?.bold && "font-semibold",
-      c < freeze && !cell?.span && "sticky z-[1]",
-      role === "header" && c < freeze && "z-[3]",
-      inRange(r, c) && !(r === active.r && c === active.c) && "bg-[color-mix(in_oklab,var(--color-primary)_7%,var(--color-surface))]",
-      r === active.r && c === active.c && "shadow-[inset_0_0_0_2px_var(--color-primary)]",
-    );
+  const onScroll = () => {
+    const el = gridRef.current;
+    if (!el) return;
+    const next = { x: el.scrollLeft > 0, y: el.scrollTop > 0 };
+    if (next.x !== scrolled.x || next.y !== scrolled.y) setScrolled(next);
   };
+
+  /** Estilo da célula de dados: seleção com 7 % de primary (igual à linha selecionada do DataGrid), ativa com contorno. */
+  const cellProps = (r: number, c: number, cell: LaidCell | null, span = 1) => {
+    const pin = c < freeze && span === 1;
+    const isActive = r === active.r && c === active.c;
+    return {
+      id: `${uid}-${r}-${c}`,
+      role: "gridcell",
+      "aria-selected": inRange(r, c),
+      "data-cell": `${r}-${c}`,
+      "data-pin": pin ? "" : undefined,
+      "data-pin-edge": pin && c === freeze - 1 ? "left" : undefined,
+      colSpan: span > 1 ? span : undefined,
+      onMouseDown: (e: React.MouseEvent) => pointer(r, c, e.shiftKey),
+      className: cn(
+        "dg-cell cursor-cell whitespace-nowrap text-[13px]",
+        cell && isNumericFormat(cell.format) ? "text-right tabular-nums" : "text-left",
+        cell?.bold && "font-semibold",
+        cell?.value === null || cell?.value === undefined ? "text-muted" : "text-ink",
+        pin && "sticky",
+        isActive && "shadow-[inset_0_0_0_1.5px_var(--color-primary)]",
+      ),
+      style: {
+        left: pin ? leftOf(c) : undefined,
+        ...(inRange(r, c) && !isActive ? { "--dg-row-bg": "color-mix(in oklab, var(--ds-primary) 7%, var(--ds-surface))" } : {}),
+      } as CSSProperties,
+    };
+  };
+
+  const head = hasHeader ? rows[headerRow] : null;
+  const total = totalRow !== null ? rows[totalRow] : null;
 
   return (
     <section aria-label={workbook.title} className={frame}>
       {bar}
-      <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line bg-soft/50 px-2 text-[13px]">
-        <span className="w-[76px] shrink-0 truncate rounded-md border border-line bg-surface px-2 py-0.5 font-mono text-[12px] tabular-nums" aria-label="Célula selecionada">
-          {address}
-        </span>
-        <span aria-hidden className="shrink-0 font-serif text-[13px] italic text-muted">
-          fx
-        </span>
-        <span className={cn("min-w-0 flex-1 truncate text-[12.5px] text-ink-soft", activeCell?.formula && "font-mono")} aria-label="Conteúdo da célula">
-          {formulaText}
-        </span>
-      </div>
+      {grid.length > 1 && (
+        <div className="shrink-0 overflow-x-auto border-b border-line px-3 pt-1">
+          <Tabs label="Abas da planilha" value={String(sheetIndex)} onChange={selectSheet} items={grid.map((s, i) => ({ id: String(i), label: s.name }))} className="-mb-px flex-nowrap" />
+        </div>
+      )}
+      {(intro.title || intro.notes.length > 0) && (
+        <div className="shrink-0 px-4 pb-3 pt-4">
+          {intro.title && <h3 className="m-0 text-[15px] font-semibold leading-snug tracking-[-0.01em] text-ink">{formatCell(intro.title)}</h3>}
+          {intro.notes.map((n, i) => (
+            <p key={i} className="m-0 mt-1 text-[12.5px] text-muted">
+              {formatCell(n)}
+            </p>
+          ))}
+        </div>
+      )}
       <div
         ref={gridRef}
         role="grid"
         aria-label={`Aba ${sheet.name}`}
-        aria-rowcount={rows.length + 1}
+        aria-rowcount={rows.length}
         aria-colcount={colCount + 1}
         aria-activedescendant={`${uid}-${active.r}-${active.c}`}
         aria-multiselectable
         tabIndex={0}
         onKeyDown={onKey}
-        className="relative min-h-0 flex-1 overflow-auto outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted/30"
+        onScroll={onScroll}
+        data-density="compact"
+        data-scrolled-x={scrolled.x || undefined}
+        data-scrolled-y={scrolled.y || undefined}
+        className="data-grid relative min-h-0 flex-1 overflow-auto border-t border-line outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted/30"
       >
-        <table role="presentation" className="border-separate border-spacing-0 text-[13px]" style={{ width: ROWNUM + px.reduce((a, b) => a + b, 0), tableLayout: "fixed" }}>
+        <table role="presentation" className="border-separate border-spacing-0" style={{ width: ROWNUM + px.reduce((a, b) => a + b, 0), tableLayout: "fixed" }}>
           <colgroup>
             <col style={{ width: ROWNUM }} />
             {px.map((w, i) => (
@@ -300,115 +381,115 @@ export function WorkbookView({
           </colgroup>
           <thead>
             <tr role="row">
-              <th role="columnheader" aria-label="Linhas e colunas" className="sticky left-0 top-0 z-[4] border-b border-r border-line bg-soft" style={{ height: LETTERS_H }} />
-              {px.map((_, c) => (
-                <th
-                  key={c}
-                  role="columnheader"
-                  className={cn("sticky top-0 z-[2] border-b border-r border-line bg-soft text-center text-[11px] font-medium text-muted", c >= c0 && c <= c1 && "bg-line text-ink", c < freeze && "z-[4]")}
-                  style={{ height: LETTERS_H, left: c < freeze ? leftOf(c) : undefined }}
-                >
-                  {columnLetter(c)}
-                </th>
-              ))}
+              <th role="columnheader" data-pin="" className="dg-th sticky left-0 text-right font-normal" style={{ left: 0 }}>
+                <span className="sr-only">Linha</span>
+              </th>
+              {px.map((_, c) => {
+                const cell = head?.[c] ?? null;
+                const pin = c < freeze;
+                const letter = columnLetter(c);
+                return (
+                  <th
+                    key={c}
+                    role="columnheader"
+                    data-pin={pin ? "" : undefined}
+                    data-pin-edge={pin && c === freeze - 1 ? "left" : undefined}
+                    title={cell?.note ? `${letter} · ${cell.note}` : `Coluna ${letter}`}
+                    onMouseDown={head ? (e) => pointer(headerRow, c, e.shiftKey) : undefined}
+                    className={cn("dg-th", head && cell && isNumericFormat(rows[bodyFrom]?.[c]?.format ?? "text") ? "text-right" : "text-left", !head && "text-center font-normal", c >= c0 && c <= c1 && "text-ink")}
+                    style={{ left: pin ? leftOf(c) : undefined }}
+                  >
+                    {head ? (
+                      <span className={cn("inline-flex max-w-full items-center gap-1", head && isNumericFormat(rows[bodyFrom]?.[c]?.format ?? "text") && "flex-row-reverse")}>
+                        <span className="truncate">{cell ? formatCell(cell) : letter}</span>
+                        {cell?.note && (
+                          <span aria-hidden className="inline-grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full text-[10px] font-semibold text-muted ring-1 ring-line-strong">
+                            ?
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      letter
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, r) => {
-              const spanCell = row[0]?.span ? row[0] : null;
-              const top = r === headerRow ? LETTERS_H : undefined;
+            {rows.slice(bodyFrom, bodyTo + 1).map((row, k) => {
+              const r = bodyFrom + k;
+              const selectedRow = r >= r0 && r <= r1;
               return (
-                <tr key={r} role="row" aria-rowindex={r + 2}>
-                  <th
-                    role="rowheader"
-                    className={cn("sticky left-0 z-[1] border-b border-r border-line bg-soft px-1 text-right text-[11px] font-normal tabular-nums text-muted", r >= r0 && r <= r1 && "bg-line text-ink", r === headerRow && "z-[3]")}
-                    style={{ top }}
-                  >
+                <tr key={r} role="row" data-row="" aria-rowindex={r + 1} style={{ height: 36 }}>
+                  <td data-pin="" className={cn("dg-cell sticky left-0 text-right text-[11.5px] tabular-nums", selectedRow ? "font-medium text-ink" : "text-muted")} style={{ left: 0 }}>
                     {r + 1}
-                  </th>
-                  {spanCell ? (
-                    <td
-                      id={`${uid}-${r}-0`}
-                      role="gridcell"
-                      aria-selected={inRange(r, 0)}
-                      data-cell={`${r}-0`}
-                      colSpan={colCount}
-                      onMouseDown={(e) => pointer(r, 0, e.shiftKey)}
-                      className={cellClass(spanCell, r, 0)}
-                    >
-                      {formatCell(spanCell)}
-                    </td>
-                  ) : (
-                    overflowSpans(row, px).map(({ c, span }) => {
-                      const cell = row[c];
-                      const sticky = c < freeze && span === 1;
-                      return (
-                        <td
-                          key={c}
-                          id={`${uid}-${r}-${c}`}
-                          role="gridcell"
-                          aria-selected={inRange(r, c)}
-                          data-cell={`${r}-${c}`}
-                          colSpan={span > 1 ? span : undefined}
-                          onMouseDown={(e) => pointer(r, c, e.shiftKey)}
-                          title={cell?.note}
-                          className={cn(cellClass(cell, r, c), cell?.note && "relative", !sticky && c < freeze && "static")}
-                          style={{ top, left: sticky ? leftOf(c) : undefined }}
-                        >
-                          {cell ? formatCell(cell) : ""}
-                          {cell?.note && <span aria-hidden className="absolute right-0 top-0 h-0 w-0 border-l-[6px] border-t-[6px] border-l-transparent border-t-accent" />}
-                        </td>
-                      );
-                    })
-                  )}
+                  </td>
+                  {overflowSpans(row, px).map(({ c, span }) => {
+                    const cell = row[c];
+                    return (
+                      <td key={c} {...cellProps(r, c, cell, span)}>
+                        <span className="block truncate">{cell ? formatCell(cell) : ""}</span>
+                      </td>
+                    );
+                  })}
                 </tr>
               );
             })}
-            {layout.lastDataRow < layout.firstDataRow && (
+            {bodyTo < bodyFrom && (
               <tr role="row">
-                <td role="gridcell" colSpan={colCount + 1} className="px-3 py-8 text-center text-[13.5px] text-muted">
-                  Nenhuma linha nesta aba.
+                <td colSpan={colCount + 1} className="p-0">
+                  <Empty title="Aba vazia" hint="Não há linhas nesta aba." framed={false} />
                 </td>
               </tr>
             )}
           </tbody>
+          {total && totalRow !== null && (
+            <tfoot>
+              <tr role="row" aria-rowindex={totalRow + 1}>
+                <td data-pin="" className="dg-tf sticky left-0 text-right text-[11.5px] font-normal text-muted" style={{ left: 0 }}>
+                  {totalRow + 1}
+                </td>
+                {total.map((cell, c) => {
+                  const p = cellProps(totalRow, c, cell);
+                  return (
+                    <td key={c} {...p} className={cn(p.className.replace("dg-cell", "dg-tf"), "font-semibold")}>
+                      <span className="block truncate">{cell ? formatCell(cell) : ""}</span>
+                    </td>
+                  );
+                })}
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
-      <footer className="flex min-h-9 shrink-0 items-stretch border-t border-line bg-soft/50">
-        <div role="tablist" aria-label="Abas" className="flex min-w-0 flex-1 overflow-x-auto">
-          {workbook.sheets.map((s, i) => (
-            <button
-              key={s.name + i}
-              type="button"
-              role="tab"
-              aria-selected={i === sheetIndex}
-              onClick={() => selectSheet(i)}
-              className={cn(
-                "shrink-0 whitespace-nowrap border-r border-line px-3.5 text-[12.5px] outline-none focus-visible:bg-soft",
-                i === sheetIndex ? "border-t-2 border-t-accent bg-surface font-medium text-ink" : "border-t-2 border-t-transparent text-muted hover:bg-soft hover:text-ink",
-              )}
-            >
-              {s.name}
-            </button>
-          ))}
-        </div>
-        {sheet.truncated && (
-          <span className="flex shrink-0 items-center px-3 text-[12px] text-muted max-sm:hidden">
-            Mostrando até {formatNumber(OFFICE_SHEET_LIMITS.rows)} linhas e {OFFICE_SHEET_LIMITS.columns} colunas
-          </span>
-        )}
+      <footer className="flex h-9 shrink-0 items-center gap-3 border-t border-line px-3 text-[12px] text-muted">
+        <span className="shrink-0 font-mono text-[11.5px] font-medium tabular-nums text-ink" aria-label="Seleção">
+          {address}
+        </span>
+        <span className="min-w-0 flex-1 truncate" aria-label="Conteúdo da célula">
+          {single && activeCell?.formula ? (
+            <>
+              <code className="font-mono text-[11.5px] text-ink-soft">={activeCell.formula}</code>
+              {activeCell.value !== null && activeCell.value !== undefined && <span className="text-muted"> → {formatCell(activeCell)}</span>}
+            </>
+          ) : single && activeCell ? (
+            formatCell(activeCell)
+          ) : null}
+        </span>
+        {sheet.truncated && <span className="shrink-0 max-sm:hidden">Primeiras {formatNumber(OFFICE_SHEET_LIMITS.rows)} linhas</span>}
         {nums.length > 1 && (
-          <div className="flex shrink-0 items-center gap-3 px-3 text-[12px] tabular-nums text-muted max-sm:hidden" aria-live="polite">
+          <span className="flex shrink-0 items-center gap-3 tabular-nums max-sm:hidden" aria-live="polite">
             <span>
-              Média <span className="text-ink">{stat(sum / nums.length)}</span>
+              Soma <span className="font-medium text-ink">{stat(sum)}</span>
             </span>
             <span>
-              Contagem <span className="text-ink">{filled}</span>
+              Média <span className="font-medium text-ink">{stat(sum / nums.length)}</span>
             </span>
             <span>
-              Soma <span className="text-ink">{stat(sum)}</span>
+              Contagem <span className="font-medium text-ink">{filled}</span>
             </span>
-          </div>
+          </span>
         )}
       </footer>
     </section>
@@ -828,36 +909,56 @@ export function DocumentView({
   };
 
   const currentHeading = [...outline].reverse().find((h) => (pageOf[h.index] ?? 0) <= current + 1)?.index;
-  const tool = "inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-muted hover:bg-soft hover:text-ink disabled:opacity-50 [&_svg]:h-4 [&_svg]:w-4";
+  // Sumário agrupado: títulos de nível 2 ficam sob o nível 1 anterior, com linha-guia (como o SectionNav).
+  const groups: { h: (typeof outline)[number]; children: typeof outline }[] = [];
+  for (const h of outline) {
+    if (h.level === 2 && groups.length) groups[groups.length - 1].children.push(h);
+    else groups.push({ h, children: [] });
+  }
+  const outlineItem = (h: (typeof outline)[number], sub: boolean) => {
+    const on = h.index === currentHeading;
+    return (
+      <button
+        type="button"
+        onClick={() => goTo(h.index)}
+        aria-current={on ? "location" : undefined}
+        className={cn(
+          "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[12.5px] transition-colors duration-150",
+          on ? "bg-surface font-medium text-ink shadow-surface ring-1 ring-line-strong" : sub ? "text-muted hover:bg-soft hover:text-ink" : "text-ink-soft hover:bg-soft hover:text-ink",
+        )}
+      >
+        {on && <span aria-hidden className={cn("absolute top-1/2 w-[3px] -translate-y-1/2 bg-nav-marker", sub ? "-left-[14px] h-3.5 rounded-full" : "left-0 h-4 rounded-r-full")} />}
+        <span className="min-w-0 flex-1 truncate">{h.text}</span>
+        <span className="shrink-0 text-[11px] tabular-nums text-muted">{content ? pageOf[h.index] : ""}</span>
+      </button>
+    );
+  };
 
   return (
     <section aria-label={doc.title} aria-busy={loading || undefined} className={cn("relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface", className)}>
-      <ViewerBar icon={<FileText />} title={doc.title} meta={loading ? undefined : `Página ${current + 1} de ${pages.length}`}>
-        <button type="button" onClick={print} disabled={loading} className={tool}>
+      <ViewerBar icon={<FileText />} title={doc.title} meta={loading ? undefined : `${current + 1} / ${pages.length}`}>
+        <button type="button" onClick={print} disabled={loading} className={viewerTool} title="Imprimir ou salvar em PDF">
           <Printer /> <span className="max-sm:sr-only">Imprimir</span>
         </button>
         {actions}
       </ViewerBar>
       <div className="flex min-h-0 flex-1">
         {showOutline && outline.length > 0 && !loading && (
-          <nav aria-label="Sumário do documento" className="hidden w-[220px] shrink-0 overflow-y-auto border-r border-line bg-soft/50 p-2.5 md:block">
-            <p className="m-0 px-2 pb-1.5 pt-1 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted">Sumário</p>
-            <ul className="m-0 flex list-none flex-col gap-px p-0">
-              {outline.map((h) => (
-                <li key={h.index}>
-                  <button
-                    type="button"
-                    onClick={() => goTo(h.index)}
-                    aria-current={h.index === currentHeading ? "location" : undefined}
-                    className={cn(
-                      "flex w-full items-baseline gap-1.5 rounded-md px-2 py-1.5 text-left text-[12.5px] hover:bg-soft hover:text-ink aria-[current=location]:bg-surface aria-[current=location]:text-ink aria-[current=location]:shadow-surface aria-[current=location]:ring-1 aria-[current=location]:ring-line",
-                      h.level === 1 ? "font-medium text-ink-soft" : "pl-5 text-muted",
-                    )}
-                  >
-                    {h.level === 1 && <ChevronRight aria-hidden className="relative top-[2px] h-3 w-3 shrink-0 text-muted" />}
-                    <span className="min-w-0 flex-1">{h.text}</span>
-                    <span className="text-[11px] tabular-nums text-muted">{content ? pageOf[h.index] : ""}</span>
-                  </button>
+          <nav aria-label="Sumário do documento" className="hidden w-[232px] shrink-0 overflow-y-auto border-r border-line bg-soft/50 px-2 py-3 md:block">
+            <p className="m-0 mb-1 flex h-8 items-center px-2 text-[12.5px] font-semibold text-ink">Sumário</p>
+            <ul className="m-0 list-none p-0">
+              {groups.map(({ h, children }) => (
+                <li key={h.index} className="mb-0.5">
+                  {outlineItem(h, false)}
+                  {children.length > 0 && (
+                    <ul className="m-0 ml-2 list-none border-l border-line p-0 py-0.5 pl-3">
+                      {children.map((c) => (
+                        <li key={c.index} className="relative">
+                          {outlineItem(c, true)}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
             </ul>
@@ -995,7 +1096,7 @@ export function presentationSlides(presentation: Presentation): DeckSlide[] {
 export type OfficeFileState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "error"; error: string; /** Tentar de novo pode resolver (falha de rede). */ retryable: boolean }
+  | { status: "error"; error: string; code: OfficeFileErrorCode }
   | { status: "ready"; file: OfficeFile };
 
 /**
@@ -1017,14 +1118,14 @@ export function useOfficeFile(source: OfficeSource | string | null | undefined, 
       let fileName = name ?? (typeof File !== "undefined" && source instanceof File ? source.name : undefined);
       if (typeof source === "string") {
         const res = await fetch(source).catch(() => null);
-        if (!res?.ok) throw new OfficeFileError("Não foi possível baixar o arquivo. Confira a conexão e tente de novo.", true);
+        if (!res?.ok) throw new OfficeFileError("network", "Confira a conexão e tente de novo.");
         data = await res.blob();
         fileName ??= decodeURIComponent(new URL(source, location.href).pathname.split("/").pop() ?? "");
       } else data = source;
       const file = await readOfficeFile(data, { name: fileName });
       if (alive) setState({ status: "ready", file });
     })().catch((e: unknown) => {
-      if (alive) setState({ status: "error", error: e instanceof OfficeFileError ? e.message : "Não foi possível abrir o arquivo. Ele pode estar corrompido.", retryable: e instanceof OfficeFileError && e.retryable });
+      if (alive) setState(e instanceof OfficeFileError ? { status: "error", error: e.message, code: e.code } : { status: "error", error: "O arquivo pode estar corrompido. Salve de novo no Office e tente outra vez.", code: "corrupt" });
     });
     return () => {
       alive = false;
@@ -1059,42 +1160,45 @@ export function OfficeFileView({
   const state = useOfficeFile(source, name);
   const frame = cn("flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface", className);
   if (state.status === "idle")
-    return <div className={cn(frame, "items-center justify-center p-8 text-center text-[13.5px] text-muted")}>{empty ?? "Nenhum arquivo para mostrar."}</div>;
+    return <div className={cn(frame, "justify-center")}>{empty ?? <StateView icon={<FileText strokeWidth={1.6} />} title="Nenhum arquivo selecionado" description="Escolha uma planilha, um documento ou uma apresentação." />}</div>;
   if (state.status === "loading")
     return (
-      <section aria-busy aria-label={name ?? "Abrindo arquivo"} className={frame}>
-        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
-          <Skeleton className="h-4 w-4" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-        <div className="flex flex-1 flex-col gap-2 p-4">
-          <Skeleton className="h-6 w-1/3" />
-          {Array.from({ length: 6 }, (_, i) => (
-            <Skeleton key={i} className="h-5 w-full" />
-          ))}
-          <span className="sr-only">Abrindo arquivo…</span>
-        </div>
+      <section aria-busy aria-label={name ?? "Abrindo arquivo"} className={cn(frame, "justify-center")}>
+        <LoadingState label="Abrindo arquivo…" hint={name} />
       </section>
     );
-  if (state.status === "error")
+  if (state.status === "error") {
+    const copy = {
+      legacy: { tone: "warn", title: "Formato antigo do Office" },
+      unsupported: { tone: "neutral", title: "Este arquivo não é do Office" },
+      corrupt: { tone: "bad", title: "Não foi possível abrir o arquivo" },
+      network: { tone: "bad", title: "Não foi possível baixar o arquivo" },
+    } as const;
     return (
-      <div role="alert" className={cn(frame, "items-center justify-center gap-3 p-8 text-center")}>
-        <p className="m-0 max-w-[420px] text-[13.5px] text-ink">{state.error}</p>
-        {state.retryable && (
-          <Button size="sm" variant="ghost" onClick={state.retry}>
-            Tentar novamente
-          </Button>
-        )}
+      <div className={cn(frame, "justify-center")}>
+        <StateView
+          tone={copy[state.code].tone}
+          icon={<FileWarning strokeWidth={1.6} />}
+          title={copy[state.code].title}
+          description={state.error}
+          action={
+            state.code === "network" ? (
+              <Button size="sm" onClick={state.retry}>
+                <RotateCw /> Tentar novamente
+              </Button>
+            ) : undefined
+          }
+        />
       </div>
     );
+  }
   const { file } = state;
   if (file.kind === "xlsx") return <WorkbookView workbook={file.workbook} actions={actions} className={className} />;
   if (file.kind === "docx") return <DocumentView document={file.document} actions={actions} className={className} />;
   if (!file.presentation.slides.length)
     return (
-      <div className={cn(frame, "items-center justify-center gap-2 p-8 text-center text-[13.5px] text-muted")}>
-        <PresentationIcon aria-hidden className="h-5 w-5" />
-        Esta apresentação não tem slides visíveis.
+      <div className={cn(frame, "justify-center")}>
+        <StateView icon={<PresentationIcon strokeWidth={1.6} />} title="Apresentação sem slides" description="Todos os slides deste arquivo estão ocultos ou ele está vazio." />
       </div>
     );
   return <SlideDeck title={file.presentation.title} slides={presentationSlides(file.presentation)} className={className} />;

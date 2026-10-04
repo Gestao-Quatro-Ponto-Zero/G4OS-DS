@@ -16,7 +16,13 @@ type OfficeFile = { kind: "xlsx"; workbook: FileWorkbook } | { kind: "docx"; doc
 
 ## OfficeFileError (class)
 
-Erro com mensagem pronta para a pessoa (pt-BR).
+## OfficeFileErrorCode (type)
+
+Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt), unsupported (não é Office), corrupt, network.
+
+```ts
+type OfficeFileErrorCode = "legacy" | "unsupported" | "corrupt" | "network"
+```
 
 ## OfficeSource (type)
 

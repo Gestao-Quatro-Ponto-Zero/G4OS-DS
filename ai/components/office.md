@@ -29,7 +29,7 @@ Exemplo (showcase `#/p/midia-documentos`):
 ## OfficeFileState (type)
 
 ```ts
-type OfficeFileState = | { status: "idle" } | { status: "loading" } | { status: "error"; error: string; retryable: boolean } | { status: "ready"; file: OfficeFile }
+type OfficeFileState = | { status: "idle" } | { status: "loading" } | { status: "error"; error: string; code: OfficeFileErrorCode } | { status: "ready"; file: OfficeFile }
 ```
 
 ## OfficeFileView
@@ -107,7 +107,7 @@ const state = useOfficeFile(url);
 
 ## WorkbookView
 
-Planilha na tela: abas escritas em código (Workbook: título, fonte, cabeçalho na cor da marca, fórmulas e total) ou lidas de um .xlsx (FileWorkbook, de readOfficeFile).
+Planilha na linguagem do DS (mesmo visual do DataGrid): abas no topo, título e fonte acima da tabela, cabeçalho e total fixos, colunas fixas.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
@@ -115,7 +115,7 @@ Planilha na tela: abas escritas em código (Workbook: título, fonte, cabeçalho
 | `actions` | `ReactNode` |  | Ações na barra do visualizador (ex.: botão "Baixar .xlsx" do app). |
 | `className` | `string \| undefined` |  |  |
 | `initialSheet` | `number \| undefined` | `0` |  |
-| `loading` | `boolean \| undefined` |  | Carregando: mostra o esqueleto da grade. |
+| `loading` | `boolean \| undefined` |  | Carregando: mostra o esqueleto da tabela. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

@@ -25542,7 +25542,13 @@
         {
           "name": "OfficeFileError",
           "kind": "class",
-          "summary": "Erro com mensagem pronta para a pessoa (pt-BR)."
+          "summary": null
+        },
+        {
+          "name": "OfficeFileErrorCode",
+          "kind": "type",
+          "summary": "Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt), unsupported (não é Office), corrupt, network.",
+          "definition": "\"legacy\" | \"unsupported\" | \"corrupt\" | \"network\""
         },
         {
           "name": "OfficeSource",
@@ -25629,7 +25635,7 @@
           "name": "OfficeFileState",
           "kind": "type",
           "summary": null,
-          "definition": "| { status: \"idle\" } | { status: \"loading\" } | { status: \"error\"; error: string; retryable: boolean } | { status: \"ready\"; file: OfficeFile }"
+          "definition": "| { status: \"idle\" } | { status: \"loading\" } | { status: \"error\"; error: string; code: OfficeFileErrorCode } | { status: \"ready\"; file: OfficeFile }"
         },
         {
           "name": "OfficeFileView",
@@ -25718,7 +25724,7 @@
         {
           "name": "WorkbookView",
           "kind": "component",
-          "summary": "Planilha na tela: abas escritas em código (Workbook: título, fonte, cabeçalho na cor da marca, fórmulas e total) ou lidas de um .xlsx (FileWorkbook, de readOfficeFile).",
+          "summary": "Planilha na linguagem do DS (mesmo visual do DataGrid): abas no topo, título e fonte acima da tabela, cabeçalho e total fixos, colunas fixas.",
           "props": [
             {
               "name": "workbook",
@@ -25753,7 +25759,7 @@
               "type": "boolean | undefined",
               "required": false,
               "default": null,
-              "description": "Carregando: mostra o esqueleto da grade."
+              "description": "Carregando: mostra o esqueleto da tabela."
             }
           ],
           "examplePage": "midia-planilhas"
