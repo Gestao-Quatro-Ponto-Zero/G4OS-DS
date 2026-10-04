@@ -58,11 +58,16 @@ const regen = {
 
 writeRegistry();
 if (process.argv.includes("--registry")) process.exit(0);
+rmSync(join(out, "chunks"), { recursive: true, force: true });
 const options = {
   entryPoints: [join(here, "main.tsx")],
   bundle: true,
   format: "esm",
-  outfile: join(out, "app.js"),
+  // Código dividido: o que só carrega sob demanda (exceljs e docx ao exportar) vira chunk separado.
+  outdir: out,
+  entryNames: "app",
+  splitting: true,
+  chunkNames: "chunks/[name]-[hash]",
   jsx: "automatic",
   minify: !watch,
   alias: { "@g4ai/ds": join(root, "src/index.ts") },

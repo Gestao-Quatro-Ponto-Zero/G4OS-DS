@@ -72,3 +72,7 @@ export * from "./components/nav-tree";
 // front AE: histórico, progresso e presença (RevisionTimeline, ProjectProgressCard, StackedList, LocationTag)
 export * from "./components/history";
 export * from "./components/presence";
+// Planilhas e documentos com exportação real para Office (WorkbookView, DocumentView, exportXlsx, exportDocx)
+export * from "./lib/office";
+export * from "./lib/office-export";
+export * from "./components/office";

@@ -3326,7 +3326,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "midia-planilhas"
         },
         {
           "name": "OperationFeedback",
@@ -25322,6 +25322,321 @@
         }
       ],
       "doc": "components/presence.md"
+    },
+    {
+      "name": "lib-office",
+      "file": "src/lib/office.ts",
+      "summary": "Modelo de planilha e de documento do DS.",
+      "exports": [
+        {
+          "name": "cellAddress",
+          "kind": "function",
+          "summary": "Endereço A1 a partir de linha/coluna 0-based.",
+          "signature": "cellAddress(row, col): string"
+        },
+        {
+          "name": "CellFormat",
+          "kind": "type",
+          "summary": "Como a coluna é formatada na tela e no Excel.",
+          "definition": "\"text\" | \"integer\" | \"number\" | \"currency\" | \"percent\" | \"date\""
+        },
+        {
+          "name": "CellValue",
+          "kind": "type",
+          "summary": "Valor de célula. Datas: `Date` ou \"AAAA-MM-DD\".",
+          "definition": "string | number | boolean | Date | null | undefined"
+        },
+        {
+          "name": "columnLetter",
+          "kind": "function",
+          "summary": "0 → \"A\", 25 → \"Z\", 26 → \"AA\".",
+          "signature": "columnLetter(index): string"
+        },
+        {
+          "name": "DocBlock",
+          "kind": "type",
+          "summary": null,
+          "definition": "| { type: \"heading\"; text: string; level?: 1 | 2 | 3 } | { type: \"paragraph\"; text: DocText } | { type: \"list\"; items: DocText[]; ordered?: boolean } | { type: \"table\"; columns: DocTableColumn[]; rows: CellValue[][]; caption?: string; totalRow?: boolean } | { type: \"stats\"; items: { label: string; value: string; delta?: string; good?: boolean }[] } | { type: \"callout\"; title?: string; text: Doc…"
+        },
+        {
+          "name": "DocRun",
+          "kind": "type",
+          "summary": "Trecho de texto com ênfase.",
+          "definition": "{ text: string; bold?: boolean; italic?: boolean; href?: string }"
+        },
+        {
+          "name": "docRuns",
+          "kind": "function",
+          "summary": null,
+          "signature": "docRuns(text): DocRun[]"
+        },
+        {
+          "name": "DocTableColumn",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ header: string; format?: CellFormat; digits?: number; width?: number }"
+        },
+        {
+          "name": "DocText",
+          "kind": "type",
+          "summary": null,
+          "definition": "string | DocRun[]"
+        },
+        {
+          "name": "documentOutline",
+          "kind": "function",
+          "summary": "Títulos de nível 1 e 2, na ordem, para sumário e navegação.",
+          "signature": "documentOutline(doc): { index: number; text: string; level: 1 | 2; }[]"
+        },
+        {
+          "name": "evaluateArithmetic",
+          "kind": "function",
+          "summary": "Avalia aritmética simples (+ − * / parênteses) sem `eval`.",
+          "signature": "evaluateArithmetic(expression): number | null"
+        },
+        {
+          "name": "excelNumberFormat",
+          "kind": "function",
+          "summary": "Código de formato numérico do Excel equivalente (o Excel aplica o separador do idioma de quem abre).",
+          "signature": "excelNumberFormat(format, digits?): string | undefined"
+        },
+        {
+          "name": "fileSlug",
+          "kind": "function",
+          "summary": "Nome de arquivo seguro a partir do título: \"Revisão Q3 · 2026\" → \"revisao-q3-2026\".",
+          "signature": "fileSlug(title): string"
+        },
+        {
+          "name": "formatCell",
+          "kind": "function",
+          "summary": "Texto da célula como aparece na tela (pt-BR, mesmas funções de lib/format).",
+          "signature": "formatCell(cell): string"
+        },
+        {
+          "name": "isNumericFormat",
+          "kind": "function",
+          "summary": null,
+          "signature": "isNumericFormat(f): boolean"
+        },
+        {
+          "name": "LaidCell",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ value: CellValue; formula?: string; role: \"title\" | \"description\" | \"header\" | \"data\" | \"total\"; format: CellFormat; digits?: number; span?: boolean; note?: string; }"
+        },
+        {
+          "name": "layoutSheet",
+          "kind": "function",
+          "summary": "Posiciona a aba numa grade com endereços do Excel: título, descrição, cabeçalho, dados e total.",
+          "signature": "layoutSheet(sheet): SheetLayout"
+        },
+        {
+          "name": "OfficeDocument",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ title: string; kicker?: string; subtitle?: string; author?: string; date?: Date | string; cover?: boolean; toc?: boolean; header?: string; footer?: string; blocks: DocBlock[]; }"
+        },
+        {
+          "name": "SheetLayout",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ rows: (LaidCell | null)[][]; colCount: number; headerRow: number; firstDataRow: number; lastDataRow: number; totalRow: number | null; widths: number[]; }"
+        },
+        {
+          "name": "toCellDate",
+          "kind": "function",
+          "summary": "\"2026-10-01\" é dia local (mesma regra de lib/format).",
+          "signature": "toCellDate(v): Date | null"
+        },
+        {
+          "name": "Workbook",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ title: string; author?: string; sheets: WorkbookSheet[]; }"
+        },
+        {
+          "name": "WorkbookAggregate",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"sum\" | \"average\" | \"count\" | \"min\" | \"max\""
+        },
+        {
+          "name": "WorkbookColumn",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ key: string; header: string; format?: CellFormat; digits?: number; width?: number; formula?: string; total?: WorkbookAggregate | { formula: string }; note?: string; }"
+        },
+        {
+          "name": "WorkbookRow",
+          "kind": "type",
+          "summary": null,
+          "definition": "Record<string, CellValue>"
+        },
+        {
+          "name": "WorkbookSheet",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ name: string; title?: string; description?: string; columns: WorkbookColumn[]; rows: WorkbookRow[]; totals?: boolean | string; freezeColumns?: number; }"
+        }
+      ],
+      "doc": "components/lib-office.md"
+    },
+    {
+      "name": "lib-office-export",
+      "file": "src/lib/office-export.ts",
+      "summary": "Exportação real para Office: .xlsx (exceljs) e .docx (docx), com a identidade do DS.",
+      "exports": [
+        {
+          "name": "documentToBlob",
+          "kind": "function",
+          "summary": "Gera o .docx como Blob: capa, sumário, títulos com estilo (aparecem no painel de navegação do Word), listas, tabelas, números, destaques, citação e assinaturas; cabeçalho e \"Página X de Y\" em todas as páginas depois da c",
+          "signature": "documentToBlob(doc, options?): Promise<Blob>"
+        },
+        {
+          "name": "downloadBlob",
+          "kind": "function",
+          "summary": "Baixa um Blob com o nome dado (no navegador).",
+          "signature": "downloadBlob(blob, fileName): void"
+        },
+        {
+          "name": "exportDocx",
+          "kind": "function",
+          "summary": "Gera e baixa o .docx.",
+          "signature": "exportDocx(doc, options?): Promise<Blob>"
+        },
+        {
+          "name": "exportXlsx",
+          "kind": "function",
+          "summary": "Gera e baixa o .xlsx.",
+          "signature": "exportXlsx(workbook, options?): Promise<Blob>"
+        },
+        {
+          "name": "officeTheme",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "OfficeTheme",
+          "kind": "type",
+          "summary": "Cores e fonte dos arquivos.",
+          "definition": "{ brand: string; onBrand: string; accent: string; accentDeep: string; ink: string; inkSoft: string; muted: string; line: string; lineStrong: string; soft: string; ok: string; rose: string; font: string; }"
+        },
+        {
+          "name": "workbookToBlob",
+          "kind": "function",
+          "summary": "Gera o .xlsx como Blob: abas, cabeçalho fixo, filtro, fórmulas vivas, totais e impressão configurada.",
+          "signature": "workbookToBlob(workbook, options?): Promise<Blob>"
+        }
+      ],
+      "doc": "components/lib-office-export.md"
+    },
+    {
+      "name": "office",
+      "file": "src/components/office.tsx",
+      "summary": "Planilhas e documentos na linguagem do DS, com exportação real para Office.",
+      "exports": [
+        {
+          "name": "DocumentView",
+          "kind": "component",
+          "summary": "Documento paginado em A4, com a mesma estrutura do .docx exportado: capa, sumário com número de página, cabeçalho e \"Página X de Y\", tabelas que continuam na página seguinte repetindo o cabeçalho.",
+          "props": [
+            {
+              "name": "document",
+              "type": "OfficeDocument",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "fileName",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do arquivo sem extensão (padrão: título sem acento)."
+            },
+            {
+              "name": "loading",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "showOutline",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Sumário lateral (a partir de 768 px)."
+            },
+            {
+              "name": "theme",
+              "type": "Partial<OfficeTheme> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro)."
+            }
+          ],
+          "examplePage": "midia-documentos"
+        },
+        {
+          "name": "WorkbookView",
+          "kind": "component",
+          "summary": "Planilha na tela, com o mesmo layout do .xlsx exportado: título, fonte, cabeçalho na cor da marca, fórmulas vivas e linha de total.",
+          "props": [
+            {
+              "name": "workbook",
+              "type": "Workbook",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "fileName",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do arquivo sem extensão (padrão: título sem acento)."
+            },
+            {
+              "name": "initialSheet",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": null
+            },
+            {
+              "name": "loading",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Carregando: mostra o esqueleto da grade."
+            },
+            {
+              "name": "theme",
+              "type": "Partial<OfficeTheme> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cores e fonte do arquivo exportado (padrão: tokens G4 do tema claro)."
+            }
+          ],
+          "examplePage": "midia-planilhas"
+        }
+      ],
+      "doc": "components/office.md"
     }
   ],
   "blocks": [

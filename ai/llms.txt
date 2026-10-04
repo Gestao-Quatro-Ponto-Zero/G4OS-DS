@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 448 componentes, gráficos SVG e 140 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 450 componentes, gráficos SVG e 140 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -68,6 +68,9 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [nav-tree](components/nav-tree.md): Navegação com subitens: tipos NavItem/NavGroup/NavSubItem/NavParentItem da Sidebar, WorkspaceMenu, menu da pessoa, SectionNav (docs/ajuda), flyout do trilho recolhido e helpers navMatches/navActiveDeep.
 - [history](components/history.md): Histórico e progresso no tempo.
 - [presence](components/presence.md): Presença: quem está por aqui e onde.
+- [lib-office](components/lib-office.md): Modelo de planilha e de documento do DS.
+- [lib-office-export](components/lib-office-export.md): Exportação real para Office: .xlsx (exceljs) e .docx (docx), com a identidade do DS.
+- [office](components/office.md): Planilhas e documentos na linguagem do DS, com exportação real para Office.
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)
