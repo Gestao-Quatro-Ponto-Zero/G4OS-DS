@@ -76,3 +76,5 @@ export * from "./components/presence";
 export * from "./lib/office";
 export * from "./lib/office-files";
 export * from "./components/office";
+// Reuniões: gravação com saúde, transcrição, notas aprimoradas com autoria e citação de momento
+export * from "./components/meeting";

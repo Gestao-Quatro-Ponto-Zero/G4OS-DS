@@ -56,6 +56,7 @@ const moduleSummary = {
   ai: "Padrões de IA: AskAI, mensagens de chat, SystemMessage, AgentTrace, ToolCallsSection, citações, sugestões.",
   interactive: "Interação e marketing: InputModal, AnimatedModal, LimitDialog, ImageSphere, Hero, FeatureGrid, BeforeAfter, NumberTicker.",
   theme: "ThemeToggle (claro/escuro/sistema).",
+  meeting: "Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.",
   cn: "cn(): concatena classes.",
   portal: "usePortalContainer: portais dentro de <dialog> aberto.",
   text: "Texto pt-BR: normalize (busca sem acento), plural, initials.",
