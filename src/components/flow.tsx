@@ -4,12 +4,15 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import { ArrowRight, Bell, Check, CheckCheck, ChevronDown, Pause, Play, X } from "lucide-react";
 import {
+  forwardRef,
   useCallback,
   useEffect,
   useId,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
+  type ForwardedRef,
   type KeyboardEvent,
   type ReactNode,
   type RefObject,
@@ -613,40 +616,69 @@ function fakePeaks(seed: string, n: number) {
   });
 }
 
+/** Controle imperativo do AudioPlayer (`ref`): pular para um momento citado. */
+export type AudioPlayerHandle = {
+  /** Vai para `t` segundos. `play: true` já começa a tocar. */
+  seekTo: (t: number, options?: { play?: boolean }) => void;
+  play: () => void;
+  pause: () => void;
+};
+
+/** Marca na linha do tempo (decisão, citação, capítulo). */
+export type AudioMarker = { t: number; label: string };
+
 /**
- * Gravação de ligação (CRM), entrevista (ATS) ou mensagem de voz (chat):
+ * Gravação de ligação (CRM), entrevista (ATS), reunião ou mensagem de voz:
  * play/pausa, forma de onda clicável (←/→ voltam/avançam 5 s), tempo e
  * velocidade 1× · 1,5× · 2×. `peaks` (0–1) vem do servidor; sem ele, a
  * forma de onda é decorativa e estável.
+ * Sincronia com transcrição: `onTimeUpdate` informa a posição, `currentTime`
+ * (ou `ref.seekTo`) leva o player a um momento, `markers` desenha marcas.
  */
-export function AudioPlayer({
-  src,
-  title,
-  peaks,
-  duration: durationProp,
-  compact = false,
-  captions,
-  className,
-}: {
-  src: string;
-  /** Nome acessível e rótulo visível ("Ligação com Ana · 12/09"). */
-  title: string;
-  peaks?: number[];
-  /** Duração em segundos, quando já conhecida (mostra antes de carregar). */
-  duration?: number;
-  /** Bolha de mensagem de voz (sem título nem velocidade). */
-  compact?: boolean;
-  /** Legendas/transcrição em WebVTT (.vtt), quando houver. */
-  captions?: string;
-  className?: string;
-}) {
+export const AudioPlayer = forwardRef(function AudioPlayer(
+  {
+    src,
+    title,
+    peaks,
+    duration: durationProp,
+    compact = false,
+    captions,
+    currentTime,
+    onTimeUpdate,
+    markers,
+    className,
+  }: {
+    src: string;
+    /** Nome acessível e rótulo visível ("Ligação com Ana · 12/09"). */
+    title: string;
+    peaks?: number[];
+    /** Duração em segundos, quando já conhecida (mostra antes de carregar). */
+    duration?: number;
+    /** Bolha de mensagem de voz (sem título nem velocidade). */
+    compact?: boolean;
+    /** Legendas/transcrição em WebVTT (.vtt), quando houver. */
+    captions?: string;
+    /** Posição pedida de fora (s). Mudou e difere do player em mais de 1 s: o player pula para lá. */
+    currentTime?: number;
+    /** Posição atual (s), a cada avanço e a cada salto. */
+    onTimeUpdate?: (t: number) => void;
+    /** Marcas na forma de onda (decisões, citações). */
+    markers?: AudioMarker[];
+    className?: string;
+  },
+  ref: ForwardedRef<AudioPlayerHandle>,
+) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(currentTime ?? 0);
   const [duration, setDuration] = useState(durationProp ?? 0);
   const [rate, setRate] = useState(1);
   const bars = useMemo(() => peaks ?? fakePeaks(src + title, compact ? 36 : 64), [peaks, src, title, compact]);
   const progress = duration ? time / duration : 0;
+  const onTimeRef = useRef(onTimeUpdate);
+  useEffect(() => {
+    onTimeRef.current = onTimeUpdate;
+  }, [onTimeUpdate]);
 
   useEffect(() => {
     const a = audio.current;
@@ -659,12 +691,49 @@ export function AudioPlayer({
     if (a.paused) void a.play().catch(() => setPlaying(false));
     else a.pause();
   };
-  const seek = (t: number) => {
-    const a = audio.current;
-    if (!a || !duration) return;
-    a.currentTime = Math.max(0, Math.min(duration, t));
-    setTime(a.currentTime);
-  };
+  // Sem metadados ainda (arquivo carregando), a posição vale assim mesmo: o
+  // elemento de áudio guarda o pedido e a transcrição sincronizada acompanha.
+  const seek = useCallback(
+    (t: number) => {
+      const limit = duration || Number.POSITIVE_INFINITY;
+      const next = Math.max(0, Math.min(limit, t));
+      const a = audio.current;
+      if (a)
+        try {
+          a.currentTime = next;
+        } catch {
+          /* fonte ainda indisponível */
+        }
+      setTime(next);
+      onTimeRef.current?.(next);
+    },
+    [duration],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      seekTo: (t, options) => {
+        seek(t);
+        if (options?.play) void audio.current?.play().catch(() => setPlaying(false));
+      },
+      play: () => void audio.current?.play().catch(() => setPlaying(false)),
+      pause: () => audio.current?.pause(),
+    }),
+    [seek],
+  );
+
+  // `currentTime` controlado: só pula quando o pedido se afasta da posição real
+  // (o eco do próprio onTimeUpdate não reinicia o áudio).
+  const lastRequest = useRef(currentTime);
+  useEffect(() => {
+    if (currentTime == null || currentTime === lastRequest.current) return;
+    lastRequest.current = currentTime;
+    const real = audio.current?.currentTime ?? 0;
+    if (Math.abs(real - currentTime) > 1) seek(currentTime);
+    else setTime(currentTime);
+  }, [currentTime, seek]);
+
   const onKey = (e: KeyboardEvent) => {
     const step = { ArrowRight: 5, ArrowLeft: -5, PageUp: 30, PageDown: -30 }[e.key as string];
     if (step != null) {
@@ -686,7 +755,12 @@ export function AudioPlayer({
         src={src}
         preload="metadata"
         onLoadedMetadata={(e) => Number.isFinite(e.currentTarget.duration) && setDuration(e.currentTarget.duration)}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onTimeUpdate={(e) => {
+          const t = e.currentTarget.currentTime;
+          setTime(t);
+          lastRequest.current = t;
+          onTimeRef.current?.(t);
+        }}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
@@ -716,8 +790,18 @@ export function AudioPlayer({
             const r = e.currentTarget.getBoundingClientRect();
             seek(((e.clientX - r.left) / r.width) * duration);
           }}
-          className="flex h-8 min-w-0 cursor-pointer items-center gap-px rounded outline-none focus-visible:ring-2 focus-visible:ring-muted/50 sm:gap-[2px]"
+          className="relative flex h-8 min-w-0 cursor-pointer items-center gap-px rounded outline-none focus-visible:ring-2 focus-visible:ring-muted/50 sm:gap-[2px]"
         >
+          {duration > 0 &&
+            markers?.map((m) => (
+              <span
+                key={`${m.t}-${m.label}`}
+                title={`${fmtClock(m.t)} · ${m.label}`}
+                aria-hidden
+                className="absolute -top-0.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-accent ring-2 ring-surface"
+                style={{ left: `${Math.min(100, (m.t / duration) * 100)}%` }}
+              />
+            ))}
           {bars.map((p, i) => (
             <span
               key={i}
@@ -744,7 +828,7 @@ export function AudioPlayer({
       )}
     </div>
   );
-}
+});
 
 /* ------------------------------------------------------------------ */
 /* InlineSelect                                                        */

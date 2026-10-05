@@ -17445,14 +17445,14 @@
         {
           "name": "Waveform",
           "kind": "component",
-          "summary": "Forma de onda animada (gravação, modo voz).",
+          "summary": "Forma de onda de gravação (modo voz, reunião).",
           "props": [
             {
               "name": "active",
-              "type": "boolean",
-              "required": true,
+              "type": "boolean | undefined",
+              "required": false,
               "default": null,
-              "description": null
+              "description": "Modo decorativo: anima enquanto true."
             },
             {
               "name": "barClassName",
@@ -17474,9 +17474,37 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "fade",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Esmaece as pontas (a onda \"entra\" pela direita)."
+            },
+            {
+              "name": "level",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nível atual (0–1), ex.: RMS do microfone."
+            },
+            {
+              "name": "levels",
+              "type": "number[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Amostras reais (0–1); mostra as últimas `bars`."
+            },
+            {
+              "name": "processing",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Onda calma e simétrica: processando, gerando notas."
             }
           ],
-          "examplePage": null
+          "examplePage": "reuniao-gravacao"
         }
       ],
       "doc": "components/ai-workspace.md"
@@ -25892,6 +25920,824 @@
         }
       ],
       "doc": "components/office.md"
+    },
+    {
+      "name": "meeting",
+      "file": "src/components/meeting.tsx",
+      "summary": "Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.",
+      "exports": [
+        {
+          "name": "AiNotes",
+          "kind": "component",
+          "summary": "Notas da reunião com autoria visível: o que a pessoa escreveu fica em tinta (`text-ink`); o que a IA completou fica em tom suave com marcador dourado, e cada bullet da IA leva o momento citado (MomentCitation).",
+          "props": [
+            {
+              "name": "sections",
+              "type": "NoteSection[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "currentTime",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Posição do áudio: a citação em andamento fica marcada."
+            },
+            {
+              "name": "labels",
+              "type": "Partial<AiNotesLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSeek",
+              "type": "((t: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onToggleTask",
+              "type": "((id: string, done: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "showLegend",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "turns",
+              "type": "TranscriptTurn[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Transcrição: as citações mostram o trecho no hover."
+            },
+            {
+              "name": "view",
+              "type": "\"mine\" | \"enhanced\" | undefined",
+              "required": false,
+              "default": "\"enhanced\"",
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-notas"
+        },
+        {
+          "name": "aiNotesLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do AiNotes."
+        },
+        {
+          "name": "AiNotesLabels",
+          "kind": "type",
+          "summary": "Textos do AiNotes e do AiNotesToggle.",
+          "definition": "{ mine: string; enhanced: string; toggle: string; legendMe: string; legendAi: string; emptyMine: string; task: (text: string) => string; aiWrote: string; }"
+        },
+        {
+          "name": "AiNotesToggle",
+          "kind": "component",
+          "summary": "Alterna \"Minhas notas\" e \"Notas aprimoradas\".",
+          "props": [
+            {
+              "name": "onChange",
+              "type": "(v: \"mine\" | \"enhanced\") => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "\"mine\" | \"enhanced\"",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "labels",
+              "type": "Partial<AiNotesLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-notas"
+        },
+        {
+          "name": "callDetectedLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do CallDetectedPrompt."
+        },
+        {
+          "name": "CallDetectedLabels",
+          "kind": "type",
+          "summary": "Textos do CallDetectedPrompt.",
+          "definition": "{ title: string; description: (app: string, host?: string) => string; record: string; dismiss: string; never: (app: string) => string; }"
+        },
+        {
+          "name": "CallDetectedPrompt",
+          "kind": "component",
+          "summary": "Aviso discreto quando outro app (Zoom, Meet, Teams) começa a usar o microfone: oferece gravar notas, sem gravar sozinho.",
+          "props": [
+            {
+              "name": "app",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "\"Google Meet\", \"Zoom\", \"Microsoft Teams\"."
+            },
+            {
+              "name": "onRecord",
+              "type": "() => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "host",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Onde roda: \"Chrome\", \"Safari\"."
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ícone ou logo do app (16 px)."
+            },
+            {
+              "name": "labels",
+              "type": "Partial<CallDetectedLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onDismiss",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onNever",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Mostra \"Não perguntar para <app>\"."
+            },
+            {
+              "name": "variant",
+              "type": "\"card\" | \"toast\" | undefined",
+              "required": false,
+              "default": "\"card\"",
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-call-detectada"
+        },
+        {
+          "name": "findTurnAt",
+          "kind": "function",
+          "summary": "Trecho em andamento no instante `t` (o último que começou até `t`).",
+          "signature": "findTurnAt(turns, t): TranscriptTurn | undefined"
+        },
+        {
+          "name": "formatMoment",
+          "kind": "function",
+          "summary": "Segundos → \"12:04\" (ou \"1:02:04\" a partir de uma hora).",
+          "signature": "formatMoment(seconds): string"
+        },
+        {
+          "name": "LiveRecordingIndicator",
+          "kind": "component",
+          "summary": "Gravação de reunião em andamento, com SAÚDE e não só \"gravando\": nível real (`level`, 0–1, RMS do microfone), faixas Você/Outros com sinal ou silêncio e uma frase de saúde (\"ouvindo · 148 palavras no último minuto\").",
+          "props": [
+            {
+              "name": "state",
+              "type": "RecordingState",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "elapsedMs",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Tempo decorrido controlado (ms)."
+            },
+            {
+              "name": "healthText",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "\"ouvindo · 148 palavras no último minuto\" ou o aviso do estado `warning`."
+            },
+            {
+              "name": "labels",
+              "type": "Partial<LiveRecordingLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "level",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nível atual 0–1 (mistura das faixas)."
+            },
+            {
+              "name": "onOpen",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Pílula: clique abre a reunião (ou expande o painel)."
+            },
+            {
+              "name": "onPause",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onResume",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRetry",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onStop",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "startedAt",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Início (epoch ms). O cronômetro anda sozinho enquanto grava."
+            },
+            {
+              "name": "tracks",
+              "type": "RecordingTrack[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"pill\" | \"panel\" | undefined",
+              "required": false,
+              "default": "\"pill\"",
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-gravacao"
+        },
+        {
+          "name": "liveRecordingLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do LiveRecordingIndicator."
+        },
+        {
+          "name": "LiveRecordingLabels",
+          "kind": "type",
+          "summary": "Textos do LiveRecordingIndicator.",
+          "definition": "{ recording: string; paused: string; processing: string; warning: string; failed: string; pause: string; resume: string; stop: string; stopAndEnhance: string; retry: string; open: string; mic: string; system: string; trackOk: string; trackSilent: string; ariaLabel: (state: string, time: string) => string; }"
+        },
+        {
+          "name": "MeetingCard",
+          "kind": "component",
+          "summary": "Linha de uma reunião gravada: horário e duração, título, origem (app da call, \"Nova reunião\"), resumo de uma linha e participantes quando houver.",
+          "props": [
+            {
+              "name": "time",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "\"14:00\"."
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "attendees",
+              "type": "MeetingPerson[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "duration",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"32 min\"."
+            },
+            {
+              "name": "labels",
+              "type": "Partial<MeetingCardLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpen",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "snippet",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Primeira linha das notas ou do resumo."
+            },
+            {
+              "name": "source",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"Google Meet\", \"Zoom\", \"Nova reunião\"."
+            },
+            {
+              "name": "status",
+              "type": "MeetingStatus | undefined",
+              "required": false,
+              "default": "\"done\"",
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-lista-e-cabecalho"
+        },
+        {
+          "name": "meetingCardLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do MeetingCard."
+        },
+        {
+          "name": "MeetingCardLabels",
+          "kind": "type",
+          "summary": "Textos do MeetingCard.",
+          "definition": "Record<Exclude<MeetingStatus, \"done\">, string> & { open: (title: string) => string }"
+        },
+        {
+          "name": "MeetingHeader",
+          "kind": "component",
+          "summary": "Cabeçalho da página de uma reunião: título, data, duração, participantes, modelo de notas (TemplatePicker) e ações (Perguntar, Exportar, Compartilhar).",
+          "props": [
+            {
+              "name": "date",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "\"Hoje, 14:00\" ou \"seg., 6 de out.\" (já formatado)."
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Substitui as ações padrão."
+            },
+            {
+              "name": "attendees",
+              "type": "MeetingPerson[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "duration",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "labels",
+              "type": "Partial<MeetingHeaderLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onAsk",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onExport",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onShare",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "status",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Selo de estado (ex.: gravando, gerando notas)."
+            },
+            {
+              "name": "template",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Chip do modelo (TemplatePicker)."
+            }
+          ],
+          "examplePage": "reuniao-lista-e-cabecalho"
+        },
+        {
+          "name": "meetingHeaderLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do MeetingHeader."
+        },
+        {
+          "name": "MeetingHeaderLabels",
+          "kind": "type",
+          "summary": "Textos do MeetingHeader.",
+          "definition": "{ share: string; export: string; ask: string; attendees: (names: string[]) => string }"
+        },
+        {
+          "name": "MeetingPerson",
+          "kind": "type",
+          "summary": "Participante de reunião.",
+          "definition": "{ name: string; initials?: string; tint?: string; src?: string }"
+        },
+        {
+          "name": "MeetingStatus",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"live\" | \"processing\" | \"done\" | \"gaps\" | \"failed\""
+        },
+        {
+          "name": "MeetingTemplate",
+          "kind": "type",
+          "summary": "Modelo de notas: as seções que a IA preenche.",
+          "definition": "{ id: string; name: string; description?: string; sections: string[] }"
+        },
+        {
+          "name": "meetingTemplates",
+          "kind": "const",
+          "summary": "Modelos padrão (pt-BR)."
+        },
+        {
+          "name": "MomentCitation",
+          "kind": "component",
+          "summary": "Citação de um momento da reunião (\"12:04\") ao lado de um bullet da IA.",
+          "props": [
+            {
+              "name": "t",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Segundos desde o início da gravação."
+            },
+            {
+              "name": "active",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Momento tocando agora."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "labels",
+              "type": "Partial<MomentCitationLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSeek",
+              "type": "((t: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "turn",
+              "type": "TranscriptTurn | undefined",
+              "required": false,
+              "default": null,
+              "description": "Trecho citado: aparece na prévia."
+            }
+          ],
+          "examplePage": "reuniao-transcricao"
+        },
+        {
+          "name": "momentCitationLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do MomentCitation."
+        },
+        {
+          "name": "MomentCitationLabels",
+          "kind": "type",
+          "summary": "Textos do MomentCitation.",
+          "definition": "{ ariaLabel: (time: string, speaker?: string) => string; listen: string; }"
+        },
+        {
+          "name": "NoteAuthor",
+          "kind": "type",
+          "summary": "Quem escreveu: `me` = a pessoa (durante a call), `ai` = a IA (a partir da transcrição).",
+          "definition": "\"me\" | \"ai\""
+        },
+        {
+          "name": "NoteCitation",
+          "kind": "type",
+          "summary": "Momento citado por um bullet.",
+          "definition": "{ t: number; turnId?: string }"
+        },
+        {
+          "name": "NoteItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; text: string; author: NoteAuthor; citations?: NoteCitation[]; task?: { done: boolean; owner?: string }; children?: NoteItem[]; }"
+        },
+        {
+          "name": "NoteSection",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; title: string; author?: NoteAuthor; items: NoteItem[] }"
+        },
+        {
+          "name": "RecordingState",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"recording\" | \"paused\" | \"processing\" | \"warning\" | \"failed\""
+        },
+        {
+          "name": "RecordingTrack",
+          "kind": "type",
+          "summary": "Faixa de captura: `mic` = sua voz, `system` = o que sai do alto-falante (os outros).",
+          "definition": "{ id: \"mic\" | \"system\"; label?: string; level: number; ok: boolean }"
+        },
+        {
+          "name": "TemplatePicker",
+          "kind": "component",
+          "summary": "Escolhe o modelo de notas de uma reunião.",
+          "props": [
+            {
+              "name": "onChange",
+              "type": "(id: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "align",
+              "type": "\"start\" | \"center\" | \"end\" | undefined",
+              "required": false,
+              "default": "\"start\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "labels",
+              "type": "Partial<TemplatePickerLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "templates",
+              "type": "MeetingTemplate[] | undefined",
+              "required": false,
+              "default": "meetingTemplates",
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-lista-e-cabecalho"
+        },
+        {
+          "name": "templatePickerLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do TemplatePicker."
+        },
+        {
+          "name": "TemplatePickerLabels",
+          "kind": "type",
+          "summary": "Textos do TemplatePicker.",
+          "definition": "{ trigger: string; title: string; preview: string }"
+        },
+        {
+          "name": "TranscriptSpeaker",
+          "kind": "type",
+          "summary": "Quem fala num trecho: `me` = microfone (Você), `other` = áudio do sistema (Outros).",
+          "definition": "MeetingPerson & { kind: \"me\" | \"other\" }"
+        },
+        {
+          "name": "TranscriptTurn",
+          "kind": "type",
+          "summary": "Um trecho da transcrição.",
+          "definition": "{ id: string; speaker: TranscriptSpeaker; start: number; end?: number; text: string; partial?: boolean; }"
+        },
+        {
+          "name": "TranscriptView",
+          "kind": "component",
+          "summary": "Transcrição por falante (Você · Outros), com horário clicável.",
+          "props": [
+            {
+              "name": "turns",
+              "type": "TranscriptTurn[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "activeTurnId",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Força o trecho ativo (tem prioridade sobre `currentTime`)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Defina a altura aqui (h-full, max-h-80): a lista rola por dentro."
+            },
+            {
+              "name": "currentTime",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Posição do áudio (s): marca e acompanha o trecho em andamento."
+            },
+            {
+              "name": "highlight",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Trechos citados em destaque (ex.: ao passar o mouse numa citação)."
+            },
+            {
+              "name": "labels",
+              "type": "Partial<TranscriptViewLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Gravação em andamento: acompanha o fim."
+            },
+            {
+              "name": "onQueryChange",
+              "type": "((q: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Com ele, mostra o campo de busca no topo."
+            },
+            {
+              "name": "onSeek",
+              "type": "((t: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "query",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"\"",
+              "description": null
+            }
+          ],
+          "examplePage": "reuniao-transcricao"
+        },
+        {
+          "name": "transcriptViewLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do TranscriptView."
+        },
+        {
+          "name": "TranscriptViewLabels",
+          "kind": "type",
+          "summary": "Textos do TranscriptView.",
+          "definition": "{ label: string; search: string; matches: (n: number) => string; noMatches: string; empty: string; jumpToEnd: string; seek: (speaker: string, time: string) => string; transcribing: string; }"
+        }
+      ],
+      "doc": "components/meeting.md"
     }
   ],
   "blocks": [
@@ -27410,6 +28256,63 @@
         "MarketplaceHero",
         "Page",
         "normalize",
+        "notify"
+      ]
+    },
+    {
+      "slug": "app-meeting-notes",
+      "file": "src/blocks/app-meeting-notes.tsx",
+      "title": "Notas de reunião com IA",
+      "description": "Reunião como página do G4 OS: aviso de call detectada, gravação com saúde do áudio (Você · Outros), notas escritas pela pessoa e aprimoradas pela IA com citação do momento, transcrição sincronizada com o áudio e perguntas sobre a reunião.",
+      "category": "Aplicação",
+      "concept": {
+        "goal": "Deixar a pessoa prestar atenção na conversa: ela anota pouco, o app grava com o áudio sob controle e, ao final, a IA completa as notas com a transcrição, sempre mostrando o que foi a pessoa e o que foi a IA, e de onde veio cada frase.",
+        "patterns": [
+          "Anatomia G · App de altura total: documento à esquerda, transcrição e áudio à direita (ResizableSplit; no celular a transcrição abre por cima)",
+          "Notas primeiro: durante a call só o editor e a pílula de gravação; nada de transcrição rolando por padrão",
+          "Gravação mostra saúde, não só 'gravando': nível real por faixa e aviso com a ação ('verifique a saída de som')",
+          "Autoria visível: texto da pessoa em tinta, texto da IA em tom suave com marcador dourado e citação '12:04' que leva ao momento",
+          "Sem agenda: gravar começa pela call detectada, por 'Nova reunião' ou dentro de uma página existente"
+        ],
+        "adapt": [
+          "Entrevistas (ATS): modelo 'Entrevista' e notas por critério",
+          "Discovery de vendas (CRM): modelo 'Vendas' e próximos passos viram tarefas no negócio",
+          "Atendimento e 1:1 de gestão: mesmo fluxo, outro modelo"
+        ],
+        "avoid": [
+          "Gravar sozinho ao detectar a call (sempre pergunte)",
+          "Misturar texto da IA com o da pessoa sem distinção",
+          "Bullet da IA sem citação do momento",
+          "Pílula de gravação sem nível de áudio (a pessoa só descobre o silêncio no fim)"
+        ]
+      },
+      "uses": [
+        "AiMark",
+        "AiNotes",
+        "AiNotesToggle",
+        "ArtifactCard",
+        "Button",
+        "CallDetectedPrompt",
+        "ChatComposer",
+        "FilterChip",
+        "IconButton",
+        "LiveRecordingIndicator",
+        "MeetingCard",
+        "MeetingHeader",
+        "MeetingPerson",
+        "MeetingStatus",
+        "MomentCitation",
+        "NoteSection",
+        "Page",
+        "PageHeading",
+        "RecordingState",
+        "ResizableSplit",
+        "SegmentedControl",
+        "TemplatePicker",
+        "TranscriptSpeaker",
+        "TranscriptTurn",
+        "TranscriptView",
+        "findTurnAt",
         "notify"
       ]
     },

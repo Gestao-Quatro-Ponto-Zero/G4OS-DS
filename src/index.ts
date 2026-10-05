@@ -61,7 +61,7 @@ export * from "./components/questionnaire";
 export * from "./components/data-view";
 // front Y
 export { Announcement, AudioPlayer, FormWizard, InlineSelect, NotificationCenter, SaveBar, Tour, useTour } from "./components/flow";
-export type { InlineOption, NotificationItem, TourStep, WizardStep } from "./components/flow";
+export type { AudioMarker, AudioPlayerHandle, InlineOption, NotificationItem, TourStep, WizardStep } from "./components/flow";
 export { effectiveBackground, surfaceTone, useReadableFills } from "./lib/readable";
 // front AA: paridade de recursos com shadcn/ui base (Attachment, Command componível, Bubble, Marker, MessageScroller)
 export * from "./components/attachment";
@@ -76,3 +76,5 @@ export * from "./components/presence";
 export * from "./lib/office";
 export * from "./lib/office-files";
 export * from "./components/office";
+// Reuniões: gravação com saúde, transcrição, notas aprimoradas com autoria e citação de momento
+export * from "./components/meeting";
