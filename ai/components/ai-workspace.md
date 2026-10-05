@@ -90,29 +90,30 @@ O agente pede permissão antes de uma ação com efeito externo (enviar e-mail, 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `title` * | `string` |  |  |
+| `actions` | `ReactNode` |  | Substitui os botões padrão (aprovar, sempre, editar, recusar) enquanto pende. |
+| `children` | `ReactNode` |  | Conteúdo extra entre o preview e o rodapé (detalhes, campos, avisos). |
 | `className` | `string \| undefined` |  |  |
+| `compact` | `boolean \| undefined` | `false` | Estado decidido (qualquer um menos "pending") vira uma linha: ícone, estado, título e impacto. |
 | `description` | `ReactNode` |  |  |
+| `eyebrow` | `ReactNode` |  | Sobrelinha do pedido pendente ("Comando no terminal"). |
+| `icon` | `ReactNode` |  | Ícone do pedido pendente. |
 | `impact` | `ReactNode` |  | "42 clientes", "R$ 18.400 em faturas". |
-| `labels` | `Partial<ApprovalRequestLabels> \| undefined` |  | Textos dos botões, da sobrelinha e do nome acessível. |
+| `labels` | `Partial<ApprovalRequestLabels> \| undefined` |  | Textos dos botões, da sobrelinha, dos estados e do nome acessível. |
 | `onApprove` | `(() => void) \| undefined` |  |  |
 | `onApproveAlways` | `(() => void) \| undefined` |  |  |
 | `onEdit` | `(() => void) \| undefined` |  |  |
 | `onReject` | `(() => void) \| undefined` |  |  |
 | `preview` | `ReactNode` |  |  |
-| `risk` | `"medium" \| "low" \| "high" \| undefined` | `"medium"` |  |
+| `risk` | `"medium" \| "low" \| "high" \| undefined` | `"medium"` | Risco da ação. Define o tom quando `tone` não vem: low = info, medium = warn, high = bad. |
 | `state` | `ApprovalState \| undefined` | `"pending"` |  |
+| `tone` | `ApprovalTone \| undefined` |  | Aparência do pedido pendente (borda e ícone). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
 Exemplo (showcase `#/p/ia-raciocinio-e-aprovacao`):
 
 ```tsx
-<ApprovalRequest
-  title="Enviar lembrete de pagamento para 42 clientes"
-  description="Não dá para desfazer depois de enviado."
-  impact="42 clientes · R$ 318,4 mil" risk="high" state={state}
-  preview={<Rascunho />}
-  onApprove={…} onApproveAlways={…} onEdit={…} onReject={…} />
+<ApprovalRequest compact state="approved" title="Enviar lembrete para 42 clientes" impact="42 clientes" />
 ```
 
 ## approvalRequestLabels (const)
@@ -124,13 +125,21 @@ Textos padrão (pt-BR) do ApprovalRequest; base para traduzir só o que muda.
 Textos do ApprovalRequest.
 
 ```ts
-type ApprovalRequestLabels = { eyebrow: string; approve: string; approveAlways: string; edit: string; reject: string; approved: string; approvedAlways: string; rejected: string; ariaLabel: (title: string) => string; }
+type ApprovalRequestLabels = { eyebrow: string; approve: string; approveAlways: string; edit: string; reject: string; approved: string; approvedAlways: string; rejected: string; expired: string; superseded: string; ariaLabel: (title: string) => string; }
 ```
 
 ## ApprovalState (type)
 
 ```ts
-type ApprovalState = "pending" | "approved" | "always" | "rejected"
+type ApprovalState = "pending" | "approved" | "always" | "rejected" | "expired" | "superseded"
+```
+
+## ApprovalTone (type)
+
+Aparência do pedido pendente.
+
+```ts
+type ApprovalTone = "neutral" | "info" | "warn" | "bad"
 ```
 
 ## ArtifactCard

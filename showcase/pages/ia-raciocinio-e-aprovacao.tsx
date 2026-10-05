@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { BrainCircuit, Code, FileText, Search } from "lucide-react";
-import { AgentPlan, ApprovalRequest, ReasoningBlock, notify, type ApprovalState } from "@g4ai/ds";
+import { BrainCircuit, Code, FileText, Search, Terminal } from "lucide-react";
+import { AgentPlan, ApprovalRequest, Button, ReasoningBlock, notify, type ApprovalState } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = { title: "Raciocínio, plano e aprovação", group: "IA e interação", order: 23, description: "ReasoningBlock (pensou por N s), AgentPlan (o que vai fazer e onde está) e ApprovalRequest (humano no controle antes de ações com efeito externo)." };
@@ -103,13 +103,90 @@ export default function Page() {
             />
           </div>
         </Demo>
+        <Demo
+          bare
+          title="Tons"
+          description="Sem `tone`, a aparência vem do `risk`: low = info, medium = warn, high = bad. `tone` sobrepõe quando o risco não diz tudo (neutral para pedidos rotineiros)."
+          code={`<ApprovalRequest risk="low" title="Criar rascunho no CRM" />          // info
+<ApprovalRequest risk="medium" title="Atualizar 12 negócios" />      // warn
+<ApprovalRequest risk="high" title="Cobrar 42 clientes" />           // bad
+<ApprovalRequest tone="neutral" title="Ler a planilha de metas" />`}
+        >
+          <div className="grid max-w-[680px] gap-3">
+            <ApprovalRequest risk="low" title="Criar rascunho de proposta no CRM" description="Fica como rascunho; ninguém recebe nada." impact="1 negócio" onApprove={() => notify("Aprovado")} onReject={() => notify("Recusado", undefined, "info")} />
+            <ApprovalRequest risk="medium" title="Atualizar a etapa de 12 negócios" description="Move de Proposta para Negociação." impact="12 negócios" onApprove={() => notify("Aprovado")} onReject={() => notify("Recusado", undefined, "info")} />
+            <ApprovalRequest risk="high" title="Cobrar 42 clientes no cartão" description="Não dá para desfazer depois de cobrado." impact="R$ 318,4 mil" onApprove={() => notify("Aprovado")} onReject={() => notify("Recusado", undefined, "info")} />
+            <ApprovalRequest tone="neutral" title="Ler a planilha de metas do trimestre" description="Só leitura, dentro da empresa." onApprove={() => notify("Aprovado")} onReject={() => notify("Recusado", undefined, "info")} />
+          </div>
+        </Demo>
+        <Demo
+          bare
+          title="Sobrelinha, ícone, corpo e ações próprios"
+          description="`eyebrow` e `icon` dizem que tipo de pedido é; `children` entra entre o preview e o rodapé; `actions` substitui os botões padrão."
+          code={`<ApprovalRequest tone="warn" eyebrow="Comando no terminal" icon={<Terminal />}
+  title="Rodar a migração do banco" preview={<code>npm run db:migrate</code>}
+  actions={<><Button size="sm">Rodar</Button><Button size="sm" variant="ghost">Agora não</Button></>}>
+  <p>Afeta 3 tabelas em produção.</p>
+</ApprovalRequest>`}
+        >
+          <div className="max-w-[680px]">
+            <ApprovalRequest
+              tone="warn"
+              eyebrow="Comando no terminal"
+              icon={<Terminal />}
+              title="Rodar a migração do banco"
+              preview={<code className="font-mono text-[12px]">npm run db:migrate -- --env produção</code>}
+              actions={
+                <>
+                  <Button size="sm" onClick={() => notify("Migração iniciada")}>Rodar</Button>
+                  <Button size="sm" variant="ghost" onClick={() => notify("Nada foi executado", undefined, "info")}>Agora não</Button>
+                </>
+              }
+            >
+              <p className="m-0">Afeta 3 tabelas em produção: pedidos, faturas e clientes.</p>
+            </ApprovalRequest>
+          </div>
+        </Demo>
+        <Demo
+          bare
+          title="Depois da decisão"
+          description="Aprovado, sempre aprovado, recusado, expirado (venceu sem resposta) e substituído (um pedido mais novo tomou o lugar). Sem botões; o cartão vira registro."
+          code={`<ApprovalRequest state="approved" … />
+<ApprovalRequest state="always" … />
+<ApprovalRequest state="rejected" … />
+<ApprovalRequest state="expired" … />
+<ApprovalRequest state="superseded" … />`}
+        >
+          <div className="grid max-w-[680px] gap-3">
+            {(["approved", "always", "rejected", "expired", "superseded"] as const).map((st) => (
+              <ApprovalRequest key={st} state={st} risk="high" title="Enviar lembrete de pagamento para 42 clientes" impact="42 clientes" />
+            ))}
+          </div>
+        </Demo>
+        <Demo
+          bare
+          title="Compacto"
+          description="`compact` reduz um pedido decidido a uma linha (ícone, estado, título, impacto). Bom para o histórico da conversa. Pedido pendente ignora `compact`."
+          code={`<ApprovalRequest compact state="approved" title="Enviar lembrete para 42 clientes" impact="42 clientes" />`}
+        >
+          <div className="grid max-w-[680px] gap-2">
+            {(["approved", "always", "rejected", "expired", "superseded"] as const).map((st) => (
+              <ApprovalRequest key={st} compact state={st} title="Enviar lembrete de pagamento para 42 clientes" impact="42 clientes" />
+            ))}
+          </div>
+        </Demo>
         <PropsTable
           rows={[
-            ["state", '"pending" | "approved" | "always" | "rejected"', '"pending"', "Depois da decisão, o cartão vira registro (sem botões)."],
-            ["risk", '"low" | "medium" | "high"', '"medium"', "high = borda rosa; medium = âmbar."],
+            ["state", '"pending" | "approved" | "always" | "rejected" | "expired" | "superseded"', '"pending"', "Depois da decisão, o cartão vira registro (sem botões). expired = venceu sem resposta; superseded = outro pedido tomou o lugar."],
+            ["risk", '"low" | "medium" | "high"', '"medium"', "Define o tom quando `tone` não vem: low = info, medium = warn, high = bad."],
+            ["tone", '"neutral" | "info" | "warn" | "bad"', "do risk", "Aparência do pedido pendente (borda e ícone). Sobrepõe a derivada do risk."],
+            ["eyebrow / icon", "ReactNode", "labels.eyebrow / escudo", "Sobrelinha e ícone do pedido pendente (“Comando no terminal”). Decidido, mostra o estado."],
             ["impact / preview", "ReactNode", "—", "O que e quanto: “42 clientes”, o rascunho do e-mail."],
+            ["children", "ReactNode", "—", "Corpo extra entre o preview e o rodapé (detalhes, avisos, campos)."],
+            ["actions", "ReactNode", "botões padrão", "Substitui aprovar/sempre/editar/recusar enquanto pende. Mantenha um primário."],
+            ["compact", "boolean", "false", "Estado decidido vira uma linha: ícone, estado, título e impacto."],
             ["onApproveAlways", "() => void", "—", "Mostra “Sempre aprovar este tipo”. Use só para ações reversíveis ou de baixo risco."],
-            ["labels", "Partial<ApprovalRequestLabels>", "pt-BR", "Textos da sobrelinha, dos botões, dos estados e do nome acessível (ariaLabel recebe o título). Passe só o que muda; o resto fica em pt-BR (approvalRequestLabels)."],
+            ["labels", "Partial<ApprovalRequestLabels>", "pt-BR", "Textos da sobrelinha, dos botões, dos estados (inclusive expired e superseded) e do nome acessível (ariaLabel recebe o título). Passe só o que muda; o resto fica em pt-BR (approvalRequestLabels)."],
           ]}
         />
       </DocSection>
