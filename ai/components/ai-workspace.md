@@ -93,6 +93,7 @@ O agente pede permissão antes de uma ação com efeito externo (enviar e-mail, 
 | `className` | `string \| undefined` |  |  |
 | `description` | `ReactNode` |  |  |
 | `impact` | `ReactNode` |  | "42 clientes", "R$ 18.400 em faturas". |
+| `labels` | `Partial<ApprovalRequestLabels> \| undefined` |  | Textos dos botões, da sobrelinha e do nome acessível. |
 | `onApprove` | `(() => void) \| undefined` |  |  |
 | `onApproveAlways` | `(() => void) \| undefined` |  |  |
 | `onEdit` | `(() => void) \| undefined` |  |  |
@@ -112,6 +113,18 @@ Exemplo (showcase `#/p/ia-raciocinio-e-aprovacao`):
   impact="42 clientes · R$ 318,4 mil" risk="high" state={state}
   preview={<Rascunho />}
   onApprove={…} onApproveAlways={…} onEdit={…} onReject={…} />
+```
+
+## approvalRequestLabels (const)
+
+Textos padrão (pt-BR) do ApprovalRequest; base para traduzir só o que muda.
+
+## ApprovalRequestLabels (type)
+
+Textos do ApprovalRequest.
+
+```ts
+type ApprovalRequestLabels = { eyebrow: string; approve: string; approveAlways: string; edit: string; reject: string; approved: string; approvedAlways: string; rejected: string; ariaLabel: (title: string) => string; }
 ```
 
 ## ApprovalState (type)

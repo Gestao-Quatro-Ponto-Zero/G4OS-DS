@@ -109,6 +109,7 @@ export default function Page() {
             ["risk", '"low" | "medium" | "high"', '"medium"', "high = borda rosa; medium = âmbar."],
             ["impact / preview", "ReactNode", "—", "O que e quanto: “42 clientes”, o rascunho do e-mail."],
             ["onApproveAlways", "() => void", "—", "Mostra “Sempre aprovar este tipo”. Use só para ações reversíveis ou de baixo risco."],
+            ["labels", "Partial<ApprovalRequestLabels>", "pt-BR", "Textos da sobrelinha, dos botões, dos estados e do nome acessível (ariaLabel recebe o título). Passe só o que muda; o resto fica em pt-BR (approvalRequestLabels)."],
           ]}
         />
       </DocSection>
