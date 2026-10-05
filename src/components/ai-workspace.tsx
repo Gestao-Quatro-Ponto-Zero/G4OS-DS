@@ -1516,23 +1516,91 @@ export function AgentMessage({
 
 export type SlashCommand = { id: string; label: string; description?: string; icon?: ReactNode };
 
-/** Forma de onda animada (gravação, modo voz). Respeita movimento reduzido. */
-export function Waveform({ active, className, barClassName = "bg-rose/80", bars: count = 28 }: { active: boolean; className?: string; barClassName?: string; bars?: number }) {
-  const [bars, setBars] = useState<number[]>(() => Array.from({ length: count }, () => 0.2));
+/**
+ * Forma de onda de gravação (modo voz, reunião). Três fontes, nesta ordem:
+ * `levels` (0–1, já amostrados: o último fica à direita), `level` (0–1, o
+ * nível atual, ex.: RMS do microfone; o componente guarda o histórico e rola
+ * enquanto `active` não for false) ou, sem nenhum dos dois, barras
+ * decorativas aleatórias enquanto `active`. `processing` troca por uma onda
+ * calma (gerando notas). Respeita movimento reduzido.
+ */
+export function Waveform({
+  active,
+  className,
+  barClassName = "bg-rose/80",
+  bars: count = 28,
+  levels,
+  level,
+  processing = false,
+  fade = false,
+}: {
+  /** Modo decorativo: anima enquanto true. Com `level`, false congela o histórico. */
+  active?: boolean;
+  className?: string;
+  barClassName?: string;
+  bars?: number;
+  /** Amostras reais (0–1); mostra as últimas `bars`. */
+  levels?: number[];
+  /** Nível atual (0–1), ex.: RMS do microfone. Amostrado a cada 90 ms. */
+  level?: number;
+  /** Onda calma e simétrica: processando, gerando notas. */
+  processing?: boolean;
+  /** Esmaece as pontas (a onda "entra" pela direita). */
+  fade?: boolean;
+}) {
+  const [bars, setBars] = useState<number[]>(() => Array.from({ length: count }, () => (levels || level != null ? 0 : 0.2)));
+  const levelRef = useRef(level ?? 0);
   useEffect(() => {
-    if (!active) return;
+    levelRef.current = level ?? 0;
+  }, [level]);
+  const live = level != null && !levels && !processing;
+  const sampling = live && active !== false;
+  const decorative = !levels && level == null && !processing && !!active;
+
+  useEffect(() => {
+    if (!sampling) return;
+    const t = setInterval(() => setBars((b) => [...b.slice(b.length >= count ? 1 : 0), Math.max(0, Math.min(1, levelRef.current))]), 90);
+    return () => clearInterval(t);
+  }, [sampling, count]);
+
+  useEffect(() => {
+    if (!decorative && !processing) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      setBars(Array.from({ length: count }, (_, i) => 0.3 + ((i * 7) % 5) / 10));
+      setBars(Array.from({ length: count }, (_, i) => (processing ? 0.25 : 0.3 + ((i * 7) % 5) / 10)));
       return;
+    }
+    if (processing) {
+      let phase = 0;
+      const t = setInterval(() => {
+        phase += 0.25;
+        setBars(Array.from({ length: count }, (_, i) => {
+          const x = (i - count / 2) / (count / 2);
+          return (0.22 + 0.18 * Math.sin(phase + x * 3) + 0.1 * Math.cos(phase * 0.6 - x * 2)) * (1 - Math.abs(x) * 0.45);
+        }));
+      }, 90);
+      return () => clearInterval(t);
     }
     const t = setInterval(() => setBars((b) => [...b.slice(1), 0.15 + Math.random() * 0.85]), 90);
     return () => clearInterval(t);
-  }, [active, count]);
+  }, [decorative, processing, count]);
+
+  // Amostras dadas: as últimas `count`, completadas à esquerda com silêncio.
+  const shown = levels && !processing ? [...Array.from({ length: Math.max(0, count - levels.length) }, () => 0), ...levels.slice(-count)] : bars;
+  const real = !!levels || level != null;
   return (
-    <span className={cn("flex h-6 flex-1 items-center gap-[3px] overflow-hidden", className)} aria-hidden>
-      {bars.map((h, i) => (
-        <span key={i} className={cn("w-[3px] shrink-0 rounded-full transition-[height] duration-100", barClassName)} style={{ height: `${Math.round(h * 100)}%` }} />
+    <span
+      className={cn("flex h-6 flex-1 items-center gap-[3px] overflow-hidden", className)}
+      style={fade ? { maskImage: "linear-gradient(to right, transparent, black 24%, black)", WebkitMaskImage: "linear-gradient(to right, transparent, black 24%, black)" } : undefined}
+      aria-hidden
+    >
+      {shown.map((h, i) => (
+        <span
+          key={i}
+          className={cn("w-[3px] shrink-0 rounded-full transition-[height] duration-100", barClassName)}
+          // Com nível real, silêncio vira um ponto (a onda não some): a pessoa vê que está gravando.
+          style={{ height: real ? `max(3px, ${Math.round(Math.max(0, Math.min(1, h)) * 100)}%)` : `${Math.round(h * 100)}%` }}
+        />
       ))}
     </span>
   );
