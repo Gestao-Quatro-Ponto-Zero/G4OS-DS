@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- 86d1944: `ApprovalRequest` aceita `labels` (sobrelinha, botões, estados e nome acessível) para apps em outro idioma; o padrão continua em pt-BR (`approvalRequestLabels`).
+
 ## 0.6.5
 
 ### Patch Changes

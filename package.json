@@ -1,6 +1,6 @@
 {
   "name": "@g4ai/ds",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "description": "Design system G4 OS: tokens, componentes React (Base UI + Tailwind v4), gráficos e blocos de tela para construir CRM, ATS, ERP e qualquer produto.",
   "license": "MIT",
   "author": "Gestão 4.0 (G4 Educação)",
