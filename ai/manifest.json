@@ -16559,6 +16559,13 @@
               "description": "\"42 clientes\", \"R$ 18.400 em faturas\"."
             },
             {
+              "name": "labels",
+              "type": "Partial<ApprovalRequestLabels> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Textos dos botões, da sobrelinha e do nome acessível."
+            },
+            {
               "name": "onApprove",
               "type": "(() => void) | undefined",
               "required": false,
@@ -16609,6 +16616,17 @@
             }
           ],
           "examplePage": "ia-raciocinio-e-aprovacao"
+        },
+        {
+          "name": "approvalRequestLabels",
+          "kind": "const",
+          "summary": "Textos padrão (pt-BR) do ApprovalRequest; base para traduzir só o que muda."
+        },
+        {
+          "name": "ApprovalRequestLabels",
+          "kind": "type",
+          "summary": "Textos do ApprovalRequest.",
+          "definition": "{ eyebrow: string; approve: string; approveAlways: string; edit: string; reject: string; approved: string; approvedAlways: string; rejected: string; ariaLabel: (title: string) => string; }"
         },
         {
           "name": "ApprovalState",

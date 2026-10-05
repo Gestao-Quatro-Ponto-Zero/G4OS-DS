@@ -1144,10 +1144,42 @@ export function ReasoningBlock({
 
 export type ApprovalState = "pending" | "approved" | "always" | "rejected";
 
+/** Textos do ApprovalRequest. Passe só o que muda (outro idioma, outro tom). */
+export type ApprovalRequestLabels = {
+  /** Sobrelinha enquanto pende. */
+  eyebrow: string;
+  approve: string;
+  approveAlways: string;
+  edit: string;
+  reject: string;
+  /** Sobrelinha depois de aprovar uma vez. */
+  approved: string;
+  /** Sobrelinha depois de "Sempre aprovar este tipo". */
+  approvedAlways: string;
+  /** Sobrelinha depois de recusar. */
+  rejected: string;
+  /** Nome acessível do cartão; recebe o título. */
+  ariaLabel: (title: string) => string;
+};
+
+/** Textos padrão (pt-BR) do ApprovalRequest; base para traduzir só o que muda. */
+export const approvalRequestLabels: ApprovalRequestLabels = {
+  eyebrow: "Precisa da sua aprovação",
+  approve: "Aprovar",
+  approveAlways: "Sempre aprovar este tipo",
+  edit: "Editar",
+  reject: "Recusar",
+  approved: "Aprovado",
+  approvedAlways: "Aprovado · sempre para este tipo",
+  rejected: "Recusado",
+  ariaLabel: (title) => `Aprovação: ${title}`,
+};
+
 /**
  * O agente pede permissão antes de uma ação com efeito externo (enviar e-mail,
  * alterar registros, cobrar). Mostra o que vai acontecer (preview), o impacto
  * e três saídas: aprovar (uma vez ou sempre para este tipo), editar, recusar.
+ * `labels` troca os textos (idioma do app); o que faltar fica em pt-BR.
  */
 export function ApprovalRequest({
   title,
@@ -1156,6 +1188,7 @@ export function ApprovalRequest({
   impact,
   risk = "medium",
   state = "pending",
+  labels,
   onApprove,
   onApproveAlways,
   onEdit,
@@ -1169,17 +1202,20 @@ export function ApprovalRequest({
   impact?: ReactNode;
   risk?: "low" | "medium" | "high";
   state?: ApprovalState;
+  /** Textos dos botões, da sobrelinha e do nome acessível. Padrão em pt-BR. */
+  labels?: Partial<ApprovalRequestLabels>;
   onApprove?: () => void;
   onApproveAlways?: () => void;
   onEdit?: () => void;
   onReject?: () => void;
   className?: string;
 }) {
+  const l = { ...approvalRequestLabels, ...labels };
   const pending = state === "pending";
   const done = state === "approved" || state === "always";
   return (
     <section
-      aria-label={`Aprovação: ${title}`}
+      aria-label={l.ariaLabel(title)}
       className={cn(
         "min-w-0 overflow-hidden rounded-xl border bg-surface",
         pending ? (risk === "high" ? "border-rose/35" : "border-amber/40") : "border-line",
@@ -1191,7 +1227,7 @@ export function ApprovalRequest({
           {pending ? <ShieldAlert className="h-4 w-4" /> : done ? <ShieldCheck className="h-4 w-4" /> : <X className="h-4 w-4" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{pending ? "Precisa da sua aprovação" : done ? (state === "always" ? "Aprovado · sempre para este tipo" : "Aprovado") : "Recusado"}</p>
+          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{pending ? l.eyebrow : done ? (state === "always" ? l.approvedAlways : l.approved) : l.rejected}</p>
           <h3 className="m-0 mt-0.5 text-[14px] font-medium leading-snug">{title}</h3>
           {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
         </div>
@@ -1201,21 +1237,21 @@ export function ApprovalRequest({
       {pending ? (
         <footer className="mt-3 flex flex-wrap items-center gap-2 border-t border-line bg-soft/40 px-4 py-3">
           <button type="button" onClick={onApprove} className="ui-button ui-button-primary inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-medium text-on-primary hover:bg-primary/90">
-            <ShieldCheck className="h-4 w-4" /> Aprovar
+            <ShieldCheck className="h-4 w-4" /> {l.approve}
           </button>
           {onApproveAlways && (
             <button type="button" onClick={onApproveAlways} className="inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft">
-              Sempre aprovar este tipo
+              {l.approveAlways}
             </button>
           )}
           {onEdit && (
             <button type="button" onClick={onEdit} className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft">
-              <Pencil className="h-3.5 w-3.5" /> Editar
+              <Pencil className="h-3.5 w-3.5" /> {l.edit}
             </button>
           )}
           {onReject && (
             <button type="button" onClick={onReject} className="ml-auto inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-muted hover:bg-soft hover:text-rose">
-              Recusar
+              {l.reject}
             </button>
           )}
         </footer>
