@@ -233,7 +233,7 @@ export function LiveRecordingIndicator({
       bars={bars}
       fade
       barClassName={tone}
-      className={cn("h-4 flex-none gap-[2px] [&>span]:w-[2px]", cls)}
+      className={cn("!h-4 !gap-[2px] [&>span]:!w-[2px]", cls)}
     />
   );
 
@@ -241,11 +241,11 @@ export function LiveRecordingIndicator({
     const summary = (
       <>
         <RecordingGlyph state={state} />
-        {wave(14, mix, "w-[44px]")}
+        {wave(14, mix, "w-[44px] !flex-none")}
         <span className="text-[12.5px] font-medium tabular-nums text-ink">{time}</span>
-        {(state === "warning" || state === "failed" || state === "processing") && (
-          <span className={cn("hidden min-w-0 max-w-[260px] truncate text-[12.5px] sm:inline", state === "warning" ? "text-amber" : "text-muted")}>
-            {state === "warning" && healthText ? healthText : stateLabel}
+        {(healthText || state !== "recording") && (
+          <span className={cn("hidden min-w-0 max-w-[360px] truncate text-[12.5px] sm:inline", state === "warning" ? "text-amber" : "text-muted")}>
+            {(state === "recording" || state === "warning") && healthText ? healthText : stateLabel}
           </span>
         )}
       </>
@@ -268,22 +268,22 @@ export function LiveRecordingIndicator({
           <span className="flex h-8 min-w-0 items-center gap-2 px-2.5">{summary}</span>
         )}
         {canPause && (
-          <IconButton size="sm" label={l.pause} onClick={onPause} className="rounded-full">
+          <IconButton size="sm" label={l.pause} onClick={onPause} className="!rounded-full">
             <Pause />
           </IconButton>
         )}
         {canResume && (
-          <IconButton size="sm" label={l.resume} onClick={onResume} className="rounded-full">
+          <IconButton size="sm" label={l.resume} onClick={onResume} className="!rounded-full">
             <Mic />
           </IconButton>
         )}
         {state === "failed" && onRetry && (
-          <IconButton size="sm" label={l.retry} onClick={onRetry} className="rounded-full">
+          <IconButton size="sm" label={l.retry} onClick={onRetry} className="!rounded-full">
             <Play />
           </IconButton>
         )}
         {(running || state === "paused") && onStop && (
-          <IconButton size="sm" label={l.stop} onClick={onStop} className="rounded-full text-ink">
+          <IconButton size="sm" label={l.stop} onClick={onStop} className="!rounded-full !text-ink">
             <Square className="!h-3 !w-3 fill-current" />
           </IconButton>
         )}
@@ -315,7 +315,7 @@ export function LiveRecordingIndicator({
               <li key={t.id} className="flex h-8 items-center gap-2.5 px-4">
                 <Icon className={cn("h-3.5 w-3.5 shrink-0", silent ? "text-amber" : "text-muted")} aria-hidden />
                 <span className="w-14 shrink-0 truncate text-[12.5px] text-ink">{name}</span>
-                {wave(26, t.ok ? t.level : 0, "min-w-0 flex-1", silent ? "bg-amber/60" : waveTone[state])}
+                {wave(40, t.ok ? t.level : 0, "min-w-0", silent ? "bg-amber/60" : running ? "bg-ink/55" : waveTone[state])}
                 <span className={cn("w-16 shrink-0 text-right text-[11.5px]", silent ? "text-amber" : "text-muted")}>{t.ok ? l.trackOk : l.trackSilent}</span>
               </li>
             );
@@ -966,7 +966,7 @@ export function MeetingCard({
   const meta = [source, snippet].filter(Boolean).join(" · ");
   return (
     <div className={cn("group relative flex min-w-0 items-center gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-soft", className)}>
-      <div className="w-12 shrink-0 text-right">
+      <div className="w-14 shrink-0 whitespace-nowrap text-right">
         <div className="text-[13px] font-medium tabular-nums text-ink">{time}</div>
         {duration && <div className="text-[11.5px] tabular-nums text-muted">{duration}</div>}
       </div>
@@ -984,7 +984,11 @@ export function MeetingCard({
         </div>
         {meta && <p className="m-0 mt-0.5 truncate text-[12.5px] text-muted">{meta}</p>}
       </div>
-      {attendees && attendees.length > 0 && <AvatarGroup people={attendees} max={3} size="xs" stacked className="hidden sm:inline-flex" />}
+      {attendees && attendees.length > 0 && (
+        <span className="hidden shrink-0 sm:inline-flex">
+          <AvatarGroup people={attendees} max={3} size="sm" stacked />
+        </span>
+      )}
       {action && <div className="relative z-10 shrink-0">{action}</div>}
     </div>
   );
@@ -1008,7 +1012,7 @@ export const meetingHeaderLabels: MeetingHeaderLabels = {
 /**
  * Cabeçalho da página de uma reunião: título, data, duração, participantes,
  * modelo de notas (TemplatePicker) e ações (Perguntar, Exportar,
- * Compartilhar). No celular as ações viram ícones.
+ * Compartilhar). Perguntar e Exportar são ícones; Compartilhar é o primário.
  */
 export function MeetingHeader({
   title,
@@ -1043,48 +1047,39 @@ export function MeetingHeader({
 }) {
   const l = { ...meetingHeaderLabels, ...labels };
   const defaultActions = (
-    <>
-      <div className="hidden items-center gap-1.5 sm:flex">
-        {onAsk && (
-          <Button size="sm" variant="ghost" onClick={onAsk}>
-            <Sparkles className="h-3.5 w-3.5" aria-hidden /> {l.ask}
-          </Button>
-        )}
-        {onExport && (
-          <Button size="sm" variant="ghost" onClick={onExport}>
-            <Download className="h-3.5 w-3.5" aria-hidden /> {l.export}
-          </Button>
-        )}
-        {onShare && (
-          <Button size="sm" onClick={onShare}>
-            <Share2 className="h-3.5 w-3.5" aria-hidden /> {l.share}
-          </Button>
-        )}
-      </div>
-      <div className="flex items-center gap-0.5 sm:hidden">
-        {onAsk && (
-          <IconButton label={l.ask} onClick={onAsk}>
-            <Sparkles />
-          </IconButton>
-        )}
-        {onExport && (
-          <IconButton label={l.export} onClick={onExport}>
-            <Download />
-          </IconButton>
-        )}
-        {onShare && (
-          <IconButton label={l.share} onClick={onShare}>
-            <Share2 />
-          </IconButton>
-        )}
-      </div>
-    </>
+    <div className="flex items-center gap-0.5">
+      {onAsk && (
+        <IconButton label={l.ask} onClick={onAsk}>
+          <Sparkles />
+        </IconButton>
+      )}
+      {onExport && (
+        <IconButton label={l.export} onClick={onExport}>
+          <Download />
+        </IconButton>
+      )}
+      {onShare && (
+        <>
+          <span className="ml-1.5 hidden sm:inline-flex">
+            <Button size="sm" onClick={onShare}>
+              <Share2 className="h-3.5 w-3.5" aria-hidden /> {l.share}
+            </Button>
+          </span>
+          <span className="inline-flex sm:hidden">
+            <IconButton label={l.share} onClick={onShare}>
+              <Share2 />
+            </IconButton>
+          </span>
+        </>
+      )}
+    </div>
   );
   return (
     <header className={cn("min-w-0", className)}>
-      <div className="flex items-start gap-3">
-        <h1 className="m-0 min-w-0 flex-1 text-[24px] font-semibold leading-tight tracking-tight text-ink">{title}</h1>
-        <div className="shrink-0 pt-0.5">{actions ?? defaultActions}</div>
+      {/* No celular as ações sobem para uma linha própria e o título fica com a largura toda. */}
+      <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
+        <h1 className="m-0 min-w-0 basis-full text-[24px] font-semibold leading-tight tracking-tight text-ink sm:basis-auto sm:flex-1">{title}</h1>
+        <div className="order-first ml-auto shrink-0 sm:order-none sm:pt-0.5">{actions ?? defaultActions}</div>
       </div>
       <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12.5px] text-muted">
         <span className="inline-flex items-center gap-1.5">
@@ -1097,7 +1092,7 @@ export function MeetingHeader({
         )}
         {attendees && attendees.length > 0 && (
           <span className="inline-flex min-w-0 items-center gap-2">
-            <AvatarGroup people={attendees} max={4} size="xs" stacked />
+            <AvatarGroup people={attendees} max={4} size="sm" stacked />
             <span className="truncate">{l.attendees(attendees.map((a) => a.name.split(" ")[0]))}</span>
           </span>
         )}
