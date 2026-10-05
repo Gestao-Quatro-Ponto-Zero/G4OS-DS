@@ -16,7 +16,7 @@ export default function Page() {
     <DocPage title={meta.title} kicker={meta.group} description={meta.description}>
       <DocSection title="MeetingCard" rule="Estado só quando foge do normal: gravando, gerando notas, trechos sem áudio, falhou. A linha inteira abre a reunião.">
         <Demo code={`<MeetingCard title="Daily de vendas" time="09:30" duration="12 min" source="Google Meet" snippet="Meta da semana em 74 %" attendees={pessoas} onOpen={abrir} />`}>
-          <div className="flex max-w-2xl flex-col">
+          <div className="flex min-w-0 max-w-2xl flex-col">
             <MeetingCard title="Revisão do pipeline de vendas — Q4" time="14:00" status="live" source="Google Meet" attendees={people} onOpen={() => {}} />
             <MeetingCard title="Entrevista — SDR pleno" time="11:00" duration="45 min" status="processing" source="Zoom" attendees={[ana]} onOpen={() => {}} />
             <MeetingCard title="Daily de vendas" time="09:30" duration="12 min" source="Google Meet" snippet="Meta da semana em 74 %" attendees={people} onOpen={() => {}} />
@@ -62,12 +62,16 @@ export default function Page() {
         </Demo>
         <PropsTable
           rows={[
-            ["MeetingHeader.title / date / duration", "string", "—", "Já formatados."],
-            ["MeetingHeader.attendees", "MeetingPerson[]", "—", "Pilha de avatares e nomes."],
-            ["MeetingHeader.template / status", "ReactNode", "—", "Chip do modelo e selo de estado."],
-            ["MeetingHeader.onAsk / onExport / onShare", "() => void", "—", "Ações padrão; `actions` substitui."],
-            ["TemplatePicker.value / onChange", "string / (id) => void", "—", "Modelo escolhido."],
-            ["TemplatePicker.templates", "MeetingTemplate[]", `meetingTemplates (${meetingTemplates.length})`, "`{ id, name, description?, sections }`."],
+            ["title / date / duration", "string", "—", "MeetingHeader: já formatados."],
+            ["attendees", "MeetingPerson[]", "—", "Pilha de avatares e nomes."],
+            ["template / status", "ReactNode", "—", "Chip do modelo e selo de estado."],
+            ["onAsk / onExport / onShare", "() => void", "—", "Ações padrão; `actions` substitui."],
+          ]}
+        />
+        <PropsTable
+          rows={[
+            ["value / onChange", "string / (id) => void", "—", "TemplatePicker: modelo escolhido."],
+            ["templates", "MeetingTemplate[]", `meetingTemplates (${meetingTemplates.length})`, "`{ id, name, description?, sections }`."],
           ]}
         />
         <Rules items={[{ do: "Trocar o modelo reorganiza as notas da IA e mantém as da pessoa.", dont: "Puxar a agenda só para listar reuniões: a lista é do que foi gravado." }]} />

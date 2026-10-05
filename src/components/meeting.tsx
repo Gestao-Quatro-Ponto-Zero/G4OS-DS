@@ -630,13 +630,14 @@ export function TranscriptView({
           role={live ? "log" : undefined}
           aria-live={live ? "polite" : undefined}
           aria-label={l.label}
-          tabIndex={-1}
+          // Sem horários clicáveis a lista não tem foco por dentro: ela mesma recebe o Tab para rolar pelo teclado.
+          tabIndex={onSeek ? -1 : 0}
           onScroll={(e) => {
             const el = e.currentTarget;
             const atEnd = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
             if (atEnd !== pinned) setPinned(atEnd);
           }}
-          className="relative h-full overflow-y-auto outline-none"
+          className="relative h-full overflow-y-auto rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
         >
           {turns.length === 0 ? (
             <p className="m-0 px-3 py-6 text-center text-[13px] text-muted">{l.empty}</p>

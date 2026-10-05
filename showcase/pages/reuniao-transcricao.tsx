@@ -73,10 +73,10 @@ const seek = (s: number) => { setT(s); player.current?.seekTo(s); };
         />
         <PropsTable
           rows={[
-            ["AudioPlayer.currentTime", "number", "—", "Posição pedida; pula quando difere mais de 1 s."],
-            ["AudioPlayer.onTimeUpdate", "(t) => void", "—", "Posição a cada avanço e salto."],
-            ["AudioPlayer ref", "AudioPlayerHandle", "—", "`seekTo(t, { play? })`, `play()`, `pause()`."],
-            ["AudioPlayer.markers", "AudioMarker[]", "—", "Pontos na forma de onda (`{ t, label }`)."],
+            ["currentTime", "number", "—", "AudioPlayer: posição pedida; pula quando difere mais de 1 s."],
+            ["onTimeUpdate", "(t) => void", "—", "Posição a cada avanço e salto."],
+            ["ref", "AudioPlayerHandle", "—", "`seekTo(t, { play? })`, `play()`, `pause()`."],
+            ["markers", "AudioMarker[]", "—", "Pontos na forma de onda (`{ t, label }`)."],
           ]}
         />
       </DocSection>
