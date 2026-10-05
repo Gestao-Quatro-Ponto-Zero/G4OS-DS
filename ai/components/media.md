@@ -225,11 +225,10 @@ Visualizador de apresentação: palco 16:9, miniaturas, ←/→ (e PageUp/Down, 
 Exemplo (showcase `#/p/midia-slides`):
 
 ```tsx
-const slides: DeckSlide[] = [
-  { id: "capa", title: "Capa", content: <SlideTitle kicker="Q3 2026" title="Vendas cresceram 18 %" />, notes: "…" },
-  { id: "kpis", title: "Resultados", content: <SlideStat title="Três números" stats={[…]} /> },
-];
-<SlideDeck title="Revisão trimestral Q3" slides={slides} />
+<OfficeFileView source={file} className="h-[640px]" />
+
+// Ou: const file = await readOfficeFile(blob)
+//     <SlideDeck title={file.presentation.title} slides={presentationSlides(file.presentation)} />
 ```
 
 ## SlideQuote

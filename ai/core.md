@@ -1,4 +1,4 @@
-# G4OS-DS · guia essencial para agentes (v0.6.0)
+# G4OS-DS · guia essencial para agentes (v0.6.5)
 
 Leia isto inteiro antes de escrever ou mudar UI num projeto com `@g4ai/ds`. Detalhes ao lado (mesma pasta): `components/<módulo>.md` (props + exemplos), `blocks/<bloco>.md`, `tokens.md`, `manifest.json`. Com o MCP `g4os-ds` ligado, use `plan_screen` (pedido → anatomia, bloco e componentes), `get_component`, `get_block` e `audit`.
 
@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (448 componentes) → `components/<nome>.md`
+## Módulos (453 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -160,6 +160,9 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **nav-tree**: Navegação com subitens: tipos NavItem/NavGroup/NavSubItem/NavParentItem da Sidebar, WorkspaceMenu, menu da pessoa, SectionNav (docs/ajuda), flyout do trilho recolhido e helpers navMatches/navActiveDeep.
 - **history**: Histórico e progresso no tempo.
 - **presence**: Presença: quem está por aqui e onde.
+- **lib-office**: Modelo de planilha, documento e apresentação do DS.
+- **lib-office-files**: Leitura de arquivos reais do Office no navegador, sem dependências: descompacta o .xlsx/.docx/.pptx (DecompressionStream) e lê o XML (DOMParser).
+- **office**: Planilhas, documentos e apresentações na linguagem do DS, escritos em código ou lidos de arquivos reais do Office.
 
 ## Blocos (140) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`

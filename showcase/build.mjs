@@ -71,6 +71,9 @@ const options = {
   logLevel: "warning",
 };
 copyFileSync(join(here, "index.html"), join(out, "index.html"));
+// Arquivos de exemplo do Office (.xlsx, .docx, .pptx) lidos pelas páginas de mídia.
+rmSync(join(out, "samples"), { recursive: true, force: true });
+cpSync(join(here, "samples"), join(out, "samples"), { recursive: true });
 writeAgentFiles();
 
 /*

@@ -517,6 +517,15 @@ export function SlideDeck({
       map[e.key]();
     }
   };
+  // Sem slides (apresentação vazia ou todos ocultos): estado vazio no lugar do palco.
+  if (!slides.length)
+    return (
+      <section aria-label={title} className={cn("flex min-h-0 flex-col items-center justify-center gap-2 rounded-2xl border border-line bg-surface p-8 text-center", className)}>
+        <Presentation className="h-5 w-5 text-muted" aria-hidden />
+        <p className="m-0 text-[13.5px] font-medium text-ink">Apresentação sem slides</p>
+        <p className="m-0 text-[12.5px] text-muted">Os slides estão ocultos ou o arquivo está vazio.</p>
+      </section>
+    );
   const current = slides[index];
   const tool = "inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-muted hover:bg-soft hover:text-ink aria-pressed:bg-soft aria-pressed:text-ink [&_svg]:h-4 [&_svg]:w-4";
 

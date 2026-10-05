@@ -40,8 +40,9 @@ const capture = (level) => (...args) => {
     let i = 1;
     text = args[0].replace(/%s/g, () => String(args[i++])) + " " + args.slice(i).map(String).join(" ");
   }
-  // Ruído do ambiente simulado, não do DS.
-  if (/Not implemented|happy-dom|getContext|HTMLCanvasElement/i.test(text)) return;
+  // Ruído do ambiente simulado, não do DS. ECONNREFUSED: páginas que buscam arquivo de exemplo
+  // (samples/*.xlsx) num DOM sem servidor; o happy-dom registra a falha e o componente mostra o estado de erro.
+  if (/Not implemented|happy-dom|getContext|HTMLCanvasElement|ECONNREFUSED/i.test(text)) return;
   if (level === "warn" && !/React|Warning|ref|prop|attribute|key/i.test(text)) return;
   issues.push({ ...current, message: text });
 };
