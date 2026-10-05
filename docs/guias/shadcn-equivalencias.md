@@ -86,4 +86,4 @@ O G4OS-DS cobre os 65 componentes do [shadcn/ui](https://ui.shadcn.com/docs/comp
 | Time Picker | `TimePicker` | Não existe no shadcn. Horário digitável ("9h30"). ([exemplo](https://gestao-quatro-ponto-zero.github.io/G4OS-DS/#/p/datas-horario)) |
 | Copy Button | `CopyButton` | Copia e confirma com ✓. ([exemplo](https://gestao-quatro-ponto-zero.github.io/G4OS-DS/#/p/ia-imagens)) |
 
-Além disso: gráficos de negócio (funil, cascata, Sankey, Gantt, bullet), DataGrid, filtros estruturados e visões salvas, blocos de IA (sessões, aprovação, raciocínio, ferramentas) e 140 blocos de tela completos (CRM, ATS, ERP, financeiro, SaaS).
+Além disso: gráficos de negócio (funil, cascata, Sankey, Gantt, bullet), DataGrid, filtros estruturados e visões salvas, blocos de IA (sessões, aprovação, raciocínio, ferramentas) e 141 blocos de tela completos (CRM, ATS, ERP, financeiro, SaaS).

@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 453 componentes, gráficos SVG e 140 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 462 componentes, gráficos SVG e 141 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -71,6 +71,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [lib-office](components/lib-office.md): Modelo de planilha, documento e apresentação do DS.
 - [lib-office-files](components/lib-office-files.md): Leitura de arquivos reais do Office no navegador, sem dependências: descompacta o .xlsx/.docx/.pptx (DecompressionStream) e lê o XML (DOMParser).
 - [office](components/office.md): Planilhas, documentos e apresentações na linguagem do DS, escritos em código ou lidos de arquivos reais do Office.
+- [meeting](components/meeting.md): Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)
@@ -106,6 +107,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [app-help-center](blocks/app-help-center.md): Central de ajuda (navegação de seções) (Aplicação)
 - [app-legal](blocks/app-legal.md): Termos e privacidade (Aplicação)
 - [app-marketplace](blocks/app-marketplace.md): Marketplace de apps (Aplicação)
+- [app-meeting-notes](blocks/app-meeting-notes.md): Notas de reunião com IA (Aplicação)
 - [app-notifications](blocks/app-notifications.md): Central de notificações (Aplicação)
 - [app-presentation](blocks/app-presentation.md): Apresentação (QBR) (Aplicação)
 - [app-record-tracker](blocks/app-record-tracker.md): Rastreador de registros (Aplicação)

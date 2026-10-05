@@ -492,13 +492,26 @@ type SlashCommand = { id: string; label: string; description?: string; icon?: Re
 
 ## Waveform
 
-Forma de onda animada (gravação, modo voz).
+Forma de onda de gravação (modo voz, reunião).
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `active` * | `boolean` |  |  |
+| `active` | `boolean \| undefined` |  | Modo decorativo: anima enquanto true. |
 | `barClassName` | `string \| undefined` | `"bg-rose/80"` |  |
 | `bars` | `number \| undefined` | `28` |  |
 | `className` | `string \| undefined` |  |  |
+| `fade` | `boolean \| undefined` | `false` | Esmaece as pontas (a onda "entra" pela direita). |
+| `level` | `number \| undefined` |  | Nível atual (0–1), ex.: RMS do microfone. |
+| `levels` | `number[] \| undefined` |  | Amostras reais (0–1); mostra as últimas `bars`. |
+| `processing` | `boolean \| undefined` | `false` | Onda calma e simétrica: processando, gerando notas. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/reuniao-gravacao`):
+
+```tsx
+// RMS do microfone a cada quadro
+<Waveform level={rms} fade barClassName="bg-ink/55" />
+<Waveform levels={amostras} bars={40} />
+<Waveform processing />
+```
