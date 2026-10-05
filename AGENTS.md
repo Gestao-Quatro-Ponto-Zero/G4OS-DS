@@ -24,6 +24,7 @@ npm run lint             # ESLint: typescript-eslint, react-hooks, jsx-a11y e o 
 npm run audit:self       # g4os-ds audit em src/, templates/ e showcase/ (--fix aplica as trocas seguras)
 npm run test:lint        # regras de auditoria (fixtures), plugin ESLint, init, doctor
 npm run test:react       # React 18 e 19: tipos, render no servidor e no cliente de blocos e páginas (também no CI)
+npm run test:components  # contrato de componentes: marcação produzida por cada prop (render no servidor)
 npm run showcase:build   # compila o site de documentação em showcase/dist
 npm run showcase:watch   # recompila a cada mudança
 npm run showcase         # build + servidor em localhost:4173

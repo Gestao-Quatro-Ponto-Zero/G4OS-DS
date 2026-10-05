@@ -33,12 +33,14 @@ import {
   PinOff,
   Plus,
   Presentation,
+  Replace,
   RotateCcw,
   Share2,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
   Square,
+  TimerOff,
   ThumbsDown,
   ThumbsUp,
   Wrench,
@@ -1142,7 +1144,10 @@ export function ReasoningBlock({
 /* ApprovalRequest                                                     */
 /* ================================================================== */
 
-export type ApprovalState = "pending" | "approved" | "always" | "rejected";
+export type ApprovalState = "pending" | "approved" | "always" | "rejected" | "expired" | "superseded";
+
+/** Aparência do pedido pendente. Sem `tone`, vem do `risk`: low = info, medium = warn, high = bad. */
+export type ApprovalTone = "neutral" | "info" | "warn" | "bad";
 
 /** Textos do ApprovalRequest. Passe só o que muda (outro idioma, outro tom). */
 export type ApprovalRequestLabels = {
@@ -1158,6 +1163,10 @@ export type ApprovalRequestLabels = {
   approvedAlways: string;
   /** Sobrelinha depois de recusar. */
   rejected: string;
+  /** Sobrelinha quando o pedido venceu sem resposta. */
+  expired: string;
+  /** Sobrelinha quando um pedido mais novo tomou o lugar deste. */
+  superseded: string;
   /** Nome acessível do cartão; recebe o título. */
   ariaLabel: (title: string) => string;
 };
@@ -1172,14 +1181,29 @@ export const approvalRequestLabels: ApprovalRequestLabels = {
   approved: "Aprovado",
   approvedAlways: "Aprovado · sempre para este tipo",
   rejected: "Recusado",
+  expired: "Expirado",
+  superseded: "Substituído",
   ariaLabel: (title) => `Aprovação: ${title}`,
+};
+
+const approvalRiskTone = { low: "info", medium: "warn", high: "bad" } as const satisfies Record<"low" | "medium" | "high", ApprovalTone>;
+
+const approvalToneClass: Record<ApprovalTone, { border: string; tile: string }> = {
+  neutral: { border: "border-line", tile: "bg-soft text-muted" },
+  info: { border: "border-info/30", tile: "bg-info-soft text-info" },
+  warn: { border: "border-amber/40", tile: "bg-amber-soft text-amber" },
+  bad: { border: "border-rose/35", tile: "bg-rose-soft text-rose" },
 };
 
 /**
  * O agente pede permissão antes de uma ação com efeito externo (enviar e-mail,
  * alterar registros, cobrar). Mostra o que vai acontecer (preview), o impacto
  * e três saídas: aprovar (uma vez ou sempre para este tipo), editar, recusar.
- * `labels` troca os textos (idioma do app); o que faltar fica em pt-BR.
+ * `tone` troca a aparência (sem ele, vem do `risk`); `eyebrow` e `icon` trocam a
+ * sobrelinha e o ícone do pedido pendente; `children` entra entre o preview e o
+ * rodapé; `actions` substitui os botões padrão. Depois da decisão o cartão vira
+ * registro; `compact` o reduz a uma linha. `labels` troca os textos (idioma do
+ * app); o que faltar fica em pt-BR.
  */
 export function ApprovalRequest({
   title,
@@ -1187,8 +1211,14 @@ export function ApprovalRequest({
   preview,
   impact,
   risk = "medium",
+  tone,
+  eyebrow,
+  icon,
   state = "pending",
+  compact = false,
   labels,
+  actions,
+  children,
   onApprove,
   onApproveAlways,
   onEdit,
@@ -1200,10 +1230,23 @@ export function ApprovalRequest({
   preview?: ReactNode;
   /** "42 clientes", "R$ 18.400 em faturas". */
   impact?: ReactNode;
+  /** Risco da ação. Define o tom quando `tone` não vem: low = info, medium = warn, high = bad. */
   risk?: "low" | "medium" | "high";
+  /** Aparência do pedido pendente (borda e ícone). Sobrepõe a derivada do `risk`. */
+  tone?: ApprovalTone;
+  /** Sobrelinha do pedido pendente ("Comando no terminal"). Padrão: `labels.eyebrow`. */
+  eyebrow?: ReactNode;
+  /** Ícone do pedido pendente. Padrão: escudo. */
+  icon?: ReactNode;
   state?: ApprovalState;
-  /** Textos dos botões, da sobrelinha e do nome acessível. Padrão em pt-BR. */
+  /** Estado decidido (qualquer um menos "pending") vira uma linha: ícone, estado, título e impacto. */
+  compact?: boolean;
+  /** Textos dos botões, da sobrelinha, dos estados e do nome acessível. Padrão em pt-BR. */
   labels?: Partial<ApprovalRequestLabels>;
+  /** Substitui os botões padrão (aprovar, sempre, editar, recusar) enquanto pende. */
+  actions?: ReactNode;
+  /** Conteúdo extra entre o preview e o rodapé (detalhes, campos, avisos). */
+  children?: ReactNode;
   onApprove?: () => void;
   onApproveAlways?: () => void;
   onEdit?: () => void;
@@ -1213,46 +1256,64 @@ export function ApprovalRequest({
   const l = { ...approvalRequestLabels, ...labels };
   const pending = state === "pending";
   const done = state === "approved" || state === "always";
+  const t = approvalToneClass[tone ?? approvalRiskTone[risk]];
+  const stateLabel =
+    state === "approved" ? l.approved : state === "always" ? l.approvedAlways : state === "rejected" ? l.rejected : state === "expired" ? l.expired : state === "superseded" ? l.superseded : null;
+  const tileClass = pending ? t.tile : done ? "bg-ok-soft text-ok" : "bg-soft text-muted";
+  const glyph = pending ? (icon ?? <ShieldAlert />) : done ? <ShieldCheck /> : state === "expired" ? <TimerOff /> : state === "superseded" ? <Replace /> : <X />;
+
+  if (compact && !pending) {
+    return (
+      <section aria-label={l.ariaLabel(title)} data-state={state} className={cn("flex min-w-0 items-center gap-2.5 rounded-lg border border-line bg-surface px-3 py-2", className)}>
+        <span aria-hidden className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-md [&_svg]:h-3.5 [&_svg]:w-3.5", tileClass)}>{glyph}</span>
+        <span className="shrink-0 text-[12px] text-muted">{stateLabel}</span>
+        <span aria-hidden className="shrink-0 text-[12px] text-muted">·</span>
+        <h3 className="m-0 min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{title}</h3>
+        {impact && <span className="shrink-0 text-[12px] tabular-nums text-ink-soft">{impact}</span>}
+      </section>
+    );
+  }
+
   return (
     <section
       aria-label={l.ariaLabel(title)}
-      className={cn(
-        "min-w-0 overflow-hidden rounded-xl border bg-surface",
-        pending ? (risk === "high" ? "border-rose/35" : "border-amber/40") : "border-line",
-        className,
-      )}
+      data-state={state}
+      className={cn("min-w-0 overflow-hidden rounded-xl border bg-surface", pending ? t.border : "border-line", className)}
     >
       <header className="flex items-start gap-3 px-4 pt-3.5">
-        <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg", pending ? (risk === "high" ? "bg-rose-soft text-rose" : "bg-amber-soft text-amber") : done ? "bg-ok-soft text-ok" : "bg-soft text-muted")}>
-          {pending ? <ShieldAlert className="h-4 w-4" /> : done ? <ShieldCheck className="h-4 w-4" /> : <X className="h-4 w-4" />}
-        </span>
+        <span aria-hidden className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg [&_svg]:h-4 [&_svg]:w-4", tileClass)}>{glyph}</span>
         <div className="min-w-0 flex-1">
-          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{pending ? l.eyebrow : done ? (state === "always" ? l.approvedAlways : l.approved) : l.rejected}</p>
+          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{pending ? (eyebrow ?? l.eyebrow) : stateLabel}</p>
           <h3 className="m-0 mt-0.5 text-[14px] font-medium leading-snug">{title}</h3>
           {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
         </div>
         {impact && <span className="shrink-0 rounded-md bg-soft px-2 py-1 text-[11.5px] font-medium tabular-nums text-ink-soft ring-1 ring-line">{impact}</span>}
       </header>
       {preview && <div className={cn("mx-4 mt-3 rounded-lg border border-line bg-soft/60 p-3 text-[12.5px] leading-relaxed text-ink-soft", !pending && "opacity-70")}>{preview}</div>}
+      {children != null && children !== false && <div className={cn("mx-4 mt-3 min-w-0 text-[12.5px] leading-relaxed text-ink-soft", !pending && "opacity-70")}>{children}</div>}
       {pending ? (
         <footer className="mt-3 flex flex-wrap items-center gap-2 border-t border-line bg-soft/40 px-4 py-3">
-          <button type="button" onClick={onApprove} className="ui-button ui-button-primary inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-medium text-on-primary hover:bg-primary/90">
-            <ShieldCheck className="h-4 w-4" /> {l.approve}
-          </button>
-          {onApproveAlways && (
-            <button type="button" onClick={onApproveAlways} className="inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft">
-              {l.approveAlways}
-            </button>
-          )}
-          {onEdit && (
-            <button type="button" onClick={onEdit} className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft">
-              <Pencil className="h-3.5 w-3.5" /> {l.edit}
-            </button>
-          )}
-          {onReject && (
-            <button type="button" onClick={onReject} className="ml-auto inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-muted hover:bg-soft hover:text-rose">
-              {l.reject}
-            </button>
+          {actions ?? (
+            <>
+              <button type="button" onClick={onApprove} className="ui-button ui-button-primary inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-medium text-on-primary hover:bg-primary/90">
+                <ShieldCheck className="h-4 w-4" /> {l.approve}
+              </button>
+              {onApproveAlways && (
+                <button type="button" onClick={onApproveAlways} className="inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft">
+                  {l.approveAlways}
+                </button>
+              )}
+              {onEdit && (
+                <button type="button" onClick={onEdit} className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-ink ring-1 ring-line hover:bg-soft">
+                  <Pencil className="h-3.5 w-3.5" /> {l.edit}
+                </button>
+              )}
+              {onReject && (
+                <button type="button" onClick={onReject} className="ml-auto inline-flex h-9 items-center rounded-lg px-3 text-[13px] font-medium text-muted hover:bg-soft hover:text-rose">
+                  {l.reject}
+                </button>
+              )}
+            </>
           )}
         </footer>
       ) : (

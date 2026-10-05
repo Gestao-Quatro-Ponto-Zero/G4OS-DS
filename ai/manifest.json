@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "package": "@g4ai/ds",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "modules": [
     {
       "name": "primitives",
@@ -16538,6 +16538,20 @@
               "description": null
             },
             {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Substitui os botões padrão (aprovar, sempre, editar, recusar) enquanto pende."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Conteúdo extra entre o preview e o rodapé (detalhes, campos, avisos)."
+            },
+            {
               "name": "className",
               "type": "string | undefined",
               "required": false,
@@ -16545,11 +16559,32 @@
               "description": null
             },
             {
+              "name": "compact",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Estado decidido (qualquer um menos \"pending\") vira uma linha: ícone, estado, título e impacto."
+            },
+            {
               "name": "description",
               "type": "ReactNode",
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "eyebrow",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Sobrelinha do pedido pendente (\"Comando no terminal\")."
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ícone do pedido pendente."
             },
             {
               "name": "impact",
@@ -16563,7 +16598,7 @@
               "type": "Partial<ApprovalRequestLabels> | undefined",
               "required": false,
               "default": null,
-              "description": "Textos dos botões, da sobrelinha e do nome acessível."
+              "description": "Textos dos botões, da sobrelinha, dos estados e do nome acessível."
             },
             {
               "name": "onApprove",
@@ -16605,7 +16640,7 @@
               "type": "\"medium\" | \"low\" | \"high\" | undefined",
               "required": false,
               "default": "\"medium\"",
-              "description": null
+              "description": "Risco da ação. Define o tom quando `tone` não vem: low = info, medium = warn, high = bad."
             },
             {
               "name": "state",
@@ -16613,6 +16648,13 @@
               "required": false,
               "default": "\"pending\"",
               "description": null
+            },
+            {
+              "name": "tone",
+              "type": "ApprovalTone | undefined",
+              "required": false,
+              "default": null,
+              "description": "Aparência do pedido pendente (borda e ícone)."
             }
           ],
           "examplePage": "ia-raciocinio-e-aprovacao"
@@ -16626,13 +16668,19 @@
           "name": "ApprovalRequestLabels",
           "kind": "type",
           "summary": "Textos do ApprovalRequest.",
-          "definition": "{ eyebrow: string; approve: string; approveAlways: string; edit: string; reject: string; approved: string; approvedAlways: string; rejected: string; ariaLabel: (title: string) => string; }"
+          "definition": "{ eyebrow: string; approve: string; approveAlways: string; edit: string; reject: string; approved: string; approvedAlways: string; rejected: string; expired: string; superseded: string; ariaLabel: (title: string) => string; }"
         },
         {
           "name": "ApprovalState",
           "kind": "type",
           "summary": null,
-          "definition": "\"pending\" | \"approved\" | \"always\" | \"rejected\""
+          "definition": "\"pending\" | \"approved\" | \"always\" | \"rejected\" | \"expired\" | \"superseded\""
+        },
+        {
+          "name": "ApprovalTone",
+          "kind": "type",
+          "summary": "Aparência do pedido pendente.",
+          "definition": "\"neutral\" | \"info\" | \"warn\" | \"bad\""
         },
         {
           "name": "ArtifactCard",

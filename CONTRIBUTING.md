@@ -30,7 +30,7 @@ Requisitos: Node 20+ (o CI usa Node 24). Para testar uma mudança num app antes 
    npm run check     # tokens + typecheck + ESLint + referências de IA + auditoria do próprio DS + testes (lint e MCP)
    npm run build     # compila dist/
    ```
-   Partes isoladas: `npm run lint` (ESLint; `npx eslint --fix .` corrige o que der), `npm run audit:self` (`g4os-ds audit` em `src/`, `templates/`, `showcase/`; `node scripts/cli.mjs audit src --fix` aplica as trocas seguras), `npm run test:lint` (regras, plugin ESLint, init, doctor), `npm run test:mcp`, `npm run test:react` (instala o pacote com React 18 e 19 num projeto temporário: tipos, render no servidor e no cliente; o CI roda os dois).
+   Partes isoladas: `npm run lint` (ESLint; `npx eslint --fix .` corrige o que der), `npm run audit:self` (`g4os-ds audit` em `src/`, `templates/`, `showcase/`; `node scripts/cli.mjs audit src --fix` aplica as trocas seguras), `npm run test:lint` (regras, plugin ESLint, init, doctor), `npm run test:mcp`, `npm run test:components` (contrato de componentes: o que cada prop produz na marcação), `npm run test:react` (instala o pacote com React 18 e 19 num projeto temporário: tipos, render no servidor e no cliente; o CI roda os dois).
 5. Registre a mudança para o changelog:
    ```bash
    npx changeset     # escolha patch (correção), minor (novo componente/prop) ou major (quebra)
