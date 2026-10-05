@@ -18,10 +18,10 @@ type OfficeFile = { kind: "xlsx"; workbook: FileWorkbook } | { kind: "csv"; work
 
 ## OfficeFileErrorCode (type)
 
-Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt/.xlsb), unsupported (não é Office), corrupt, network.
+Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt/.xlsb), protected (senha), unsupported (não é Office), corrupt, network.
 
 ```ts
-type OfficeFileErrorCode = "legacy" | "unsupported" | "corrupt" | "network"
+type OfficeFileErrorCode = "legacy" | "protected" | "unsupported" | "corrupt" | "network"
 ```
 
 ## OfficeSource (type)

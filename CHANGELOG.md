@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.5
+
+### Patch Changes
+
+- Planilhas, documentos, apresentações e arquivos do Office.
+
+  - `WorkbookView`: planilha no visual do `DataGrid` (abas com `Tabs`, título e fonte acima da tabela, cabeçalho e total fixos, colunas fixas), escrita em código (`Workbook` com fórmulas `{qtd} * {preco}` e total) ou lida de arquivo; desenha só as linhas visíveis (até 50 mil); endereço, fórmula, soma, média e contagem da seleção no rodapé; Ctrl+C copia para colar no Excel.
+  - `DocumentView`: documento em páginas A4 medidas (capa, sumário com número de página, tabelas que continuam com o cabeçalho repetido, imprimir/PDF), escrito em código (`OfficeDocument` com blocos) ou lido de arquivo.
+  - `readOfficeFile`, `useOfficeFile` e `OfficeFileView`: abrem .xlsx, .csv, .docx e .pptx no navegador, sem dependências e sem enviar o arquivo a nenhum serviço, com estados de carregando, erro (formato antigo, protegido por senha, corrompido, rede) e sem arquivo.
+  - Cobertura pensada no que mais aparece em arquivos de empresa: cores de célula, mesclas, linhas e colunas ocultas, gráficos e folhas de gráfico (Excel); CSV do Excel em português (`;`, vírgula decimal, Windows-1252); listas em níveis com a numeração do Word, tabelas mescladas, campos, sumário, cabeçalho e rodapé (Word); modelo da marca, fundos, formas, linhas e setas, imagens recortadas, tabelas com o estilo do PowerPoint e gráficos nativos (PowerPoint).
+  - `OfficeSlide` e `presentationSlides` levam o .pptx ao `SlideDeck`; `OfficeChartView` desenha gráficos do Office com os gráficos do DS.
+  - `SlideDeck` sem slides mostra um estado vazio em vez de quebrar.
+  - Exportar .xlsx/.docx é opcional e fica no app: receita em `templates/office-export.ts` (exceljs e docx) e guia em `docs/guias/office.md`.
+  - Testado com 577 arquivos reais do Office (conjunto de testes do Apache POI): 530 abrem e os demais (corrompidos de propósito, protegidos por senha, formato antigo) recebem a mensagem certa, sem nenhuma falha inesperada.
+
 ## 0.6.0
 
 ### Minor Changes

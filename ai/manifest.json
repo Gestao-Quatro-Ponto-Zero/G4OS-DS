@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "package": "@g4ai/ds",
-  "version": "0.6.0",
+  "version": "0.6.5",
   "modules": [
     {
       "name": "primitives",
@@ -25565,8 +25565,8 @@
         {
           "name": "OfficeFileErrorCode",
           "kind": "type",
-          "summary": "Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt/.xlsb), unsupported (não é Office), corrupt, network.",
-          "definition": "\"legacy\" | \"unsupported\" | \"corrupt\" | \"network\""
+          "summary": "Erro de leitura com motivo, para a tela escolher título e saída: legacy (.xls/.doc/.ppt/.xlsb), protected (senha), unsupported (não é Office), corrupt, network.",
+          "definition": "\"legacy\" | \"protected\" | \"unsupported\" | \"corrupt\" | \"network\""
         },
         {
           "name": "OfficeSource",

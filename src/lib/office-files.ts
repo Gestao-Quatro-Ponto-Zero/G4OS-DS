@@ -39,9 +39,9 @@ export type OfficeFile = { kind: "xlsx"; workbook: FileWorkbook } | { kind: "csv
 
 /**
  * Erro de leitura com motivo, para a tela escolher título e saída:
- * legacy (.xls/.doc/.ppt/.xlsb), unsupported (não é Office), corrupt, network.
+ * legacy (.xls/.doc/.ppt/.xlsb), protected (senha), unsupported (não é Office), corrupt, network.
  */
-export type OfficeFileErrorCode = "legacy" | "unsupported" | "corrupt" | "network";
+export type OfficeFileErrorCode = "legacy" | "protected" | "unsupported" | "corrupt" | "network";
 export class OfficeFileError extends Error {
   constructor(
     readonly code: OfficeFileErrorCode,
@@ -81,22 +81,27 @@ class Zip {
     const count = v.getUint16(eocd + 10, true);
     let p = v.getUint32(eocd + 16, true);
     const dec = new TextDecoder();
-    for (let n = 0; n < count && v.getUint32(p, true) === 0x02014b50; n++) {
+    // Diretório central fora do arquivo ou cortado: corrompido (não estoura com RangeError).
+    for (let n = 0; n < count && p + 46 <= data.length && v.getUint32(p, true) === 0x02014b50; n++) {
       const nameLen = v.getUint16(p + 28, true);
-      const name = dec.decode(data.subarray(p + 46, p + 46 + nameLen));
-      this.entries.set(name, { method: v.getUint16(p + 10, true), size: v.getUint32(p + 20, true), offset: v.getUint32(p + 42, true) });
+      // Alguns programas gravam "xl\worksheets\sheet1.xml": normaliza para "/".
+      const name = dec.decode(data.subarray(p + 46, p + 46 + nameLen)).replace(/\\/g, "/");
+      // Nomes de parte no pacote do Office não diferenciam maiúsculas (sharedstrings.xml = sharedStrings.xml).
+      this.entries.set(name.toLowerCase(), { method: v.getUint16(p + 10, true), size: v.getUint32(p + 20, true), offset: v.getUint32(p + 42, true) });
       p += 46 + nameLen + v.getUint16(p + 30, true) + v.getUint16(p + 32, true);
     }
+    if (!this.entries.size) throw new OfficeFileError("corrupt", "O arquivo está corrompido ou incompleto.");
   }
   has(name: string) {
-    return this.entries.has(name);
+    return this.entries.has(name.toLowerCase());
   }
   bytes(name: string): Promise<Uint8Array> {
     const hit = this.cache.get(name);
     if (hit) return hit;
-    const e = this.entries.get(name);
+    const e = this.entries.get(name.toLowerCase());
     if (!e) return Promise.reject(new OfficeFileError("corrupt", `Parte ausente no arquivo: ${name}`));
     const v = new DataView(this.data.buffer, this.data.byteOffset, this.data.byteLength);
+    if (e.offset + 30 > this.data.length) return Promise.reject(new OfficeFileError("corrupt", "O arquivo está corrompido ou incompleto."));
     const start = e.offset + 30 + v.getUint16(e.offset + 26, true) + v.getUint16(e.offset + 28, true);
     const raw = this.data.slice(start, start + e.size);
     const out =
@@ -146,7 +151,20 @@ const kid = (el: Element | Document | null | undefined, name: string) => {
 };
 const all = (el: Element | Document | null | undefined, name: string) => (el ? Array.from(el.getElementsByTagNameNS("*", name)) : []);
 const first = (el: Element | Document | null | undefined, name: string) => all(el, name)[0];
-const at = (el: Element | null | undefined, name: string) => el?.getAttribute(name) ?? null;
+/**
+ * Atributo pelo nome com prefixo ("r:id", "w:val"). O prefixo é livre no XML: se o arquivo usa outro
+ * ("d3p1:id", comum em geradores .NET/Java), procura pelo nome local entre os atributos com namespace.
+ */
+const at = (el: Element | null | undefined, name: string) => {
+  if (!el) return null;
+  const v = el.getAttribute(name);
+  if (v !== null) return v;
+  const i = name.indexOf(":");
+  if (i < 0) return null;
+  const local = name.slice(i + 1);
+  for (const a of Array.from(el.attributes)) if (a.localName === local && a.prefix) return a.value;
+  return null;
+};
 const num = (el: Element | null | undefined, name: string, fallback = 0) => {
   const v = at(el, name);
   return v === null || v === "" ? fallback : Number(v);
@@ -172,7 +190,7 @@ async function rels(zip: Zip, part: string): Promise<Rels> {
   if (!part || !zip.has(path)) return map;
   for (const r of all(await zip.xml(path), "Relationship")) {
     const external = at(r, "TargetMode") === "External";
-    const target = at(r, "Target") ?? "";
+    const target = (at(r, "Target") ?? "").replace(/\\/g, "/");
     map.set(at(r, "Id") ?? "", { target: external ? target : resolvePath(part, target), type: at(r, "Type") ?? "", external });
   }
   return map;
@@ -311,8 +329,31 @@ const UNSUPPORTED = "Abra uma planilha (.xlsx ou .csv), um documento (.docx) ou 
 
 /** Lê .xlsx, .docx, .pptx ou .csv, detectando o tipo pelo conteúdo. `name` vira o título se o arquivo não tiver um. */
 export async function readOfficeFile(src: OfficeSource, options: { name?: string } = {}): Promise<OfficeFile> {
-  const data = await toBytes(src);
-  if (data[0] === 0xd0 && data[1] === 0xcf && data[2] === 0x11 && data[3] === 0xe0) throw new OfficeFileError("legacy", "Abra no Excel, Word ou PowerPoint e salve como .xlsx, .docx ou .pptx.");
+  try {
+    return await detectAndRead(await toBytes(src), options.name);
+  } catch (e) {
+    // Qualquer falha que não seja um motivo conhecido vira "corrompido", sempre com mensagem para a pessoa.
+    if (e instanceof OfficeFileError) throw e;
+    throw new OfficeFileError("corrupt", "O arquivo está corrompido ou foi salvo de um jeito que o DS não lê. Abra no Office, salve de novo e tente outra vez.");
+  }
+}
+
+/** O Office guarda arquivo com senha num contêiner do formato antigo, com a parte "EncryptedPackage". */
+function isEncrypted(data: Uint8Array) {
+  const name = [..."EncryptedPackage"].flatMap((ch) => [ch.charCodeAt(0), 0]);
+  outer: for (let i = 0; i <= Math.min(data.length, 2_000_000) - name.length; i++) {
+    for (let k = 0; k < name.length; k++) if (data[i + k] !== name[k]) continue outer;
+    return true;
+  }
+  return false;
+}
+
+async function detectAndRead(data: Uint8Array, name?: string): Promise<OfficeFile> {
+  const options = { name };
+  if (data[0] === 0xd0 && data[1] === 0xcf && data[2] === 0x11 && data[3] === 0xe0) {
+    if (isEncrypted(data)) throw new OfficeFileError("protected", "Remova a senha no Office (Arquivo › Informações › Proteger) e abra de novo.");
+    throw new OfficeFileError("legacy", "Abra no Excel, Word ou PowerPoint e salve como .xlsx, .docx ou .pptx.");
+  }
   if (data[0] === 0x50 && data[1] === 0x4b) {
     const zip = new Zip(data);
     if (zip.has("xl/workbook.xml")) return { kind: "xlsx", workbook: await parseXlsx(zip, options.name) };
@@ -909,7 +950,8 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
   const runsOf = (p: Element): { runs: DocRun[]; pageBreak: boolean } => {
     const out: DocRun[] = [];
     let pageBreak = false;
-    let field = 0;
+    // Campo complexo: begin → instrução (esconde) → separate → resultado (mostra) → end.
+    const fields: ("instr" | "result")[] = [];
     const same = (a: DocRun, b: DocRun) => a.bold === b.bold && a.italic === b.italic && a.underline === b.underline && a.strike === b.strike && a.href === b.href && a.color === b.color && a.highlight === b.highlight;
     const walk = (el: Element, href?: string) => {
       for (const ch of Array.from(el.children)) {
@@ -922,10 +964,12 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
           for (const t of Array.from(ch.children)) {
             if (t.localName === "fldChar") {
               const type = at(t, "w:fldCharType");
-              if (type === "begin") field++;
-              else if (type === "end") field = Math.max(0, field - 1);
-            } else if (field) continue;
+              if (type === "begin") fields.push("instr");
+              else if (type === "separate" && fields.length) fields[fields.length - 1] = "result";
+              else if (type === "end") fields.pop();
+            } else if (fields.includes("instr")) continue;
             else if (t.localName === "t") text += t.textContent ?? "";
+            else if (t.localName === "ruby") text += all(kid(t, "rubyBase"), "t").map((x) => x.textContent ?? "").join("");
             else if (t.localName === "tab") text += " ";
             else if (t.localName === "br" && at(t, "w:type") === "page") pageBreak = true;
             else if (t.localName === "br") text += "\n";
@@ -947,7 +991,7 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
           const prev = out[out.length - 1];
           if (prev && same(prev, run)) prev.text += text;
           else out.push(run);
-        } else if (["ins", "smartTag", "sdt", "sdtContent", "customXml"].includes(ch.localName)) walk(ch, href);
+        } else if (["ins", "moveTo", "smartTag", "sdt", "sdtContent", "customXml", "fldSimple"].includes(ch.localName)) walk(ch, href);
       }
     };
     walk(p);
@@ -970,10 +1014,13 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
     return out;
   };
 
+  /** Filhos com nome `name`, abrindo controles de conteúdo (sdt) e customXml no caminho. */
+  const deep = (el: Element, name: string): Element[] =>
+    Array.from(el.children).flatMap((c) => (c.localName === name ? [c] : ["sdt", "sdtContent", "customXml"].includes(c.localName) ? deep(c.localName === "sdt" ? (kid(c, "sdtContent") ?? c) : c, name) : []));
   const table = (el: Element): DocBlock => {
     const grid = kids(kid(el, "tblGrid"), "gridCol").map((g) => num(g, "w:w", 1));
-    const trs = kids(el, "tr");
-    const cols = Math.max(grid.length, ...trs.map((tr) => kids(tr, "tc").reduce((a, tc) => a + Number(at(kid(kid(tc, "tcPr"), "gridSpan"), "w:val") ?? 1), 0)));
+    const trs = deep(el, "tr");
+    const cols = Math.max(grid.length, ...trs.map((tr) => deep(tr, "tc").reduce((a, tc) => a + Number(at(kid(kid(tc, "tcPr"), "gridSpan"), "w:val") ?? 1), 0)));
     const rows: CellValue[][] = [];
     const spans: Record<string, [number, number]> = {};
     const fills: Record<string, string> = {};
@@ -985,7 +1032,7 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
       const row: CellValue[] = Array.from({ length: cols }, () => "");
       bold[r] = [];
       let c = 0;
-      for (const tc of kids(tr, "tc")) {
+      for (const tc of deep(tr, "tc")) {
         const pr = kid(tc, "tcPr");
         const span = Number(at(kid(pr, "gridSpan"), "w:val") ?? 1);
         const vMerge = kid(pr, "vMerge");
@@ -1110,7 +1157,7 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
       if (pageBreak) blocks.push({ type: "pageBreak" });
     } else if (el.localName === "tbl") {
       list = null;
-      if (kids(el, "tr").length) blocks.push(table(el));
+      if (deep(el, "tr").length) blocks.push(table(el));
     }
   }
   while (blocks[blocks.length - 1]?.type === "pageBreak") blocks.pop();
@@ -1127,7 +1174,7 @@ async function parseDocx(zip: Zip, name?: string): Promise<OfficeDocument> {
       .map((p) => runsOf(p).runs.map((r) => r.text).join("").trim())
       .filter(Boolean)
       .join(" · ")
-      .replace(/\s*\b(p[áa]gina|p[áa]g\.?|page)\s*(de|of)?\s*$/i, "")
+      .replace(/\s*\b(p[áa]gina|p[áa]g\.?|page)\s*\d*\s*((de|of)\s*\d*)?\s*$/i, "")
       .replace(/[\s·|•–—:,-]+$/, "")
       .trim();
     return text || undefined;

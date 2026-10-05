@@ -1228,6 +1228,8 @@ export function DocumentView({
               <Skeleton className="h-4 w-4/5" />
               <Skeleton className="mt-4 h-24 w-full" />
             </div>
+          ) : !doc.blocks.length && !showCover ? (
+            <Empty title="Documento sem conteúdo" hint="O texto pode estar só no cabeçalho, em caixas de texto ou o arquivo está vazio." framed={false} />
           ) : (
             <div ref={pagesRef} className="mx-auto flex w-fit flex-col gap-6 py-6" style={{ zoom: scale }}>
               {pages.map(renderPage)}
@@ -1619,6 +1621,7 @@ export function OfficeFileView({
   if (state.status === "error") {
     const copy = {
       legacy: { tone: "warn", title: "Formato antigo do Office" },
+      protected: { tone: "warn", title: "Arquivo protegido por senha" },
       unsupported: { tone: "neutral", title: "Este arquivo não é do Office" },
       corrupt: { tone: "bad", title: "Não foi possível abrir o arquivo" },
       network: { tone: "bad", title: "Não foi possível baixar o arquivo" },
