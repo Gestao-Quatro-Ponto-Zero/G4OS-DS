@@ -109,6 +109,7 @@
     "test:mcp": "node scripts/test-mcp.mjs",
     "test:react": "node scripts/test-react18.mjs",
     "test:components": "node scripts/test-components.mjs",
+    "test:layout": "node scripts/test-page-heading-layout.mjs",
     "lint": "eslint .",
     "test:lint": "node scripts/lint/test-lint.mjs",
     "qa:sweep": "node scripts/qa/sweep.mjs"
@@ -141,6 +142,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.13.0",
     "lucide-react": "1.45.0",
+    "playwright-core": "^1.64.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "tailwindcss": "4.3.3",

@@ -31,7 +31,7 @@ function test(name, fn) {
 try {
   await build({
     stdin: {
-      contents: `export { ApprovalRequest, approvalRequestLabels } from "./src/components/ai-workspace";`,
+      contents: `export { ApprovalRequest, approvalRequestLabels } from "./src/components/ai-workspace"; export { PageHeading } from "./src/components/navigation";`,
       resolveDir: root,
       loader: "ts",
     },
@@ -44,7 +44,7 @@ try {
     logLevel: "error",
   });
   writeFileSync(join(dir, "package.json"), JSON.stringify({ type: "module" }));
-  const { ApprovalRequest } = await import(pathToFileURL(out).href);
+  const { ApprovalRequest, PageHeading } = await import(pathToFileURL(out).href);
   const { createElement: h } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const render = (props, ...children) => renderToStaticMarkup(h(ApprovalRequest, { title: "Enviar lembrete", ...props }, ...children));
@@ -138,6 +138,34 @@ try {
     assert.match(html, /aria-label="Approval: Enviar lembrete"/);
     assert.match(html, /> Approve</);
     assert.match(html, /Precisa da sua aprovação/);
+  });
+
+  console.log("PageHeading");
+
+  test("sticky mantém o cabeçalho completo no fluxo e cria uma âncora compacta inerte", () => {
+    const html = renderToStaticMarkup(h(PageHeading, {
+      title: "Projetos",
+      description: "Organize o trabalho",
+      actions: h("button", { type: "button" }, "Novo projeto"),
+    }));
+    assert.match(html, /sticky-page-header-anchor/);
+    assert.match(html, /sticky-page-header-overlay/);
+    assert.match(html, /sticky-page-header-flow/);
+    assert.match(html, /data-sticky-observer=""/);
+    assert.match(html, /data-sticky-actions=""/);
+    assert.equal((html.match(/>Projetos</g) ?? []).length, 2);
+    assert.equal((html.match(/>Novo projeto</g) ?? []).length, 2);
+  });
+
+  test("sem sticky não duplica título nem ações", () => {
+    const html = renderToStaticMarkup(h(PageHeading, {
+      sticky: false,
+      title: "Projetos",
+      actions: h("button", { type: "button" }, "Novo projeto"),
+    }));
+    assert.doesNotMatch(html, /sticky-page-header-anchor|sticky-page-header-overlay|sticky-page-header-flow/);
+    assert.equal((html.match(/>Projetos</g) ?? []).length, 1);
+    assert.equal((html.match(/>Novo projeto</g) ?? []).length, 1);
   });
 } finally {
   rmSync(dir, { recursive: true, force: true });
