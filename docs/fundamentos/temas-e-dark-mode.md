@@ -27,7 +27,9 @@ const { mode, setMode, brand, setBrand, resolved } = useTheme();
 
 ## Marca de cliente
 
-Presets prontos em `src/styles/themes.css` (importado por `styles.css`): `oceano`, `floresta`, `vinho`, `grafite`, `violeta`.
+A aparência padrão é **G4 OS** (`g4os`, o visual do KV G4 OS): é aplicada sem `data-brand`, então não precisa de atributo. `useTheme` e `themeScript` tratam `g4os` como padrão (`DEFAULT_BRAND`).
+
+Presets prontos em `src/styles/themes.css` (importado por `styles.css`): `g4-classico` (G4 clássico, o tema anterior ao KV: branco, grafite e Royal Gold; combine com `data-type="classica"` para a Figtree), `g4-institucional`, `oceano`, `floresta`, `vinho`, `grafite`, `violeta`.
 
 ```html
 <html data-theme="system" data-brand="oceano">

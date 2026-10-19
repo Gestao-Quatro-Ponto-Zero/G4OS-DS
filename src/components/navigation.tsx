@@ -9,6 +9,7 @@ import { usePortalContainer } from "../lib/portal";
 import { popupClass } from "./overlays";
 import { NavRailItem, NavTreeGroup, SidebarUserMenu, navHasActiveChild, useNavOpenState, type NavGroup, type SidebarUser } from "./nav-tree";
 import { DsLink } from "./primitives";
+import { G4OSSymbol } from "./g4os";
 
 /* ================================================================== */
 /* StickyHeader                                                        */
@@ -658,17 +659,8 @@ export function Sidebar({
 
 /** Marca-padrão (grafo de três nós, um dourado). Troque pela marca do produto. */
 export function ProductMark({ size = 28 }: { size?: number }) {
-  return (
-    // ds-audit-ignore-start hex-color: logotipo (cores fixas da marca G4 OS)
-    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" aria-hidden>
-      <rect width="28" height="28" rx="8" fill="var(--ds-ink)" />
-      <path d="m9 12 10-2.5-2.5 9.5L9 12Z" stroke="var(--ds-page)" strokeWidth="1.1" />
-      <circle cx="9" cy="12" r="2" fill="var(--ds-page)" />
-      <circle cx="19" cy="9.5" r="2" fill="var(--ds-page)" />
-      <circle cx="16.5" cy="19" r="2.3" fill="var(--ds-accent)" />
-    </svg>
-    // ds-audit-ignore-end
-  );
+  // Logotipo do produto: a esfera G4 OS do KV.
+  return <G4OSSymbol size={size} />;
 }
 
 /** Indicador de sincronização no pé da sidebar. */

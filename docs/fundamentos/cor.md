@@ -1,14 +1,14 @@
 # Cor
 
-Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, PDF e e-mail). `npm run check:tokens` falha se os dois divergirem. A arquitetura (primitivos → semânticos → utilitários) está em [tokens.md](tokens.md); tema escuro e marcas em [temas-e-dark-mode.md](temas-e-dark-mode.md). Os hex abaixo são do **tema claro G4**: em componente use sempre o utilitário ou `var(--color-…)`, nunca o hex.
+Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, PDF e e-mail). `npm run check:tokens` falha se os dois divergirem. A arquitetura (primitivos → semânticos → utilitários) está em [tokens.md](tokens.md); tema escuro e marcas em [temas-e-dark-mode.md](temas-e-dark-mode.md). Os hex abaixo são do **tema claro G4 OS** (visual do KV G4 OS): em componente use sempre o utilitário ou `var(--color-…)`, nunca o hex.
 
 ## A regra que decide 90 % dos casos
 
 **A interface é superfície e gelo. Cor aparece só quando carrega significado, e sempre com uma palavra ao lado.** Vale igual no tema escuro.
 
-- Fundo de trabalho: `bg-page`. Cards, painéis, tabelas e campos: `bg-surface`. Menus, modais e toasts: `bg-popover`. Nunca `bg-white`.
+- Fundo de trabalho: `bg-page` (o gelo `#f9f9f9` do KV, não branco). Cards, painéis, tabelas e campos: `bg-surface`. Menus, modais e toasts: `bg-popover`. Nunca `bg-white`.
 - Gelo (`bg-soft`, `bg-rail`) só delimita: sidebar, cabeçalho de tabela, hover, rodapé de drawer, moldura de `ListPanel`.
-- Ação principal e seleção usam **`bg-primary text-on-primary`**: tinta no tema G4, a cor da marca num cliente com `data-brand`. Um botão dourado não existe (dourado é destaque, não ação).
+- Ação principal e seleção usam **`bg-primary text-on-primary`**: Navy Blue no tema G4 OS, a cor da marca num cliente com `data-brand`. Um botão dourado não existe (dourado é destaque, não ação).
 - Texto sobre preenchimento forte (`bg-ink`, `bg-rose`, `bg-ok`) é `text-on-ink`, nunca `text-white` (no escuro esses fundos ficam claros).
 - Separação de superfícies é feita por **borda de 1 px** (`border-line`), não por sombra nem por fundo colorido.
 
@@ -16,17 +16,17 @@ Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, P
 
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `page` | `#ffffff` | fundo de trabalho |
+| `page` | `#f9f9f9` | fundo de trabalho: o gelo do KV |
 | `surface` | `#ffffff` | card, painel, tabela, campo |
 | `popover` | `#ffffff` | menu, popover, modal, toast |
-| `soft` | `#f8f8f9` | hover, cabeçalho de tabela, faixas de rodapé, trilhas de progresso |
-| `rail` | `#fbfbfc` | fundo da sidebar |
-| `line` | `#e9eaed` | toda borda e divisória |
-| `line-strong` | `#d2d4da` | hover de card, borda de checkbox, separador `›` |
-| `muted` | `#63666e` | metadado, rótulo, placeholder (contraste AA sobre branco) |
-| `ink-soft` | `#484a50` | texto secundário forte, ícone ativo |
-| `ink` | `#202124` | texto principal, série 1 de gráfico |
-| `primary` / `on-primary` | `#202124` / `#ffffff` | ação principal e seleção / texto sobre ela (troca com a marca) |
+| `soft` | `#f1f4f6` | hover, cabeçalho de tabela, faixas de rodapé, trilhas de progresso |
+| `rail` | `#f3f5f7` | fundo da sidebar |
+| `line` | `#e4e7ea` | toda borda e divisória |
+| `line-strong` | `#d5dbe0` | hover de card, borda de checkbox, separador `›` |
+| `muted` | `#5b6670` | metadado, rótulo, placeholder (AA sobre branco e sobre o gelo) |
+| `ink-soft` | `#184560` | texto secundário forte, ícone ativo |
+| `ink` | `#031a26` | texto principal (Maua Blue) |
+| `primary` / `on-primary` | `#001f35` / `#ffffff` | ação principal e seleção (Navy Blue) / texto sobre ela (troca com a marca) |
 | `on-ink` | `#ffffff` | texto sobre `bg-ink`, `bg-rose`, `bg-ok`, `bg-amber` |
 
 `muted` é **cor de texto**. Não use como fundo (`bg-muted` fica cinza-escuro). Fundo neutro é `bg-soft`.
@@ -36,12 +36,14 @@ Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, P
 | Token | Hex | Uso |
 | --- | --- | --- |
 | `navy` | `#031a26` | superfícies escuras de marca: painel de login, capa, hero |
-| `blue` | `#184560` | link, ação textual, estado "em andamento", tom `info` em texto |
+| `blue` | `#005b98` | link, ação textual, estado "em andamento", tom `info` em texto |
 | `clay` / `clay-soft` | `#842e20` / `#f6e7e3` | ênfase editorial, identidade de conta |
-| `accent` | `#b9915b` | **só preenchimento**: progresso de marca, moldura de próximo passo, destaque de série |
-| `accent-deep` | `#7d5e33` | texto dourado (o `accent` não passa em contraste como texto) |
-| `accent-soft` | `#f5eee3` | fundo de "próximo passo", seleção de texto |
+| `accent` | `#a38e5a` | **só preenchimento**: progresso de marca, moldura de próximo passo, destaque de série |
+| `accent-deep` | `#6e5a2c` | texto dourado (o `accent` não passa em contraste como texto) |
+| `accent-soft` | `#f4efe4` | fundo de "próximo passo", seleção de texto |
 | `founders` | `#441b1b` | legado; uso restrito a produtos do programa Founders |
+| `ai-accent` / `ai-accent-soft` | `#0084dd` / `#cadfeb` | **só IA**: botão enviar, orb, indicador de pensamento. Nunca texto. |
+| `gradient-brand` | dourado → aço → azul | título de momento (saudação da IA, capa, login); um por tela, nunca em texto de trabalho |
 
 O dourado é o único gesto de marca dentro do produto. Use pouco: se tudo é dourado, nada é.
 
@@ -54,7 +56,7 @@ Cada tom tem a versão forte (texto, ícone, ponto) e a `-soft` (fundo).
 | `ok` | `#1b5e20` | `#e8f5e9` | concluído, aprovado, dentro da meta, pago |
 | `amber` (warn) | `#b54500` | `#fff3e0` | atenção, prazo próximo, abaixo do ritmo, parado |
 | `rose` (bad) | `#b71c1c` | `#ffebee` | erro, bloqueado, atrasado, vencido, perdido |
-| `info` | `#0d47a1` | `#e3f2fd` | informação neutra do sistema (novidade, dica) |
+| `info` | `#005b98` | `#e3f2fd` | informação neutra do sistema (novidade, dica) |
 
 Nos componentes, esses tons chegam pelo tipo `Tone = "neutral" | "ok" | "warn" | "bad" | "info" | "accent"`. Prefira passar `tone` a pintar à mão.
 

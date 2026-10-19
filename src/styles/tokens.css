@@ -58,6 +58,25 @@
   --g4-wine-900: #441b1b;
   --g4-sage-500: #5f7f6f;
 
+  /* KV G4 OS: gelo, azul da esfera e dourado terroso. */
+  --g4-kv-ice: #f9f9f9; /* fundo do KV */
+  --g4-kv-ice-blue: #f1f4f6; /* gelo azulado: hover, cabeçalho, trilho */
+  --g4-kv-rail: #f3f5f7; /* sidebar */
+  --g4-kv-line: #e4e7ea;
+  --g4-kv-line-strong: #d5dbe0;
+  --g4-kv-muted: #5b6670; /* texto de apoio: 5,6:1 sobre o gelo */
+  --g4-kv-deep: #005b98; /* azul profundo: link, foco, info */
+  --g4-kv-sky: #0084dd; /* azul-céu: só preenchimento da IA (enviar, orb) */
+  --g4-kv-sky-soft: #cadfeb;
+  --g4-kv-gold: #a38e5a; /* dourado do KV: marcador, progresso */
+  --g4-kv-gold-deep: #6e5a2c; /* texto dourado */
+  --g4-kv-gold-soft: #f4efe4;
+  --g4-kv-gold-light: #caa977;
+  --g4-kv-slate: #9ca3af;
+  --g4-kv-steel: #3b5766; /* meio do gradiente: azul acinzentado */
+  --g4-kv-mist: #768086;
+  --g4-kv-abyss: #004777; /* núcleo do orb */
+
   --g4-green-800: #1b5e20;
   --g4-green-50: #e8f5e9;
   --g4-orange-800: #e65100;
@@ -77,40 +96,40 @@
   color-scheme: light;
 
   /* Superfícies */
-  --ds-page: var(--g4-white); /* fundo da área de trabalho */
+  --ds-page: var(--g4-kv-ice); /* fundo da área de trabalho */
   --ds-surface: var(--g4-white); /* card, painel, tabela, campo */
   --ds-popover: var(--g4-white); /* menu, popover, modal, toast */
-  --ds-soft: var(--g4-gray-50); /* gelo: hover, cabeçalho de tabela, rodapé */
-  --ds-rail: var(--g4-gray-25); /* sidebar */
+  --ds-soft: var(--g4-kv-ice-blue); /* gelo: hover, cabeçalho de tabela, rodapé */
+  --ds-rail: var(--g4-kv-rail); /* sidebar */
 
   /* Texto e linhas */
-  --ds-ink: var(--g4-gray-900); /* texto principal */
-  --ds-ink-soft: var(--g4-gray-700); /* texto secundário forte */
-  --ds-muted: var(--g4-gray-500); /* metadado, rótulo, placeholder (AA) */
-  --ds-line: var(--g4-gray-100); /* toda borda e divisória */
-  --ds-line-strong: var(--g4-gray-200); /* hover de card, borda de checkbox */
+  --ds-ink: var(--g4-maua-blue); /* texto principal */
+  --ds-ink-soft: var(--g4-scaling-blue); /* texto secundário forte */
+  --ds-muted: var(--g4-kv-muted); /* metadado, rótulo, placeholder (AA) */
+  --ds-line: var(--g4-kv-line); /* toda borda e divisória */
+  --ds-line-strong: var(--g4-kv-line-strong); /* hover de card, borda de checkbox */
   --ds-on-ink: var(--g4-white); /* texto sobre preenchimento forte (ink, rose, ok…) */
 
   /* Ação principal: por padrão é a tinta. Marcas trocam aqui. */
-  --ds-primary: var(--g4-gray-900);
+  --ds-primary: var(--g4-navy-blue);
   --ds-on-primary: var(--g4-white);
 
   /* Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela. */
   --ds-brand: var(--g4-navy-blue);
   --ds-on-brand: var(--g4-royal-silver);
-  --ds-brand-accent: var(--g4-royal-gold);
+  --ds-brand-accent: var(--g4-kv-gold);
   /* Marcador do item ativo na navegação (gesto de marca discreto). */
-  --ds-nav-marker: var(--g4-royal-gold);
+  --ds-nav-marker: var(--g4-kv-gold);
 
   /* Marca */
   --ds-navy: var(--g4-navy-900); /* superfícies escuras de marca (fica escura nos dois modos) */
-  --ds-blue: var(--g4-navy-700); /* link, ação textual, "em andamento" */
+  --ds-blue: var(--g4-kv-deep); /* link, ação textual, "em andamento" */
   --ds-clay: var(--g4-clay-700);
   --ds-clay-soft: var(--g4-clay-50);
   --ds-founders: var(--g4-wine-900);
-  --ds-accent: var(--g4-gold-500); /* SÓ preenchimento: progresso, foco, próximo passo */
-  --ds-accent-deep: var(--g4-gold-700); /* texto na cor de destaque */
-  --ds-accent-soft: var(--g4-gold-50);
+  --ds-accent: var(--g4-kv-gold); /* SÓ preenchimento: progresso, foco, próximo passo */
+  --ds-accent-deep: var(--g4-kv-gold-deep); /* texto na cor de destaque */
+  --ds-accent-soft: var(--g4-kv-gold-soft);
 
   /* Estados */
   --ds-ok: var(--g4-green-800);
@@ -119,20 +138,32 @@
   --ds-amber-soft: var(--g4-orange-50);
   --ds-rose: var(--g4-red-800);
   --ds-rose-soft: var(--g4-red-50);
-  --ds-info: var(--g4-blue-800);
+  --ds-info: var(--g4-kv-deep);
   --ds-info-soft: var(--g4-blue-50);
 
   /* Canvas escuros (grafo, IA) */
   --ds-ai: #18181b;
+  /* IA no KV: azul-céu só em preenchimento (botão enviar, orb, pensamento). */
+  --ds-ai-accent: var(--g4-kv-sky);
+  --ds-ai-accent-soft: var(--g4-kv-sky-soft);
+  /* Gradiente de marca do KV: só em título de momento, um por tela. */
+  --ds-gradient-brand: linear-gradient(90deg, #a38e5a 0%, #3b5766 38%, #005b98 72%, #5f87a6 100%);
+  /* Marca G4 OS (símbolo e "OS" do logotipo): dourado → aço → névoa. */
+  --ds-mark-gold: var(--g4-kv-gold-light);
+  --ds-mark-steel: var(--g4-kv-steel);
+  --ds-mark-mist: var(--g4-kv-mist);
+  --ds-orb-core: var(--g4-kv-abyss);
+  /* Névoa de fundo dos momentos de marca (o cinza quente desfocado do KV). */
+  --ds-haze: #ebeae6;
   --ds-graph: var(--g4-gray-950);
 
   /* Dados */
-  --ds-chart-1: var(--g4-gray-900);
-  --ds-chart-2: var(--g4-navy-700);
-  --ds-chart-3: var(--g4-gold-500);
+  --ds-chart-1: var(--g4-navy-blue);
+  --ds-chart-2: var(--g4-kv-deep);
+  --ds-chart-3: var(--g4-kv-gold);
   --ds-chart-4: var(--g4-clay-700);
   --ds-chart-5: var(--g4-sage-500);
-  --ds-chart-6: var(--g4-gray-400);
+  --ds-chart-6: var(--g4-kv-slate);
   --ds-chart-grid: #eef0f2;
 
   /* Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. */
@@ -160,12 +191,12 @@
   --ds-mark-bg: 8%;
 
   /* Foco e sobreposição */
-  --ds-focus: var(--g4-gray-500);
+  --ds-focus: var(--g4-kv-deep);
   --ds-backdrop: rgb(0 0 0 / 0.2);
 
   /* Sombras: quase invisíveis no claro */
-  --ds-shadow-surface: 0 1px 2px #20212403;
-  --ds-shadow-raised: 0 3px 12px #20212407;
+  --ds-shadow-surface: 0 1px 2px #031a260a, 0 8px 24px #031a260a;
+  --ds-shadow-raised: 0 24px 48px #031a2614, 0 2px 6px #031a260a;
   --ds-shadow-pressed: 0 1px 3px #20212408;
   --ds-shadow-primary: inset 0 1px 0 #ffffff24, 0 1px 2px #20212418;
   --ds-shadow-popup: 0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a;
@@ -173,15 +204,17 @@
   --ds-shadow-overlay: 0 25px 50px -12px #00000026;
 
   /* Forma e tipo da marca */
-  --ds-radius-scale: 1; /* 0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável */
-  --ds-font-sans: "Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif;
+  --ds-radius-scale: 1.25; /* 0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável */
+  --ds-font-sans: "Manrope", "Figtree", ui-sans-serif, system-ui, sans-serif;
   --ds-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   /* Títulos (h1 de página, título de registro, capa, hero). Pode ser serifada. */
   --ds-font-display: var(--ds-font-sans);
-  --ds-display-weight: 600;
+  --ds-display-weight: 500;
   --ds-display-tracking: -0.035em;
   /* Leitura longa (documentos, políticas, relatórios): serifa editorial. */
   --ds-font-reading: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  /* Assinatura do KV ("Sua empresa no piloto automático"): itálico serifado. */
+  --ds-font-tagline: "Libre Baskerville", Georgia, serif;
 }
 
 /* ==================================================================== */
@@ -228,6 +261,14 @@
   --ds-info-soft: #14233a;
   --ds-ai: #0e0e10;
   --ds-graph: #0b0b0d;
+  --ds-ai-accent: #4fb3f0;
+  --ds-ai-accent-soft: #15324a;
+  --ds-gradient-brand: linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%);
+  --ds-mark-gold: #c9a46f;
+  --ds-mark-steel: #8cb8da;
+  --ds-mark-mist: #6b6e76;
+  --ds-orb-core: #0a3a5e;
+  --ds-haze: #1d1d21;
   --ds-chart-1: #ececef;
   --ds-chart-2: #6fa8d6;
   --ds-chart-3: #c9a46f;
@@ -301,6 +342,14 @@
     --ds-rose-soft: #3a1719;
     --ds-info: #90b8f8;
     --ds-info-soft: #14233a;
+    --ds-ai-accent: #4fb3f0;
+    --ds-ai-accent-soft: #15324a;
+    --ds-gradient-brand: linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%);
+    --ds-mark-gold: #c9a46f;
+    --ds-mark-steel: #8cb8da;
+    --ds-mark-mist: #6b6e76;
+    --ds-orb-core: #0a3a5e;
+    --ds-haze: #1d1d21;
     --ds-chart-1: #ececef;
     --ds-chart-2: #6fa8d6;
     --ds-chart-3: #c9a46f;
@@ -378,6 +427,10 @@
   --color-info-soft: var(--ds-info-soft);
 
   --color-ai: var(--ds-ai);
+  --color-ai-accent: var(--ds-ai-accent);
+  --color-ai-accent-soft: var(--ds-ai-accent-soft);
+  --color-orb-core: var(--ds-orb-core);
+  --color-haze: var(--ds-haze);
   --color-graph: var(--ds-graph);
 
   --color-chart-1: var(--ds-chart-1);

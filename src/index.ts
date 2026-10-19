@@ -42,6 +42,7 @@ export * from "./components/data-grid";
 export * from "./components/ai-workspace";
 export * from "./components/ai-sessions";
 export * from "./components/brand";
+export * from "./components/g4os";
 export * from "./components/connections";
 export * from "./components/email-compose";
 export * from "./components/tags";

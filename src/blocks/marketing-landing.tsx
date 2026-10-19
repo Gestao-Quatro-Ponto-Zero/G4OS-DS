@@ -1,7 +1,9 @@
 import { ArrowRight, BarChart3, Bot, Check, Lock, Rocket, Workflow } from "lucide-react";
 
 import {
+  AiOrb,
   AreaChart,
+  BrandHaze,
   Button,
   FeatureGrid,
   HeroSection,
@@ -208,21 +210,21 @@ export default function MarketingLanding() {
         </section>
         {/* ds-audit-ignore-end white-black */}
 
-        {/* ds-audit-ignore-start white-black: faixa de CTA em bg-navy (escura nos dois modos) */}
         <section className="px-5 pb-16 sm:px-8">
-          <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-3xl bg-navy px-6 py-14 text-center text-white sm:px-12">
-            <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(50% 80% at 50% 0%, color-mix(in oklab, var(--color-accent) 30%, transparent), transparent 70%)" }} />
-            <div className="relative">
-              <h2 className="m-0 text-balance text-[30px] font-semibold tracking-[-0.03em] sm:text-[38px]">Seu próximo trimestre começa hoje</h2>
-              <p className="mx-auto mt-3 max-w-[520px] text-[15px] text-white/75">Importe sua planilha em minutos e veja o pipeline real antes da próxima reunião de vendas.</p>
-              <div className="mt-7 flex flex-wrap justify-center gap-3">
-                <a href={authRoutes.signup} className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-4 text-[13.5px] font-medium text-navy hover:bg-white/90">
-                  Começar grátis <ArrowRight className="h-4 w-4" />
-                </a>
-                <a href="mailto:vendas@atlas.app" className="inline-flex h-10 items-center rounded-lg px-4 text-[13.5px] font-medium text-white ring-1 ring-white/30 hover:bg-white/10">
-                  Falar com vendas
-                </a>
-              </div>
+          <div className="relative isolate mx-auto max-w-[1200px] overflow-hidden rounded-3xl border border-line bg-soft px-6 py-14 text-center sm:px-12">
+            <BrandHaze size={720} className="absolute left-1/2 top-[-60%] -z-10 -translate-x-1/2" />
+            <AiOrb size={300} blur={24} className="absolute -right-20 -top-24 -z-10 opacity-50" />
+            <h2 className="m-0 text-balance text-[30px] font-medium tracking-[-0.03em] sm:text-[40px]">
+              <span className="ds-gradient-text">Seu próximo trimestre</span> <span className="text-ink-soft">começa hoje</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-[520px] text-[15px] text-muted">Importe sua planilha em minutos e veja o pipeline real antes da próxima reunião de vendas.</p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Button href={authRoutes.signup}>
+                Começar grátis <ArrowRight />
+              </Button>
+              <Button variant="ghost" href="mailto:vendas@atlas.app">
+                Falar com vendas
+              </Button>
             </div>
           </div>
         </section>

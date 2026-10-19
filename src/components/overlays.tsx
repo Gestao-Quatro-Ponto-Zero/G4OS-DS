@@ -237,9 +237,14 @@ export function Popover({
   width = 300,
   align = "center",
   side = "bottom",
+  open,
+  onOpenChange,
 }: {
   trigger: ReactNode;
   triggerLabel: string;
+  /** Controlado: estado aberto (use com onOpenChange, ex.: fechar ao escolher uma opção). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   triggerClassName?: string;
   title?: ReactNode;
   children: ReactNode;
@@ -249,7 +254,7 @@ export function Popover({
   side?: "top" | "bottom" | "left" | "right";
 }) {
   return (
-    <BasePopover.Root>
+    <BasePopover.Root open={open} onOpenChange={onOpenChange ? (o) => onOpenChange(o) : undefined}>
       <BasePopover.Trigger
         aria-label={triggerLabel}
         className={cn(

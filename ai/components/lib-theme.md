@@ -18,6 +18,10 @@ applyTheme(mode, brand?, root?, type?): void
 
 Presets de themes.css.
 
+## DEFAULT_BRAND (const)
+
+Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand.
+
 ## resolvedTheme (function)
 
 Tema efetivo agora ("system" resolvido pelo SO).
