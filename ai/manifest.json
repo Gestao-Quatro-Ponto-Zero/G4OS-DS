@@ -2462,6 +2462,13 @@
               "description": null
             },
             {
+              "name": "compact",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Conteúdo da cópia compacta, exibida só depois que o conteúdo normal sai pelo topo."
+            },
+            {
               "name": "enabled",
               "type": "boolean | undefined",
               "required": false,

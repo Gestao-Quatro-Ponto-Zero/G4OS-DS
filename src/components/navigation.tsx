@@ -4,6 +4,7 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Check, ChevronRight, MoreHorizontal, PanelLeft, Search } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { inertProps } from "../lib/inert";
 import { usePortalContainer } from "../lib/portal";
 import { popupClass } from "./overlays";
 import { NavRailItem, NavTreeGroup, SidebarUserMenu, navHasActiveChild, useNavOpenState, type NavGroup, type SidebarUser } from "./nav-tree";
@@ -19,15 +20,22 @@ import { DsLink } from "./primitives";
  * reduzir título, mostrar a linha inferior). Também publica
  * `--pinned-header-height` no scroller, para o foco de teclado não ficar
  * escondido atrás do cabeçalho.
+ *
+ * Com `compact`, o conteúdo normal permanece intacto no fluxo e uma cópia
+ * compacta aparece sobre uma âncora sticky de altura zero. Assim compactar
+ * nunca muda `scrollHeight` nem a posição do conteúdo abaixo.
  */
 export function StickyHeader({
   children,
+  compact,
   className,
   enabled = true,
   scroller: scrollerSelector,
   scrollerKey,
 }: {
   children: ReactNode;
+  /** Conteúdo da cópia compacta, exibida só depois que o conteúdo normal sai pelo topo. */
+  compact?: ReactNode;
   className?: string;
   enabled?: boolean;
   /** Seletor de um irmão que rola no lugar do ancestral (cabeçalho fixo acima de painel rolável). */
@@ -36,6 +44,9 @@ export function StickyHeader({
   scrollerKey?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
+  const compactRef = useRef<HTMLElement>(null);
+  const hasCompact = compact !== undefined;
+  const usesCompactOverlay = hasCompact && !scrollerSelector;
   useEffect(() => {
     const header = ref.current;
     if (!header || !enabled) return;
@@ -49,6 +60,61 @@ export function StickyHeader({
     if (!parent) return;
     const scroller = parent;
     const external = Boolean(scrollerSelector);
+
+    if (usesCompactOverlay) {
+      const compactHeader = compactRef.current;
+      if (!compactHeader) return;
+      const observed = header.querySelector<HTMLElement>("[data-sticky-observer]") ?? header;
+      const flowActions = header.querySelectorAll<HTMLElement>("[data-sticky-actions]");
+      const setStuck = (stuck: boolean) => {
+        compactHeader.toggleAttribute("data-stuck", stuck);
+        compactHeader.toggleAttribute("inert", !stuck);
+        for (const actions of flowActions) actions.toggleAttribute("inert", stuck);
+      };
+      const publishHeight = () => {
+        const height = compactHeader.getBoundingClientRect().height;
+        scroller.style.setProperty("--page-header-height", `${height}px`);
+        scroller.style.setProperty("--pinned-header-height", `${height + 12}px`);
+      };
+
+      scroller.setAttribute("data-compact-page-header", "");
+      setStuck(false);
+      publishHeight();
+
+      const resizeObserver = new ResizeObserver(publishHeight);
+      resizeObserver.observe(compactHeader);
+      resizeObserver.observe(scroller);
+
+      if (typeof IntersectionObserver === "undefined") {
+        return () => {
+          resizeObserver.disconnect();
+          setStuck(false);
+          scroller.removeAttribute("data-compact-page-header");
+          scroller.style.removeProperty("--page-header-height");
+          scroller.style.removeProperty("--pinned-header-height");
+        };
+      }
+
+      const intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          const entry = entries.at(-1);
+          if (!entry) return;
+          const rootTop = entry.rootBounds?.top ?? scroller.getBoundingClientRect().top;
+          setStuck(!entry.isIntersecting && entry.boundingClientRect.bottom <= rootTop + 1);
+        },
+        { root: scroller, threshold: 0 },
+      );
+      intersectionObserver.observe(observed);
+      return () => {
+        intersectionObserver.disconnect();
+        resizeObserver.disconnect();
+        setStuck(false);
+        scroller.removeAttribute("data-compact-page-header");
+        scroller.style.removeProperty("--page-header-height");
+        scroller.style.removeProperty("--pinned-header-height");
+      };
+    }
+
     let frame = 0;
     const sync = () => {
       cancelAnimationFrame(frame);
@@ -76,7 +142,27 @@ export function StickyHeader({
       scroller.removeEventListener("scroll", sync);
       observer.disconnect();
     };
-  }, [enabled, scrollerSelector, scrollerKey]);
+  }, [enabled, scrollerSelector, scrollerKey, usesCompactOverlay]);
+
+  if (enabled && usesCompactOverlay) {
+    return (
+      <>
+        <div className="sticky-page-header-anchor">
+          <header
+            {...inertProps(true)}
+            ref={compactRef}
+            className={cn("sticky-page-header-overlay", className)}
+          >
+            {compact}
+          </header>
+        </div>
+        <header ref={ref} className={cn("sticky-page-header-flow", className)}>
+          {children}
+        </header>
+      </>
+    );
+  }
+
   return (
     <header ref={ref} className={cn(enabled && "sticky-page-header", className)}>
       {children}
@@ -228,15 +314,27 @@ export function PageHeading({
   kicker?: ReactNode;
 }) {
   const Heading = compact ? "h2" : "h1";
+  const actionSlot = actions && <div className="page-heading-actions">{actions}</div>;
   return (
-    <StickyHeader enabled={sticky} className={cn("page-heading", compact && "page-heading-compact")}>
+    <StickyHeader
+      enabled={sticky}
+      className={cn("page-heading", compact && "page-heading-compact")}
+      compact={
+        <>
+          <span aria-hidden="true" className="page-heading-pinned-title">
+            {title}
+          </span>
+          {actionSlot}
+        </>
+      }
+    >
       {crumbs && crumbs.length > 0 && <Breadcrumb items={crumbs} className="page-heading-crumbs" />}
-      <div className="min-w-0">
+      <div className="min-w-0" data-sticky-observer="">
         {kicker && <p className="m-0 mb-2 text-[11px] text-muted first-letter:uppercase">{kicker}</p>}
         <Heading>{title}</Heading>
         {description && <p data-header-description="">{description}</p>}
       </div>
-      {actions && <div className="page-heading-actions">{actions}</div>}
+      {actions && <div className="page-heading-actions" data-sticky-actions="">{actions}</div>}
     </StickyHeader>
   );
 }

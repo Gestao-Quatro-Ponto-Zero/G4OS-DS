@@ -27,6 +27,7 @@
   scroll-padding-block: 24px;
   scroll-padding-top: var(--pinned-header-height, 24px);
 }
+.page-inset[data-compact-page-header] { --sticky-top: 0px; }
 .page-gutter {
   padding-inline: 20px;
 }
@@ -57,11 +58,14 @@
 .page-inset[data-page-width="medium"] { --page-max: 1024px; }
 .page-inset[data-page-width="narrow"] { --page-max: 896px; }
 .page-inset[data-page-width="reading"] { --page-max: 720px; }
-.page-inset[data-page-width] > :not(.sticky-page-header):not(.page-toolbar) {
+.page-inset[data-page-width] > :not(.sticky-page-header):not(.sticky-page-header-flow):not(.sticky-page-header-anchor):not(.page-toolbar) {
   max-width: var(--page-max);
   margin-inline: auto;
 }
-.page-inset[data-page-width] > :is(.sticky-page-header, .page-toolbar) {
+.page-inset[data-page-width] > :is(.sticky-page-header, .sticky-page-header-flow, .page-toolbar) {
+  padding-inline: max(0px, calc((100% - var(--page-max)) / 2));
+}
+.page-inset[data-page-width] > .sticky-page-header-anchor > .sticky-page-header-overlay {
   padding-inline: max(0px, calc((100% - var(--page-max)) / 2));
 }
 /* Respiro padrão entre o cabeçalho da página e o conteúdo: o app não precisa
@@ -154,11 +158,76 @@
 .sticky-page-header[data-stuck] [data-header-description] { display: none; }
 .sticky-page-header[data-stuck] h1 { font-size: 20px; }
 
+/* PageHeading preserva o cabeçalho completo no fluxo e mostra esta cópia
+   compacta sobre uma âncora de altura zero. Trocar de estado não altera a
+   geometria do rolador, portanto passos pequenos de trackpad não voltam a
+   página ao topo e listas quase do tamanho da janela continuam alcançáveis. */
+.sticky-page-header-anchor {
+  position: sticky;
+  top: var(--sticky-top, 0px);
+  z-index: var(--z-sticky);
+  height: 0;
+}
+.sticky-page-header-flow {
+  position: relative;
+}
+.sticky-page-header-overlay {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  flex-wrap: nowrap;
+  min-height: 52px;
+  padding-block: 10px;
+  background: var(--ds-page);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity var(--duration-state) ease,
+    transform var(--duration-state) ease;
+}
+.sticky-page-header-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(-1 * var(--page-gutter, 0px));
+  z-index: -1;
+  background: var(--ds-page);
+}
+.sticky-page-header-overlay::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  inset-inline: calc(-1 * var(--page-gutter, 0px));
+  height: 12px;
+  background: linear-gradient(to bottom, var(--ds-page), transparent);
+  pointer-events: none;
+}
+.sticky-page-header-overlay[data-stuck] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.page-heading-pinned-title {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--ds-font-display);
+  font-size: 20px;
+  font-weight: var(--ds-display-weight);
+  letter-spacing: var(--ds-display-tracking);
+}
+
 @media (max-width: 639.98px) {
   .page-heading h1 { font-size: 23px; }
   .page-heading-actions { gap: 8px; }
   .sticky-page-header[data-stuck] { gap: 8px; padding-block: 8px; }
   .sticky-page-header[data-stuck] .page-heading-actions { gap: 6px; }
+  .sticky-page-header-overlay { min-height: 44px; padding-block: 6px; }
+  .sticky-page-header-overlay .page-heading-actions { flex-wrap: nowrap; flex-shrink: 0; gap: 6px; }
+  .sticky-page-header-overlay .page-heading-actions > :not(:last-child):not(.ui-button-primary):not(:has(.ui-button-primary)) { display: none; }
+  .page-heading-pinned-title { font-size: 18px; }
 }
 
 /* Barra da página (filtros/visões) colada abaixo do cabeçalho fixo. O fundo se
@@ -218,8 +287,14 @@
 
 /* Barra de contexto de uma página de registro (ciclo, tarefa, reunião). */
 .context-bar { --page-gutter: 0px; }
-.context-bar[data-stuck] { padding-block: 0; }
 .context-bar[data-stuck]::after { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sticky-page-header-overlay {
+    transform: none;
+    transition: none;
+  }
+}
 
 /* ==================================================================== */
 /* Cabeçalho de entidade (EntityHeader): identidade + abas, compacta ao rolar */

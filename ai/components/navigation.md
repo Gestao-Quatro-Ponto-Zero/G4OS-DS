@@ -248,6 +248,7 @@ Cabeçalho que gruda no topo do ancestral rolável e marca `data-stuck` quando g
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
+| `compact` | `ReactNode` |  | Conteúdo da cópia compacta, exibida só depois que o conteúdo normal sai pelo topo. |
 | `enabled` | `boolean \| undefined` | `true` |  |
 | `scroller` | `string \| undefined` |  | Seletor de um irmão que rola no lugar do ancestral (cabeçalho fixo acima de painel rolável). |
 | `scrollerKey` | `string \| undefined` |  | Reanexa quando o irmão rolável é recriado (troca de rota). |
