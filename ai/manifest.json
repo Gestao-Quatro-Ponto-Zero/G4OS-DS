@@ -1128,6 +1128,20 @@
               "description": "Alinhamento em relação ao gatilho."
             },
             {
+              "name": "onOpenChange",
+              "type": "((open: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "open",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Controlado: estado aberto (use com onOpenChange, ex.: fechar ao escolher uma opção)."
+            },
+            {
               "name": "side",
               "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | undefined",
               "required": false,
@@ -34440,7 +34454,7 @@
       "pergaminho",
       "ledger",
       "caderno",
-      "g4",
+      "g4-classico",
       "g4-institucional"
     ]
   }

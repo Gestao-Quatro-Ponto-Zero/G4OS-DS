@@ -55,8 +55,11 @@ const featured = featuredSlugs.map((s) => blocks.find((b) => b.slug === s)).filt
 function Appearance() {
   const t = useTheme("light");
   const current = brandPresets.find((b) => b.id === t.brand) ?? brandPresets[0];
+  const [open, setOpen] = useState(false);
   return (
     <Popover
+      open={open}
+      onOpenChange={setOpen}
       triggerLabel="Aparência: tema, marca e tipografia"
       triggerClassName="h-8 rounded-lg border border-line bg-surface px-2.5 text-ink hover:border-line-strong"
       width={340}
@@ -82,7 +85,10 @@ function Appearance() {
                 key={b.id}
                 type="button"
                 aria-pressed={t.brand === b.id}
-                onClick={() => t.setBrand(b.id)}
+                onClick={() => {
+                  t.setBrand(b.id);
+                  setOpen(false);
+                }}
                 className={cn("flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[12px] ring-1", t.brand === b.id ? "bg-soft font-medium text-ink ring-line-strong" : "text-ink-soft ring-line hover:bg-soft")}
               >
                 <span aria-hidden className="flex shrink-0">

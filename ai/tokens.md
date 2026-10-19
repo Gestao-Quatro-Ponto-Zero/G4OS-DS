@@ -128,6 +128,6 @@ Valores arbitrários permitidos (iguais à escala ou meios-passos de componentes
 
 ## Marcas prontas (`<html data-brand=…>`)
 
-`cliente`, `oceano`, `floresta`, `vinho`, `grafite`, `violeta`, `pergaminho`, `ledger`, `caderno`, `g4`, `g4-institucional`
+`cliente`, `oceano`, `floresta`, `vinho`, `grafite`, `violeta`, `pergaminho`, `ledger`, `caderno`, `g4-classico`, `g4-institucional`
 
 Nova marca: sobrescreva só `--ds-*` em `[data-brand="x"]` e `[data-brand="x"][data-theme="dark"]`. Detalhes: `docs/fundamentos/temas-e-dark-mode.md`.

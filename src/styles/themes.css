@@ -326,7 +326,7 @@
 /* ---------------- G4 clássico: o tema padrão anterior ao KV G4 OS.
    Branco, tinta grafite e Royal Gold; IA sem o azul-céu. Para
    produtos que ainda não migraram. O escuro é o mesmo neutro do padrão. --- */
-[data-brand="g4"] {
+[data-brand="g4-classico"] {
   --ds-page: var(--g4-white);
   --ds-soft: var(--g4-gray-50);
   --ds-rail: var(--g4-gray-25);
@@ -357,7 +357,7 @@
   --ds-radius-scale: 1;
   /* Tipografia é outro eixo: a Figtree do clássico fica em data-type="classica". */
 }
-[data-brand="g4"][data-theme="dark"] {
+[data-brand="g4-classico"][data-theme="dark"] {
   --ds-page: #111113;
   --ds-surface: #18181b;
   --ds-soft: #202024;
@@ -388,7 +388,7 @@
   --ds-shadow-raised: 0 4px 16px #00000059;
 }
 @media (prefers-color-scheme: dark) {
-  [data-brand="g4"][data-theme="system"] {
+  [data-brand="g4-classico"][data-theme="system"] {
     --ds-page: #111113;
     --ds-surface: #18181b;
     --ds-soft: #202024;

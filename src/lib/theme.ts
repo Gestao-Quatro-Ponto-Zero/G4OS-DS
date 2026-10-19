@@ -17,12 +17,15 @@ export const BRAND_KEY = "ds-brand";
 
 /** Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand. */
 export const DEFAULT_BRAND = "g4os";
-const isDefaultBrand = (b?: string | null) => !b || b === DEFAULT_BRAND;
+/** "g4" era o id do padrão antes do KV: quem o tem salvo passa ao padrão atual. */
+const LEGACY_DEFAULT_BRAND = "g4";
+const normalizeBrand = (b?: string | null) => (!b || b === LEGACY_DEFAULT_BRAND ? DEFAULT_BRAND : b);
+const isDefaultBrand = (b?: string | null) => normalizeBrand(b) === DEFAULT_BRAND;
 
-/** Presets de themes.css. "g4os" = padrão (sem atributo); "g4" = G4 clássico, anterior ao KV. */
+/** Presets de themes.css. "g4os" = padrão (sem atributo); "g4-classico" = tema anterior ao KV. */
 export const brandPresets = [
   { id: "g4os", label: "G4 OS (padrão)", primary: "#001f35", accent: "#a38e5a" },
-  { id: "g4", label: "G4 clássico", primary: "#202124", accent: "#b9915b" },
+  { id: "g4-classico", label: "G4 clássico", primary: "#202124", accent: "#b9915b" },
   { id: "g4-institucional", label: "G4 Institucional", primary: "#001f35", accent: "#b9915b" },
   { id: "oceano", label: "Oceano", primary: "#1554d1", accent: "#1554d1" },
   { id: "floresta", label: "Floresta", primary: "#1f5f45", accent: "#c8963e" },
@@ -101,7 +104,7 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
   // Sem valor salvo, herda o que já está no <html> (outra instância ou themeScript aplicou antes).
   const fromDom = (attr: string) => (typeof document !== "undefined" ? document.documentElement.getAttribute(attr) : null);
   const [mode, setModeState] = useState<ThemeMode>(() => ((typeof window !== "undefined" && ((read(THEME_KEY) as ThemeMode) || (fromDom("data-theme") as ThemeMode))) || initial));
-  const [brand, setBrandState] = useState<string>(() => (typeof window !== "undefined" && (read(BRAND_KEY) || fromDom("data-brand"))) || DEFAULT_BRAND);
+  const [brand, setBrandState] = useState<string>(() => (typeof window !== "undefined" && normalizeBrand(read(BRAND_KEY) || fromDom("data-brand"))) || DEFAULT_BRAND);
   const [type, setTypeState] = useState<string>(() => (typeof window !== "undefined" && (read(TYPE_KEY) || fromDom("data-type"))) || "g4");
 
   useEffect(() => {
@@ -110,14 +113,14 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
   useEffect(() => {
     const on = (e: StorageEvent) => {
       if (e.key === THEME_KEY && e.newValue) setModeState(e.newValue as ThemeMode);
-      if (e.key === BRAND_KEY && e.newValue) setBrandState(e.newValue);
+      if (e.key === BRAND_KEY && e.newValue) setBrandState(normalizeBrand(e.newValue));
       if (e.key === TYPE_KEY && e.newValue) setTypeState(e.newValue);
     };
     // Outras instâncias do hook no MESMO documento (storage só avisa outras abas/iframes).
     const local = (e: Event) => {
       const { key, value } = (e as CustomEvent<{ key: string; value: string }>).detail;
       if (key === THEME_KEY) setModeState(value as ThemeMode);
-      if (key === BRAND_KEY) setBrandState(value);
+      if (key === BRAND_KEY) setBrandState(normalizeBrand(value));
       if (key === TYPE_KEY) setTypeState(value);
     };
     window.addEventListener("storage", on);
@@ -144,4 +147,4 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
 }
 
 /** Script inline para o <head>: aplica o tema salvo antes da primeira pintura. */
-export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}"),y=localStorage.getItem("${TYPE_KEY}");d.setAttribute("data-theme",t);if(b&&b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
+export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}"),y=localStorage.getItem("${TYPE_KEY}");d.setAttribute("data-theme",t);if(b&&b!=="${DEFAULT_BRAND}"&&b!=="${LEGACY_DEFAULT_BRAND}")d.setAttribute("data-brand",b);if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
