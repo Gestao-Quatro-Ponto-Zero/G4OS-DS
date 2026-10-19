@@ -11254,13 +11254,20 @@
         {
           "name": "AiMark",
           "kind": "component",
-          "summary": "Marca do assistente (avatar redondo com brilho).",
+          "summary": "Marca do assistente: a esfera G4 OS num disco de gelo.",
           "props": [
             {
               "name": "className",
               "type": "string | undefined",
               "required": false,
               "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
               "description": null
             },
             {
@@ -18930,7 +18937,7 @@
     {
       "name": "brand",
       "file": "src/components/brand.tsx",
-      "summary": "Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.",
+      "summary": "Momentos de marca G4.",
       "exports": [
         {
           "name": "AchievementCard",
@@ -19050,7 +19057,7 @@
         {
           "name": "BrandPanel",
           "kind": "component",
-          "summary": "Painel navy com brilho dourado sutil e grade fina.",
+          "summary": "Painel de momento de marca.",
           "props": [
             {
               "name": "actions",
@@ -19114,12 +19121,300 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "tone",
+              "type": "BrandTone | undefined",
+              "required": false,
+              "default": "\"kv\"",
+              "description": "\"kv\" (padrão, claro) ou \"navy\" (painel escuro do manual de marca)."
             }
           ],
           "examplePage": "fund-marca"
         }
       ],
       "doc": "components/brand.md"
+    },
+    {
+      "name": "g4os",
+      "file": "src/components/g4os.tsx",
+      "summary": "Identidade G4 OS (KV G4 OS): a esfera, o logotipo, o gradiente de marca, o orb e os três pontos da IA.",
+      "exports": [
+        {
+          "name": "AiDots",
+          "kind": "component",
+          "summary": "Os três pontos da IA (navy, céu, gelo azul).",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "gap",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "6",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "AiGreeting",
+          "kind": "component",
+          "summary": "Saudação da IA no tom do KV: três pontos, o nome no gradiente de marca e a pergunta em navy com a última palavra esmaecendo.",
+          "props": [
+            {
+              "name": "align",
+              "type": "\"start\" | \"center\" | undefined",
+              "required": false,
+              "default": "\"start\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "greeting",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Olá\"",
+              "description": null
+            },
+            {
+              "name": "level",
+              "type": "1 | 2 | undefined",
+              "required": false,
+              "default": "1",
+              "description": "Nível do título: 1 na tela inicial, 2 quando a tela já tem um h1."
+            },
+            {
+              "name": "name",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "question",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"qual decisão você precisa tomar hoje?\"",
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"md\" | \"lg\" | undefined",
+              "required": false,
+              "default": "\"lg\"",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "AiOrb",
+          "kind": "component",
+          "summary": "Orb: a esfera da IA desfocada atrás do conteúdo (saudação, capa, login).",
+          "props": [
+            {
+              "name": "blur",
+              "type": "number | undefined",
+              "required": false,
+              "default": "8",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "420",
+              "description": null
+            },
+            {
+              "name": "style",
+              "type": "CSSProperties | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "BrandHaze",
+          "kind": "component",
+          "summary": "Névoa quente do KV, atrás de momentos de marca claros.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "760",
+              "description": null
+            },
+            {
+              "name": "style",
+              "type": "CSSProperties | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "G4OSLogo",
+          "kind": "component",
+          "summary": "Logotipo G4 OS: \"G4\" na tinta e \"OS\" fino no gradiente dourado → aço.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "24",
+              "description": null
+            },
+            {
+              "name": "symbol",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"G4 OS\"",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "G4OSSymbol",
+          "kind": "component",
+          "summary": "Esfera G4 OS: o símbolo da IA.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "32",
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "GradientText",
+          "kind": "component",
+          "summary": "Texto no gradiente de marca do KV.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "as",
+              "type": "ElementType | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        }
+      ],
+      "doc": "components/g4os.md"
     },
     {
       "name": "connections",
@@ -27315,7 +27610,7 @@
         ]
       },
       "uses": [
-        "AiMark",
+        "AiGreeting",
         "AiSource",
         "Button",
         "ChatComposer",
@@ -27680,6 +27975,8 @@
         ]
       },
       "uses": [
+        "AiGreeting",
+        "AiOrb",
         "ComposerChip",
         "Disclaimer",
         "FileCard",
@@ -31769,7 +32066,9 @@
         ]
       },
       "uses": [
+        "AiOrb",
         "AreaChart",
+        "BrandHaze",
         "Button",
         "FeatureGrid",
         "HeroSection",
@@ -33429,7 +33728,7 @@
       {
         "token": "--ds-page",
         "utility": "page",
-        "light": "#ffffff",
+        "light": "#f9f9f9",
         "dark": "#111113",
         "note": "fundo da área de trabalho"
       },
@@ -33450,49 +33749,49 @@
       {
         "token": "--ds-soft",
         "utility": "soft",
-        "light": "#f8f8f9",
+        "light": "#f1f4f6",
         "dark": "#202024",
         "note": "gelo: hover, cabeçalho de tabela, rodapé"
       },
       {
         "token": "--ds-rail",
         "utility": "rail",
-        "light": "#fbfbfc",
+        "light": "#f3f5f7",
         "dark": "#141416",
         "note": "sidebar"
       },
       {
         "token": "--ds-ink",
         "utility": "ink",
-        "light": "#202124",
+        "light": "#031a26",
         "dark": "#ececef",
         "note": "texto principal"
       },
       {
         "token": "--ds-ink-soft",
         "utility": "ink-soft",
-        "light": "#484a50",
+        "light": "#184560",
         "dark": "#c5c6cc",
         "note": "texto secundário forte"
       },
       {
         "token": "--ds-muted",
         "utility": "muted",
-        "light": "#63666e",
+        "light": "#5b6670",
         "dark": "#8f929a",
         "note": "metadado, rótulo, placeholder (AA)"
       },
       {
         "token": "--ds-line",
         "utility": "line",
-        "light": "#e9eaed",
+        "light": "#e4e7ea",
         "dark": "#2a2a2f",
         "note": "toda borda e divisória"
       },
       {
         "token": "--ds-line-strong",
         "utility": "line-strong",
-        "light": "#d2d4da",
+        "light": "#d5dbe0",
         "dark": "#3b3c43",
         "note": "hover de card, borda de checkbox"
       },
@@ -33506,7 +33805,7 @@
       {
         "token": "--ds-primary",
         "utility": "primary",
-        "light": "#202124",
+        "light": "#001f35",
         "dark": "#ececef",
         "note": null
       },
@@ -33534,14 +33833,14 @@
       {
         "token": "--ds-brand-accent",
         "utility": "brand-accent",
-        "light": "#b9915b",
+        "light": "#a38e5a",
         "dark": "#c9a46f",
         "note": "Marcador do item ativo na navegação (gesto de marca discreto)."
       },
       {
         "token": "--ds-nav-marker",
         "utility": "nav-marker",
-        "light": "#b9915b",
+        "light": "#a38e5a",
         "dark": "#c9a46f",
         "note": "Marca"
       },
@@ -33555,7 +33854,7 @@
       {
         "token": "--ds-blue",
         "utility": "blue",
-        "light": "#184560",
+        "light": "#005b98",
         "dark": "#8cb8da",
         "note": "link, ação textual, \"em andamento\""
       },
@@ -33583,21 +33882,21 @@
       {
         "token": "--ds-accent",
         "utility": "accent",
-        "light": "#b9915b",
+        "light": "#a38e5a",
         "dark": "#c9a46f",
         "note": "SÓ preenchimento: progresso, foco, próximo passo"
       },
       {
         "token": "--ds-accent-deep",
         "utility": "accent-deep",
-        "light": "#7d5e33",
+        "light": "#6e5a2c",
         "dark": "#dcbd8e",
         "note": "texto na cor de destaque"
       },
       {
         "token": "--ds-accent-soft",
         "utility": "accent-soft",
-        "light": "#f5eee3",
+        "light": "#f4efe4",
         "dark": "#2e2619",
         "note": "Estados"
       },
@@ -33646,7 +33945,7 @@
       {
         "token": "--ds-info",
         "utility": "info",
-        "light": "#0d47a1",
+        "light": "#005b98",
         "dark": "#90b8f8",
         "note": null
       },
@@ -33662,6 +33961,62 @@
         "utility": "ai",
         "light": "#18181b",
         "dark": "#0e0e10",
+        "note": "IA no KV: azul-céu só em preenchimento (botão enviar, orb, pensamento)."
+      },
+      {
+        "token": "--ds-ai-accent",
+        "utility": "ai-accent",
+        "light": "#0084dd",
+        "dark": "#4fb3f0",
+        "note": null
+      },
+      {
+        "token": "--ds-ai-accent-soft",
+        "utility": "ai-accent-soft",
+        "light": "#cadfeb",
+        "dark": "#15324a",
+        "note": "Gradiente de marca do KV: só em título de momento, um por tela."
+      },
+      {
+        "token": "--ds-gradient-brand",
+        "utility": null,
+        "light": "linear-gradient(90deg, #a38e5a 0%, #3b5766 38%, #005b98 72%, #5f87a6 100%)",
+        "dark": "linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%)",
+        "note": "Marca G4 OS (símbolo e \"OS\" do logotipo): dourado → aço → névoa."
+      },
+      {
+        "token": "--ds-mark-gold",
+        "utility": null,
+        "light": "#caa977",
+        "dark": "#c9a46f",
+        "note": null
+      },
+      {
+        "token": "--ds-mark-steel",
+        "utility": null,
+        "light": "#3b5766",
+        "dark": "#8cb8da",
+        "note": null
+      },
+      {
+        "token": "--ds-mark-mist",
+        "utility": null,
+        "light": "#768086",
+        "dark": "#6b6e76",
+        "note": null
+      },
+      {
+        "token": "--ds-orb-core",
+        "utility": "orb-core",
+        "light": "#004777",
+        "dark": "#0a3a5e",
+        "note": "Névoa de fundo dos momentos de marca (o cinza quente desfocado do KV)."
+      },
+      {
+        "token": "--ds-haze",
+        "utility": "haze",
+        "light": "#ebeae6",
+        "dark": "#1d1d21",
         "note": null
       },
       {
@@ -33674,21 +34029,21 @@
       {
         "token": "--ds-chart-1",
         "utility": "chart-1",
-        "light": "#202124",
+        "light": "#001f35",
         "dark": "#ececef",
         "note": null
       },
       {
         "token": "--ds-chart-2",
         "utility": "chart-2",
-        "light": "#184560",
+        "light": "#005b98",
         "dark": "#6fa8d6",
         "note": null
       },
       {
         "token": "--ds-chart-3",
         "utility": "chart-3",
-        "light": "#b9915b",
+        "light": "#a38e5a",
         "dark": "#c9a46f",
         "note": null
       },
@@ -33709,7 +34064,7 @@
       {
         "token": "--ds-chart-6",
         "utility": "chart-6",
-        "light": "#a3a7b0",
+        "light": "#9ca3af",
         "dark": "#6b6e76",
         "note": null
       },
@@ -33863,7 +34218,7 @@
       {
         "token": "--ds-focus",
         "utility": null,
-        "light": "#63666e",
+        "light": "#005b98",
         "dark": "#8f929a",
         "note": null
       },
@@ -33877,14 +34232,14 @@
       {
         "token": "--ds-shadow-surface",
         "utility": null,
-        "light": "0 1px 2px #20212403",
+        "light": "0 1px 2px #031a260a, 0 8px 24px #031a260a",
         "dark": "0 1px 2px #00000040",
         "note": null
       },
       {
         "token": "--ds-shadow-raised",
         "utility": null,
-        "light": "0 3px 12px #20212407",
+        "light": "0 24px 48px #031a2614, 0 2px 6px #031a260a",
         "dark": "0 4px 16px #00000059",
         "note": null
       },
@@ -33926,14 +34281,14 @@
       {
         "token": "--ds-radius-scale",
         "utility": null,
-        "light": "1",
+        "light": "1.25",
         "dark": null,
         "note": "0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável"
       },
       {
         "token": "--ds-font-sans",
         "utility": null,
-        "light": "\"Figtree\", \"Figtree Fallback\", ui-sans-serif, system-ui, sans-serif",
+        "light": "\"Manrope\", \"Figtree\", ui-sans-serif, system-ui, sans-serif",
         "dark": null,
         "note": null
       },
@@ -33954,7 +34309,7 @@
       {
         "token": "--ds-display-weight",
         "utility": null,
-        "light": "600",
+        "light": "500",
         "dark": null,
         "note": null
       },
@@ -33969,6 +34324,13 @@
         "token": "--ds-font-reading",
         "utility": null,
         "light": "\"Source Serif 4\", \"Source Serif Pro\", Georgia, \"Times New Roman\", serif",
+        "dark": null,
+        "note": "Assinatura do KV (\"Sua empresa no piloto automático\"): itálico serifado."
+      },
+      {
+        "token": "--ds-font-tagline",
+        "utility": null,
+        "light": "\"Libre Baskerville\", Georgia, serif",
         "dark": null,
         "note": null
       }

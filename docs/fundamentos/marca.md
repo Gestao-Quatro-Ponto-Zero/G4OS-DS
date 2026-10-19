@@ -12,7 +12,7 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 
 O tema padrão segue o key visual do G4 OS: fundo gelo `#F9F9F9`, texto em Maua Blue, ação em Navy, raio 25 % maior (`--ds-radius-scale: 1.25`), sombras longas e difusas e a tipografia Manrope.
 
-- **Gradiente de marca** (`--ds-gradient-brand`): dourado `#A38E5A` → `#3B5766` → azul `#005B98` → ardósia `#9CA3AF` → gelo. Aplicado como `background-clip: text` em títulos de momento; termina dissolvido no fundo de propósito.
+- **Gradiente de marca** (`--ds-gradient-brand`): dourado `#A38E5A` → aço `#3B5766` → azul `#005B98` → azul acinzentado `#5F87A6`. Aplicado como `background-clip: text` em títulos de momento. No KV ele se dissolve no fundo; na interface termina em um azul legível (3:1 ou mais sobre o gelo).
 - **Esfera G4 OS**: o símbolo da IA. Em movimento ela gira, recalcula e conduz; parada, aparece como orb azul desfocado (`--ds-ai-accent`) atrás do conteúdo da IA. Um por tela.
 - **Azul-céu** (`#0084DD`) é exclusivo da IA: botão enviar, orb, os três pontos de "pensando". Ações comuns continuam em Navy.
 - **Dourado terroso** (`#A38E5A`) substitui o Royal Gold no produto: marcador da navegação, progresso, destaque de série.

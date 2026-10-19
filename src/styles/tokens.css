@@ -73,6 +73,9 @@
   --g4-kv-gold-soft: #f4efe4;
   --g4-kv-gold-light: #caa977;
   --g4-kv-slate: #9ca3af;
+  --g4-kv-steel: #3b5766; /* meio do gradiente: azul acinzentado */
+  --g4-kv-mist: #768086;
+  --g4-kv-abyss: #004777; /* núcleo do orb */
 
   --g4-green-800: #1b5e20;
   --g4-green-50: #e8f5e9;
@@ -144,7 +147,14 @@
   --ds-ai-accent: var(--g4-kv-sky);
   --ds-ai-accent-soft: var(--g4-kv-sky-soft);
   /* Gradiente de marca do KV: só em título de momento, um por tela. */
-  --ds-gradient-brand: linear-gradient(90deg, #a38e5a 0%, #3b5766 32%, #005b98 58%, #9ca3af 84%, #e5e7eb 100%);
+  --ds-gradient-brand: linear-gradient(90deg, #a38e5a 0%, #3b5766 38%, #005b98 72%, #5f87a6 100%);
+  /* Marca G4 OS (símbolo e "OS" do logotipo): dourado → aço → névoa. */
+  --ds-mark-gold: var(--g4-kv-gold-light);
+  --ds-mark-steel: var(--g4-kv-steel);
+  --ds-mark-mist: var(--g4-kv-mist);
+  --ds-orb-core: var(--g4-kv-abyss);
+  /* Névoa de fundo dos momentos de marca (o cinza quente desfocado do KV). */
+  --ds-haze: #ebeae6;
   --ds-graph: var(--g4-gray-950);
 
   /* Dados */
@@ -251,6 +261,14 @@
   --ds-info-soft: #14233a;
   --ds-ai: #0e0e10;
   --ds-graph: #0b0b0d;
+  --ds-ai-accent: #4fb3f0;
+  --ds-ai-accent-soft: #15324a;
+  --ds-gradient-brand: linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%);
+  --ds-mark-gold: #c9a46f;
+  --ds-mark-steel: #8cb8da;
+  --ds-mark-mist: #6b6e76;
+  --ds-orb-core: #0a3a5e;
+  --ds-haze: #1d1d21;
   --ds-chart-1: #ececef;
   --ds-chart-2: #6fa8d6;
   --ds-chart-3: #c9a46f;
@@ -324,6 +342,14 @@
     --ds-rose-soft: #3a1719;
     --ds-info: #90b8f8;
     --ds-info-soft: #14233a;
+    --ds-ai-accent: #4fb3f0;
+    --ds-ai-accent-soft: #15324a;
+    --ds-gradient-brand: linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%);
+    --ds-mark-gold: #c9a46f;
+    --ds-mark-steel: #8cb8da;
+    --ds-mark-mist: #6b6e76;
+    --ds-orb-core: #0a3a5e;
+    --ds-haze: #1d1d21;
     --ds-chart-1: #ececef;
     --ds-chart-2: #6fa8d6;
     --ds-chart-3: #c9a46f;
@@ -401,6 +427,10 @@
   --color-info-soft: var(--ds-info-soft);
 
   --color-ai: var(--ds-ai);
+  --color-ai-accent: var(--ds-ai-accent);
+  --color-ai-accent-soft: var(--ds-ai-accent-soft);
+  --color-orb-core: var(--ds-orb-core);
+  --color-haze: var(--ds-haze);
   --color-graph: var(--ds-graph);
 
   --color-chart-1: var(--ds-chart-1);

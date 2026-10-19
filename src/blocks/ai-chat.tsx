@@ -1,7 +1,7 @@
 import { BarChart3, Database, FileSpreadsheet, FileText, Mail, Menu, MessageSquarePlus, Search, Sparkles, Users, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
-  AiMark,
+  AiGreeting,
   Button,
   ChatComposer,
   ChatMessage,
@@ -216,9 +216,15 @@ export default function AiChat() {
         {msgs.length === 0 ? (
           <div className="min-h-0 flex-1 overflow-y-auto">
             <div className="mx-auto flex min-h-full max-w-[680px] flex-col justify-center px-5 py-10">
-              <AiMark size={40} />
-              <h2 className="m-0 mt-5 text-[26px] font-semibold tracking-[-0.03em]">Bom dia, {me.name.split(" ")[0]}. O que vamos resolver?</h2>
-              <p className="m-0 mb-6 mt-2 text-[14px] text-muted">Pergunte sobre números, pessoas e documentos da Acme. Eu mostro de onde veio cada resposta.</p>
+              <AiGreeting
+                level={2}
+                size="md"
+                greeting="Bom dia"
+                name={me.name.split(" ")[0]}
+                question="o que vamos resolver hoje?"
+                description="Pergunte sobre números, pessoas e documentos da Acme. Eu mostro de onde veio cada resposta."
+                className="mb-6"
+              />
               <PromptSuggestions items={suggestions} onSelect={(s) => send(s.label)} />
             </div>
           </div>

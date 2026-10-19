@@ -43,7 +43,7 @@ Fonte: `src/styles/tokens.css` (CSS) e `src/tokens/index.ts` (TS, para canvas, P
 | `accent-soft` | `#f4efe4` | fundo de "próximo passo", seleção de texto |
 | `founders` | `#441b1b` | legado; uso restrito a produtos do programa Founders |
 | `ai-accent` / `ai-accent-soft` | `#0084dd` / `#cadfeb` | **só IA**: botão enviar, orb, indicador de pensamento. Nunca texto. |
-| `gradient-brand` | dourado → azul → gelo | título de momento (saudação da IA, capa, login); um por tela, nunca em texto de trabalho |
+| `gradient-brand` | dourado → aço → azul | título de momento (saudação da IA, capa, login); um por tela, nunca em texto de trabalho |
 
 O dourado é o único gesto de marca dentro do produto. Use pouco: se tudo é dourado, nada é.
 

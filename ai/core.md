@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (462 componentes) → `components/<nome>.md`
+## Módulos (469 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -138,7 +138,8 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **data-grid**: DataGrid: a tabela "de trabalho" do DS.
 - **ai-workspace**: Workspace de agente (docs: showcase › IA e interação › Workspace de agente).
 - **ai-sessions**: Interface agêntica de sessões (app de trabalho com agente: G4 OS desktop, Codex, T3).
-- **brand**: Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
+- **brand**: Momentos de marca G4.
+- **g4os**: Identidade G4 OS (KV G4 OS): a esfera, o logotipo, o gradiente de marca, o orb e os três pontos da IA.
 - **connections**: Conexões e apps: marketplace de integrações, detalhe da conexão, permissões por conta e o "cartão do agente" (o que ele acessa, quem ele aciona, o que entrega).
 - **email-compose**: Escrever e-mail (com ou sem IA): remetente, destinatários com busca, assunto, corpo, modelo e envio com agendamento.
 - **tags**: Etiquetas coloridas (categoria, tipo, status) no estilo "banco de dados": fundo suave + texto AA, 9 matizes em tokens (--ds-tag-*-bg/-fg), claros e escuros.

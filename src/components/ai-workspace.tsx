@@ -1767,7 +1767,7 @@ export function AgentComposer({
     { label: "Link (URL)", icon: <Link className="h-4 w-4" /> },
   ];
   return (
-    <div className={cn("@container/composer relative rounded-2xl border border-line bg-surface shadow-surface transition-colors focus-within:border-line-strong", className)}>
+    <div className={cn("@container/composer ds-glass relative rounded-2xl transition-colors", className)}>
       {menuOpen && (
         <div role="listbox" aria-label="Comandos" className="absolute inset-x-2 bottom-full z-20 mb-2 overflow-hidden rounded-xl border border-line bg-popover p-1 shadow-popup">
           {filtered.map((c, i) => (
@@ -1874,11 +1874,11 @@ export function AgentComposer({
               </button>
             </Tooltip>
             {busy ? (
-              <button type="button" onClick={onStop} aria-label="Parar" className="grid h-8 w-8 place-items-center rounded-full bg-primary text-on-primary hover:bg-primary/90">
+              <button type="button" onClick={onStop} aria-label="Parar" className="ds-ai-action grid h-8 w-8 place-items-center rounded-full">
                 <Square className="h-3 w-3 fill-current" />
               </button>
             ) : (
-              <button type="button" onClick={send} disabled={!value.trim() || disabled} aria-label="Enviar" className="grid h-8 w-8 place-items-center rounded-full bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-30">
+              <button type="button" onClick={send} disabled={!value.trim() || disabled} aria-label="Enviar" className="ds-ai-action grid h-8 w-8 place-items-center rounded-full">
                 <ArrowUp className="h-4 w-4" />
               </button>
             )}

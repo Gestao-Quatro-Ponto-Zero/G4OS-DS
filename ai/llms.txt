@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 462 componentes, gráficos SVG e 141 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 469 componentes, gráficos SVG e 141 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -46,7 +46,8 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [data-grid](components/data-grid.md): DataGrid: a tabela "de trabalho" do DS.
 - [ai-workspace](components/ai-workspace.md): Workspace de agente (docs: showcase › IA e interação › Workspace de agente).
 - [ai-sessions](components/ai-sessions.md): Interface agêntica de sessões (app de trabalho com agente: G4 OS desktop, Codex, T3).
-- [brand](components/brand.md): Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
+- [brand](components/brand.md): Momentos de marca G4.
+- [g4os](components/g4os.md): Identidade G4 OS (KV G4 OS): a esfera, o logotipo, o gradiente de marca, o orb e os três pontos da IA.
 - [connections](components/connections.md): Conexões e apps: marketplace de integrações, detalhe da conexão, permissões por conta e o "cartão do agente" (o que ele acessa, quem ele aciona, o que entrega).
 - [email-compose](components/email-compose.md): Escrever e-mail (com ou sem IA): remetente, destinatários com busca, assunto, corpo, modelo e envio com agendamento.
 - [tags](components/tags.md): Etiquetas coloridas (categoria, tipo, status) no estilo "banco de dados": fundo suave + texto AA, 9 matizes em tokens (--ds-tag-*-bg/-fg), claros e escuros.

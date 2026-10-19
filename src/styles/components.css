@@ -869,3 +869,88 @@
   border-radius: 8px;
   transition: outline-offset 150ms;
 }
+
+/* ==================================================================== */
+/* KV G4 OS: gradiente de marca, vidro, orb e esfera                     */
+/* (docs/fundamentos/marca.md). Tudo em var(--ds-…): acompanha o tema.   */
+/* ==================================================================== */
+
+/* Título de momento com o gradiente do KV. Um por tela. */
+.ds-gradient-text {
+  background-image: var(--ds-gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-bottom: 0.08em; /* descendentes (g, p, ç) não são cortados */
+}
+@media (forced-colors: active) {
+  .ds-gradient-text { background: none; color: CanvasText; }
+}
+
+/* Vidro sobre o gelo: compositor da IA, painéis flutuantes de marca. */
+.ds-glass {
+  background-color: color-mix(in oklab, var(--ds-surface) 76%, transparent);
+  border: 1px solid color-mix(in oklab, var(--ds-surface) 92%, var(--ds-line));
+  box-shadow: var(--ds-shadow-raised);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
+}
+.ds-glass:focus-within {
+  border-color: color-mix(in oklab, var(--ds-blue) 35%, var(--ds-line));
+}
+
+/* Ação da IA (enviar): o azul-céu da esfera, redondo. */
+.ds-ai-action {
+  color: var(--ds-on-ink);
+  background-image: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--ds-ai-accent) 55%, white) 0%, var(--ds-ai-accent) 45%, var(--ds-blue) 100%);
+  box-shadow: 0 6px 16px color-mix(in oklab, var(--ds-ai-accent) 32%, transparent);
+  transition: filter 150ms, transform 150ms, opacity 150ms;
+}
+.ds-ai-action:hover:not(:disabled) { filter: brightness(1.06); }
+.ds-ai-action:active:not(:disabled) { transform: scale(0.96); }
+.ds-ai-action:disabled { opacity: 0.35; box-shadow: none; }
+
+/* Orb: a esfera da IA desfocada atrás do conteúdo. Decorativo (aria-hidden). */
+.ds-orb {
+  pointer-events: none;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 42% 40%, var(--ds-orb-core) 0%, var(--ds-blue) 22%, var(--ds-ai-accent) 45%, color-mix(in oklab, var(--ds-ai-accent-soft) 85%, transparent) 70%, transparent 100%);
+  filter: blur(var(--orb-blur, 8px));
+}
+.ds-orb[data-live] { animation: ds-orb-breathe 6s ease-in-out infinite; }
+/* Só escala: a opacidade fica com quem posiciona o orb. */
+@keyframes ds-orb-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.05; }
+}
+
+/* Névoa quente do KV: fundo dos momentos de marca claros. */
+.ds-haze {
+  pointer-events: none;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, var(--ds-haze) 0%, color-mix(in oklab, var(--ds-haze) 55%, transparent) 45%, transparent 100%);
+}
+
+/* Esfera G4 OS viva: gira, recalcula, conduz. */
+.ds-symbol-live { animation: ds-symbol-turn 3.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; transform-origin: 50% 50%; }
+@keyframes ds-symbol-turn {
+  0% { transform: rotate(0deg); }
+  45% { transform: rotate(200deg); }
+  60% { transform: rotate(170deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Três pontos da IA pensando: navy, céu, gelo azul. */
+.ds-thinking-dot { animation: ds-thinking 1.2s ease-in-out infinite; }
+.ds-thinking-dot:nth-child(2) { animation-delay: 160ms; }
+.ds-thinking-dot:nth-child(3) { animation-delay: 320ms; }
+@keyframes ds-thinking {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  40% { transform: translateY(-3px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-orb[data-live], .ds-symbol-live, .ds-thinking-dot { animation: none; }
+}

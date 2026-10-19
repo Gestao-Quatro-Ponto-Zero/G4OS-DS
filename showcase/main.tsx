@@ -2,7 +2,7 @@ import { ArrowRight, Blocks, BookOpen, Check, Copy, Menu, Search } from "lucide-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { Popover, Toaster, cn, normalize, notify, ProductMark, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
+import { AiOrb, BrandHaze, G4OSLogo, Popover, Toaster, cn, normalize, notify, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
 import { Palette } from "lucide-react";
 import { blocks, pages } from "./.generated/registry";
 import { BlockPreview, ShadcnContext, blockCategories, groups, type BlockModule, type PageModule } from "./kit";
@@ -136,8 +136,8 @@ function SiteHeader({ section, onMenu }: { section: string; onMenu: () => void }
           <Menu className="h-4 w-4" />
         </button>
         <a href="#/" className="flex shrink-0 items-center gap-2">
-          <ProductMark size={24} />
-          <span className="text-[14px] font-semibold tracking-tight">G4OS-DS</span>
+          <G4OSLogo height={18} symbol title="G4 OS" />
+          <span className="rounded-md bg-soft px-1.5 py-0.5 text-[11px] font-semibold tracking-tight text-ink-soft ring-1 ring-line">DS</span>
         </a>
         <nav aria-label="Seções" className="hidden items-center gap-5 md:flex">
           {links.map(([id, label, href]) => (
@@ -360,11 +360,13 @@ function Home() {
   const current = featured.find((b) => b.slug === tab) ?? featured[0];
   return (
     <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
-      <section className="mx-auto max-w-[760px] py-14 text-center sm:py-20">
+      <section className="relative isolate mx-auto max-w-[760px] py-14 text-center sm:py-20">
+        <BrandHaze size={760} className="absolute left-1/2 top-[-30%] -z-10 -translate-x-1/2" />
+        <AiOrb size={240} blur={30} live className="absolute -right-72 top-40 -z-10 opacity-25" />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-[12px] text-muted">
           <span className="h-1.5 w-1.5 rounded-full bg-accent" /> {blocks.length} blocos · {pages.length} páginas de componentes
         </span>
-        <h1 className="m-0 mt-5 text-[34px] font-semibold leading-[1.1] tracking-[-0.04em] sm:text-[48px]">Construa qualquer produto G4 OS com os mesmos blocos</h1>
+        <h1 className="m-0 mt-5 text-[34px] font-medium leading-[1.12] tracking-[-0.04em] sm:text-[52px]"><span className="text-ink-soft">Construa qualquer</span> <span className="ds-gradient-text">produto G4 OS</span> <span className="text-ink-soft">com os mesmos blocos</span></h1>
         <p className="mx-auto mt-4 max-w-[600px] text-[15px] leading-relaxed text-muted">
           CRM, ATS, ERP, financeiro, portais. Componentes React acessíveis, gráficos sem dependência e telas inteiras prontas para copiar — tudo na mesma linguagem visual.
         </p>

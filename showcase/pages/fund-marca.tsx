@@ -1,12 +1,12 @@
 import { ArrowRight, FileText, Sparkles, Trophy } from "lucide-react";
-import { AchievementCard, Badge, BrandBadge, BrandButton, BrandPanel, Button, cn, useTheme } from "@g4ai/ds";
+import { AchievementCard, AiDots, AiGreeting, AiOrb, Badge, BrandBadge, BrandButton, BrandPanel, Button, G4OSLogo, G4OSSymbol, GradientText, cn, useTheme } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
   title: "Marca G4 na interface",
   group: "Fundamentos",
   order: 3,
-  description: "A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver) aparece em momentos escolhidos — não pinta a interface inteira. O tema G4 continua neutro; o navy não vira modo escuro.",
+  description: "O tema padrão segue o KV G4 OS: gelo, tinta navy, a esfera da IA e o gradiente dourado → azul nos momentos de marca. A paleta do manual (Navy Blue, Royal Gold, Royal Silver) continua no preset Institucional e no BrandPanel tone=\"navy\".",
 };
 
 const palette: { group: string; items: [string, string, string, string][] }[] = [
@@ -43,11 +43,27 @@ export default function Page() {
   const t = useTheme("light");
   return (
     <DocPage title={meta.title} kicker="Fundamentos" description={meta.description}>
+      <DocSection title="KV G4 OS" rule="A esfera, o logotipo, o gradiente e o orb são a identidade do produto. Gradiente e orb: no máximo um de cada por tela.">
+        <Demo>
+          <div className="relative isolate grid gap-8 overflow-hidden rounded-2xl border border-line bg-page p-8 md:grid-cols-2">
+            <AiOrb size={300} blur={18} live className="absolute -right-44 top-1/2 -z-10 -translate-y-1/2 opacity-40" />
+            <div className="flex flex-col gap-6">
+              <G4OSLogo height={32} symbol />
+              <AiGreeting size="md" level={2} name="João" />
+            </div>
+            <div className="flex flex-col justify-end gap-4 text-[13px] text-muted">
+              <div className="flex items-center gap-3"><G4OSSymbol size={40} live /> <span>G4OSSymbol live: a esfera gira, recalcula, conduz.</span></div>
+              <div className="flex items-center gap-3"><AiDots size={8} /> <span>AiDots: a IA pensando.</span></div>
+              <div className="text-[28px] font-medium tracking-[-0.03em]"><GradientText>decisões complexas</GradientText></div>
+            </div>
+          </div>
+        </Demo>
+      </DocSection>
       <DocSection title="Três níveis de marca" rule="Escolha o nível pelo contexto. Produto de uso diário fica no nível 1; materiais e portais podem subir.">
         <div className="grid gap-3 md:grid-cols-3">
           {[
             ["1 · Toque (padrão G4)", "Interface neutra. A marca aparece no marcador dourado da navegação, no progresso e nos selos. É o tema de todos os produtos."],
-            ["2 · Momento", "Um BrandPanel navy por tela, onde há emoção ou abertura: login, fim de onboarding, capa de relatório, saudação da IA, conquista."],
+            ["2 · Momento", "Um BrandPanel por tela (gelo, orb e título em gradiente do KV; ou tone=\"navy\"), onde há emoção ou abertura: login, fim de onboarding, capa de relatório, saudação da IA, conquista."],
             ["3 · Institucional", "Preset data-brand=\"g4-institucional\": fundo do clássico, Navy na ação, Gold no destaque e nos gráficos. Para apresentações, portais e marketing."],
           ].map(([title, body], i) => (
             <div key={title} className={cn("rounded-xl border p-4", i === 0 ? "border-accent/40 bg-accent-soft/30" : "border-line bg-surface")}>
@@ -100,7 +116,7 @@ export default function Page() {
         </Demo>
       </DocSection>
 
-      <DocSection title="Nível 2 · Momentos de marca" rule="BrandPanel é navy nos dois temas, com brilho Royal Gold e grade técnica sutil. Um por tela.">
+      <DocSection title="Nível 2 · Momentos de marca" rule="BrandPanel segue o KV por padrão: gelo, névoa, orb da IA e título no gradiente de marca. O tom navy (prop tone) mantém o painel escuro com Royal Gold. Um por tela.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Demo
             bare
