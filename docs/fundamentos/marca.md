@@ -8,6 +8,15 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 | 2 · Momento | Login, fim de onboarding, capa de relatório, saudação da IA, conquista | `BrandPanel` (navy `--ds-brand`, texto Royal Silver `--ds-on-brand`, brilho Royal Gold `--ds-brand-accent`), `BrandButton`, `AchievementCard`. **No máximo um por tela.** |
 | 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4-institucional">`: fundo e superfícies iguais ao G4 clássico (sem bege), Navy na ação, Gold no destaque, escuro neutro com Silver na ação e semânticas do manual. |
 
+## KV G4 OS
+
+O tema padrão segue o key visual do G4 OS: fundo gelo `#F9F9F9`, texto em Maua Blue, ação em Navy, raio 25 % maior (`--ds-radius-scale: 1.25`), sombras longas e difusas e a tipografia Manrope.
+
+- **Gradiente de marca** (`--ds-gradient-brand`): dourado `#A38E5A` → `#3B5766` → azul `#005B98` → ardósia `#9CA3AF` → gelo. Aplicado como `background-clip: text` em títulos de momento; termina dissolvido no fundo de propósito.
+- **Esfera G4 OS**: o símbolo da IA. Em movimento ela gira, recalcula e conduz; parada, aparece como orb azul desfocado (`--ds-ai-accent`) atrás do conteúdo da IA. Um por tela.
+- **Azul-céu** (`#0084DD`) é exclusivo da IA: botão enviar, orb, os três pontos de "pensando". Ações comuns continuam em Navy.
+- **Dourado terroso** (`#A38E5A`) substitui o Royal Gold no produto: marcador da navegação, progresso, destaque de série.
+
 ## Paleta → tokens
 
 | Nome | Hex | Primitivo | Semântico |

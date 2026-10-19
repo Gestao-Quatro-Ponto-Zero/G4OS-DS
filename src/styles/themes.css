@@ -311,6 +311,12 @@
   --ds-display-weight: 650;
   --ds-display-tracking: -0.03em;
 }
+[data-type="classica"] {
+  /* Figtree, a tipografia anterior ao KV G4 OS. */
+  --ds-font-sans: "Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif;
+  --ds-display-weight: 600;
+  --ds-display-tracking: -0.035em;
+}
 [data-type="suave"] {
   --ds-font-sans: "Manrope", system-ui, sans-serif;
   --ds-display-weight: 700;

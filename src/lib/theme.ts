@@ -31,7 +31,8 @@ export const brandPresets = [
 
 /** Presets de tipografia (eixo independente da cor): <html data-type="…">. */
 export const typePresets = [
-  { id: "g4", label: "G4 · Figtree", sample: "Figtree" },
+  { id: "g4", label: "G4 OS · Manrope", sample: "Manrope" },
+  { id: "classica", label: "Clássica · Figtree", sample: "Figtree" },
   { id: "editorial", label: "Editorial · Serifa nos títulos", sample: "Source Serif 4" },
   { id: "tecnica", label: "Técnica · IBM Plex", sample: "IBM Plex Sans" },
   { id: "neutra", label: "Neutra · Inter", sample: "Inter" },
