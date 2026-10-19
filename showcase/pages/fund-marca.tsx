@@ -13,28 +13,41 @@ const palette: { group: string; items: [string, string, string, string][] }[] = 
   {
     group: "Primárias",
     items: [
-      ["Navy Blue", "#001F35", "--g4-navy-blue", "Momentos de marca (BrandPanel), ação no preset Institucional"],
-      ["Royal Gold", "#B9915B", "--g4-royal-gold", "Marcador de navegação, progresso, conquista, selo premium"],
-      ["Royal Silver", "#F5F4F3", "--g4-royal-silver", "Texto sobre navy; superfície suave no Institucional"],
+      ["Navy", "#001F35", "--g4-navy-blue", "Ação principal (--ds-primary), série 1 de gráfico"],
+      ["Maua", "#031A26", "--g4-maua-blue", "Texto principal (--ds-ink) e \"G4\" do logotipo"],
+      ["Gelo", "#F9F9F9", "--g4-kv-ice", "Fundo de trabalho (--ds-page), o fundo do KV"],
     ],
   },
   {
-    group: "Secundárias",
+    group: "Azuis da esfera",
     items: [
-      ["Maua Blue", "#031A26", "--g4-maua-blue", "Painéis navy profundos (login, slides)"],
-      ["Scaling Blue", "#184560", "--g4-scaling-blue", "Links e ações textuais (--ds-blue)"],
-      ["Founders Red", "#441B1B", "--g4-founders-red", "Só conteúdo Founders"],
-      ["Ground Clay", "#842E20", "--g4-ground-clay", "Ênfase editorial, série 4 de gráfico"],
+      ["Scaling", "#184560", "--g4-scaling-blue", "Texto secundário forte e títulos leves (--ds-ink-soft)"],
+      ["Azul profundo", "#005B98", "--g4-kv-deep", "Link, foco, info, \"em andamento\" (--ds-blue)"],
+      ["Céu", "#0084DD", "--g4-kv-sky", "Só IA: botão enviar, orb, pontos (--ds-ai-accent). Nunca texto"],
+      ["Gelo azul", "#CADFEB", "--g4-kv-sky-soft", "Fundo de selo da IA, halo do orb (--ds-ai-accent-soft)"],
+      ["Abismo", "#004777", "--g4-kv-abyss", "Núcleo do orb (--ds-orb-core)"],
+      ["Aço", "#3B5766", "--g4-kv-steel", "Meio do gradiente, \"OS\" do logotipo (--ds-mark-steel)"],
     ],
   },
   {
-    group: "Neutros quentes (materiais impressos e slides; a interface usa os neutros do clássico)",
+    group: "Dourados do KV",
     items: [
-      ["Warm White", "#FAFAF9", "--g4-warm-white", "Fundo de slides e materiais"],
-      ["Light Gray", "#E8E6E3", "--g4-light-gray", "Bordas e divisórias"],
-      ["Mid Gray", "#9A9895", "--g4-mid-gray", "Ícones (como texto, use #6E6B67 para AA)"],
-      ["Dark Gray", "#4A4845", "--g4-dark-gray", "Texto secundário"],
-      ["Charcoal", "#2A2826", "--g4-charcoal", "Texto principal"],
+      ["Dourado", "#A38E5A", "--g4-kv-gold", "Marcador da navegação, progresso, destaque (--ds-accent)"],
+      ["Dourado claro", "#CAA977", "--g4-kv-gold-light", "Início do gradiente da esfera e do logotipo (--ds-mark-gold)"],
+      ["Dourado profundo", "#6E5A2C", "--g4-kv-gold-deep", "Texto dourado com contraste AA (--ds-accent-deep)"],
+      ["Dourado suave", "#F4EFE4", "--g4-kv-gold-soft", "Fundo de \"próximo passo\" e selos (--ds-accent-soft)"],
+    ],
+  },
+  {
+    group: "Neutros gelo",
+    items: [
+      ["Gelo azulado", "#F1F4F6", "--g4-kv-ice-blue", "Hover, cabeçalho de tabela, rodapé (--ds-soft)"],
+      ["Trilho", "#F3F5F7", "--g4-kv-rail", "Sidebar (--ds-rail)"],
+      ["Linha", "#E4E7EA", "--g4-kv-line", "Toda borda e divisória (--ds-line)"],
+      ["Linha forte", "#D5DBE0", "--g4-kv-line-strong", "Hover de card, borda de campo (--ds-line-strong)"],
+      ["Ardósia", "#9CA3AF", "--g4-kv-slate", "Ícones inativos, série 6 de gráfico"],
+      ["Névoa", "#768086", "--g4-kv-mist", "Fim do gradiente do \"OS\" (--ds-mark-mist)"],
+      ["Texto de apoio", "#5B6670", "--g4-kv-muted", "Metadado, rótulo, placeholder: 5,6:1 sobre o gelo (--ds-muted)"],
     ],
   },
 ];
@@ -74,7 +87,19 @@ export default function Page() {
         </div>
       </DocSection>
 
-      <DocSection title="Paleta oficial" rule="Todas viram primitivos --g4-* com o nome do manual. Componentes usam os semânticos (--ds-brand, --ds-on-brand, --ds-brand-accent, --ds-nav-marker), nunca o hex.">
+      <DocSection title="Paleta oficial G4 OS" rule="As cores do KV G4 OS viram primitivos --g4-*. Componentes usam os semânticos (--ds-primary, --ds-ink, --ds-blue, --ds-ai-accent, --ds-accent…), nunca o hex. A paleta do manual G4 (Royal Gold, Royal Silver, Founders Red, Ground Clay) segue no preset Institucional.">
+        <div>
+          <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Gradiente de marca</p>
+          <div className="overflow-hidden rounded-xl border border-line bg-surface">
+            <div className="h-16" style={{ background: "var(--ds-gradient-brand)" }} />
+            <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
+              <div className="text-[13px] font-medium">
+                <GradientText>Dourado → aço → azul profundo</GradientText> <span className="font-mono text-[11px] font-normal text-muted">#A38E5A · #3B5766 · #005B98 · #5F87A6</span>
+              </div>
+              <code className="font-mono text-[11px] text-blue">--ds-gradient-brand</code>
+            </div>
+          </div>
+        </div>
         {palette.map((g) => (
           <div key={g.group}>
             <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{g.group}</p>
@@ -96,7 +121,7 @@ export default function Page() {
         ))}
       </DocSection>
 
-      <DocSection title="Nível 1 · Toques na interface" rule="Já estão no tema G4: marcador Royal Gold no item ativo da navegação, progresso dourado, selos.">
+      <DocSection title="Nível 1 · Toques na interface" rule="Já estão no tema G4 OS: marcador dourado do KV no item ativo da navegação, progresso dourado, selos.">
         <Demo className="flex flex-wrap items-center gap-6" code={`// Já vem nos componentes: Sidebar, IconRail e SessionSidebar usam --ds-nav-marker.
 <BrandBadge kind="premium" />  <BrandBadge kind="conquista" />  <BrandBadge kind="founders" />`}>
           <div className="w-56 rounded-xl border border-line bg-rail p-2.5">
@@ -176,11 +201,11 @@ export default function Page() {
       <DocSection title="Regras">
         <Rules
           items={[
-            { do: "Navy em momentos (capa, login, conquista, saudação). Um por tela.", dont: "Navy como fundo de app ou como modo escuro: o escuro do DS é neutro de propósito." },
-            { do: "Royal Gold como preenchimento e marcador (progresso, item ativo, selo). Texto dourado usa accent-deep.", dont: "Texto em #B9915B sobre branco (2,6:1, reprova AA) ou botões dourados espalhados." },
-            { do: "Royal Silver como texto sobre navy e como superfície suave no Institucional.", dont: "Silver como texto sobre branco." },
-            { do: "Founders Red só em conteúdo Founders.", dont: "Usar Founders Red como cor de erro (erro é rose)." },
-            { do: "Gráficos: Navy e Gold como séries 1 e 2 no Institucional.", dont: "Mais de 3 cores de marca no mesmo gráfico." },
+            { do: "Gelo (#F9F9F9) como fundo e Navy na ação principal. O momento de marca é claro: névoa, orb e título em gradiente, um por tela.", dont: "Navy como fundo de app ou como modo escuro: o escuro do DS é neutro de propósito." },
+            { do: "Azul-céu (#0084DD) só na IA: enviar, orb, os três pontos.", dont: "Céu em botões comuns, links ou texto: link é o azul profundo (--ds-blue)." },
+            { do: "Gradiente de marca em um título de momento (saudação da IA, capa, login).", dont: "Gradiente em texto de trabalho, botão, número, tabela ou em mais de um título por tela." },
+            { do: "Dourado do KV como preenchimento e marcador (progresso, item ativo, selo). Texto dourado usa accent-deep (#6E5A2C).", dont: "Texto em #A38E5A sobre o gelo (reprova AA) ou botões dourados espalhados." },
+            { do: "Gráficos: Navy, azul profundo e dourado como séries 1 a 3.", dont: "Céu ou o gradiente como série de gráfico." },
           ]}
         />
       </DocSection>
