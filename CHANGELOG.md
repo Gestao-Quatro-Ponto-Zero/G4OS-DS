@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+### Patch Changes
+
+- 2a87c28: Mantém a geometria do `PageHeading` estável ao mostrar o cabeçalho compacto, evitando tremor e retorno da rolagem ao topo em páginas com pouco conteúdo.
+
 ## 0.9.0
 
 ### Minor Changes
