@@ -6,7 +6,7 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 | --- | --- | --- |
 | 1 · Toque (padrão) | Todos os produtos | Marcador Royal Gold no item ativo da navegação (`--ds-nav-marker`), progresso dourado, selos (`BrandBadge`). |
 | 2 · Momento | Login, fim de onboarding, capa de relatório, saudação da IA, conquista | `BrandPanel` (navy `--ds-brand`, texto Royal Silver `--ds-on-brand`, brilho Royal Gold `--ds-brand-accent`), `BrandButton`, `AchievementCard`. **No máximo um por tela.** |
-| 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4-institucional">`: fundo e superfícies iguais ao G4 clássico (sem bege), Navy na ação, Gold no destaque, escuro neutro com Silver na ação e semânticas do manual. |
+| 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4-institucional">`: fundo e superfícies neutros (sem bege), Navy na ação, Gold no destaque, escuro neutro com Silver na ação e semânticas do manual. |
 
 ## KV G4 OS
 

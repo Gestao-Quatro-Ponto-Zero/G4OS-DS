@@ -6523,6 +6523,11 @@
           "summary": "Presets de themes.css."
         },
         {
+          "name": "DEFAULT_BRAND",
+          "kind": "const",
+          "summary": "Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand."
+        },
+        {
           "name": "resolvedTheme",
           "kind": "function",
           "summary": "Tema efetivo agora (\"system\" resolvido pelo SO).",
@@ -32701,6 +32706,7 @@
       "uses": [
         "Badge",
         "Button",
+        "DEFAULT_BRAND",
         "Delta",
         "SettingsSection",
         "Switch",
@@ -34434,6 +34440,7 @@
       "pergaminho",
       "ledger",
       "caderno",
+      "g4",
       "g4-institucional"
     ]
   }

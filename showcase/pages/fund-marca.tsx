@@ -191,7 +191,7 @@ export default function Page() {
       <DocSection title="Nível 3 · Preset G4 Institucional" rule="Para apresentações, portal do cliente, páginas públicas. Fundo e superfícies iguais ao clássico; o escuro continua neutro (não navy), com Royal Silver na ação e as semânticas do manual.">
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4">
           <span className="text-[13px] text-ink-soft">Ver o site inteiro com o preset:</span>
-          <Button size="sm" variant={t.brand === "g4-institucional" ? "primary" : "ghost"} onClick={() => t.setBrand(t.brand === "g4-institucional" ? "g4" : "g4-institucional")}>
+          <Button size="sm" variant={t.brand === "g4-institucional" ? "primary" : "ghost"} onClick={() => t.setBrand(t.brand === "g4-institucional" ? "g4os" : "g4-institucional")}>
             <FileText /> {t.brand === "g4-institucional" ? "Voltar ao G4" : "Aplicar G4 Institucional"}
           </Button>
           <code className="ml-auto font-mono text-[12px] text-muted">{'<html data-brand="g4-institucional">'}</code>

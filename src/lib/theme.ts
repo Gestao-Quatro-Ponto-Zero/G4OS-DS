@@ -15,9 +15,14 @@ export type ThemeMode = "light" | "dark" | "system";
 export const THEME_KEY = "ds-theme";
 export const BRAND_KEY = "ds-brand";
 
-/** Presets de themes.css. "g4" = padrão (sem atributo). */
+/** Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand. */
+export const DEFAULT_BRAND = "g4os";
+const isDefaultBrand = (b?: string | null) => !b || b === DEFAULT_BRAND;
+
+/** Presets de themes.css. "g4os" = padrão (sem atributo); "g4" = G4 clássico, anterior ao KV. */
 export const brandPresets = [
-  { id: "g4", label: "G4 (padrão)", primary: "#202124", accent: "#b9915b" },
+  { id: "g4os", label: "G4 OS (padrão)", primary: "#001f35", accent: "#a38e5a" },
+  { id: "g4", label: "G4 clássico", primary: "#202124", accent: "#b9915b" },
   { id: "g4-institucional", label: "G4 Institucional", primary: "#001f35", accent: "#b9915b" },
   { id: "oceano", label: "Oceano", primary: "#1554d1", accent: "#1554d1" },
   { id: "floresta", label: "Floresta", primary: "#1f5f45", accent: "#c8963e" },
@@ -59,7 +64,7 @@ const write = (key: string, value: string) => {
 
 /** Aplica tema/marca no documento (ou em outro elemento raiz). */
 export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = document.documentElement, type?: string) {
-  const changed = root.getAttribute("data-theme") !== mode || (root.getAttribute("data-brand") ?? "g4") !== (brand ?? "g4");
+  const changed = root.getAttribute("data-theme") !== mode || (root.getAttribute("data-brand") ?? DEFAULT_BRAND) !== (isDefaultBrand(brand) ? DEFAULT_BRAND : brand);
   // Troca de tema sem "animar" cores: desliga transições por um quadro (como o next-themes).
   let restore: (() => void) | undefined;
   if (changed && typeof document !== "undefined" && root === document.documentElement) {
@@ -72,7 +77,7 @@ export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = 
     };
   }
   root.setAttribute("data-theme", mode);
-  if (brand && brand !== "g4") root.setAttribute("data-brand", brand);
+  if (!isDefaultBrand(brand)) root.setAttribute("data-brand", brand as string);
   else root.removeAttribute("data-brand");
   if (type !== undefined) {
     if (type && type !== "g4") root.setAttribute("data-type", type);
@@ -96,7 +101,7 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
   // Sem valor salvo, herda o que já está no <html> (outra instância ou themeScript aplicou antes).
   const fromDom = (attr: string) => (typeof document !== "undefined" ? document.documentElement.getAttribute(attr) : null);
   const [mode, setModeState] = useState<ThemeMode>(() => ((typeof window !== "undefined" && ((read(THEME_KEY) as ThemeMode) || (fromDom("data-theme") as ThemeMode))) || initial));
-  const [brand, setBrandState] = useState<string>(() => (typeof window !== "undefined" && (read(BRAND_KEY) || fromDom("data-brand"))) || "g4");
+  const [brand, setBrandState] = useState<string>(() => (typeof window !== "undefined" && (read(BRAND_KEY) || fromDom("data-brand"))) || DEFAULT_BRAND);
   const [type, setTypeState] = useState<string>(() => (typeof window !== "undefined" && (read(TYPE_KEY) || fromDom("data-type"))) || "g4");
 
   useEffect(() => {
@@ -139,4 +144,4 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
 }
 
 /** Script inline para o <head>: aplica o tema salvo antes da primeira pintura. */
-export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}"),y=localStorage.getItem("${TYPE_KEY}");d.setAttribute("data-theme",t);if(b&&b!=="g4")d.setAttribute("data-brand",b);if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
+export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}"),y=localStorage.getItem("${TYPE_KEY}");d.setAttribute("data-theme",t);if(b&&b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
