@@ -28,7 +28,7 @@ Exemplos vivos e mini-diagramas: showcase › Navegação › Anatomia de págin
 | F | **Mestre-detalhe** | Cabeçalho; lista à esquerda | Lista e detalhe rolam cada um (são duas áreas, não aninhadas); no celular o detalhe abre em tela cheia com voltar | Lista + painel, `Drawer`/`Sheet` no celular | erp-purchase-requests, saas-support, fin-reconciliation, ats-offers |
 | G | **App de altura total** (conversa, IA, arquivos, apresentação) | Casca, cabeçalho da área, composer | Só a thread/lista/canvas; a página não rola | `AppShell` sem `Page`, `ResizableSplit`, `AgentComposer`, `ArtifactPanel` | ai-chat, ai-agent-builder, app-file-manager, app-presentation |
 | H | **Fluxo focado** (auth, assistente) | Nada além do cartão/coluna; rodapé de passos fixo no assistente | O documento | Coluna única ou split com painel de marca; `Stepper` | auth-*, onboarding-wizard |
-| I | **Público** (marketing, carreiras) | Cabeçalho do site | O documento (sem casca de app) | `HeroSection`, seções, CTA | marketing-landing, marketing-pricing, ats-careers |
+| I | **Público** (marketing, carreiras) | Cabeçalho do site | O documento (sem casca de app) | `HeroSection`, seções, CTA; em cena: `SiteHeader`, `StageSky`, `Chapter`, `Stage`, `CtaButton` | marketing-landing, marketing-stage, marketing-pricing, ats-careers |
 
 ## Detalhes por anatomia
 
@@ -50,7 +50,7 @@ Faixa de números (`StatGrid`/`KpiGrid`) numa lista: **acima da `PageToolbar`** 
 
 **H · Fluxo focado.** Uma tarefa por tela, sem navegação do app. Em assistentes, o rodapé com Voltar/Continuar é fixo e o progresso é visível.
 
-**I · Público.** Rolagem do documento, cabeçalho do site fixo e translúcido, seções largas. Sem `AppShell`.
+**I · Público.** Rolagem do documento, cabeçalho do site fixo e translúcido, seções largas. Sem `AppShell`. Para mostrar o produto em cena: `SiteHeader` (vira pílula ao rolar), `StageSky` no hero, `Chapter` com um `Stage` por ideia e `CtaButton`; ver [palcos](palcos.md) e o bloco marketing-stage.
 
 ## Celular
 

@@ -9,7 +9,7 @@ import { formatNumber } from "../lib/format";
 import { Kbd, KbdGroup } from "./primitives";
 
 /*
- * Interação e marketing. Regras (docs/padroes/interacao.md):
+ * Interação e marketing. Regras (docs/fundamentos/movimento.md e, para a camada expressiva, docs/padroes/palcos.md):
  *   · animação serve para orientar (de onde veio, para onde foi), nunca para enfeitar
  *   · toda animação tem versão estática com prefers-reduced-motion
  *   · superfícies de marketing (hero, landing) usam o mesmo tipo e as mesmas cores do produto
