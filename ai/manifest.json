@@ -21794,7 +21794,7 @@
         {
           "name": "AgentAppLayout",
           "kind": "component",
-          "summary": null,
+          "summary": "Casca de app de agente (anatomia G): lista, conversa e painel, com navegação móvel.",
           "props": [
             {
               "name": "main",

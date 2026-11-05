@@ -6,6 +6,8 @@ Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
 
 ## AgentAppLayout
 
+Casca de app de agente (anatomia G): lista, conversa e painel, com navegação móvel.
+
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `main` * | `ReactNode` |  | Área principal: ThreadHeader + ThreadView + campo. |

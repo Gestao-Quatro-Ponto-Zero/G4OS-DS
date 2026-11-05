@@ -65,6 +65,13 @@ export function useAgentLayout() {
   return useContext(AgentLayoutContext);
 }
 
+/**
+ * Casca de app de agente (anatomia G): lista, conversa e painel, com
+ * navegação móvel. No celular, com `mobileNav`, a área reserva
+ * `--ds-mobile-nav-space` (76 px + safe area) embaixo. Uma área que rola pode
+ * passar sob a pílula de vidro com `-mb-(--ds-mobile-nav-space)
+ * pb-(--ds-mobile-nav-space)`: o conteúdo aparece fosco atrás da navegação.
+ */
 export function AgentAppLayout({
   rail,
   list,
@@ -187,11 +194,11 @@ export function AgentAppLayout({
       <div className={cn("flex h-dvh min-h-0 flex-col overflow-hidden bg-page", className)}>
         {showList ? (
           <>
-            <div className={cn("flex min-h-0 flex-1", !!mobileNav && "pb-[calc(76px+env(safe-area-inset-bottom))]")}>{list}</div>
+            <div className={cn("flex min-h-0 flex-1", !!mobileNav && "pb-(--ds-mobile-nav-space) [--ds-mobile-nav-space:calc(76px+env(safe-area-inset-bottom))]")}>{list}</div>
             {mobileNav}
           </>
         ) : (
-          <div className={cn("flex min-h-0 flex-1", !list && !!mobileNav && "pb-[calc(76px+env(safe-area-inset-bottom))]")}>
+          <div className={cn("flex min-h-0 flex-1", !list && !!mobileNav && "pb-(--ds-mobile-nav-space) [--ds-mobile-nav-space:calc(76px+env(safe-area-inset-bottom))]")}>
             <ResizableSplit left={main} right={panel ?? null} rightOpen={!!panel && panelOpen} storageKey={storageKey ? `${storageKey}:panel` : undefined} />
           </div>
         )}
