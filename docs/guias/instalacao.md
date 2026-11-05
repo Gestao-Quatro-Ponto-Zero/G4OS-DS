@@ -28,7 +28,7 @@ Projeto novo em Next: copie [`templates/next-app`](../../templates/next-app/READ
 /* @import "@g4ai/ds/shadcn.css"; */
 ```
 
-`styles.css` já declara os `@source` dos componentes e blocos (relativos a ele), então o Tailwind do app compila as classes do DS sem configuração.
+`styles.css` já declara os `@source` dos componentes (relativos a ele), então o Tailwind do app compila as classes do DS sem configuração. Os blocos ficam de fora: copie o bloco para o `src` do app, e o Tailwind do app lê a cópia. Não aponte `@source` para `node_modules/@g4ai/ds/src` inteiro: isso traz as classes de todos os blocos de exemplo.
 
 ## 3. Fonte e raiz
 

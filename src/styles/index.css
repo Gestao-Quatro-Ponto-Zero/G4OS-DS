@@ -5,8 +5,11 @@
  *   @import "tailwindcss";
  *   @import "@g4ai/ds/styles.css";
  *
- * As classes dos componentes e blocos são lidas pelos @source abaixo
- * (relativos a ESTE arquivo), então o app não precisa declarar nada.
+ * As classes dos componentes são lidas pelos @source abaixo (relativos a
+ * ESTE arquivo), então o app não precisa declarar nada. Os blocos
+ * (src/blocks) ficam de fora: são exemplos para copiar, e a cópia no app é
+ * lida pelo Tailwind do próprio app. Ler os 140+ blocos aqui só acrescentava
+ * classes que nenhuma tela usa (cerca de 2 KiB gzip no CSS de cada app).
  *
  * Tema: <html data-theme="light|dark|system" data-brand="…">. Ver src/lib/theme.ts.
  */
@@ -17,5 +20,4 @@
 @import "./stage.css"; /* camada expressiva: palcos, vidro, movimento de páginas públicas */
 
 @source "../components";
-@source "../blocks";
 @source "../lib";
