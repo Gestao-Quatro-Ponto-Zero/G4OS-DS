@@ -98,5 +98,5 @@ Paleta própria `chart-1…6` e regras em [dados.md](dados.md).
 
 - Opacidade em cor de texto (`text-muted/70`, `text-on-brand/60`): reprova contraste. Use o próximo degrau da escala.
 - Hex solto em componente (`text-[#842e20]`, `style={{ color: "#..." }}`), `bg-white`, `text-white` fora de `bg-navy`, paleta do Tailwind (`gray-500`, `blue-600`). Use o token. Exceções documentadas: `tint` de `Avatar`/`EntityMark` (identidade do registro) e logos de terceiros.
-- Gradiente decorativo, sombra colorida, fundo de página colorido.
+- Gradiente decorativo, sombra colorida, fundo de página colorido. Exceção: `Stage` e `StageSky` da [camada expressiva](../padroes/palcos.md), feitos só de tokens, em páginas públicas, boas-vindas e onboarding, nunca atrás de dados de trabalho.
 - Azul "de link" genérico do navegador. Link é `text-blue` com sublinhado no hover, ou `text-ink` com seta.

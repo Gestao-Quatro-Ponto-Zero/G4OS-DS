@@ -1,0 +1,239 @@
+/*
+ * G4OS-DS · camada expressiva (palcos)
+ *
+ * Superfícies e movimento para páginas públicas (anatomia I), boas-vindas,
+ * onboarding e estados vazios de destaque. Nunca atrás de dados de trabalho
+ * (listas, tabelas, formulários, painéis). Ver docs/padroes/palcos.md.
+ *
+ * Tudo sai dos tokens semânticos: segue tema claro/escuro e data-brand sem
+ * código extra. Movimento reduzido: base.css zera as animações; os componentes
+ * que trocam de cena sozinhos (useBeat) também param.
+ *
+ * Tudo em @layer components: um utilitário do app (rounded-*, bg-*, max-w-*)
+ * ainda vence a classe da peça.
+ */
+
+@layer components {
+/* ------------------------------------------------------------------ */
+/* Palco: céu, dois morros e um grão, todos de tokens                  */
+/* ------------------------------------------------------------------ */
+.ds-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--radius-stage);
+  background:
+    radial-gradient(ellipse 70% 42% at 18% 104%, color-mix(in oklab, var(--ds-clay) 34%, var(--ds-clay-soft)), transparent 72%),
+    radial-gradient(ellipse 80% 46% at 86% 108%, color-mix(in oklab, var(--ds-accent) 38%, var(--ds-accent-soft)), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 50% -20%, color-mix(in oklab, var(--ds-info) 30%, var(--ds-info-soft)), transparent 72%),
+    linear-gradient(180deg, color-mix(in oklab, var(--ds-info) 14%, var(--ds-info-soft)), color-mix(in oklab, var(--ds-accent-soft) 60%, var(--ds-page)));
+}
+.ds-stage[data-tone="sea"] {
+  background:
+    radial-gradient(ellipse 75% 45% at 80% 106%, color-mix(in oklab, var(--ds-ok) 26%, var(--ds-ok-soft)), transparent 72%),
+    radial-gradient(ellipse 70% 40% at 12% 108%, color-mix(in oklab, var(--ds-info) 32%, var(--ds-info-soft)), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 40% -20%, color-mix(in oklab, var(--ds-info) 26%, var(--ds-info-soft)), transparent 72%),
+    linear-gradient(180deg, color-mix(in oklab, var(--ds-info) 10%, var(--ds-info-soft)), var(--ds-page));
+}
+.ds-stage[data-tone="dusk"] {
+  background:
+    radial-gradient(ellipse 80% 46% at 30% 108%, color-mix(in oklab, var(--ds-accent) 40%, var(--ds-accent-soft)), transparent 72%),
+    radial-gradient(ellipse 70% 42% at 92% 104%, color-mix(in oklab, var(--ds-clay) 30%, var(--ds-clay-soft)), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 70% -20%, color-mix(in oklab, var(--ds-clay) 22%, var(--ds-clay-soft)), transparent 72%),
+    linear-gradient(180deg, color-mix(in oklab, var(--ds-clay-soft) 70%, var(--ds-page)), var(--ds-page));
+}
+/* A marca do cliente (data-brand) tinge o palco pelo primary. */
+.ds-stage[data-tone="brand"] {
+  background:
+    radial-gradient(ellipse 80% 46% at 24% 108%, color-mix(in oklab, var(--ds-primary) 22%, var(--ds-page)), transparent 72%),
+    radial-gradient(ellipse 70% 42% at 88% 104%, color-mix(in oklab, var(--ds-accent) 30%, var(--ds-accent-soft)), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 50% -20%, color-mix(in oklab, var(--ds-primary) 14%, var(--ds-page)), transparent 72%),
+    linear-gradient(180deg, color-mix(in oklab, var(--ds-primary) 6%, var(--ds-page)), var(--ds-page));
+}
+/* O grão faz o gradiente ler como imagem, não como preenchimento. Um SVG
+   inline de 220 px, repetido: sem requisição, sem custo por quadro. */
+.ds-stage[data-grain]::before,
+.ds-sky[data-grain]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.32;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.9'/></svg>");
+  pointer-events: none;
+}
+
+/* Céu do hero: a mesma luz do palco, de ponta a ponta e sem borda,
+   sumindo na página. */
+.ds-sky {
+  position: relative;
+  isolation: isolate;
+}
+.ds-sky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% -4%, color-mix(in oklab, var(--ds-info) 22%, var(--ds-info-soft)), transparent 72%),
+    radial-gradient(ellipse 45% 36% at 12% 82%, color-mix(in oklab, var(--ds-clay) 16%, transparent), transparent 70%),
+    radial-gradient(ellipse 45% 36% at 88% 86%, color-mix(in oklab, var(--ds-accent) 20%, transparent), transparent 70%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent);
+  pointer-events: none;
+}
+.ds-sky[data-grain]::after {
+  mask-image: linear-gradient(to bottom, black 50%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Vidro: uma peça do produto sobre o palco                            */
+/* ------------------------------------------------------------------ */
+.ds-glass {
+  border: 1px solid color-mix(in oklab, var(--ds-surface) 60%, transparent);
+  background: color-mix(in oklab, var(--ds-surface) 78%, transparent);
+  box-shadow: var(--ds-shadow-overlay);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+/* Vidro que se move (cartões que trocam de lugar, peças animadas): o blur
+   recalcularia a cada quadro, a parte mais cara da animação. Tinta sólida. */
+.ds-glass[data-solid] {
+  backdrop-filter: none;
+  background: color-mix(in oklab, var(--ds-surface) 90%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Movimento expressivo: só transform e opacity (compositor)           */
+/* ------------------------------------------------------------------ */
+
+/* Subir com a página: as peças entram uma depois da outra (data-delay 1–4). */
+.ds-rise {
+  animation: ds-rise var(--duration-scene) var(--ease-panel) both;
+}
+.ds-rise[data-delay="1"] { animation-delay: 90ms; }
+.ds-rise[data-delay="2"] { animation-delay: 180ms; }
+.ds-rise[data-delay="3"] { animation-delay: 300ms; }
+.ds-rise[data-delay="4"] { animation-delay: 380ms; }
+@keyframes ds-rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+/* Flutuar: uma figura sobre o palco; a sombra no chão respira junto.
+   data-delay 1–2 desencontra figuras vizinhas. */
+.ds-float {
+  display: grid;
+  animation: ds-float 5.2s ease-in-out infinite;
+}
+.ds-float[data-delay="1"] { animation-delay: -1.7s; }
+.ds-float[data-delay="2"] { animation-delay: -3.4s; }
+.ds-float-shadow {
+  width: 56%;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--ds-ink) 12%, transparent);
+  filter: blur(5px);
+  animation: ds-float-shadow 5.2s ease-in-out infinite;
+}
+.ds-float-shadow[data-delay="1"] { animation-delay: -1.7s; }
+.ds-float-shadow[data-delay="2"] { animation-delay: -3.4s; }
+:root[data-theme="dark"] .ds-float-shadow {
+  background: color-mix(in oklab, black 45%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ds-float-shadow {
+    background: color-mix(in oklab, black 45%, transparent);
+  }
+}
+/* Fora da tela ou atrás de um véu, a figura para (economiza quadros). */
+.ds-float[data-paused],
+.ds-float-shadow[data-paused] {
+  animation-play-state: paused;
+}
+@keyframes ds-float {
+  0%,
+  100% { translate: 0 0; }
+  50% { translate: 0 -10px; }
+}
+@keyframes ds-float-shadow {
+  0%,
+  100% { scale: 1; opacity: 1; }
+  50% { scale: 0.82; opacity: 0.6; }
+}
+
+/* O que espera o toque da pessoa (enviar, aprovar) respira um anel suave.
+   O anel existe sempre, sólido e transparente: só largura e cor mudam, então
+   nunca "pisca". Um por tela, e só numa demonstração. */
+.ds-pulse:not(:focus-visible) {
+  outline-style: solid;
+  outline-width: 0;
+  outline-color: transparent;
+  outline-offset: 2px;
+  animation: ds-pulse 2s ease-in-out 600ms infinite;
+}
+@keyframes ds-pulse {
+  50% {
+    outline-width: 4px;
+    outline-color: color-mix(in oklab, var(--ds-primary) 16%, transparent);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Balão de fala                                                       */
+/* ------------------------------------------------------------------ */
+.ds-bubble {
+  position: relative;
+  width: max-content;
+  max-width: 240px;
+}
+.ds-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  border: 8px solid transparent;
+  border-top-color: var(--ds-bubble, var(--ds-surface));
+}
+.ds-bubble[data-side="left"]::after { left: 24px; }
+.ds-bubble[data-side="center"]::after { left: calc(50% - 8px); }
+.ds-bubble[data-side="right"]::after { right: 24px; }
+.ds-bubble[data-leaving] {
+  pointer-events: none;
+  animation: ds-bubble-leave 200ms var(--ease-travel) both;
+}
+@keyframes ds-bubble-leave {
+  to {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Cabeçalho do site que vira pílula ao rolar                          */
+/* ------------------------------------------------------------------ */
+.ds-site-header-bar {
+  transition:
+    max-width var(--duration-scene) var(--ease-panel),
+    height var(--duration-scene) var(--ease-panel),
+    padding var(--duration-scene) var(--ease-panel),
+    background-color 400ms ease,
+    border-color 400ms ease,
+    box-shadow 400ms ease;
+}
+
+/* ------------------------------------------------------------------ */
+/* CTA em pílula: a seta no círculo anda e gira no hover               */
+/* ------------------------------------------------------------------ */
+.ds-cta-arrow,
+.ds-cta-arrow svg {
+  transition: transform var(--duration-panel) var(--ease-panel);
+}
+:where(.group):hover > .ds-cta-arrow {
+  transform: translateX(2px);
+}
+:where(.group):hover > .ds-cta-arrow svg {
+  transform: rotate(45deg);
+}
+}

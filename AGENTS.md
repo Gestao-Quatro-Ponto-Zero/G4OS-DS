@@ -58,7 +58,7 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
    | Estados | `text-ok` / `bg-ok-soft`, `amber`, `rose`, `info` | `text-green-700`, `bg-red-50` |
    | Cor em SVG / `style` | `var(--color-…)` ou `color-mix(in oklab, var(--color-ink) 20%, transparent)` | `"#202124"`, `rgba(…)` |
 
-   **Tamanho de texto só na escala**: utilitários nomeados (`text-overline` 10, `text-meta` 11, `text-caption` 12, `text-label` 12.5, `text-control` 13, `text-body` 13.5, `text-input` 14, `text-value` 15, `text-section` 18, `text-record` 20, `text-metric` 22, `text-title` 25) **ou** o valor arbitrário equivalente `text-[13.5px]`. Permitidos: 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 15, 16, 17, 18, 20, 22, 24, 25, 30 px (os meios-passos 10.5/11.5 e os de número 16/17/24/30 existem em componentes densos e KPIs). Nada fora da lista.
+   **Tamanho de texto só na escala**: utilitários nomeados (`text-overline` 10, `text-meta` 11, `text-caption` 12, `text-label` 12.5, `text-control` 13, `text-body` 13.5, `text-input` 14, `text-value` 15, `text-section` 18, `text-record` 20, `text-metric` 22, `text-title` 25) **ou** o valor arbitrário equivalente `text-[13.5px]`. Permitidos: 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 15, 16, 17, 18, 20, 22, 24, 25, 30 px (os meios-passos 10.5/11.5 e os de número 16/17/24/30 existem em componentes densos e KPIs). Nada fora da lista abaixo de 26 px; de 26 px para cima é tamanho de display (hero, capítulo de página pública, slide).
 2. **Superfície, gelo e ação.** Área de trabalho em `page`; gelo (`soft`) só delimita; ação principal e seleção em `primary` (tinta no tema G4, cor da marca em `[data-brand]`). Dourado (`accent`) só preenche; texto dourado é `accent-deep`.
 3. **Superfície separa por borda de 1 px**, não por sombra. Sombra só no que flutua ou é clicável.
 4. **Cor sempre com palavra.** Status = ponto + texto. Badge neutro é o padrão; tom só na exceção. Número bom não grita (só warn/bad pintam o valor).
@@ -92,6 +92,9 @@ Site: `#/` início · `#/p/<slug>` documentação · `#/blocos/<categoria>` bloc
 20. **pt-BR**, verbo + objeto nos botões ("Criar vaga"), sem exclamação, sem "com sucesso", sem jargão de sistema, só a primeira letra maiúscula. Ver [escrita.md](docs/fundamentos/escrita.md).
 21. **Acessível**: tudo por teclado, foco visível (nunca `outline: none` sem substituto), nomes acessíveis, cor nunca sozinha, `prefers-reduced-motion` respeitado.
 22. **Responsivo de 320 a 1440 px**, sem rolagem horizontal da página. Confira 1440 e 390 px.
+
+### Páginas públicas e boas-vindas
+22a. **Camada expressiva só fora do trabalho.** Página pública, boas-vindas, onboarding e estado vazio de destaque podem usar palcos (`Stage`, `StageSky`, `Glass`, `Chapter`, `CtaButton`, `SiteHeader`) e movimento de cena. Nunca atrás de lista, tabela, formulário ou painel. Cena com tempo usa `useBeat`/`everyVisible` (só com a aba visível) e `useInView`; movimento reduzido mostra o fim da cena; vidro não se move (`Glass solid`). Ver [palcos](docs/padroes/palcos.md).
 
 ### Tema escuro e marca
 23. **Todo componente funciona nos dois temas e em qualquer marca** sem código extra: basta usar os tokens da regra 1. Tema: `<html data-theme="light|dark|system">`; marca: `<html data-brand="oceano">` (presets em `src/styles/themes.css`) ou um bloco `[data-brand="cliente"] { --ds-primary: …; }` só com semânticos `--ds-*`. Estado no app: `useTheme()` + `ThemeToggle` (`src/lib/theme.ts`, `src/components/theme.tsx`); para não piscar, injete `themeScript` no `<head>`. A variante `dark:` do Tailwind segue `data-theme`; use-a só para ajuste fino (imagem, ilustração), nunca para trocar cores que um token já troca. Ver [tokens](docs/fundamentos/tokens.md) e [temas](docs/fundamentos/temas-e-dark-mode.md).
@@ -127,6 +130,7 @@ Os blocos estão em `src/blocks/` e no site em **Blocos**. Categorias: SaaS, CRM
 | **Assistente / chat de IA** | `ai-workspace` | `ai-sessions`, `ai-projects` | `ai-trace` | `ai-chat`, `ai-conversation`, `ai-assistant` |
 | **SaaS / produto** | `saas-dashboard` | `saas-customers`, `saas-plans`, `saas-usage` | `saas-customer` | `saas-analytics`, `settings-*`, `onboarding-*` |
 | **Portal do cliente** | `onboarding-checklist` + `NextStep` | lista simples | — | `auth-login`, `auth-otp`, `app-file-manager` |
+| **Página pública** | — | — | — | `marketing-stage` (palcos, cena, cabeçalho que vira pílula), `marketing-landing`, `marketing-pricing`, `ats-careers` |
 | **Qualquer app** | — | — | — | `auth-*`, `settings-profile`/`-organization`/`-roles`/`-billing`/`-notifications`/`-team`/`-webhooks`/`-data`, `app-error-pages`, `app-legal`, `app-presentation` |
 
 Receitas por tipo de app (entidades, mapa de navegação, telas): `docs/receitas/` (CRM, ATS, ERP, ERP de serviços, financeiro, contratos, comunicação interna, agentes de IA, portal).

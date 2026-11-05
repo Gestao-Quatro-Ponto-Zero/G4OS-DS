@@ -251,7 +251,7 @@ Mídia à esquerda do Item: "icon" = quadrado gelo com ícone 16 px; "image" = m
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
-| `variant` | `"icon" \| "image" \| "default" \| undefined` | `"default"` |  |
+| `variant` | `"default" \| "icon" \| "image" \| undefined` | `"default"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

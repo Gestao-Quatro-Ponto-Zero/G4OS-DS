@@ -204,6 +204,13 @@
               "description": null
             },
             {
+              "name": "shape",
+              "type": "ButtonShape | undefined",
+              "required": false,
+              "default": "\"default\"",
+              "description": "`pill`: totalmente arredondado (páginas públicas, palcos)."
+            },
+            {
               "name": "size",
               "type": "\"sm\" | \"md\" | undefined",
               "required": false,
@@ -225,6 +232,12 @@
           "kind": "function",
           "summary": null,
           "signature": "buttonClass(props?): string"
+        },
+        {
+          "name": "ButtonShape",
+          "kind": "type",
+          "summary": "Forma do botão: `default` (raio de controle) ou `pill` (totalmente arredondado, para páginas públicas e CTAs de palco).",
+          "definition": "\"default\" | \"pill\""
         },
         {
           "name": "ButtonVariant",
@@ -22462,7 +22475,7 @@
             },
             {
               "name": "variant",
-              "type": "\"icon\" | \"image\" | \"default\" | undefined",
+              "type": "\"default\" | \"icon\" | \"image\" | undefined",
               "required": false,
               "default": "\"default\"",
               "description": null
@@ -26745,6 +26758,462 @@
         }
       ],
       "doc": "components/meeting.md"
+    },
+    {
+      "name": "lib-motion",
+      "file": "src/lib/motion.ts",
+      "summary": "Movimento com contrato: o tempo só corre quando a pessoa vê, e movimento reduzido mostra o fim da cena (não uma cena congelada no meio).",
+      "exports": [
+        {
+          "name": "EASE_TRAVEL",
+          "kind": "const",
+          "summary": "Curva de viagem (igual a `--ease-travel`): saída lenta, trajeto claro, chegada suave."
+        },
+        {
+          "name": "everyVisible",
+          "kind": "function",
+          "summary": "Repete `run` a cada `ms` só enquanto a aba está visível.",
+          "signature": "everyVisible(run, ms): () => void"
+        },
+        {
+          "name": "prefersReducedMotion",
+          "kind": "function",
+          "summary": "Se a pessoa pediu menos movimento ao sistema.",
+          "signature": "prefersReducedMotion(): boolean"
+        },
+        {
+          "name": "useBeat",
+          "kind": "hook",
+          "summary": "O compasso de uma cena: 0, 1, … `count - 1`, um a cada `ms` com a aba visível, e de novo do 0.",
+          "signature": "useBeat(count, ms, props?): number"
+        },
+        {
+          "name": "useEasedWidth",
+          "kind": "hook",
+          "summary": "Uma pílula cujas palavras mudam: a largura vai da antiga à nova em vez de saltar.",
+          "signature": "useEasedWidth(element, key, duration?): void"
+        },
+        {
+          "name": "useGlide",
+          "kind": "hook",
+          "summary": "Uma lista ancorada no pé (conversa, feed): quando um item chega ou sai, os que já estavam deslizam até o novo lugar em vez de pular.",
+          "signature": "useGlide(box, duration?): void"
+        },
+        {
+          "name": "useInView",
+          "kind": "hook",
+          "summary": "Se o elemento já entrou na tela (uma vez).",
+          "signature": "useInView(props?): readonly [Dispatch<SetStateAction<T | null>>, boolean]"
+        },
+        {
+          "name": "useOutgoing",
+          "kind": "hook",
+          "summary": "O que estava na tela enquanto sai: quando `key` muda, devolve o valor anterior até a animação de saída terminar (chame `done` no `onAnimationEnd`).",
+          "signature": "useOutgoing(value, key?): readonly [{ value: T; key: unknown; } | undefined, () => void]"
+        },
+        {
+          "name": "useReducedMotion",
+          "kind": "hook",
+          "summary": "`prefersReducedMotion` como estado: muda junto com a preferência do sistema.",
+          "signature": "useReducedMotion(): boolean"
+        },
+        {
+          "name": "useScrolled",
+          "kind": "hook",
+          "summary": "Se a área de rolagem já passou de `threshold` px.",
+          "signature": "useScrolled(threshold?, { window: onWindow = false }?): { scrolled: boolean; onScroll: (event: { currentTarget: { scrollTop: number; }; }) => void; }"
+        },
+        {
+          "name": "useVisibleInterval",
+          "kind": "hook",
+          "summary": "`everyVisible` como hook.",
+          "signature": "useVisibleInterval(run, ms): void"
+        },
+        {
+          "name": "whenIdle",
+          "kind": "function",
+          "summary": "Roda quando o navegador fica ocioso: dados abaixo da dobra, prévias e pré-carregamentos que não podem atrasar a primeira tela.",
+          "signature": "whenIdle(run, timeout?): () => void"
+        }
+      ],
+      "doc": "components/lib-motion.md"
+    },
+    {
+      "name": "stage",
+      "file": "src/components/stage.tsx",
+      "summary": "Camada expressiva (palcos).",
+      "exports": [
+        {
+          "name": "Chapter",
+          "kind": "component",
+          "summary": "Capítulo de página pública: uma ideia por seção.",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "A cena: em geral um `Stage` com peças reais do produto."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "flip",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "index",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Número do capítulo no sobretítulo (\"01\")."
+            },
+            {
+              "name": "kicker",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "wide",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "chapterTitleClass",
+          "kind": "const",
+          "summary": "Título de capítulo e de chamada final: 34 px no celular, 48 px a partir de 640 px."
+        },
+        {
+          "name": "CtaButton",
+          "kind": "component",
+          "summary": "Chamada principal de página pública: pílula com a seta num círculo, que anda e gira no hover.",
+          "props": [
+            {
+              "name": "disabledReason",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Por que está desabilitado."
+            },
+            {
+              "name": "href",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "FloatingFigure",
+          "kind": "component",
+          "summary": "Figura que flutua sobre o palco (rosto de agente, ícone de app, peça), com a sombra no chão respirando junto.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "delay",
+              "type": "0 | 1 | 2 | undefined",
+              "required": false,
+              "default": "0",
+              "description": null
+            },
+            {
+              "name": "paused",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "shadow",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "Glass",
+          "kind": "component",
+          "summary": "Vidro: uma peça do produto sobre o palco (cartão de rotina, aprovação, notificação), fosca para a paisagem aparecer atrás.",
+          "props": [
+            {
+              "name": "as",
+              "type": "ElementType | undefined",
+              "required": false,
+              "default": "\"div\"",
+              "description": null
+            },
+            {
+              "name": "solid",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "Kicker",
+          "kind": "component",
+          "summary": "Sobretítulo de seção pública: monoespaçado, caixa alta, com o número do capítulo (\"01 / Na prática\").",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "index",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "SiteHeader",
+          "kind": "component",
+          "summary": "Cabeçalho de site público (anatomia I).",
+          "props": [
+            {
+              "name": "brand",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": "Marca: logo + nome do produto."
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Entrar / começar: um `Button size=\"sm\" shape=\"pill\"`."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "floating",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "A página rolou: o cabeçalho vira pílula flutuante."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Seções\"",
+              "description": "Nome acessível da navegação."
+            },
+            {
+              "name": "links",
+              "type": "SiteHeaderLink[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": "Seções da página (rolagem) ou páginas do site."
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "SiteHeaderLink",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ label: string; href?: string; onSelect?: () => void }"
+        },
+        {
+          "name": "SpeechBubble",
+          "kind": "component",
+          "summary": "Balão de fala sobre quem fala (uma figura no palco).",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "leaving",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onAnimationEnd",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "side",
+              "type": "\"center\" | \"left\" | \"right\" | undefined",
+              "required": false,
+              "default": "\"center\"",
+              "description": null
+            },
+            {
+              "name": "style",
+              "type": "CSSProperties | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "Stage",
+          "kind": "component",
+          "summary": "Palco: superfície expressiva com céu, dois morros e grão, todos de tokens (segue tema e marca).",
+          "props": [
+            {
+              "name": "as",
+              "type": "ElementType | undefined",
+              "required": false,
+              "default": "\"div\"",
+              "description": null
+            },
+            {
+              "name": "grain",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Grão sutil que faz o gradiente ler como imagem."
+            },
+            {
+              "name": "tone",
+              "type": "StageTone | undefined",
+              "required": false,
+              "default": "\"dawn\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-palcos"
+        },
+        {
+          "name": "StageSky",
+          "kind": "component",
+          "summary": "Céu do hero: a luz do palco de ponta a ponta, sem borda, sumindo na página embaixo.",
+          "props": [
+            {
+              "name": "as",
+              "type": "ElementType | undefined",
+              "required": false,
+              "default": "\"section\"",
+              "description": null
+            },
+            {
+              "name": "grain",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "StageTone",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"dawn\" | \"sea\" | \"dusk\" | \"brand\""
+        }
+      ],
+      "doc": "components/stage.md"
     }
   ],
   "blocks": [
@@ -31819,6 +32288,53 @@
         "NumberField",
         "SegmentedControl",
         "formatCurrency"
+      ]
+    },
+    {
+      "slug": "marketing-stage",
+      "file": "src/blocks/marketing-stage.tsx",
+      "title": "Landing com palcos",
+      "description": "Página pública na camada expressiva: cabeçalho que vira pílula, céu no hero com agentes que conversam, capítulos com o produto real em palcos de tokens, uma demonstração que a pessoa conduz e a chamada final.",
+      "category": "Marketing",
+      "concept": {
+        "goal": "Mostrar o produto trabalhando, em cena, e levar a pessoa a entrar: cada capítulo é uma ideia com uma peça real para tocar.",
+        "patterns": [
+          "Anatomia I · Público: a página rola, o SiteHeader fica e vira pílula de vidro ao rolar (useScrolled)",
+          "StageSky no hero; Chapter com Kicker numerado e um Stage por capítulo, alternando o lado (flip)",
+          "Peças reais do produto em Glass sobre o palco; a aprovação responde ao toque",
+          "Cenas com useBeat (só com a aba visível), começam quando vistas (useInView); movimento reduzido mostra o fim da cena",
+          "Uma CtaButton por dobra; a secundária é Button quiet em pílula"
+        ],
+        "adapt": [
+          "Página de produto, de módulo, de evento ou de parceiro: troque o elenco e as falas",
+          "Boas-vindas de um app (primeiro acesso): um Stage com o primeiro passo, sem o cabeçalho de site"
+        ],
+        "avoid": [
+          "Palco atrás de dados de trabalho (lista, tabela, formulário)",
+          "Mais de uma cena se movendo na mesma dobra",
+          "Vidro (backdrop-filter) dentro de algo que anima a cada quadro: use Glass solid",
+          "Ilustração genérica no lugar de uma peça real do produto"
+        ]
+      },
+      "uses": [
+        "Button",
+        "Chapter",
+        "CtaButton",
+        "FloatingFigure",
+        "Glass",
+        "Kicker",
+        "ProductMark",
+        "SiteHeader",
+        "SpeechBubble",
+        "Stage",
+        "StageSky",
+        "chapterTitleClass",
+        "formatCurrency",
+        "useBeat",
+        "useGlide",
+        "useInView",
+        "useOutgoing",
+        "useScrolled"
       ]
     },
     {

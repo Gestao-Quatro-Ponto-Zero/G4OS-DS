@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (462 componentes) → `components/<nome>.md`
+## Módulos (471 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -164,8 +164,10 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **lib-office-files**: Leitura de arquivos reais do Office no navegador, sem dependências: descompacta o .xlsx/.docx/.pptx (DecompressionStream) e lê o XML (DOMParser).
 - **office**: Planilhas, documentos e apresentações na linguagem do DS, escritos em código ou lidos de arquivos reais do Office.
 - **meeting**: Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.
+- **lib-motion**: Movimento com contrato: o tempo só corre quando a pessoa vê, e movimento reduzido mostra o fim da cena (não uma cena congelada no meio).
+- **stage**: Camada expressiva (palcos).
 
-## Blocos (141) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
+## Blocos (142) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`
 - **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-legal`, `app-marketplace`, `app-meeting-notes`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
@@ -176,7 +178,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-products`, `erp-purchase-order`, `erp-purchase-orders`, `erp-purchase-requests`, `erp-receiving`, `erp-shipping`, `erp-stock-movements`, `erp-suppliers`
 - **Financeiro**: `fin-bank-accounts`, `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
 - **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-approvals`, `ai-assistant`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
-- **Marketing**: `marketing-landing`, `marketing-pricing`
+- **Marketing**: `marketing-landing`, `marketing-pricing`, `marketing-stage`
 - **Onboarding**: `onboarding-checklist`, `onboarding-wizard`
 - **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-integrations`, `saas-plans`, `saas-reports`, `saas-support`, `saas-usage`
 - **Serviços**: `srv-billing`, `srv-client`, `srv-clients`, `srv-contracts`, `srv-dashboard`, `srv-invoices`, `srv-quotes`, `srv-schedule`, `srv-work-order`, `srv-work-orders`
