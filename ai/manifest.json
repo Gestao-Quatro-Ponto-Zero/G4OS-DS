@@ -1503,7 +1503,7 @@
           "name": "ComboboxOption",
           "kind": "type",
           "summary": null,
-          "definition": "{ value: string; label: string; description?: string; disabled?: boolean; }"
+          "definition": "{ value: string; label: string; description?: string; disabled?: boolean; icon?: ReactNode; }"
         },
         {
           "name": "ControlLabelProps",

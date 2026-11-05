@@ -125,18 +125,18 @@ Lista de entidades (pessoas, clientes, documentos) com busca sem acento.
 Exemplo (showcase `#/p/form-listas`):
 
 ```tsx
-<Select label="Status" options={…} value={status} onValueChange={setStatus} />
-<Combobox label="Vendedor" options={pessoas} value={pessoa} onValueChange={setPessoa} placeholder="Selecione um vendedor" />
-<FieldBlock label="Data" hint="Vazio = hoje.">
-  <DatePicker label="Data" value={date} onValueChange={setDate} placeholder="Hoje (padrão)" clearable />
-</FieldBlock>
-<Select size="compact" label="Fase" … />   // toolbar: rótulo só acessível
+<Combobox
+  label="App"
+  options={[{ value: "email", label: "E-mail", description: "Conectado", icon: <Mail className="h-4 w-4" /> }, …]}
+  value={app}
+  onValueChange={setApp}
+/>
 ```
 
 ## ComboboxOption (type)
 
 ```ts
-type ComboboxOption = { value: string; label: string; description?: string; disabled?: boolean; }
+type ComboboxOption = { value: string; label: string; description?: string; disabled?: boolean; icon?: ReactNode; }
 ```
 
 ## ControlLabelProps (type)
