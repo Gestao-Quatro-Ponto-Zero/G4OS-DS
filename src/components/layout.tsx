@@ -135,7 +135,7 @@ export function BottomNav({
     <nav
       aria-label="Navegação principal"
       className={cn(
-        "fixed inset-x-3 z-[35] mx-auto flex max-w-[480px] items-stretch gap-1 rounded-2xl border border-line bg-popover/90 p-1.5 shadow-toast backdrop-blur-md",
+        "fixed inset-x-3 z-[35] mx-auto flex max-w-[480px] items-stretch gap-1 rounded-2xl border border-line/60 bg-popover/70 p-1.5 shadow-toast backdrop-blur-xl backdrop-saturate-150",
         "bottom-[calc(12px+env(safe-area-inset-bottom))]",
         !alwaysVisible && "md:hidden",
         className,
