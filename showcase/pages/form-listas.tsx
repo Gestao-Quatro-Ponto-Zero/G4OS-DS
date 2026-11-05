@@ -1,4 +1,4 @@
-import { CalendarCheck, FlaskConical, Home, LogOut, Users } from "lucide-react";
+import { CalendarCheck, FlaskConical, Home, LogOut, Mail, MessageSquare, Table2, Users } from "lucide-react";
 import { useState } from "react";
 import { Button, Checkbox, CheckboxGroup, Combobox, DatePicker, FieldBlock, MultiSelect, NativeSelect, Select, Sidebar, ToggleGroup } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
@@ -48,6 +48,7 @@ export default function Page() {
   const [status, setStatus] = useState("aberto");
   const [pessoa, setPessoa] = useState("");
   const [nativa, setNativa] = useState("");
+  const [app, setApp] = useState("email");
   const [sel, setSel] = useState<string[]>(["exec", "coord", "gerente"]);
   const [times, setTimes] = useState<string[]>(["sp", "rj", "poa"]);
   const [chips, setChips] = useState<string[]>(["ana-matias", "breno-soares"]);
@@ -87,6 +88,34 @@ export default function Page() {
             </tbody>
           </table>
         </div>
+      </DocSection>
+
+      <DocSection
+        title="Opções com ícone"
+        rule="`icon` em cada opção põe um elemento à esquerda, na lista e ao lado do valor escolhido, como no Select. Use em listas longas de entidades com marca (apps, integrações, contas): o logo acha o item antes do nome."
+      >
+        <Demo
+          className="max-w-sm"
+          code={`<Combobox
+  label="App"
+  options={[{ value: "email", label: "E-mail", description: "Conectado", icon: <Mail className="h-4 w-4" /> }, …]}
+  value={app}
+  onValueChange={setApp}
+/>`}
+        >
+          <Combobox
+            label="App"
+            placeholder="Adicionar app…"
+            value={app}
+            onValueChange={setApp}
+            options={[
+              { value: "email", label: "E-mail", description: "Conectado", icon: <Mail className="h-4 w-4 text-muted" /> },
+              { value: "chat", label: "Chat do time", icon: <MessageSquare className="h-4 w-4 text-muted" /> },
+              { value: "agenda", label: "Agenda", icon: <CalendarCheck className="h-4 w-4 text-muted" /> },
+              { value: "planilhas", label: "Planilhas", icon: <Table2 className="h-4 w-4 text-muted" /> },
+            ]}
+          />
+        </Demo>
       </DocSection>
 
       <DocSection

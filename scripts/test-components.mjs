@@ -31,7 +31,7 @@ function test(name, fn) {
 try {
   await build({
     stdin: {
-      contents: `export { ApprovalRequest, approvalRequestLabels } from "./src/components/ai-workspace"; export { PageHeading } from "./src/components/navigation";`,
+      contents: `export { ApprovalRequest, approvalRequestLabels } from "./src/components/ai-workspace"; export { PageHeading } from "./src/components/navigation"; export { Combobox } from "./src/components/forms";`,
       resolveDir: root,
       loader: "ts",
     },
@@ -44,7 +44,7 @@ try {
     logLevel: "error",
   });
   writeFileSync(join(dir, "package.json"), JSON.stringify({ type: "module" }));
-  const { ApprovalRequest, PageHeading } = await import(pathToFileURL(out).href);
+  const { ApprovalRequest, PageHeading, Combobox } = await import(pathToFileURL(out).href);
   const { createElement: h } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const render = (props, ...children) => renderToStaticMarkup(h(ApprovalRequest, { title: "Enviar lembrete", ...props }, ...children));
@@ -138,6 +138,20 @@ try {
     assert.match(html, /aria-label="Approval: Enviar lembrete"/);
     assert.match(html, /> Approve</);
     assert.match(html, /Precisa da sua aprovação/);
+  });
+
+  console.log("Combobox");
+
+  test("icon da opção aparece ao lado do valor escolhido", () => {
+    const options = [
+      { value: "gmail", label: "Gmail", icon: h("svg", { "data-testid": "gmail-logo" }) },
+      { value: "slack", label: "Slack", icon: h("svg", { "data-testid": "slack-logo" }) },
+    ];
+    const chosen = renderToStaticMarkup(h(Combobox, { label: "App", options, value: "gmail", onValueChange: () => undefined }));
+    assert.match(chosen, /data-testid="gmail-logo"/);
+    assert.doesNotMatch(chosen, /data-testid="slack-logo"/);
+    const empty = renderToStaticMarkup(h(Combobox, { label: "App", options, value: "", onValueChange: () => undefined }));
+    assert.doesNotMatch(empty, /data-testid=/);
   });
 
   console.log("PageHeading");

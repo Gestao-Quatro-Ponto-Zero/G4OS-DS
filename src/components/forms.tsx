@@ -404,6 +404,8 @@ export type ComboboxOption = {
   label: string;
   description?: string;
   disabled?: boolean;
+  /** Elemento à esquerda, ex.: o logo do app. */
+  icon?: ReactNode;
 };
 
 type ComboboxProps = ControlLabelProps & {
@@ -469,7 +471,7 @@ export function Combobox({ options, label, hideLabel, hint, error, optional, pla
           className ?? cn("h-10 w-full rounded-lg border bg-surface px-3 text-[14px]", field.invalid ? "border-rose/50" : "border-line hover:border-line-strong"),
         )}
       >
-        <span className="truncate">
+        <span className="flex min-w-0 items-center gap-2 truncate">
           {selection.multiple ? (
             selectedOptions.length ? (
               `${selectedOptions.length} ${selectedOptions.length === 1 ? "selecionado" : "selecionados"}`
@@ -477,7 +479,12 @@ export function Combobox({ options, label, hideLabel, hint, error, optional, pla
               <span className="text-muted">{placeholder}</span>
             )
           ) : (
-            <BaseCombobox.Value placeholder={placeholder} />
+            <>
+              {options.find((o) => o.value === selection.value)?.icon}
+              <span className="truncate">
+                <BaseCombobox.Value placeholder={placeholder} />
+              </span>
+            </>
           )}
         </span>
         <ChevronsUpDown aria-hidden className="h-3.5 w-3.5 shrink-0 text-muted" />
@@ -523,6 +530,7 @@ export function Combobox({ options, label, hideLabel, hint, error, optional, pla
                   disabled={option.disabled}
                   className="flex cursor-default items-center gap-3 rounded-lg px-2.5 py-2 text-[14px] outline-none data-highlighted:bg-soft data-disabled:cursor-not-allowed data-disabled:text-muted max-sm:min-h-11"
                 >
+                  {option.icon && <span className="flex shrink-0 items-center">{option.icon}</span>}
                   <div className="min-w-0 flex-1">
                     <div className="break-words">{option.label}</div>
                     {option.description && <div className="mt-0.5 text-[12px] text-muted">{option.description}</div>}
