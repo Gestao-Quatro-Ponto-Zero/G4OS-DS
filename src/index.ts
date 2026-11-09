@@ -48,6 +48,8 @@ export * from "./components/tags";
 export * from "./components/rich-text";
 export * from "./components/agent-builder";
 export * from "./components/tasks-ai";
+// Resumo do período ("catch up"): fontes, quatro seções, linhas com oferta da IA e lido
+export * from "./components/catch-up";
 export * from "./components/record-panel";
 export * from "./components/collab";
 export * from "./components/ai-layout";

@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (471 componentes) → `components/<nome>.md`
+## Módulos (476 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -145,6 +145,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **rich-text**: Editor de texto rico LEVE (contentEditable + comandos do navegador).
 - **agent-builder**: Construtor de agente: a "ficha" do agente ao lado da conversa com ele.
 - **tasks-ai**: Tarefas propostas pela IA (a partir de uma reunião, documento ou análise).
+- **catch-up**: Resumo do que aconteceu enquanto a pessoa esteve fora ("catch up").
 - **record-panel**: Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
 - **collab**: Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
 - **ai-layout**: Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
@@ -167,7 +168,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **lib-motion**: Movimento com contrato: o tempo só corre quando a pessoa vê, e movimento reduzido mostra o fim da cena (não uma cena congelada no meio).
 - **stage**: Camada expressiva (palcos).
 
-## Blocos (142) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
+## Blocos (143) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`
 - **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-legal`, `app-marketplace`, `app-meeting-notes`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
@@ -177,7 +178,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **Contratos**: `clm-approvals`, `clm-contract`, `clm-contracts`, `clm-counterparties`, `clm-dashboard`, `clm-obligations`, `clm-request`, `clm-templates`
 - **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-products`, `erp-purchase-order`, `erp-purchase-orders`, `erp-purchase-requests`, `erp-receiving`, `erp-shipping`, `erp-stock-movements`, `erp-suppliers`
 - **Financeiro**: `fin-bank-accounts`, `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
-- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-approvals`, `ai-assistant`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
+- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-approvals`, `ai-assistant`, `ai-catch-up`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
 - **Marketing**: `marketing-landing`, `marketing-pricing`, `marketing-stage`
 - **Onboarding**: `onboarding-checklist`, `onboarding-wizard`
 - **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-integrations`, `saas-plans`, `saas-reports`, `saas-support`, `saas-usage`

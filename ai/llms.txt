@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 471 componentes, gráficos SVG e 142 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 476 componentes, gráficos SVG e 143 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -53,6 +53,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [rich-text](components/rich-text.md): Editor de texto rico LEVE (contentEditable + comandos do navegador).
 - [agent-builder](components/agent-builder.md): Construtor de agente: a "ficha" do agente ao lado da conversa com ele.
 - [tasks-ai](components/tasks-ai.md): Tarefas propostas pela IA (a partir de uma reunião, documento ou análise).
+- [catch-up](components/catch-up.md): Resumo do que aconteceu enquanto a pessoa esteve fora ("catch up").
 - [record-panel](components/record-panel.md): Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.
 - [collab](components/collab.md): Colaboração entre pessoas (não com a IA): conversa do time ao lado de um documento.
 - [ai-layout](components/ai-layout.md): Layout de app agêntico (docs: IA e interação › Layout de app agêntico).
@@ -87,6 +88,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [ai-agents](blocks/ai-agents.md): Frota de agentes (IA)
 - [ai-approvals](blocks/ai-approvals.md): Aprovações de agentes (IA)
 - [ai-assistant](blocks/ai-assistant.md): Assistente sobre a tela (IA)
+- [ai-catch-up](blocks/ai-catch-up.md): Resumo do período (IA)
 - [ai-chat](blocks/ai-chat.md): Chat com histórico (IA)
 - [ai-codex](blocks/ai-codex.md): Agente de código (tarefas longas) (IA)
 - [ai-compose-email](blocks/ai-compose-email.md): E-mail com IA (IA)
