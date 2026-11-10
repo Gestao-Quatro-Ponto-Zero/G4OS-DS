@@ -35,7 +35,7 @@ Uma linha do resumo: marca da fonte, a frase, onde e quando, quem.
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `item` * | `CatchUpItem` |  |  |
-| `action` | `ReactNode` |  |  |
+| `action` | `ReactNode \| ((markAsRead: () => boolean) => ReactNode)` |  | A função preserva o foco e retorna false se a leitura já começou. |
 | `children` | `ReactNode` |  | Detalhe abaixo da frase (a oferta da IA, uma citação). |
 | `className` | `string \| undefined` |  |  |
 | `onOpen` | `((item: CatchUpItem) => void) \| undefined` |  | Padrão: abre `href` numa aba nova. |
@@ -59,7 +59,13 @@ Exemplo (showcase `#/p/ia-resumo-do-periodo`):
 
 ## CatchUpRowSkeleton
 
-Linha reservada enquanto o resumo chega: mesma altura da linha final, nada pula.
+Reserva a estrutura da linha enquanto o resumo chega, incluindo oferta e ação quando previstas.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `withAction` | `boolean \| undefined` | `false` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
 
 Exemplo (showcase `#/p/ia-resumo-do-periodo`):
 

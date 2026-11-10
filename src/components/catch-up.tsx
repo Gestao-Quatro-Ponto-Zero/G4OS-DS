@@ -156,7 +156,8 @@ export function CatchUpRow({
   className,
 }: {
   item: CatchUpItem;
-  action?: ReactNode;
+  /** A função preserva o foco e retorna false se a leitura já começou. Execute a ação apenas quando retornar true. */
+  action?: ReactNode | ((markAsRead: () => boolean) => ReactNode);
   /** Padrão: abre `href` numa aba nova. */
   onOpen?: (item: CatchUpItem) => void;
   onRead?: (id: string) => void;
@@ -190,9 +191,13 @@ export function CatchUpRow({
   }
 
   function read() {
-    if (prefersReducedMotion()) return finish();
-    setLeaving(true);
-    timer.current = setTimeout(finish, 220);
+    if (done.current || timer.current !== null) return false;
+    if (prefersReducedMotion()) finish();
+    else {
+      setLeaving(true);
+      timer.current = setTimeout(finish, 220);
+    }
+    return true;
   }
 
   return (
@@ -222,7 +227,7 @@ export function CatchUpRow({
               </div>
             )}
             {children && <div className="mt-2">{children}</div>}
-            {action && <div className="mt-2 flex flex-wrap items-center gap-1.5">{action}</div>}
+            {action && <div className="mt-2 flex flex-wrap items-center gap-1.5">{typeof action === "function" ? action(read) : action}</div>}
           </div>
           <div className="-mr-1 flex shrink-0 items-center">
             {(item.href || onOpen) && (
@@ -246,14 +251,20 @@ export function CatchUpRow({
   );
 }
 
-/** Linha reservada enquanto o resumo chega: mesma altura da linha final, nada pula. */
-export function CatchUpRowSkeleton() {
+/** Reserva a estrutura da linha enquanto o resumo chega, incluindo oferta e ação quando previstas. */
+export function CatchUpRowSkeleton({ withAction = false }: { withAction?: boolean }) {
   return (
     <li className="flex items-start gap-3 py-3" aria-hidden>
       <Skeleton className="mt-0.5 h-[18px] w-[18px]" />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <Skeleton className="h-3.5 w-[85%]" />
         <Skeleton className="h-3 w-[40%]" />
+        {withAction && (
+          <>
+            <Skeleton className="mt-2 h-16 w-full sm:h-10" />
+            <Skeleton className="h-8 w-24" />
+          </>
+        )}
       </div>
     </li>
   );

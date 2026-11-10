@@ -284,7 +284,7 @@ export default function CatchUp() {
           {phase === "error" && (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-rose-soft px-4 py-3 text-[13px] text-ink" role="alert">
               O Gmail não respondeu. O resumo saiu sem ele.
-              <Button variant="ghost" size="sm" className="ml-auto" onClick={() => start(false)}>
+              <Button variant="ghost" size="sm" className="ml-auto" onClick={() => start(false)} data-catch-up-fallback="">
                 <RotateCcw className="h-3.5 w-3.5" aria-hidden /> Tentar de novo
               </Button>
             </div>
@@ -293,16 +293,20 @@ export default function CatchUp() {
           {phase === "stopped" && (
             <div role="status" className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-soft px-4 py-3 text-[13px] text-ink">
               <p className="m-0 flex-1">Resumo interrompido. {written === 0 ? "A leitura parou antes de gerar itens." : "O conteúdo abaixo é parcial."}</p>
-              <Button variant="ghost" size="sm" onClick={() => start()}>Refazer resumo</Button>
+              <Button variant="ghost" size="sm" onClick={() => start()} data-catch-up-fallback="">Refazer resumo</Button>
             </div>
           )}
 
           {phase !== "idle" && (phase !== "stopped" || left > 0) && (
             <article aria-busy={writing || undefined} aria-label="Resumo" className="flex flex-col gap-5 rounded-xl border border-line bg-surface px-4 py-4">
               {left === 0 && !writing ? (
-                <CatchUpDone action={<Button variant="ghost" size="sm" onClick={() => start()} data-catch-up-fallback="">Resumir de novo</Button>}>
-                  Nada mais {current.since}. As próximas novidades aparecem aqui.
-                </CatchUpDone>
+                phase === "error" ? (
+                  <p className="m-0 py-4 text-[13.5px] text-ink-soft" role="status">Itens disponíveis lidos. Tente ler o Gmail para concluir o resumo.</p>
+                ) : (
+                  <CatchUpDone action={<Button variant="ghost" size="sm" onClick={() => start()} data-catch-up-fallback="">Resumir de novo</Button>}>
+                    Nada mais {current.since}. As próximas novidades aparecem aqui.
+                  </CatchUpDone>
+                )
               ) : (
                 catchUpSections.map((section) => {
                   const all = periodDigest.filter((d) => d.section === section.id && (phase !== "error" || d.source !== "Gmail"));
@@ -320,9 +324,13 @@ export default function CatchUp() {
                           onRead={(id) => markRead([id])}
                           action={
                             d.offer ? (
-                              <Button size="sm" onClick={() => { markRead([d.id]); notify(`Pedido enviado ao agente: ${d.offerLabel?.toLowerCase()}`); }}>
-                                {d.offerLabel}
-                              </Button>
+                              (markAsRead) => (
+                                <Button size="sm" onClick={() => {
+                                  if (markAsRead()) notify(`Pedido enviado ao agente: ${d.offerLabel?.toLowerCase()}`);
+                                }}>
+                                  {d.offerLabel}
+                                </Button>
+                              )
                             ) : undefined
                           }
                         >
@@ -334,8 +342,8 @@ export default function CatchUp() {
                           )}
                         </CatchUpRow>
                       ))}
-                      {Array.from({ length: pending }, (_, i) => (
-                        <CatchUpRowSkeleton key={`s${i}`} />
+                      {rows.slice(shown.length, shown.length + pending).map((d) => (
+                        <CatchUpRowSkeleton key={`s${d.id}`} withAction={!!d.offer} />
                       ))}
                     </CatchUpSection>
                   );
@@ -353,7 +361,13 @@ export default function CatchUp() {
                   ) : (
                     <>
                       {left > 0 && (
-                        <Button variant="ghost" size="sm" onClick={() => { const before = read; markRead(visible.map((v) => v.id)); notify(`${left} itens marcados como lidos`, () => setRead(before)); }}>
+                        <Button variant="ghost" size="sm" onClick={(event) => {
+                          const root = event.currentTarget.closest("[data-catch-up]");
+                          const before = read;
+                          markRead(visible.map((v) => v.id));
+                          notify(`${left} itens marcados como lidos`, () => setRead(before));
+                          requestAnimationFrame(() => root?.querySelector<HTMLElement>("[data-catch-up-fallback]")?.focus());
+                        }}>
                           Marcar tudo como lido
                         </Button>
                       )}

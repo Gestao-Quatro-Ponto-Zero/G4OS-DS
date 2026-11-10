@@ -21243,10 +21243,10 @@
             },
             {
               "name": "action",
-              "type": "ReactNode",
+              "type": "ReactNode | ((markAsRead: () => boolean) => ReactNode)",
               "required": false,
               "default": null,
-              "description": null
+              "description": "A função preserva o foco e retorna false se a leitura já começou."
             },
             {
               "name": "children",
@@ -21289,8 +21289,16 @@
         {
           "name": "CatchUpRowSkeleton",
           "kind": "component",
-          "summary": "Linha reservada enquanto o resumo chega: mesma altura da linha final, nada pula.",
-          "props": [],
+          "summary": "Reserva a estrutura da linha enquanto o resumo chega, incluindo oferta e ação quando previstas.",
+          "props": [
+            {
+              "name": "withAction",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            }
+          ],
           "examplePage": "ia-resumo-do-periodo"
         },
         {
