@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.2
+
+### Patch Changes
+
+- 755d1d8: `styles.css` deixa de ler `src/blocks` com `@source`. Os blocos são exemplos para copiar, e a cópia no app é lida pelo Tailwind do próprio app. Medido nos Galts: o CSS inicial cai 19,5 KB (2,3 KiB gzip) sem mudar nenhuma tela. Se o seu app aponta `@source` para `node_modules/@g4ai/ds/src` inteiro, exclua os blocos com `@source not ".../@g4ai/ds/src/blocks"`.
+
+## 0.10.1
+
+### Patch Changes
+
+- bcc492a: Correções que os Galts aplicavam como patch local do 0.9.0: barras horizontais quebram nomes longos de categoria em até três linhas (com reticências), em vez de vazar à esquerda; `AgentAppLayout` expõe `--ds-mobile-nav-space` para uma área rolar sob a navegação móvel; a `BottomNav` vira vidro mais leve (`bg-popover/70`, `backdrop-blur-xl`, borda `line/60`). Também documenta `useOutgoing`, que entrou no 0.10.0.
+
+## 0.10.0
+
+### Minor Changes
+
+- f8a0d62: Camada expressiva para páginas públicas, boas-vindas e onboarding, promovida da página inicial dos Galts: `Stage` (palco de tokens com tons `dawn`, `sea`, `dusk` e `brand`), `StageSky`, `Glass`, `Kicker`, `Chapter`, `CtaButton`, `SiteHeader` (vira pílula ao rolar), `FloatingFigure` e `SpeechBubble`; `Button shape="pill"`; hooks de movimento com contrato (`useBeat`, `useInView`, `everyVisible`, `useVisibleInterval`, `whenIdle`, `useGlide`, `useEasedWidth`, `useScrolled`, `useReducedMotion`); tokens `--ease-travel`, `--duration-scene` e `--radius-stage`; bloco `marketing-stage` e guia `docs/padroes/palcos.md`.
+
+## 0.9.1
+
+### Patch Changes
+
+- 2a87c28: Mantém a geometria do `PageHeading` estável ao mostrar o cabeçalho compacto, evitando tremor e retorno da rolagem ao topo em páginas com pouco conteúdo.
+
 ## 0.9.0
 
 ### Minor Changes

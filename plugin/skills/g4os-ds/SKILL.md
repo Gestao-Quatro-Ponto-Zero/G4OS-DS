@@ -42,6 +42,7 @@ Chame essa pasta de `DS`. Se o projeto ainda não tem o pacote, instale (`pnpm a
 ## 4. Regras que mais erram (lista completa em "Erros que agentes mais cometem", no core.md)
 
 - **Anatomia**: toda tela é `Page` + `PageHeading`. Coluna estreita = `<Page width="narrow">` (ou `medium`/`reading`), **nunca** um `div` `mx-auto max-w-*` em volta só do corpo (o título fica fora do eixo).
+- **Página pública e boas-vindas**: camada expressiva (`Stage`, `StageSky`, `Glass`, `Chapter`, `CtaButton`, `SiteHeader`), nunca atrás de lista, tabela ou formulário. Cena com tempo usa `useBeat`/`everyVisible` (para com a aba oculta), nunca `setInterval` cru; movimento reduzido mostra o fim da cena; vidro não se move (`Glass solid`). Ver `DS/docs/padroes/palcos.md`.
 - **Rótulos**: o `label` dos campos já é visível. Não embrulhe `TextField`/`CurrencyField` num `FieldBlock` com o mesmo rótulo, nem repita o texto como children do `Checkbox`. `hideLabel` só em célula de tabela e toolbar.
 - **Desabilitado**: `<Button disabled disabledReason="motivo">`. Nunca `span` com `opacity-50`/`pointer-events-none` em volta.
 - **Escolha o controle certo**: vários itens → `CheckboxGroup` (visíveis) ou `MultiSelect`; dias da semana → `ToggleGroup multiple`; data → `DatePicker`; hora → `TimePicker`; entidade de lista longa → `Combobox`. Nada de `<select>`, `<input>`, `<textarea>`, `<table>` crus, `confirm()` ou `alert()`.

@@ -343,13 +343,18 @@ export function CriticalFlag({ label = "Crítica", title }: { label?: string; ti
 
 export type ButtonVariant = "primary" | "ghost" | "danger" | "quiet" | "split-left" | "split-right";
 
+/** Forma do botão: `default` (raio de controle) ou `pill` (totalmente arredondado, para páginas públicas e CTAs de palco). */
+export type ButtonShape = "default" | "pill";
+
 export function buttonClass({
   variant = "primary",
   size = "md",
+  shape = "default",
   className,
 }: {
   variant?: ButtonVariant;
   size?: "sm" | "md";
+  shape?: ButtonShape;
   className?: string;
 } = {}) {
   const sizes = size === "sm" ? "min-h-9 px-3 py-2 text-[13px]" : "min-h-10 px-4 py-2.5 text-[13.5px]";
@@ -362,7 +367,8 @@ export function buttonClass({
     "split-right": "ui-button-solid rounded-l-none bg-primary text-on-primary hover:bg-primary/90",
   };
   return cn(
-    "ui-button inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium leading-5 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0",
+    "ui-button inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-medium leading-5 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0",
+    shape === "pill" ? "rounded-full" : "rounded-lg",
     sizes,
     variants[variant],
     className,
@@ -375,11 +381,13 @@ export function buttonClass({
  * em linha. Com `href`, vira link com a mesma aparência.
  * `disabled` + `disabledReason`: continua focável (aria-disabled), não
  * dispara e explica o motivo num tooltip ("Indisponível na demonstração").
+ * `shape="pill"`: pílula, para páginas públicas e palcos (não em telas de trabalho).
  */
 export const Button = forwardRef(function Button({
   children,
   variant = "primary",
   size = "md",
+  shape = "default",
   className,
   href,
   type = "button",
@@ -389,12 +397,14 @@ export const Button = forwardRef(function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: "sm" | "md";
+  /** `pill`: totalmente arredondado (páginas públicas, palcos). Padrão: raio de controle. */
+  shape?: ButtonShape;
   href?: string;
   /** Por que está desabilitado. Mostra tooltip no hover/foco e é lido pelo leitor de tela. */
   disabledReason?: ReactNode;
 }, ref: ForwardedRef<HTMLButtonElement>) {
   const reasonId = useId();
-  const cls = buttonClass({ variant, size, className });
+  const cls = buttonClass({ variant, size, shape, className });
   if (href && !disabled)
     return (
       <DsLink ref={ref as unknown as ForwardedRef<HTMLAnchorElement>} href={href} className={cls}>

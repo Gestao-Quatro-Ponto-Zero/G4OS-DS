@@ -463,6 +463,41 @@ function barPath(x: number, y: number, w: number, h: number, r: number, side: "t
   return `M${x + w},${y}H${x + r}Q${x},${y} ${x},${y + r}V${y + h - r}Q${x},${y + h} ${x + r},${y + h}H${x + w}Z`;
 }
 
+/** Altura de linha (px) dos nomes de categoria em barras horizontais. */
+const CATEGORY_LINE = 14;
+
+/**
+ * Quebra um nome de categoria em até `maxLines` linhas que cabem em `width` px (12 px ≈ 7 px por caractere).
+ * Palavra maior que a linha é cortada; o que sobra da última linha vira reticências.
+ */
+function wrapCategory(name: string, width: number, maxLines: number): string[] {
+  const perLine = Math.max(4, Math.floor(width / 7));
+  if (name.length <= perLine) return [name];
+  const lines: string[] = [];
+  let line = "";
+  for (const word of name.split(/\s+/).filter(Boolean)) {
+    let rest = word;
+    while (rest.length > perLine) {
+      if (line) lines.push(line);
+      line = "";
+      lines.push(rest.slice(0, perLine));
+      rest = rest.slice(perLine);
+    }
+    if (!line) line = rest;
+    else if (line.length + 1 + rest.length <= perLine) line += ` ${rest}`;
+    else {
+      lines.push(line);
+      line = rest;
+    }
+  }
+  if (line) lines.push(line);
+  if (lines.length <= maxLines) return lines;
+  const kept = lines.slice(0, maxLines);
+  const last = kept[maxLines - 1]!;
+  kept[maxLines - 1] = `${(last.length < perLine ? last : last.slice(0, perLine - 1)).trimEnd()}…`;
+  return kept;
+}
+
 function Cartesian({
   kind,
   data,
@@ -949,9 +984,21 @@ function Cartesian({
               data.map((d, i) =>
                 i % labelEvery === 0 ? (
                   horizontal ? (
-                    <text key={i} x={m.left - 10} y={cat(i)} dy="0.32em" textAnchor="end" className="fill-ink-soft text-[12px]">
-                      {formatIndex(String(d[index] ?? ""))}
-                    </text>
+                    (() => {
+                      // Nomes longos quebram em linhas dentro da coluna de categorias, em vez de vazar à esquerda.
+                      const lines = wrapCategory(formatIndex(String(d[index] ?? "")), catW - 14, Math.max(1, Math.min(3, Math.floor((band - 4) / CATEGORY_LINE))));
+                      return (
+                        <text key={i} x={m.left - 10} y={cat(i) - ((lines.length - 1) * CATEGORY_LINE) / 2} dy="0.32em" textAnchor="end" className="fill-ink-soft text-[12px]">
+                          {lines.length === 1
+                            ? lines[0]
+                            : lines.map((line, j) => (
+                                <tspan key={j} x={m.left - 10} dy={j ? CATEGORY_LINE : undefined}>
+                                  {line}
+                                </tspan>
+                              ))}
+                        </text>
+                      );
+                    })()
                   ) : (
                     <text
                       key={i}

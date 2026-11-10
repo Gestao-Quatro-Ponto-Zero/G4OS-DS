@@ -79,3 +79,6 @@ export * from "./lib/office-files";
 export * from "./components/office";
 // Reuniões: gravação com saúde, transcrição, notas aprimoradas com autoria e citação de momento
 export * from "./components/meeting";
+// Camada expressiva: palcos, vidro, cabeçalho de site, capítulos e movimento com contrato (tempo só quando visível)
+export * from "./lib/motion";
+export * from "./components/stage";

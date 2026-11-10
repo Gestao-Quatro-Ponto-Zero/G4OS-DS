@@ -96,6 +96,7 @@ Um primário por área.
 | --- | --- | --- | --- |
 | `disabledReason` | `ReactNode` |  | Por que está desabilitado. |
 | `href` | `string \| undefined` |  |  |
+| `shape` | `ButtonShape \| undefined` | `"default"` | `pill`: totalmente arredondado (páginas públicas, palcos). |
 | `size` | `"sm" \| "md" \| undefined` | `"md"` |  |
 | `variant` | `ButtonVariant \| undefined` | `"primary"` |  |
 
@@ -119,6 +120,14 @@ Exemplo (showcase `#/p/ia-avisos`):
 
 ```ts
 buttonClass(props?): string
+```
+
+## ButtonShape (type)
+
+Forma do botão: `default` (raio de controle) ou `pill` (totalmente arredondado, para páginas públicas e CTAs de palco).
+
+```ts
+type ButtonShape = "default" | "pill"
 ```
 
 ## ButtonVariant (type)

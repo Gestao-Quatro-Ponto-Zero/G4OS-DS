@@ -23,6 +23,8 @@ Pré-requisito: aplique a skill **g4os-ds** (localizar o DS e ler `DS/ai/core.md
 2. Se servir ≥ 60 %: copie `DS/src/blocks/<slug>.tsx` para o projeto, renomeie, troque os dados do topo pelos tipos/fetch reais e remova o que não se aplica.
 3. Se não houver bloco: componha. Leia só os `DS/ai/components/<módulo>.md` necessários. Padrões: `DS/docs/padroes/` (layout, formulários, tabelas, filtros, dashboards, superfícies).
 
+Página pública, boas-vindas ou onboarding (anatomia I ou primeiro acesso): use a camada expressiva (`SiteHeader`, `StageSky`, `Chapter`, `Stage`, `Glass`, `CtaButton`, hooks `useBeat`/`useInView`). Comece pelo bloco `marketing-stage` e leia `DS/docs/padroes/palcos.md`. Nunca ponha palco atrás de dados de trabalho.
+
 Decisões de superfície: entidade = página; criar/editar sem perder a lista = `Drawer`; decisão curta = `Modal`; irreversível = `ConfirmDialog`.
 
 ## 3. Construa

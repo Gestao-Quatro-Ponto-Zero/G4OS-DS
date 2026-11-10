@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 469 componentes, gráficos SVG e 141 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 478 componentes, gráficos SVG e 142 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -73,6 +73,8 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [lib-office-files](components/lib-office-files.md): Leitura de arquivos reais do Office no navegador, sem dependências: descompacta o .xlsx/.docx/.pptx (DecompressionStream) e lê o XML (DOMParser).
 - [office](components/office.md): Planilhas, documentos e apresentações na linguagem do DS, escritos em código ou lidos de arquivos reais do Office.
 - [meeting](components/meeting.md): Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.
+- [lib-motion](components/lib-motion.md): Movimento com contrato: o tempo só corre quando a pessoa vê, e movimento reduzido mostra o fim da cena (não uma cena congelada no meio).
+- [stage](components/stage.md): Camada expressiva (palcos).
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)
@@ -182,6 +184,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [fin-reconciliation](blocks/fin-reconciliation.md): Conciliação bancária (Financeiro)
 - [marketing-landing](blocks/marketing-landing.md): Landing de produto (Marketing)
 - [marketing-pricing](blocks/marketing-pricing.md): Página de preços (Marketing)
+- [marketing-stage](blocks/marketing-stage.md): Landing com palcos (Marketing)
 - [onboarding-checklist](blocks/onboarding-checklist.md): Primeiros passos (Onboarding)
 - [onboarding-wizard](blocks/onboarding-wizard.md): Assistente de configuração (Onboarding)
 - [saas-analytics](blocks/saas-analytics.md): Análise de aquisição (SaaS)

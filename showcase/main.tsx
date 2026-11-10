@@ -44,7 +44,7 @@ const isDoc = (p: PageModule) => (docGroups as readonly string[]).includes(p.met
 const byCategory = (cat: string) => blocks.filter((b) => b.meta.category === cat).sort((a, b) => (a.meta.order ?? 50) - (b.meta.order ?? 50));
 const categories = blockCategories.filter((c) => byCategory(c).length);
 const slugCat = (c: string) => normalize(c).replace(/\s+/g, "-");
-const featuredSlugs = ["saas-dashboard", "crm-pipeline", "ats-pipeline", "erp-orders", "srv-work-orders", "fin-cashflow", "clm-contract", "comms-home", "ai-agents-dashboard", "ai-agent", "auth-login", "app-presentation"];
+const featuredSlugs = ["saas-dashboard", "crm-pipeline", "ats-pipeline", "erp-orders", "srv-work-orders", "fin-cashflow", "clm-contract", "comms-home", "ai-agents-dashboard", "auth-login", "app-presentation"];
 const featured = featuredSlugs.map((s) => blocks.find((b) => b.slug === s)).filter(Boolean) as BlockModule[];
 
 /* ------------------------------------------------------------------ */
@@ -365,7 +365,7 @@ function Home() {
   const [tab, setTab] = useState(featured[0]?.slug);
   const current = featured.find((b) => b.slug === tab) ?? featured[0];
   return (
-    <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
+    <div className="mx-auto max-w-[1440px] overflow-x-clip px-4 sm:px-6">
       <section className="relative isolate mx-auto max-w-[760px] py-14 text-center sm:py-20">
         <BrandHaze size={760} className="absolute left-1/2 top-[-30%] -z-10 -translate-x-1/2" />
         <AiOrb size={240} blur={30} live className="absolute -right-72 top-40 -z-10 opacity-25" />

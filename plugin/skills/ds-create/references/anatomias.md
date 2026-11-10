@@ -12,7 +12,7 @@ Fonte completa: `DS/docs/padroes/anatomia-de-pagina.md`. Escolha UMA antes de mo
 | F | Mestre-detalhe | cabeçalho; seleção em `?id=` | lista e detalhe, cada um | erp-purchase-requests, saas-support |
 | G | App de altura total | casca, cabeçalho da área, composer | só a thread/lista/canvas | ai-chat, ai-agent-builder |
 | H | Fluxo focado | rodapé de passos | documento | auth-login, onboarding-wizard |
-| I | Público | cabeçalho do site | documento | marketing-landing |
+| I | Público | cabeçalho do site (`SiteHeader`, vira pílula ao rolar) | documento | marketing-stage, marketing-landing |
 
 Checklist rápido:
 - [ ] `PageHeading` direto dentro de `<Page>` (sem invólucro; se precisar de classe, `contents`).
