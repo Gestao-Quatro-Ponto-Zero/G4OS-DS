@@ -187,10 +187,10 @@ export default function Page() {
               ]}
             />
             <div className="min-w-0 space-y-3 text-[13px] leading-relaxed text-ink-soft">
-              <p className="m-0">
+              <p>
                 <strong className="text-ink">Conexões:</strong> check verde = acesso liberado; linha tingida = em uso agora; “Conectar” = disponível mas ainda não autorizado para este agente.
               </p>
-              <p className="m-0">
+              <p>
                 <strong className="text-ink">Subagentes:</strong> ponto âmbar pulsando = executando, verde = concluído, cinza = parado, rosa = falhou. Sempre com rótulo acessível.
               </p>
               <p className="m-0">

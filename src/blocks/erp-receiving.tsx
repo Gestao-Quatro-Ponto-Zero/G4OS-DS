@@ -315,7 +315,7 @@ function Conference({ order, onDone }: { order: PurchaseOrder; onDone: () => voi
 
         {(short.length > 0 || over.length > 0) && (
           <section className="space-y-3">
-            <h3 className="m-0 text-[13px] font-medium">3 · Divergências</h3>
+            <h3 className="text-[13px] font-medium">3 · Divergências</h3>
             {over.length > 0 && (
               <Callout tone="bad" title="Chegou mais do que o pedido">
                 {over.map((r) => `${formatNumber(r.diff)} ${r.p.unit} de ${r.p.sku}`).join(", ")}. Recuse o excedente no canhoto ou peça a carta de correção ao fornecedor antes de dar entrada.

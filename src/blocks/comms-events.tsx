@@ -325,7 +325,7 @@ export default function CommsEvents() {
         {selected && (
           <div className="space-y-6">
             {selected.going && (
-              <p role="status" className="m-0 flex items-center gap-2 rounded-lg bg-ok-soft px-3 py-2 text-[13px] text-ok">
+              <p role="status" className="flex items-center gap-2 rounded-lg bg-ok-soft px-3 py-2 text-[13px] text-ok">
                 <Check className="h-4 w-4" aria-hidden /> Você está inscrito.
               </p>
             )}
@@ -339,7 +339,7 @@ export default function CommsEvents() {
               ]}
             />
             {selected.city && <LocationTag place={cityById(selected.city).place} timeZone={cityById(selected.city).timeZone} />}
-            <p className="m-0 text-[13.5px] leading-relaxed text-ink-soft">{selected.description}</p>
+            <p className="text-[13.5px] leading-relaxed text-ink-soft">{selected.description}</p>
             <section>
               <h3 className="m-0 text-[12.5px] font-medium text-muted">Quem vai · {formatNumber(selected.enrolled)}</h3>
               <ul className="m-0 mt-2 list-none space-y-1.5 p-0">

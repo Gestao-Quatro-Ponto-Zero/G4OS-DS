@@ -397,7 +397,7 @@ export default function CommsSurveys() {
                     </IconButton>
                   </div>
                 ))}
-                {tried && errors.options && <p className="m-0 text-[12px] text-rose">{errors.options}</p>}
+                {tried && errors.options && <p className="text-[12px] text-rose">{errors.options}</p>}
                 <Button size="sm" variant="quiet" onClick={() => setOptions((all) => [...all, ""])} disabled={options.length >= 6} disabledReason="Até 6 opções.">
                   <Plus /> Adicionar opção
                 </Button>
@@ -410,7 +410,7 @@ export default function CommsSurveys() {
             <DatePicker label="Fim" value={end} onValueChange={setEnd} min={start} now={todayIso} error={tried ? errors.end : undefined} />
           </div>
           <Switch label="Respostas anônimas" checked={anon} onCheckedChange={setAnon} />
-          <p className="m-0 -mt-3 text-[12px] text-muted">{anon ? "Ninguém, nem a Comunicação, vê quem respondeu o quê. Resultados por área só com 5 ou mais respostas." : "O nome de quem respondeu aparece no resultado."}</p>
+          <p className="-mt-3 text-[12px] text-muted">{anon ? "Ninguém, nem a Comunicação, vê quem respondeu o quê. Resultados por área só com 5 ou mais respostas." : "O nome de quem respondeu aparece no resultado."}</p>
           <div className="rounded-xl border border-line bg-soft p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="m-0 text-[13px] font-medium">Como a pessoa responde</p>

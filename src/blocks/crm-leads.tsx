@@ -202,7 +202,7 @@ export default function CrmLeads() {
                 </header>
 
                 <div className="space-y-6 px-5 py-5 sm:px-6">
-                  <figure className="m-0 rounded-xl bg-soft px-4 py-3">
+                  <figure className="rounded-xl bg-soft px-4 py-3">
                     <figcaption className="mb-1 flex items-center gap-1.5 text-[12px] text-muted">
                       <MessageSquareQuote className="h-3.5 w-3.5" /> Mensagem · {current.source} · {received(current)}
                     </figcaption>

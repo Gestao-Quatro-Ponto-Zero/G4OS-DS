@@ -153,7 +153,7 @@ export function OfficeChartView({ chart, height = 260, showTitle = true, classNa
     );
   }
   return (
-    <figure className={cn("m-0 min-w-0", className)}>
+    <figure className={cn("min-w-0", className)}>
       {showTitle && chart.title && <figcaption className="mb-3 text-[13.5px] font-medium text-ink">{chart.title}</figcaption>}
       {body}
     </figure>

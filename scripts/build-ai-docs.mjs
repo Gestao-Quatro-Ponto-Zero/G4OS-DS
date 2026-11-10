@@ -484,6 +484,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, \`@base-ui/react\`, \`lucide-react\`
 16. Props inventadas ou trocadas: \`<Empty description>\` (é \`hint\`; \`description\` é do \`StateView\`), \`<Card title>\` (use \`Section\`/\`ChartCard\`), \`<Badge variant>\` (é \`tone\`). Confira \`components/<módulo>.md\` antes; \`npx tsc --noEmit\` pega o resto.
 17. Importar de caminhos internos (\`@g4ai/ds/src/…\`) → sempre \`from "@g4ai/ds"\`. [\`deep-import\`]
 18. \`useEffect(async () => …)\` ou efeito que devolve Promise → função interna \`async\` e chame. [\`effect-return\`]
+19. \`space-y-*\` com filho \`m-0\` (\`<div className="space-y-6"><p className="m-0">\`): no Tailwind v4 o \`m-0\` vence e os irmãos encostam → \`flex flex-col gap-6\` no pai. Pilha nova sempre com \`gap-*\`. [\`stack-margin-reset\`]
 
 ## Regras visuais (resumo de AGENTS.md)
 - **Só tokens semânticos**: fundos \`bg-page\` (área) · \`bg-surface\` (card, campo) · \`bg-popover\` (menu, modal) · \`bg-soft\` (hover, faixa); texto \`text-ink\` · \`text-ink-soft\` · \`text-muted\`; borda \`border-line\` (\`-strong\` no hover); ação \`bg-primary text-on-primary\`; sobre preenchimento forte \`text-on-ink\`; estados \`ok · amber · rose · info\` (+\`-soft\`). Isso garante tema escuro e marca do cliente sem código extra.

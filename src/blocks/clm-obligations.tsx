@@ -258,7 +258,7 @@ export default function ClmObligations() {
               </div>
 
               <aside className="min-w-0 space-y-4" aria-label="Renovações em andamento">
-                <h2 className="m-0 text-[15px] font-medium">Renovações em andamento</h2>
+                <h2 className="text-[15px] font-medium">Renovações em andamento</h2>
                 {renewals.map((r) => {
                   const c = contractById(r.contractId);
                   return (

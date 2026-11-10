@@ -208,7 +208,7 @@ export default function SaasBilling() {
           </div>
 
           <section className="space-y-4">
-            <h2 className="m-0 text-[14px] font-medium">Faturas</h2>
+            <h2 className="text-[14px] font-medium">Faturas</h2>
             <PageToolbar>
               <FilterBar filters={filters} noun="fatura" search={<TableSearch value={q} onChange={filters.setQuery} total={filters.total} noun="fatura" searchIn="cliente e número da nota" />} />
             </PageToolbar>

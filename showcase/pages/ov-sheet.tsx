@@ -68,7 +68,7 @@ export default function Page() {
 
         <Sheet open={open === "ajuda"} onClose={close} side="left" title="Como funciona a comissão" width={380}>
           <div className="space-y-3 text-[13.5px] leading-relaxed text-ink-soft">
-            <p className="m-0">A comissão é calculada sobre o valor líquido da fatura paga, no mês do pagamento.</p>
+            <p>A comissão é calculada sobre o valor líquido da fatura paga, no mês do pagamento.</p>
             <p className="m-0">Descontos acima de 15 % reduzem a comissão pela metade. Cancelamentos em até 30 dias estornam a comissão no mês seguinte.</p>
           </div>
         </Sheet>

@@ -280,7 +280,7 @@ export function ConnectionStatus({ status, label }: { status: ConnectionState; l
  */
 export function DataSyncTable({ rows, className }: { rows: { label: string; value: ReactNode; icon?: IconLike; href?: string; onClick?: () => void; hint?: ReactNode }[]; className?: string }) {
   return (
-    <dl className={cn("m-0 overflow-hidden rounded-xl border border-line bg-surface", className)}>
+    <dl className={cn("overflow-hidden rounded-xl border border-line bg-surface", className)}>
       {rows.map((r) => {
         const Icon = r.icon;
         const value = r.href ? (

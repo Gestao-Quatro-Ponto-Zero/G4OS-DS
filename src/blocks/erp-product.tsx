@@ -137,7 +137,7 @@ function ProductPage({ product }: { product: Product }) {
             aside={
               <>
                 <section className="space-y-4 rounded-xl border border-line bg-surface p-4">
-                  <h2 className="m-0 text-[13px] font-medium">Por depósito</h2>
+                  <h2 className="text-[13px] font-medium">Por depósito</h2>
                   {warehouses.map((w) => (
                     <div key={w.id}>
                       <div className="flex justify-between text-[12.5px]">

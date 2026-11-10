@@ -254,7 +254,7 @@ export default function AppConnection() {
       <Drawer open={!!syncOpen} onClose={() => setSyncOpen(null)} kicker={`${app.name} · sincronizado`} title={syncOpen ?? ""}>
         {syncOpen && (
           <div className="space-y-3">
-            <p className="m-0 text-[13px] text-muted">Os itens mais recentes que o agente pode consultar. A lista completa fica no próprio {app.name}.</p>
+            <p className="text-[13px] text-muted">Os itens mais recentes que o agente pode consultar. A lista completa fica no próprio {app.name}.</p>
             <DataTable
               label={syncOpen}
               rows={sampleOf(app, syncOpen)}

@@ -570,7 +570,7 @@ function Photos({ w }: { w: WorkOrder }) {
           ))}
         </AttachmentGroup>
       ) : (
-        <p className="m-0 rounded-xl border border-dashed border-line px-4 py-6 text-center text-[13px] text-muted">Nenhuma foto ainda. O técnico tira antes e depois pelo app.</p>
+        <p className="rounded-xl border border-dashed border-line px-4 py-6 text-center text-[13px] text-muted">Nenhuma foto ainda. O técnico tira antes e depois pelo app.</p>
       )}
       <FileDropzone
         label="Anexar fotos ou laudos"

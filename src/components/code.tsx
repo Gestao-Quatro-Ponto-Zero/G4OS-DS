@@ -141,7 +141,7 @@ export function CodeBlock({
   const byLine = lineNumbers || marked.size > 0;
   const paint = (s: string) => (kind.prose || kind.plain ? s : tokens(s));
   return (
-    <figure className={cn("code-block m-0 min-w-0 max-w-full overflow-hidden rounded-xl border border-line bg-surface", className)}>
+    <figure className={cn("code-block min-w-0 max-w-full overflow-hidden rounded-xl border border-line bg-surface", className)}>
       <figcaption className="flex min-h-10 items-center gap-2 border-b border-line py-1 pl-4 pr-1">
         <span className={cn("min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink-soft", title != null && "font-mono")}>{title ?? kind.label}</span>
         {actions}
@@ -263,7 +263,7 @@ export function DiffView({ diff, title, maxHeight = 420, className }: { /** Diff
   const many = files.length > 1;
   const name = title ?? (many ? `${files.length} arquivos` : (files[0].name ?? "Alterações"));
   return (
-    <figure className={cn("diff-view m-0 min-w-0 max-w-full overflow-hidden rounded-xl border border-line bg-surface", className)} aria-label={`Diff: ${name}`}>
+    <figure className={cn("diff-view min-w-0 max-w-full overflow-hidden rounded-xl border border-line bg-surface", className)} aria-label={`Diff: ${name}`}>
       <figcaption className="flex min-h-10 items-center gap-2 border-b border-line py-1 pl-4 pr-1">
         <FileDiff className="h-4 w-4 shrink-0 text-muted" aria-hidden />
         <span className="min-w-0 flex-1 truncate font-mono text-[12.5px] font-medium text-ink-soft">{name}</span>

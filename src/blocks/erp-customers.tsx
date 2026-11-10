@@ -341,7 +341,7 @@ function NewCustomer({ onClose, onCreated }: { onClose: () => void; onCreated: (
     >
       <div className="space-y-7">
         <section className="space-y-4">
-          <h3 className="m-0 text-[13px] font-medium">Empresa</h3>
+          <h3 className="text-[13px] font-medium">Empresa</h3>
           <div className="grid items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
             <MaskedField mask={masks.cnpj} label="CNPJ" value={f.cnpj} onChange={(v) => set({ cnpj: v })} error={err("cnpj") ?? (duplicate ? errors.cnpj : undefined)} hint="Ex.: 11.222.333/0001-81" />
             <div className="sm:pt-[26px]">
@@ -359,7 +359,7 @@ function NewCustomer({ onClose, onCreated }: { onClose: () => void; onCreated: (
         </section>
 
         <section className="space-y-4">
-          <h3 className="m-0 text-[13px] font-medium">Endereço de entrega</h3>
+          <h3 className="text-[13px] font-medium">Endereço de entrega</h3>
           <div className="grid gap-3 sm:grid-cols-[140px_minmax(0,1fr)_140px]">
             <MaskedField mask={masks.cep} label="CEP" value={f.cep} onChange={(v) => set({ cep: v })} error={err("cep")} />
             <TextField label="Logradouro" value={f.street} onChange={(v) => set({ street: v })} error={err("street")} />
@@ -373,7 +373,7 @@ function NewCustomer({ onClose, onCreated }: { onClose: () => void; onCreated: (
         </section>
 
         <section className="space-y-4">
-          <h3 className="m-0 text-[13px] font-medium">Contato de compras</h3>
+          <h3 className="text-[13px] font-medium">Contato de compras</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField label="Nome" value={f.contact} onChange={(v) => set({ contact: v })} optional />
             <MaskedField mask={masks.phone} label="Telefone" value={f.phone} onChange={(v) => set({ phone: v })} optional />
@@ -382,7 +382,7 @@ function NewCustomer({ onClose, onCreated }: { onClose: () => void; onCreated: (
         </section>
 
         <section className="space-y-3 rounded-xl border border-line bg-soft/40 p-4">
-          <h3 className="m-0 text-[13px] font-medium">Condições comerciais</h3>
+          <h3 className="text-[13px] font-medium">Condições comerciais</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             <Select label="Vendedor responsável" value={f.seller} onValueChange={(v) => set({ seller: v })} options={sellers.map((s) => ({ value: s.id, label: s.name }))} />
             <Select label="Condição de pagamento" value={f.payment} onValueChange={(v) => set({ payment: v as Payment })} options={paymentTerms.map((p) => ({ value: p, label: p }))} />

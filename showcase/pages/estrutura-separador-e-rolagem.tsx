@@ -85,7 +85,7 @@ export default function Page() {
             </ul>
           </ScrollArea>
           <div className="min-w-0 space-y-2">
-            <p className="m-0 text-[12.5px] font-medium text-ink">Etapas do funil</p>
+            <p className="text-[12.5px] font-medium text-ink">Etapas do funil</p>
             <ScrollArea orientation="horizontal" label="Etapas do funil" className="rounded-xl border border-line bg-surface">
               <div className="flex gap-2 p-3">
                 {etapas.map((e, i) => (

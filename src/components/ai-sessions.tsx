@@ -1252,7 +1252,7 @@ export function SessionComposer({
 
 /** "G4 OS usa IA e pode cometer erros." Sempre abaixo do campo. */
 export function Disclaimer({ children, className }: { children?: ReactNode; className?: string }) {
-  return <p className={cn("m-0 text-center text-[11.5px] text-muted", className)}>{children ?? "G4 OS usa IA e pode cometer erros. Por favor, verifique as respostas."}</p>;
+  return <p className={cn("text-center text-[11.5px] text-muted", className)}>{children ?? "G4 OS usa IA e pode cometer erros. Por favor, verifique as respostas."}</p>;
 }
 
 /* ================================================================== */

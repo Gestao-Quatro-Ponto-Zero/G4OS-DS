@@ -52,7 +52,7 @@ export default function Page() {
       </DocSection>
       <DocSection title="Fontes e citações" rule="Número no texto (CitationChip) e lista no fim (SourceList) com a mesma numeração. Registros internos abrem o registro; web abre em nova aba.">
         <Demo className="block space-y-4" code={`<p>… proposta de R$ 460,8 mil <CitationChip index={1} source={fontes[0]} /></p>\n<SourceList sources={fontes} />`}>
-          <p className="m-0 text-[13.5px] leading-relaxed">
+          <p className="text-[13.5px] leading-relaxed">
             A proposta está em R$ 460,8 mil para 240 usuários
             <CitationChip index={1} source={sources[0]} /> com implantação em 60 dias
             <CitationChip index={2} source={sources[1]} />. O win rate do segmento é 27 %

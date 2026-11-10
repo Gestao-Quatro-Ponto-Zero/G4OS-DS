@@ -254,64 +254,76 @@ export default function Page() {
       </DocSection>
 
       <DocSection title="Props">
-        <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">AgentAppLayout</p>
-        <PropsTable
-          rows={[
-            ["main", "ReactNode", "—", "Obrigatório. Cabeçalho, conversa e campo."],
-            ["rail · list · panel", "ReactNode", "—", "Áreas opcionais."],
-            ["panelOpen / onPanelOpenChange", "boolean / (v) => void", "false", "Controle do painel; o handler habilita ⌘."],
-            ["listOpen / onListOpenChange", "boolean / (v) => void", "interno", "Opcional; sem ele o layout guarda (e persiste) o estado."],
-            ["defaultListWidth · minListWidth · maxListWidth", "number", "300 · 240 · 420", "Largura da lista (px)."],
-            ["panelSize", "number", "0.58", "Fração do main quando o painel está aberto."],
-            ["storageKey", "string", "—", "Persiste largura, abertura e tamanho do painel."],
-            ["mobileView", '"list" | "main"', '"main"', "Tela mostrada no celular."],
-            ["mobileNav", "ReactNode", "—", "BottomNav mostrada na lista no celular."],
-          ]}
-        />
-        <p className="m-0 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">ThreadHeader</p>
-        <PropsTable
-          rows={[
-            ["title", "ReactNode", "—", "Título da conversa."],
-            ["menu", "MenuEntry[]", "—", "Menu no título (renomear, mover, exportar…)."],
-            ["actions", "ThreadAction[]", "[]", "Ícones com tooltip; showLabel mostra texto ≥ 1024px; active/tone para estado."],
-            ["onBack", "() => void", "—", "Botão ‹ no celular."],
-            ["leading · trailing", "ReactNode", "—", "Antes do título / depois das ações."],
-          ]}
-        />
-        <p className="m-0 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">ThreadView</p>
-        <PropsTable
-          rows={[
-            ["follow", "unknown", "—", "Mude quando o conteúdo crescer: segue o fim se a pessoa estiver no fim."],
-            ["resetKey", "unknown", "—", "Mude ao trocar de conversa: volta ao fim."],
-            ["minimap", "MinimapItem[]", "—", "Minimapa à esquerda (≥ 1024px)."],
-            ["maxWidth", "number", "760", "Largura da coluna de leitura."],
-            ["scrollRef", "RefObject", "—", "Para rolar de fora (ex.: ir até uma mensagem)."],
-            ["collapseBefore", "number", "0", "Recolhe os N primeiros filhos em “N mensagens anteriores”; o minimapa mostra só os visíveis."],
-            ["collapsedLabel", "ReactNode", "“N mensagens anteriores”", "Texto do botão de expandir."],
-          ]}
-        />
-        <p className="m-0 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">ListToggle</p>
-        <PropsTable
-          rows={[
-            ["open · onToggle", "boolean · () => void", "do layout", "Opcionais dentro do AgentAppLayout (usa useAgentLayout)."],
-            ["label", "string", '"lista"', "Completa o rótulo: “Recolher lista ⌘\\” / “Mostrar lista”."],
-          ]}
-        />
-        <p className="m-0 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">SessionQuickSwitcher</p>
-        <PropsTable
-          rows={[
-            ["sessions", "QuickSession[]", "—", "{ id, title, time?, status?, group? }; group vira cabeçalho (ex.: projeto)."],
-            ["activeId · onSelect", "string · (id) => void", "—", "Sessão atual e troca."],
-            ["always", "boolean", "false", "Mostrar mesmo com a lista aberta (ou fora do layout)."],
-            ["label", "string", '"Sessões"', "Texto do gatilho."],
-          ]}
-        />
-        <p className="m-0 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">RunSummary</p>
-        <PropsTable
-          rows={[
-            ["variant", '"inline" | "divider"', '"inline"', "divider: “Trabalhou por 3 min 34 s ›” sobre uma linha; abre os passos (children) e as métricas."],
-          ]}
-        />
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">AgentAppLayout</p>
+          <PropsTable
+            rows={[
+              ["main", "ReactNode", "—", "Obrigatório. Cabeçalho, conversa e campo."],
+              ["rail · list · panel", "ReactNode", "—", "Áreas opcionais."],
+              ["panelOpen / onPanelOpenChange", "boolean / (v) => void", "false", "Controle do painel; o handler habilita ⌘."],
+              ["listOpen / onListOpenChange", "boolean / (v) => void", "interno", "Opcional; sem ele o layout guarda (e persiste) o estado."],
+              ["defaultListWidth · minListWidth · maxListWidth", "number", "300 · 240 · 420", "Largura da lista (px)."],
+              ["panelSize", "number", "0.58", "Fração do main quando o painel está aberto."],
+              ["storageKey", "string", "—", "Persiste largura, abertura e tamanho do painel."],
+              ["mobileView", '"list" | "main"', '"main"', "Tela mostrada no celular."],
+              ["mobileNav", "ReactNode", "—", "BottomNav mostrada na lista no celular."],
+            ]}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">ThreadHeader</p>
+          <PropsTable
+            rows={[
+              ["title", "ReactNode", "—", "Título da conversa."],
+              ["menu", "MenuEntry[]", "—", "Menu no título (renomear, mover, exportar…)."],
+              ["actions", "ThreadAction[]", "[]", "Ícones com tooltip; showLabel mostra texto ≥ 1024px; active/tone para estado."],
+              ["onBack", "() => void", "—", "Botão ‹ no celular."],
+              ["leading · trailing", "ReactNode", "—", "Antes do título / depois das ações."],
+            ]}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">ThreadView</p>
+          <PropsTable
+            rows={[
+              ["follow", "unknown", "—", "Mude quando o conteúdo crescer: segue o fim se a pessoa estiver no fim."],
+              ["resetKey", "unknown", "—", "Mude ao trocar de conversa: volta ao fim."],
+              ["minimap", "MinimapItem[]", "—", "Minimapa à esquerda (≥ 1024px)."],
+              ["maxWidth", "number", "760", "Largura da coluna de leitura."],
+              ["scrollRef", "RefObject", "—", "Para rolar de fora (ex.: ir até uma mensagem)."],
+              ["collapseBefore", "number", "0", "Recolhe os N primeiros filhos em “N mensagens anteriores”; o minimapa mostra só os visíveis."],
+              ["collapsedLabel", "ReactNode", "“N mensagens anteriores”", "Texto do botão de expandir."],
+            ]}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">ListToggle</p>
+          <PropsTable
+            rows={[
+              ["open · onToggle", "boolean · () => void", "do layout", "Opcionais dentro do AgentAppLayout (usa useAgentLayout)."],
+              ["label", "string", '"lista"', "Completa o rótulo: “Recolher lista ⌘\\” / “Mostrar lista”."],
+            ]}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">SessionQuickSwitcher</p>
+          <PropsTable
+            rows={[
+              ["sessions", "QuickSession[]", "—", "{ id, title, time?, status?, group? }; group vira cabeçalho (ex.: projeto)."],
+              ["activeId · onSelect", "string · (id) => void", "—", "Sessão atual e troca."],
+              ["always", "boolean", "false", "Mostrar mesmo com a lista aberta (ou fora do layout)."],
+              ["label", "string", '"Sessões"', "Texto do gatilho."],
+            ]}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[12px] font-medium uppercase tracking-[0.08em] text-muted">RunSummary</p>
+          <PropsTable
+            rows={[
+              ["variant", '"inline" | "divider"', '"inline"', "divider: “Trabalhou por 3 min 34 s ›” sobre uma linha; abre os passos (children) e as métricas."],
+            ]}
+          />
+        </div>
       </DocSection>
 
       <DocSection title="Regras">
