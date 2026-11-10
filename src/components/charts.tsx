@@ -417,7 +417,7 @@ export type CartesianProps = {
   tooltip?: ChartTooltipOptions | false;
   /** Rótulos de valor: em barras ("top" padrão, "inside"); em linhas, acima do ponto. */
   labels?: boolean | "top" | "inside";
-  /** Rótulo com o valor no último ponto de cada linha. */
+  /** Rótulo com o valor no último ponto de cada linha. Em linha não empilhada, omite se esse ponto estiver sem dado. */
   endLabels?: boolean;
   /** Barras: "vertical" (padrão) ou "horizontal" (categorias à esquerda). */
   layout?: "vertical" | "horizontal";
@@ -552,6 +552,7 @@ function Cartesian({
   const vis = series.filter((s) => visibleKeys.includes(s.key));
   const expand = stackOffset === "expand";
   const stacked = stackedProp || expand;
+  const gaps = kind === "line" && !stacked;
   const horizontal = kind === "bar" && layout === "horizontal";
   const gid = useId().replace(/:/g, "");
   const n = data.length;
@@ -842,7 +843,6 @@ function Cartesian({
                   const baseLine = curvePath(base, curve === "step" ? "linear" : curve);
                   const area = curve === "step" ? `${line}L${base.map((p) => p.join(",")).join("L")}Z` : `${line}L${baseLine.slice(1)}Z`;
                   // A null point is a gap: the line breaks there instead of dropping to zero.
-                  const gaps = kind === "line" && !stacked;
                   const has = (i: number) => !gaps || data[i]?.[s.key] != null;
                   const runs: [number, number][][] = [];
                   top.forEach((p, i) => {
@@ -928,7 +928,7 @@ function Cartesian({
                   })
                 : vis.map((s) => (
                     <g key={`l-${s.key}`}>
-                      {data.map((d, i) => (
+                      {data.map((d, i) => gaps && d[s.key] == null ? null : (
                         <text key={i} x={cat(i)} y={vScale(stacks.highs[s.key][i]) - 9} textAnchor="middle" className="fill-ink-soft text-[11.5px] font-medium tabular-nums">
                           {format(num(d[s.key]))}
                         </text>
@@ -965,6 +965,7 @@ function Cartesian({
               n > 0 &&
               vis.map((s) => {
                 const last = n - 1;
+                if (gaps && data[last][s.key] == null) return null;
                 const cy = vScale(stacks.highs[s.key][last]);
                 return (
                   <g key={`e-${s.key}`}>
@@ -991,7 +992,7 @@ function Cartesian({
               <g>
                 <line x1={cat(active)} x2={cat(active)} y1={m.top} y2={m.top + innerH} stroke="var(--ds-line-strong)" strokeDasharray={tip.indicator === "dashed" ? "3 3" : undefined} />
                 {vis.map((s) =>
-                  kind === "line" && !stacked && data[active]?.[s.key] == null ? null : (
+                  gaps && data[active]?.[s.key] == null ? null : (
                     <circle key={s.key} cx={cat(active)} cy={vScale(stacks.highs[s.key][active])} r={4.5} fill="var(--ds-surface)" stroke={colorOf(s)} strokeWidth={2} />
                   ),
                 )}
