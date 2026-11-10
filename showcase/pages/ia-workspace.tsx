@@ -31,7 +31,7 @@ export default function Page() {
   return (
     <DocPage title={meta.title} kicker="IA e interação" description={meta.description}>
       <DocSection title="Anatomia" rule="Bloco pronto: Blocos › IA › Workspace de agente (src/blocks/ai-workspace.tsx).">
-        <div className="grid gap-3 md:grid-cols-[56px_1fr_1fr]">
+        <div className="grid gap-3 md:grid-cols-[minmax(96px,auto)_minmax(0,1fr)_minmax(0,1fr)]">
           <div className="rounded-xl border border-dashed border-line-strong p-3 text-center text-[11.5px] text-muted">
             IconRail
             <br />

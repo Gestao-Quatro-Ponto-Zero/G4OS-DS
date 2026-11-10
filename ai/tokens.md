@@ -87,10 +87,10 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | — | `--ds-shadow-toast` | `0 8px 32px #20212412, 0 2px 4px #20212404` | `0 8px 32px #00000080, 0 0 0 1px #ffffff0a` |  |
 | — | `--ds-shadow-overlay` | `0 25px 50px -12px #00000026` | `0 25px 50px -12px #000000a6, 0 0 0 1px #ffffff0a` | Forma e tipo da marca |
 | — | `--ds-radius-scale` | `1` | `=` | 0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável |
-| — | `--ds-font-sans` | `"Manrope", "Figtree", ui-sans-serif, system-ui, sans-serif` | `=` |  |
+| — | `--ds-font-sans` | `"Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif` | `=` |  |
 | — | `--ds-font-mono` | `ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace` | `=` | Títulos (h1 de página, título de registro, capa, hero). Pode ser serifada. |
 | — | `--ds-font-display` | `var(--ds-font-sans)` | `=` |  |
-| — | `--ds-display-weight` | `500` | `=` |  |
+| — | `--ds-display-weight` | `600` | `=` |  |
 | — | `--ds-display-tracking` | `-0.035em` | `=` | Leitura longa (documentos, políticas, relatórios): serifa editorial. |
 | — | `--ds-font-reading` | `"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif` | `=` | Assinatura do KV ("Sua empresa no piloto automático"): itálico serifado. |
 | — | `--ds-font-tagline` | `"Libre Baskerville", Georgia, serif` | `=` |  |

@@ -127,7 +127,7 @@ export function Demo({ title, description, code, children, className, bare }: { 
         <div className="mb-2 flex items-end justify-between gap-3">
           <div className="min-w-0">
             {title && <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{title}</p>}
-            {description && <p className="m-0 mt-1 text-[12.5px] text-muted">{typeof description === "string" ? inlineCode(description) : description}</p>}
+            {description && <p className="m-0 mt-1 text-[12.5px] text-muted [overflow-wrap:anywhere]">{typeof description === "string" ? inlineCode(description) : description}</p>}
           </div>
           {code && (
             <div className="segmented-control shrink-0" role="group" aria-label="Visualização">

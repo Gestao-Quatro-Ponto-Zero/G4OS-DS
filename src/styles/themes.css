@@ -312,9 +312,16 @@
   --ds-display-tracking: -0.03em;
 }
 [data-type="classica"] {
-  /* Figtree, a tipografia anterior ao KV G4 OS. */
+  /* Figtree, a tipografia padrão: igual a não declarar data-type. Fica explícita para valer
+     dentro de um escopo que herdou outra tipografia. */
   --ds-font-sans: "Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif;
   --ds-display-weight: 600;
+  --ds-display-tracking: -0.035em;
+}
+[data-type="g4os"] {
+  /* Manrope, a tipografia do KV G4 OS: títulos em peso médio. Opcional. */
+  --ds-font-sans: "Manrope", "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --ds-display-weight: 500;
   --ds-display-tracking: -0.035em;
 }
 [data-type="suave"] {

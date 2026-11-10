@@ -35,15 +35,23 @@ export const brandPresets = [
   { id: "caderno", label: "Caderno (ref. Notion)", primary: "#0075de", accent: "#ffb110" },
 ] as const;
 
-/** Presets de tipografia (eixo independente da cor): <html data-type="…">. */
+/**
+ * Presets de tipografia (eixo independente da cor): <html data-type="…">. A Clássica (Figtree) é
+ * o padrão e vale sem atributo; `g4os` é a Manrope do KV G4 OS, opcional.
+ */
 export const typePresets = [
-  { id: "g4", label: "Padrão · Manrope", sample: "Manrope" },
-  { id: "classica", label: "Clássica · Figtree", sample: "Figtree" },
+  { id: "classica", label: "Clássica · Figtree (padrão)", sample: "Figtree" },
+  { id: "g4os", label: "G4 OS · Manrope", sample: "Manrope" },
   { id: "editorial", label: "Editorial · Serifa nos títulos", sample: "Source Serif 4" },
   { id: "tecnica", label: "Técnica · IBM Plex", sample: "IBM Plex Sans" },
   { id: "neutra", label: "Neutra · Inter", sample: "Inter" },
   { id: "suave", label: "Suave · Manrope", sample: "Manrope" },
 ] as const;
+/** Tipografia padrão: Figtree, aplicada sem atributo data-type. */
+export const DEFAULT_TYPE = "classica";
+/** "g4" era o id do padrão enquanto ele foi a Manrope: quem o tem salvo passa ao padrão atual. */
+const LEGACY_DEFAULT_TYPE = "g4";
+const normalizeType = (t?: string | null) => (!t || t === LEGACY_DEFAULT_TYPE ? DEFAULT_TYPE : t);
 export const TYPE_KEY = "ds-type";
 
 const read = (key: string) => {
@@ -83,7 +91,7 @@ export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = 
   if (nextBrand !== DEFAULT_BRAND || !documentRoot) root.setAttribute("data-brand", nextBrand);
   else root.removeAttribute("data-brand");
   if (type !== undefined) {
-    if (type && type !== "g4") root.setAttribute("data-type", type);
+    if (normalizeType(type) !== DEFAULT_TYPE) root.setAttribute("data-type", normalizeType(type));
     else root.removeAttribute("data-type");
   }
   restore?.();
@@ -105,7 +113,7 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
   const fromDom = (attr: string) => (typeof document !== "undefined" ? document.documentElement.getAttribute(attr) : null);
   const [mode, setModeState] = useState<ThemeMode>(() => ((typeof window !== "undefined" && ((read(THEME_KEY) as ThemeMode) || (fromDom("data-theme") as ThemeMode))) || initial));
   const [brand, setBrandState] = useState<string>(() => (typeof window !== "undefined" && normalizeBrand(read(BRAND_KEY) || fromDom("data-brand"))) || DEFAULT_BRAND);
-  const [type, setTypeState] = useState<string>(() => (typeof window !== "undefined" && (read(TYPE_KEY) || fromDom("data-type"))) || "g4");
+  const [type, setTypeState] = useState<string>(() => (typeof window !== "undefined" && normalizeType(read(TYPE_KEY) || fromDom("data-type"))) || DEFAULT_TYPE);
 
   useEffect(() => {
     if (apply) applyTheme(mode, brand, document.documentElement, type);
@@ -114,14 +122,14 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
     const on = (e: StorageEvent) => {
       if (e.key === THEME_KEY && e.newValue) setModeState(e.newValue as ThemeMode);
       if (e.key === BRAND_KEY) setBrandState(normalizeBrand(e.newValue));
-      if (e.key === TYPE_KEY && e.newValue) setTypeState(e.newValue);
+      if (e.key === TYPE_KEY && e.newValue) setTypeState(normalizeType(e.newValue));
     };
     // Outras instâncias do hook no MESMO documento (storage só avisa outras abas/iframes).
     const local = (e: Event) => {
       const { key, value } = (e as CustomEvent<{ key: string; value: string }>).detail;
       if (key === THEME_KEY) setModeState(value as ThemeMode);
       if (key === BRAND_KEY) setBrandState(normalizeBrand(value));
-      if (key === TYPE_KEY) setTypeState(value);
+      if (key === TYPE_KEY) setTypeState(normalizeType(value));
     };
     window.addEventListener("storage", on);
     window.addEventListener(LOCAL_EVENT, local);
@@ -148,4 +156,4 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
 }
 
 /** Script inline para o <head>: aplica o tema salvo antes da primeira pintura. */
-export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}")||d.getAttribute("data-brand"),y=localStorage.getItem("${TYPE_KEY}");b=!b||b==="${LEGACY_DEFAULT_BRAND}"?"${DEFAULT_BRAND}":b==="g4-institucional"?"g4os":b;d.setAttribute("data-theme",t);if(b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);else d.removeAttribute("data-brand");if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
+export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}")||d.getAttribute("data-brand"),y=localStorage.getItem("${TYPE_KEY}");b=!b||b==="${LEGACY_DEFAULT_BRAND}"?"${DEFAULT_BRAND}":b==="g4-institucional"?"g4os":b;d.setAttribute("data-theme",t);if(b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);else d.removeAttribute("data-brand");if(y){if(y!=="${LEGACY_DEFAULT_TYPE}"&&y!=="${DEFAULT_TYPE}")d.setAttribute("data-type",y);else d.removeAttribute("data-type")}}catch(e){}})();`;

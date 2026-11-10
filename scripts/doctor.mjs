@@ -175,7 +175,7 @@ export function doctor(target = ".") {
     if (deps.next && /<html\b/.test(s) && !/suppressHydrationWarning/.test(tag)) add("info", "suppressHydrationWarning", r, "Em Next, o themeScript altera data-theme antes da hidratação: use <html … suppressHydrationWarning>.", r);
   }
   const fontOk = /Manrope|Figtree/i.test(cssText) || all.some(([, x]) => /Manrope|Figtree/i.test(x)) || /--ds-font-sans/.test(cssText);
-  add(fontOk ? "ok" : "warn", "Fonte", fontOk ? "Manrope (ou --ds-font-sans) configurada" : "Manrope não encontrada", "next/font/google Manrope, <link> do Google Fonts, ou defina --ds-font-sans da marca.");
+  add(fontOk ? "ok" : "warn", "Fonte", fontOk ? "Figtree (ou --ds-font-sans) configurada" : "Figtree não encontrada", "next/font/google Figtree, <link> do Google Fonts, ou defina --ds-font-sans da marca.");
   if (deps.next) {
     add(all.some(([, s]) => /setLinkComponent\(/.test(s)) ? "ok" : "warn", "setLinkComponent(Link)", "", "Registre next/link uma vez num módulo cliente importado pelo layout (sem isso, links do DS recarregam a página).");
     const nextCfg = ["next.config.ts", "next.config.mjs", "next.config.js"].find((x) => existsSync(join(root, x)));

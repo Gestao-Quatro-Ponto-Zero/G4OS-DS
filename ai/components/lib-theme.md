@@ -22,6 +22,10 @@ Presets de themes.css.
 
 Marca padrão: G4 clássico, aplicada sem atributo data-brand.
 
+## DEFAULT_TYPE (const)
+
+Tipografia padrão: Figtree, aplicada sem atributo data-type.
+
 ## resolvedTheme (function)
 
 Tema efetivo agora ("system" resolvido pelo SO).

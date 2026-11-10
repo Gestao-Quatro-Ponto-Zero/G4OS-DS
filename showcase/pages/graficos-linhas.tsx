@@ -108,7 +108,7 @@ export default function Page() {
         </ChartGrid>
       </DocSection>
       <DocSection title="Sparkline" rule="Mini tendência ao lado de um número, sem eixo. Nunca sozinha.">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
           {[
             ["MRR", "R$ 412 mil", [3, 4, 4, 5, 6, 6, 7, 8], "neutral"],
             ["Churn", "1,8 %", [5, 5, 4, 4, 3, 3, 2, 2], "neutral"],
@@ -116,7 +116,7 @@ export default function Page() {
             ["NPS", "72", [60, 62, 61, 66, 68, 70, 71, 72], "accent"],
           ].map(([l, v, s, t]) => (
             <div key={l as string} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3">
-              <div className="min-w-0">
+              <div className="shrink-0">
                 <div className="text-[12px] text-muted">{l as string}</div>
                 <div className="whitespace-nowrap text-[18px] font-semibold tabular-nums">{v as string}</div>
               </div>
