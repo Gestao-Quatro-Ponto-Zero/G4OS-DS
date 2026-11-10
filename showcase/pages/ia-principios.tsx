@@ -32,10 +32,10 @@ export default function Page() {
       </DocSection>
       <DocSection title="Na prática">
         <div className="space-y-3 rounded-xl border border-line bg-surface p-5">
-          <p className="m-0 flex items-center gap-2 text-[13.5px] font-medium">
+          <p className="flex items-center gap-2 text-[13.5px] font-medium">
             Resumo da conta <AiBadge />
           </p>
-          <p className="m-0 text-[13.5px] leading-relaxed text-ink-soft">
+          <p className="text-[13.5px] leading-relaxed text-ink-soft">
             O Grupo Aurora está em negociação há 18 dias, com proposta de R$ 460,8 mil. O jurídico pediu SLA de 99,9 %; a diretoria aprova até R$ 480 mil.
           </p>
           <ToolCallsSection calls={toolCalls} />

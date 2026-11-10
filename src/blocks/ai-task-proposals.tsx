@@ -88,7 +88,7 @@ export default function TaskProposals() {
         </span>
       </header>
       <div className="space-y-6 px-5 py-6 sm:px-8">
-        <h1 className="m-0 text-[24px] font-semibold leading-tight tracking-[-0.02em]" style={{ fontFamily: "var(--ds-font-display)" }}>
+        <h1 className="text-[24px] font-semibold leading-tight tracking-[-0.02em]" style={{ fontFamily: "var(--ds-font-display)" }}>
           {meeting.title}
         </h1>
         <section className="rounded-xl border border-line bg-soft/40 p-4">

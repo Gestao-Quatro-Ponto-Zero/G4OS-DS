@@ -34,6 +34,7 @@ templates/       starters de app
    - Comentário JSDoc curto dizendo **quando usar** e a regra principal (é o que aparece no editor).
    - Acessível: nome acessível, teclado, foco, `aria-*`.
    - Nomes exportados únicos no pacote inteiro.
+   - Sem margem na raiz, nem `m-0`: o espaço entre irmãos é de quem empilha (`gap-*`). `m-0` na raiz anula o `space-y-*` do pai (regra `stack-margin-reset`).
 2. Exporte em `src/index.ts` (`export * from "./components/<arquivo>"`, se for arquivo novo).
 3. Documente no showcase (abaixo).
 4. `npm run ai:build` e `npm run check` (tokens + typecheck + lint + `ai/` em dia + auditoria + testes).

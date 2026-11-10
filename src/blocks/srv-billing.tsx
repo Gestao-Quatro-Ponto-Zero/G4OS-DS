@@ -290,7 +290,7 @@ function ChargeDrawer({ b, onChange }: { b: Charge; onChange: (b: Charge) => voi
             <div className="flex items-center gap-2 text-[12.5px] font-medium">
               <QrCode className="h-4 w-4 text-muted" aria-hidden /> {b.method === "Pix" ? "Pix copia e cola" : "Linha digitável"}
             </div>
-            <p className="m-0 break-all rounded-lg bg-soft px-3 py-2 font-mono text-[11.5px] text-ink-soft">{b.method === "Pix" ? pixCode(b) : digitavel(b)}</p>
+            <p className="break-all rounded-lg bg-soft px-3 py-2 font-mono text-[11.5px] text-ink-soft">{b.method === "Pix" ? pixCode(b) : digitavel(b)}</p>
             <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="ghost" onClick={() => notify("Código copiado", undefined, "info")}>
                 <Copy /> Copiar código

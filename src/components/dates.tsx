@@ -1851,7 +1851,7 @@ export function MiniAgenda({ events, onEventClick, now = todayIso(), limit, clas
   if (!days.length) return <p className={cn("m-0 py-6 text-center text-[13px] text-muted", className)}>Nada agendado.</p>;
   const rel = (iso: IsoDate) => (iso === now ? "Hoje" : iso === addDays(now, 1) ? "Amanhã" : iso === addDays(now, -1) ? "Ontem" : undefined);
   return (
-    <ol className={cn("m-0 list-none space-y-3 p-0", className)}>
+    <ol className={cn("list-none space-y-3 p-0", className)}>
       {days.map(([iso, list]) => (
         <li key={iso} className="flex gap-3">
           <DateBadge date={iso} tone={iso === now ? "accent" : iso < now ? "neutral" : "neutral"} size="sm" />

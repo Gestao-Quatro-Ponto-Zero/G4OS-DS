@@ -180,7 +180,7 @@ function OfferDetail({ offer: o, onUpdate, onDecline }: { offer: Offer; onUpdate
             Faixa aprovada: {formatCurrency(job.salary[0], { cents: false })} – {formatCurrency(job.salary[1], { cents: false })}. A proposta precisa do aval da diretoria.
           </Callout>
         )}
-        {o.note && <p className="m-0 text-[13px] leading-relaxed text-ink-soft">{o.note}</p>}
+        {o.note && <p className="text-[13px] leading-relaxed text-ink-soft">{o.note}</p>}
         <div>
           <h3 className="m-0 mb-3 text-[12.5px] font-medium text-muted">Aprovações</h3>
           <Stepper steps={o.approvals.map((a, i) => ({ id: String(i), label: person(a.who).name, hint: person(a.who).role, state: a.state }))} label="Cadeia de aprovação" />

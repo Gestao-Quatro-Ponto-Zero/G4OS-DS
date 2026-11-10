@@ -399,7 +399,7 @@ function FixDrawer({ n, onClose, onSent }: { n: Invoice; onClose: () => void; on
         {field ? (
           <TextField label={field.label} value={value} onChange={setValue} hint={field.hint} error={tried && unchanged ? "Ainda é o valor recusado pela SEFAZ: corrija antes de reenviar." : tried && !value.trim() ? "Informe o valor correto." : undefined} />
         ) : (
-          <p className="m-0 text-[13px] text-ink-soft">Revise o cadastro do cliente e os dados do pedido; o reenvio usa o mesmo número.</p>
+          <p className="text-[13px] text-ink-soft">Revise o cadastro do cliente e os dados do pedido; o reenvio usa o mesmo número.</p>
         )}
         <PropertyList
           items={[

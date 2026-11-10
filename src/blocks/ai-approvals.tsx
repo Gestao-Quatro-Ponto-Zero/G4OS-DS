@@ -59,7 +59,7 @@ function Preview({ p }: { p: Approval["preview"] }) {
   if (p.kind === "email")
     return (
       <div className="space-y-2">
-        <p className="m-0 text-[12px] text-muted">
+        <p className="text-[12px] text-muted">
           Para <span className="text-ink">{p.to}</span> · Assunto <span className="text-ink">{p.subject}</span>
         </p>
         <pre className="m-0 whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-ink">{p.body}</pre>
@@ -255,7 +255,7 @@ export default function AiApprovals() {
                     }}
                   />
                   {decided[current.id]?.reason && (
-                    <p className="m-0 rounded-lg bg-soft px-3 py-2 text-[12.5px] text-ink-soft">
+                    <p className="rounded-lg bg-soft px-3 py-2 text-[12.5px] text-ink-soft">
                       <span className="font-medium text-ink">Motivo da recusa:</span> {decided[current.id].reason}
                     </p>
                   )}

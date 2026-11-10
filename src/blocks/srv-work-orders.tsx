@@ -381,7 +381,7 @@ function NewWorkOrder({ open, number, onClose, onCreate }: { open: boolean; numb
         <OperationFeedback operation={op} />
         <Combobox label="Cliente" placeholder="Busque por nome ou CNPJ" value={clientId} onValueChange={setClientId} options={clients.filter((k) => k.status !== "inativo").map((k) => ({ value: k.id, label: k.name, description: `${k.cnpj} · ${k.district}` }))} error={tried && !clientId ? "Escolha o cliente." : undefined} />
         {clientId && (
-          <p className="m-0 -mt-2 text-[12px] text-muted">
+          <p className="-mt-2 text-[12px] text-muted">
             {contract ? `Coberta pelo ${contract.number} (${contract.plan}) · SLA ${contract.sla}. Mão de obra não fatura.` : "Cliente sem contrato ativo: horas e materiais são faturados."}
           </p>
         )}

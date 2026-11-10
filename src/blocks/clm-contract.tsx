@@ -545,7 +545,7 @@ export default function ClmContract() {
                         </div>
                       )}
                       <OperationFeedback operation={remindOp} />
-                      <ol className="m-0 list-none divide-y divide-line rounded-xl border border-line bg-surface p-0">
+                      <ol className="list-none divide-y divide-line rounded-xl border border-line bg-surface p-0">
                         {signers.map((s) => (
                           <li key={s.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
                             <span className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-medium tabular-nums", s.status === "assinou" ? "bg-primary text-on-primary" : s.status === "pendente" ? "ring-2 ring-accent" : "text-muted ring-1 ring-line-strong")}>
@@ -588,7 +588,7 @@ export default function ClmContract() {
                         </Button>
                       </div>
                       {obls.length ? (
-                        <ul className="m-0 list-none divide-y divide-line rounded-xl border border-line bg-surface p-0">
+                        <ul className="list-none divide-y divide-line rounded-xl border border-line bg-surface p-0">
                           {[...obls].sort((a, b) => a.due.localeCompare(b.due)).map((o) => {
                             const d = daysFromToday(o.due);
                             const lateOne = !o.done && d < 0;

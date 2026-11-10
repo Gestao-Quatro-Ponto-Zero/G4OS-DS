@@ -38,6 +38,7 @@ codex mcp add g4os-ds -- npx -y @g4ai/ds mcp
 gemini mcp add -s user g4os-ds npx -y @g4ai/ds mcp`}
         />
         <CodeBlock
+          language="json"
           code={`// Cursor (.cursor/mcp.json), Claude Desktop, Windsurf, Cline, Kiro, JetBrains, pi (pi-mcp-adapter)
 { "mcpServers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }
 
@@ -48,8 +49,8 @@ gemini mcp add -s user g4os-ds npx -y @g4ai/ds mcp`}
 { "context_servers": { "g4os-ds": { "command": "npx", "args": ["-y", "@g4ai/ds", "mcp"] } } }`}
         />
         <CodeBlock
-          code={`# ~/.codex/config.toml
-[mcp_servers.g4os-ds]
+          title="~/.codex/config.toml"
+          code={`[mcp_servers.g4os-ds]
 command = "npx"
 args = ["-y", "@g4ai/ds", "mcp"]
 startup_timeout_sec = 60`}
@@ -97,6 +98,7 @@ startup_timeout_sec = 60`}
 
       <DocSection title="3. No projeto, sem nada instalado no agente" rule="Cole o trecho no AGENTS.md (ou CLAUDE.md, .cursorrules) do app: o agente passa a ler o guia da versão instalada.">
         <CodeBlock
+          language="md"
           code={`## Design system: G4OS-DS
 Este projeto usa @g4ai/ds. Antes de criar ou editar interface, leia
 node_modules/@g4ai/ds/ai/core.md (ou ${SITE}llms.txt).

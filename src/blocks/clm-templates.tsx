@@ -235,7 +235,7 @@ export default function ClmTemplates() {
       >
         {open && (
           <div className="space-y-6">
-            <p className="m-0 text-[13.5px] leading-relaxed text-ink-soft">{open.description}</p>
+            <p className="text-[13.5px] leading-relaxed text-ink-soft">{open.description}</p>
             {stale(open.lastReview) && <Callout tone="warn" title="Revisão vencida">Última revisão há mais de um ano. A política pede revisão anual; contratos gerados agora saem com aviso para o Jurídico.</Callout>}
             <PropertyList
               items={[

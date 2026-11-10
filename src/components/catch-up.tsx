@@ -66,7 +66,7 @@ export type CatchUpSource = {
  */
 export function CatchUpSources({ sources, className }: { sources: CatchUpSource[]; className?: string }) {
   return (
-    <ul className={cn("m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 min-[440px]:grid-cols-2", className)} aria-label="Fontes">
+    <ul className={cn("grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 min-[440px]:grid-cols-2", className)} aria-label="Fontes">
       {sources.map((s) => (
         <li key={s.id} className="flex min-h-9 min-w-0 items-center gap-2.5 text-[13px]">
           <span className="grid h-[18px] w-[18px] shrink-0 place-items-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden>

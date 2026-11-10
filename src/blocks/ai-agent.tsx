@@ -377,7 +377,7 @@ function AgentRecord({ base }: { base: FleetAgent }) {
                         </ChartCard>
                       ) : null}
                       {suites.length ? (
-                        <ul className="m-0 list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
+                        <ul className="list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
                           {suites.map((s) => {
                             const score = suiteScore(s);
                             const below = score < s.threshold;

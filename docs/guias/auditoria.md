@@ -230,6 +230,7 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 | [`icon-star-import`](#icon-star-import) | Performance | aviso | aviso | aviso |  |
 | [`page-width-wrapper`](#page-width-wrapper) | Anatomia de página | aviso | aviso | aviso |  |
 | [`page-heading`](#page-heading) | Anatomia de página | info | aviso | aviso |  |
+| [`stack-margin-reset`](#stack-margin-reset) | Anatomia de página | aviso | aviso | aviso |  |
 | [`disabled-wrapper`](#disabled-wrapper) | Componentes | aviso | aviso | aviso |  |
 | [`redundant-children`](#redundant-children) | Componentes | info | info | aviso | sim |
 | [`field-double-label`](#field-double-label) | Componentes | aviso | aviso | aviso |  |
@@ -543,6 +544,15 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 - Gravidade: info (strict: aviso)
 - Evite: `<Page><h1 className="text-title">Histórico</h1>…`
 - Use: `<Page><PageHeading title="Histórico" description="…" />…`
+
+#### `stack-margin-reset`
+
+**m-0 em filho de space-y-* / space-x-*.** No Tailwind v4 o space-* tem especificidade zero: m-0, my-0 ou mb-0 no filho apaga o espaço e os irmãos encostam. Empilhe com flex flex-col gap-* no pai (ou tire o m-0 do filho: o reset do Tailwind já zera a margem).
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `<div className="space-y-6"><p className="m-0">…</p><CodeBlock … /></div>`
+- Use: `<div className="flex flex-col gap-6"><p className="m-0">…</p><CodeBlock … /></div>`
+- Só vê filhos escritos no mesmo JSX. Componente próprio com `m-0` na raiz escapa: não ponha margem (nem `m-0`) na raiz de componente; quem empilha decide o espaço.
 
 ### Composição
 

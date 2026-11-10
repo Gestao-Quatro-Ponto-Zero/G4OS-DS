@@ -181,7 +181,7 @@ export function FieldSet({
   className?: string;
 }) {
   return (
-    <fieldset disabled={disabled} className={cn("m-0 min-w-0 border-0 p-0 disabled:opacity-60", className)}>
+    <fieldset disabled={disabled} className={cn("min-w-0 border-0 p-0 disabled:opacity-60", className)}>
       <legend className={cn("m-0 p-0 text-ink", variant === "section" ? "text-[15px] font-semibold tracking-tight" : "text-[12.5px] font-medium")}>{legend}</legend>
       {description && <p className={cn("m-0 text-muted", variant === "section" ? "mt-1 text-[13px]" : "mt-0.5 text-[12px]")}>{description}</p>}
       <div className={variant === "section" ? "mt-4" : "mt-2"}>{children}</div>
@@ -275,7 +275,7 @@ export function ItemTitle({ children, className }: { children: ReactNode; classN
 }
 
 export function ItemDescription({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cn("m-0 line-clamp-2 text-[12.5px] leading-relaxed text-muted", className)}>{children}</p>;
+  return <p className={cn("line-clamp-2 text-[12.5px] leading-relaxed text-muted", className)}>{children}</p>;
 }
 
 /** Ações à direita (Button ghost/quiet, IconButton, Switch, Badge). */

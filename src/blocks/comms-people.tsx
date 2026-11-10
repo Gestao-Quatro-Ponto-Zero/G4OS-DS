@@ -260,7 +260,7 @@ export default function CommsPeople() {
               </div>
             </div>
             <LocationTag place={cityById(selected.city).place} timeZone={cityById(selected.city).timeZone} />
-            {selected.bio && <p className="m-0 text-[13.5px] leading-relaxed text-ink-soft">{selected.bio}</p>}
+            {selected.bio && <p className="text-[13.5px] leading-relaxed text-ink-soft">{selected.bio}</p>}
             <PropertyList
               items={[
                 { label: "Unidade", value: cityById(selected.city).site },

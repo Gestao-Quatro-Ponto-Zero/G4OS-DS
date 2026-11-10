@@ -111,16 +111,16 @@ export default function HelpCenterBlock() {
       <Page width="reading">
         <PageHeading title={current.item.label} description={current.section} />
         <article className="space-y-4 text-[14px] leading-relaxed text-ink-soft">
-          <p className="m-0">
+          <p>
             Este artigo explica <strong className="font-medium text-ink">{current.item.label.toLowerCase()}</strong> passo a passo. Use o filtro à esquerda para achar outro assunto: ele ignora acentos e mantém a seção de
             cada resultado.
           </p>
           <Callout tone="info" title="Dica">
             No celular, o menu ☰ abre as mesmas seções. Ao tocar num artigo, o menu fecha sozinho.
           </Callout>
-          <h2 className="m-0 pt-2 text-[18px] font-semibold text-ink">Antes de começar</h2>
-          <p className="m-0">Você precisa ser administrador do workspace ou ter a permissão “Gerenciar configurações”. Mudanças valem para todo o time na hora.</p>
-          <h2 className="m-0 pt-2 text-[18px] font-semibold text-ink">Passo a passo</h2>
+          <h2 className="pt-2 text-[18px] font-semibold text-ink">Antes de começar</h2>
+          <p>Você precisa ser administrador do workspace ou ter a permissão “Gerenciar configurações”. Mudanças valem para todo o time na hora.</p>
+          <h2 className="pt-2 text-[18px] font-semibold text-ink">Passo a passo</h2>
           <ol className="m-0 list-decimal space-y-1.5 pl-5">
             <li>Abra Configurações no menu da conta.</li>
             <li>Escolha a seção correspondente e revise os campos.</li>

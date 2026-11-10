@@ -248,7 +248,7 @@ function SupplierDrawer({ s, onClose }: { s: Supplier; onClose: () => void }) {
               <BulletChart label="Prazo" hint="dias úteis · meta 5" value={s.leadTime} target={5} max={15} format={(n) => `${n} d`} />
             </div>
           ) : (
-            <p className="m-0 rounded-lg border border-dashed border-line px-4 py-3 text-[12.5px] text-muted">Sem histórico de entregas ainda: OTIF e classe aparecem depois do primeiro recebimento.</p>
+            <p className="rounded-lg border border-dashed border-line px-4 py-3 text-[12.5px] text-muted">Sem histórico de entregas ainda: OTIF e classe aparecem depois do primeiro recebimento.</p>
           )}
           <PropertyList
             items={[
@@ -281,7 +281,7 @@ function SupplierDrawer({ s, onClose }: { s: Supplier; onClose: () => void }) {
         </div>
       ) : (
         <div className="space-y-6">
-          <p className="m-0 text-[13px] text-ink-soft">
+          <p className="text-[13px] text-ink-soft">
             Vai por e-mail para {s.contact} ({s.email}) com o link para responder preço, prazo e condição. As respostas entram na requisição.
           </p>
           <section>

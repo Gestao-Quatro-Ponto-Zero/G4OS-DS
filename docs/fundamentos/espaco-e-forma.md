@@ -11,8 +11,10 @@ Base de 4 px. Os valores que realmente aparecem no DS, em ordem de frequência:
 | 6 | `gap-1.5` | ponto + rótulo, avatar + nome, itens de legenda |
 | 4 | `gap-1` | abas, grupo de ícones |
 | 16 | `gap-4`, `px-4` | padding horizontal de card e célula, entre blocos de formulário |
-| 24 | `gap-6`, `space-y-6` | entre seções de uma página, padding de modal |
+| 24 | `gap-6` | entre seções de uma página, padding de modal |
 | 32 / 40 | `gap-8`, `gap-10` | entre colunas de `SplitLayout`, antes de rodapé |
+
+**Pilha com `gap`, não com `space-y`.** Para empilhar irmãos use `flex flex-col gap-*` (ou `grid gap-*`). No Tailwind v4 o `space-y-*` tem especificidade zero: qualquer filho com `m-0`, `my-0` ou `mb-0` (comum em `<p>`, `<h2>`, `<figure>`) zera o espaço e encosta no irmão de baixo. A auditoria avisa (`stack-margin-reset`). Pelo mesmo motivo, componente não leva margem na raiz, nem `m-0`: quem empilha decide o espaço.
 
 Regra de proximidade: **o que é relacionado fica mais perto do que o que não é.** Rótulo e campo: 6–8 px. Campo e próximo campo: 16 px. Seção e seção: 24–36 px.
 

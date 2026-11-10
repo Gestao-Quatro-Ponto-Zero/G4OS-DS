@@ -75,7 +75,7 @@ export function Glass({ solid, as: Tag = "div", className, children, ...rest }: 
  */
 export function Kicker({ index, children, className }: { index?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <p className={cn("m-0 font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft", className)}>
+    <p className={cn("font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft", className)}>
       {index != null && <>{index} / </>}
       {children}
     </p>

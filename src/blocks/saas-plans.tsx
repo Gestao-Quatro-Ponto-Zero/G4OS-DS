@@ -225,7 +225,7 @@ export default function SaasPlans() {
               <CurrencyField label="Preço mensal (por usuário)" value={editing.monthly} onChange={(v) => setEditing({ ...editing, monthly: v ?? 0 })} />
               <CurrencyField label="Preço no anual (por usuário/mês)" value={editing.annual} onChange={(v) => setEditing({ ...editing, annual: v ?? 0 })} hint={editing.monthly ? `${formatPercent(1 - editing.annual / editing.monthly, 0)} de desconto` : undefined} />
             </FieldGrid>
-            <fieldset className="m-0 space-y-4 border-0 p-0">
+            <fieldset className="space-y-4 border-0 p-0">
               <legend className="mb-3 text-[13px] font-medium">Limites</legend>
               <FieldGrid>
                 <NumberField label="Usuários" value={editing.limits.usuarios} onChange={(v) => setEditing({ ...editing, limits: { ...editing.limits, usuarios: v } })} min={1} hint="Vazio = ilimitado" />

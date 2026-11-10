@@ -324,7 +324,7 @@ function QuoteDrawer({ quote: q, onClose, onPatch }: { quote: Row; onClose: () =
               <Copy /> Copiar link
             </Button>
           </div>
-          {q.status === "recusada" && q.lostReason && <p className="m-0 rounded-lg bg-rose-soft px-3 py-2 text-[13px] text-ink-soft">Motivo da recusa: {q.lostReason}</p>}
+          {q.status === "recusada" && q.lostReason && <p className="rounded-lg bg-rose-soft px-3 py-2 text-[13px] text-ink-soft">Motivo da recusa: {q.lostReason}</p>}
           <PropertyList
             items={[
               { label: "Negócio", value: <a className="font-medium hover:underline" href={`#/frame/crm-deal?id=${deal.id}`}>{deal.title}</a> },

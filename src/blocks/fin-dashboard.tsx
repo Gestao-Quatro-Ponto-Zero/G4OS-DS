@@ -258,7 +258,7 @@ export default function FinDashboard() {
                         <Meter value={0} thick label="Linhas conciliadas" />
                       </div>
                     </div>
-                    <p className="m-0 text-[12.5px] leading-relaxed text-muted">{bankLines.filter((b) => (b.confidence ?? 0) >= 0.9).length} linhas têm sugestão segura: dá para conciliar em um clique.</p>
+                    <p className="text-[12.5px] leading-relaxed text-muted">{bankLines.filter((b) => (b.confidence ?? 0) >= 0.9).length} linhas têm sugestão segura: dá para conciliar em um clique.</p>
                     <div className="flex flex-wrap gap-2">
                       <Button size="sm" variant="ghost" onClick={() => go("fin-reconciliation", { conta: "itau" })}>
                         Conciliar agora

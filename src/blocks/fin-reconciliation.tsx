@@ -157,7 +157,7 @@ export default function FinReconciliation() {
                     </div>
                   ) : picking === b.id ? (
                     <div className="space-y-1.5">
-                      <p className="m-0 text-[12px] text-muted">Escolha o lançamento correspondente:</p>
+                      <p className="text-[12px] text-muted">Escolha o lançamento correspondente:</p>
                       {ledger
                         .filter((l) => !used.has(l.id) && Math.sign(l.value) === Math.sign(b.value))
                         .map((l) => (

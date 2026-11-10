@@ -75,8 +75,8 @@ export default function Page() {
         >
           <Questionnaire key={key} title="Antes de montar a campanha" items={perguntas} submitLabel="Montar campanha" onSubmit={setResultado} onCancel={() => setResultado(null)} />
           <div className="min-w-0 space-y-3">
-            <p className="m-0 text-[12.5px] font-medium text-ink">Respostas enviadas</p>
-            {resultado ? <JsonView value={resultado} /> : <p className="m-0 text-[12.5px] text-muted">Responda e envie para ver o objeto que o agente recebe.</p>}
+            <p className="text-[12.5px] font-medium text-ink">Respostas enviadas</p>
+            {resultado ? <JsonView value={resultado} /> : <p className="text-[12.5px] text-muted">Responda e envie para ver o objeto que o agente recebe.</p>}
             {resultado && (
               <Button
                 variant="ghost"

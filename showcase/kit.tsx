@@ -107,7 +107,7 @@ export function DocSection({ id, title, rule, children }: { id?: string; title: 
     <section id={id} className="scroll-mt-20 py-9">
       <h2 data-toc="" className="m-0 scroll-mt-20 text-[18px] font-semibold tracking-tight">{title}</h2>
       {rule && <div className="m-0 mt-1.5 max-w-[720px] text-[13px] leading-relaxed text-muted">{typeof rule === "string" ? inlineCode(rule) : rule}</div>}
-      <div className="mt-5 space-y-6">{children}</div>
+      <div className="mt-5 flex flex-col gap-6">{children}</div>
     </section>
   );
 }
@@ -232,9 +232,11 @@ export function PropsTable({ rows }: { rows: [string, string, string, string][] 
 /* ------------------------------------------------------------------ */
 
 /** Código do site: o CodeBlock do próprio DS (copiar, altura limitada, realce mínimo). */
-export function CodeBlock({ code, maxHeight = 520, title, className }: { code: string; maxHeight?: number; title?: string; className?: string }) {
-  return <DsCodeBlock language="tsx" title={title} code={code} maxHeight={maxHeight} className={className} />;
+export function CodeBlock({ code, maxHeight = 520, title, language, className }: { code: string; maxHeight?: number; title?: string; /** Padrão: "bash" quando o trecho é comando de terminal, senão "tsx". */ language?: string; className?: string }) {
+  return <DsCodeBlock language={language ?? (SHELL.test(code) ? "bash" : "tsx")} title={title} code={code} maxHeight={maxHeight} className={className} />;
 }
+/** Primeira linha que não é comentário `#` começa por um comando conhecido. */
+const SHELL = /^\s*(?:#[^\n]*\n\s*)*(?:npm|npx|pnpm|yarn|node|git|claude|codex|gemini|curl|python3?|\/plugin)\s/;
 
 /* ------------------------------------------------------------------ */
 /* Bloco: preview em iframe (responsivo de verdade) + código           */

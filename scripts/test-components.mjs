@@ -247,6 +247,13 @@ try {
     assert.doesNotMatch(renderToStaticMarkup(h(mod.AgentOrb, { seed: "x", size: 16, badge })), /agent-orb-badge/);
   });
 
+  test("CodeBlock e DiffView: raiz sem margem (m-0 anularia o space-y-* de quem empilha)", () => {
+    const rootCls = (html) => html.match(/^<figure[^>]*class="([^"]*)"/)[1].split(" ");
+    for (const html of [renderToStaticMarkup(h(mod.CodeBlock, { code: "a" })), renderToStaticMarkup(h(mod.DiffView, { diff: "--- a/x.ts\n+++ b/x.ts\n@@ -1 +1 @@\n-a\n+b\n" }))]) {
+      assert.deepEqual(rootCls(html).filter((c) => /^-?m[xytrbl se]?-/.test(c)), []);
+    }
+  });
+
   test("CodeBlock: rótulo da linguagem, linhas numeradas e código escapado", () => {
     const html = renderToStaticMarkup(h(mod.CodeBlock, { language: "ts", lineNumbers: true, code: "const a = '<b>';\nreturn a;" }));
     assert.match(html, />TypeScript</);

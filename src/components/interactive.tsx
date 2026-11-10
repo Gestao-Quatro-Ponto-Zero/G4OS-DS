@@ -726,7 +726,7 @@ export function Testimonial({
       </figure>
     );
   return (
-    <figure className={cn("m-0 flex flex-col justify-between gap-6 rounded-2xl border border-line bg-surface p-6", className)}>
+    <figure className={cn("flex flex-col justify-between gap-6 rounded-2xl border border-line bg-surface p-6", className)}>
       <blockquote className="m-0 text-[14px] leading-relaxed text-ink">“{quote}”</blockquote>
       {person}
     </figure>

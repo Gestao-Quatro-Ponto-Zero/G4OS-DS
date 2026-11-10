@@ -38,11 +38,11 @@ export default function Page() {
             navegação
           </div>
           <div className="space-y-2 rounded-xl border border-dashed border-line-strong p-3 text-[12.5px]">
-            <p className="m-0 font-medium">Conversa</p>
+            <p className="font-medium">Conversa</p>
             <p className="m-0 text-muted">Trilha (Projetos › análise) · RunSummary com o trace · resposta · ArtifactCard · sugestões · AgentComposer</p>
           </div>
           <div className="space-y-2 rounded-xl border border-dashed border-line-strong p-3 text-[12.5px]">
-            <p className="m-0 font-medium">ArtifactPanel</p>
+            <p className="font-medium">ArtifactPanel</p>
             <p className="m-0 text-muted">Abas Relatório · Contexto · Saída · planilhas; copiar, exportar, compartilhar, expandir, fechar. Divisor arrastável (ResizableSplit).</p>
           </div>
         </div>

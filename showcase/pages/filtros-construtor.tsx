@@ -102,32 +102,36 @@ export default function Page() {
       </DocSection>
 
       <DocSection title="API">
-        <p className="m-0 text-[13px] font-medium">FilterField&lt;T&gt;</p>
-        <PropsTable
-          rows={[
-            ["key", "string", "—", "Identificador (vai para a URL)."],
-            ["label", "string", "—", "Nome visível do campo."],
-            ["type", '"text" | "number" | "currency" | "date" | "enum" | "person" | "boolean"', "—", "Define operadores e editor de valor."],
-            ["accessor", "(row: T) => unknown", "—", "Valor na linha. enum/person aceitam string ou string[]."],
-            ["options", "{ value, label, icon?, hint? }[]", "—", "Para enum/person. hint = contagem ao lado da opção."],
-            ["quick", "boolean", "false", "Vira atalho de faceta na barra (enum/person)."],
-            ["icon · unit", "ReactNode · string", "—", "Ícone no menu/chip; unidade no chip de número (“dias”)."],
-          ]}
-        />
-        <p className="m-0 text-[13px] font-medium">useFilters(rows, options) → filters</p>
-        <PropsTable
-          rows={[
-            ["options.fields", "FilterField<T>[]", "—", "Campos filtráveis."],
-            ["options.search", "(row) => string[]", "—", "Textos da busca livre (todas as palavras em E, sem acento)."],
-            ["options.me · now", "string · Date", "—", "Pessoa atual (“sou eu”) e data de referência (“hoje”)."],
-            ["options.url", "boolean | string", "false", "Sincroniza com ?q=&f=&m=. String = prefixo."],
-            ["options.initial", "FilterState", "vazio", "Recorte inicial (ex.: visão padrão)."],
-            ["filters.rows · shown · total", "T[] · number · number", "", "Resultado e contagens."],
-            ["filters.add · update · remove · clear · removeLast", "", "", "Mexem nas condições."],
-            ["filters.setQuery · setFacet · countFor", "", "", "Busca, faceta rápida, prévia de contagem para um estado."],
-            ["filters.match · setMatch", '"and" | "or"', '"and"', "Combina os filtros em E (todos) ou OU (qualquer um). A busca livre sempre restringe. MatchToggle mostra a troca na barra (só com 2+ filtros); a FilterBar já inclui."],
-          ]}
-        />
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[13px] font-medium">FilterField&lt;T&gt;</p>
+          <PropsTable
+            rows={[
+              ["key", "string", "—", "Identificador (vai para a URL)."],
+              ["label", "string", "—", "Nome visível do campo."],
+              ["type", '"text" | "number" | "currency" | "date" | "enum" | "person" | "boolean"', "—", "Define operadores e editor de valor."],
+              ["accessor", "(row: T) => unknown", "—", "Valor na linha. enum/person aceitam string ou string[]."],
+              ["options", "{ value, label, icon?, hint? }[]", "—", "Para enum/person. hint = contagem ao lado da opção."],
+              ["quick", "boolean", "false", "Vira atalho de faceta na barra (enum/person)."],
+              ["icon · unit", "ReactNode · string", "—", "Ícone no menu/chip; unidade no chip de número (“dias”)."],
+            ]}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="m-0 text-[13px] font-medium">useFilters(rows, options) → filters</p>
+          <PropsTable
+            rows={[
+              ["options.fields", "FilterField<T>[]", "—", "Campos filtráveis."],
+              ["options.search", "(row) => string[]", "—", "Textos da busca livre (todas as palavras em E, sem acento)."],
+              ["options.me · now", "string · Date", "—", "Pessoa atual (“sou eu”) e data de referência (“hoje”)."],
+              ["options.url", "boolean | string", "false", "Sincroniza com ?q=&f=&m=. String = prefixo."],
+              ["options.initial", "FilterState", "vazio", "Recorte inicial (ex.: visão padrão)."],
+              ["filters.rows · shown · total", "T[] · number · number", "", "Resultado e contagens."],
+              ["filters.add · update · remove · clear · removeLast", "", "", "Mexem nas condições."],
+              ["filters.setQuery · setFacet · countFor", "", "", "Busca, faceta rápida, prévia de contagem para um estado."],
+              ["filters.match · setMatch", '"and" | "or"', '"and"', "Combina os filtros em E (todos) ou OU (qualquer um). A busca livre sempre restringe. MatchToggle mostra a troca na barra (só com 2+ filtros); a FilterBar já inclui."],
+            ]}
+          />
+        </div>
       </DocSection>
 
       <DocSection title="Regras">

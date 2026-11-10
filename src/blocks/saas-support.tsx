@@ -117,7 +117,7 @@ export default function SaasSupport() {
               <FilterBar filters={filters} noun="chamado" search={<TableSearch value={q} onChange={filters.setQuery} total={filters.total} noun="chamado" searchIn="assunto, número e cliente" />} />
             </PageToolbar>
             {estado === "carregando" ? (
-              <ul role="status" aria-label="Carregando chamados" className="m-0 list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
+              <ul role="status" aria-label="Carregando chamados" className="list-none divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface p-0">
                 {Array.from({ length: 6 }, (_, i) => (
                   <li key={i} className="flex gap-3 px-4 py-3">
                     <Skeleton className="h-7 w-7 rounded-lg" />

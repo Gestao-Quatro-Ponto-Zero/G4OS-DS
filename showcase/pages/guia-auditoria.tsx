@@ -180,6 +180,7 @@ pre-commit:
             ["icon-star-import", "Performance", "import * de \"lucide-react\"", "aviso", ""],
             ["page-width-wrapper", "Anatomia de página", "Largura da página num wrapper (mx-auto max-w-*)", "aviso", ""],
             ["page-heading", "Anatomia de página", "<h1> solto numa tela com Page", "info", ""],
+            ["stack-margin-reset", "Anatomia de página", "m-0 em filho de space-y-* / space-x-*", "aviso", ""],
             ["disabled-wrapper", "Componentes", "Wrapper com opacity/pointer-events em volta de controle desabilitado", "aviso", ""],
             ["redundant-children", "Componentes", "Texto repetido em label e children", "info", "sim"],
             ["field-double-label", "Componentes", "FieldBlock em volta de campo que já tem rótulo", "aviso", ""],

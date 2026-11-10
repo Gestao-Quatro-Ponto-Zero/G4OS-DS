@@ -199,7 +199,7 @@ function PaymentDrawer({ open, onClose, onSaved }: { open: boolean; onClose: () 
               <TextField label="Validade" value={exp} onChange={(v) => setExp(v.slice(0, 5))} placeholder="MM/AA" inputMode="numeric" autoComplete="cc-exp" error={show("exp")} />
               <TextField label="Código de segurança" value={cvv} onChange={(v) => setCvv(digits(v).slice(0, 4))} placeholder="123" inputMode="numeric" autoComplete="cc-csc" error={show("cvv")} />
             </div>
-            <p className="m-0 text-[12px] leading-relaxed text-muted">Os dados do cartão vão direto para o provedor de pagamento. Nós guardamos só a bandeira e os 4 últimos dígitos.</p>
+            <p className="text-[12px] leading-relaxed text-muted">Os dados do cartão vão direto para o provedor de pagamento. Nós guardamos só a bandeira e os 4 últimos dígitos.</p>
           </>
         ) : (
           <>

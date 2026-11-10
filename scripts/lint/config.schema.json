@@ -432,6 +432,18 @@
           ],
           "description": "<h1> solto numa tela com Page. Use <PageHeading title=… description=… actions=…>: título fixo, ações e subnavegação no lugar certo."
         },
+        "stack-margin-reset": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "m-0 em filho de space-y-* / space-x-*. No Tailwind v4 o space-* tem especificidade zero: m-0, my-0 ou mb-0 no filho apaga o espaço e os irmãos encostam. Empilhe com flex flex-col gap-* no pai (ou tire o m-0 do filho: o reset do Tailwind já zera a margem)."
+        },
         "disabled-wrapper": {
           "enum": [
             "off",

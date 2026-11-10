@@ -80,6 +80,7 @@ export const RULES = {
   // anatomia de página e composição (erros que agentes cometem com frequência)
   "page-width-wrapper": { category: "layout", severity: "warn", fixable: false, title: "Largura da página num wrapper (mx-auto max-w-*)", hint: 'Use <Page width="wide|medium|narrow|reading">: cabeçalho, filtros e corpo ficam no mesmo eixo. Um wrapper só centraliza o corpo e desalinha o título.' },
   "page-heading": { category: "layout", severity: "info", strict: "warn", fixable: false, title: "<h1> solto numa tela com Page", hint: "Use <PageHeading title=… description=… actions=…>: título fixo, ações e subnavegação no lugar certo." },
+  "stack-margin-reset": { category: "layout", severity: "warn", fixable: false, title: "m-0 em filho de space-y-* / space-x-*", hint: "No Tailwind v4 o space-* tem especificidade zero: m-0, my-0 ou mb-0 no filho apaga o espaço e os irmãos encostam. Empilhe com flex flex-col gap-* no pai (ou tire o m-0 do filho: o reset do Tailwind já zera a margem)." },
   "disabled-wrapper": { category: "componentes", severity: "warn", fixable: false, title: "Wrapper com opacity/pointer-events em volta de controle desabilitado", hint: "Use disabled + disabledReason=\"…\" no Button (fica legível, focável e explica o motivo). Opacidade extra deixa o botão invisível." },
   "redundant-children": { category: "componentes", severity: "info", fixable: true, title: "Texto repetido em label e children", hint: "Checkbox/Switch já mostram o label. Remova os children (ou use children só para texto rico)." },
   "field-double-label": { category: "componentes", severity: "warn", fixable: false, title: "FieldBlock em volta de campo que já tem rótulo", hint: "TextField, NumberField, CurrencyField, TextareaField… já desenham o label. Remova o FieldBlock (ou o label do campo)." },
@@ -461,6 +462,31 @@ function checkComposition(tag, { code, report, ext, clsRaw, strVal }) {
     if (page >= 0 && !object && /<PageHeading[\s/>]/.test(code.slice(page, tag.start))) {
       const w = PAGE_WIDTH[mw[1]] ?? (/^\[/.test(mw[1]) ? "medium" : null);
       if (w) report("page-width-wrapper", cls.start, cls.end, { suggestion: `<Page width="${w}"> e tire mx-auto ${mw[0]} deste wrapper.` });
+    }
+  }
+
+  // pilha com space-*: filho direto com margem zerada cola no irmão seguinte
+  if (clsRaw && !tag.selfClosing) {
+    const axis = /(?:^|[\s"'`:])space-([xy])-(?!0(?![\d.])|reverse)[\w.[\]/-]+/.exec(clsRaw)?.[1];
+    const body = axis ? tagBody(code, tag) : null;
+    if (body) {
+      const reset = axis === "y" ? /^(m|my|mb)-0$/ : /^(m|mx|mr|me)-0$/;
+      const kids = [];
+      let pos = 0;
+      for (const k of scanTags(body)) {
+        if (k.start < pos) continue;
+        const inner = k.selfClosing ? "" : tagBody(body, k);
+        pos = inner == null ? k.end : k.end + inner.length + (k.selfClosing ? 0 : k.name.length + 3);
+        kids.push(k);
+      }
+      // o último filho não tem irmão depois: a margem dele não separa nada
+      for (const k of kids.slice(0, -1)) {
+        const kc = k.attr("className");
+        if (!kc) continue;
+        const kRaw = body.slice(kc.valueStart, kc.end);
+        const hit = kRaw.split(/[\s"'`{}()?:,]+/).find((t) => reset.test(t));
+        if (hit) report("stack-margin-reset", tag.end + kc.start, tag.end + kc.end, { suggestion: `Troque space-${axis}-* por flex ${axis === "y" ? "flex-col " : ""}gap-* no pai, ou tire ${hit} deste filho.` });
+      }
     }
   }
 

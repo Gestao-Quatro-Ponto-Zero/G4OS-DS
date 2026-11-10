@@ -332,7 +332,7 @@ export default function CommsAnnouncement() {
                   <div className="mt-4 space-y-2">
                     <OperationFeedback operation={remind} />
                     {reminded ? (
-                      <p role="status" className="m-0 text-[12.5px] text-muted">
+                      <p role="status" className="text-[12.5px] text-muted">
                         Lembrete enviado. O próximo pode sair em 24 h.
                       </p>
                     ) : (
