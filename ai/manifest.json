@@ -4236,6 +4236,13 @@
               "description": "Séries visíveis (controlado)."
             },
             {
+              "name": "axisWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Largura fixa do eixo de valores, para alinhar gráficos empilhados."
+            },
+            {
               "name": "categoryInside",
               "type": "boolean | undefined",
               "required": false,
@@ -4459,6 +4466,13 @@
               "required": false,
               "default": null,
               "description": "Séries visíveis (controlado)."
+            },
+            {
+              "name": "axisWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Largura fixa do eixo de valores, para alinhar gráficos empilhados."
             },
             {
               "name": "categoryInside",
@@ -5163,6 +5177,13 @@
               "required": false,
               "default": null,
               "description": "Séries visíveis (controlado)."
+            },
+            {
+              "name": "axisWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Largura fixa do eixo de valores, para alinhar gráficos empilhados."
             },
             {
               "name": "categoryInside",
