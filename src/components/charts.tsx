@@ -417,7 +417,7 @@ export type CartesianProps = {
   tooltip?: ChartTooltipOptions | false;
   /** Rótulos de valor: em barras ("top" padrão, "inside"); em linhas, acima do ponto. */
   labels?: boolean | "top" | "inside";
-  /** Rótulo com o valor no último ponto de cada linha. */
+  /** Rótulo com o valor no último ponto de cada linha. Em linha não empilhada, omite se esse ponto estiver sem dado. */
   endLabels?: boolean;
   /** Barras: "vertical" (padrão) ou "horizontal" (categorias à esquerda). */
   layout?: "vertical" | "horizontal";
@@ -436,6 +436,8 @@ export type CartesianProps = {
   reference?: { value: number; label: string };
   /** Eixo começando em zero. Padrão: sim em barras/áreas, não em linhas. */
   zero?: boolean;
+  /** Largura fixa do eixo de valores, para alinhar gráficos empilhados. Padrão: pelo maior rótulo. */
+  axisWidth?: number;
   className?: string;
 };
 
@@ -530,6 +532,7 @@ function Cartesian({
   onActiveSeriesChange,
   reference,
   zero: zeroProp,
+  axisWidth,
   className,
 }: CartesianProps & { kind: Kind }) {
   // Barras e áreas começam no zero (sempre); linhas usam o intervalo dos dados.
@@ -549,6 +552,7 @@ function Cartesian({
   const vis = series.filter((s) => visibleKeys.includes(s.key));
   const expand = stackOffset === "expand";
   const stacked = stackedProp || expand;
+  const gaps = kind === "line" && !stacked;
   const horizontal = kind === "bar" && layout === "horizontal";
   const gid = useId().replace(/:/g, "");
   const n = data.length;
@@ -646,7 +650,7 @@ function Cartesian({
 
   /* ---------- geometria ---------- */
   const catW = horizontal && !categoryInside ? Math.min(150, Math.max(40, Math.max(...data.map((d) => formatIndex(String(d[index] ?? "")).length)) * 6.6 + 12)) : 0;
-  const axisW = !horizontal && yAxis ? Math.min(68, Math.max(28, Math.max(...ticks.map((t) => axisFormat(t).length)) * 6.8 + 12)) : 0;
+  const axisW = !horizontal && yAxis ? (axisWidth ?? Math.min(68, Math.max(28, Math.max(...ticks.map((t) => axisFormat(t).length)) * 6.8 + 12))) : 0;
   const labelTop = (labels || endLabels) && !horizontal ? 16 : 0;
   const m = horizontal
     ? { top: 4, right: labels ? 56 : 12, bottom: xAxis ? 26 : 6, left: catW }
@@ -838,12 +842,22 @@ function Cartesian({
                   const line = curvePath(top, curve);
                   const baseLine = curvePath(base, curve === "step" ? "linear" : curve);
                   const area = curve === "step" ? `${line}L${base.map((p) => p.join(",")).join("L")}Z` : `${line}L${baseLine.slice(1)}Z`;
+                  // A null point is a gap: the line breaks there instead of dropping to zero.
+                  const has = (i: number) => !gaps || data[i]?.[s.key] != null;
+                  const runs: [number, number][][] = [];
+                  top.forEach((p, i) => {
+                    if (!has(i)) return;
+                    if (i > 0 && has(i - 1)) runs[runs.length - 1].push(p);
+                    else runs.push([p]);
+                  });
+                  const stroke = gaps ? runs.filter((r) => r.length > 1).map((r) => curvePath(r, curve)).join("") : line;
+                  const alone = gaps ? runs.filter((r) => r.length === 1).map((r) => r[0]) : [];
                   const primary = series.indexOf(s) === 0;
                   return (
                     <g key={s.key}>
                       {kind === "area" && !s.dashed && <path d={area} fill={`url(#${gid}-g-${s.key})`} />}
                       <path
-                        d={line}
+                        d={stroke}
                         fill="none"
                         stroke={colorOf(s)}
                         strokeWidth={primary ? 2 : 1.75}
@@ -851,8 +865,11 @@ function Cartesian({
                         strokeLinejoin="round"
                         strokeLinecap="round"
                       />
+                      {alone.map(([cx, cy]) => (
+                        <circle key={`a${cx}`} cx={cx} cy={cy} r={2} fill={colorOf(s)} />
+                      ))}
                       {dots &&
-                        top.map(([cx, cy], i) => <circle key={i} cx={cx} cy={cy} r={3} fill="var(--ds-surface)" stroke={colorOf(s)} strokeWidth={1.75} />)}
+                        top.map(([cx, cy], i) => (has(i) ? <circle key={i} cx={cx} cy={cy} r={3} fill="var(--ds-surface)" stroke={colorOf(s)} strokeWidth={1.75} /> : null))}
                     </g>
                   );
                 })}
@@ -911,7 +928,7 @@ function Cartesian({
                   })
                 : vis.map((s) => (
                     <g key={`l-${s.key}`}>
-                      {data.map((d, i) => (
+                      {data.map((d, i) => gaps && d[s.key] == null ? null : (
                         <text key={i} x={cat(i)} y={vScale(stacks.highs[s.key][i]) - 9} textAnchor="middle" className="fill-ink-soft text-[11.5px] font-medium tabular-nums">
                           {format(num(d[s.key]))}
                         </text>
@@ -948,6 +965,7 @@ function Cartesian({
               n > 0 &&
               vis.map((s) => {
                 const last = n - 1;
+                if (gaps && data[last][s.key] == null) return null;
                 const cy = vScale(stacks.highs[s.key][last]);
                 return (
                   <g key={`e-${s.key}`}>
@@ -973,9 +991,11 @@ function Cartesian({
             {kind !== "bar" && active != null && tip && (
               <g>
                 <line x1={cat(active)} x2={cat(active)} y1={m.top} y2={m.top + innerH} stroke="var(--ds-line-strong)" strokeDasharray={tip.indicator === "dashed" ? "3 3" : undefined} />
-                {vis.map((s) => (
-                  <circle key={s.key} cx={cat(active)} cy={vScale(stacks.highs[s.key][active])} r={4.5} fill="var(--ds-surface)" stroke={colorOf(s)} strokeWidth={2} />
-                ))}
+                {vis.map((s) =>
+                  gaps && data[active]?.[s.key] == null ? null : (
+                    <circle key={s.key} cx={cat(active)} cy={vScale(stacks.highs[s.key][active])} r={4.5} fill="var(--ds-surface)" stroke={colorOf(s)} strokeWidth={2} />
+                  ),
+                )}
               </g>
             )}
 

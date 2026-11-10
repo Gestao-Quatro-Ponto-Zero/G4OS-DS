@@ -34,18 +34,18 @@ Projeto novo em Next: copie [`templates/next-app`](../../templates/next-app/READ
 
 ```tsx
 // Next: app/layout.tsx
-import { Figtree } from "next/font/google";
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree" });
+import { Manrope } from "next/font/google";
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 
 import { themeScript } from "@g4ai/ds";
 
-<html lang="pt-BR" className={`ds-app ${figtree.variable}`} data-theme="system" suppressHydrationWarning>
+<html lang="pt-BR" className={`ds-app ${manrope.variable}`} data-theme="system" suppressHydrationWarning>
   <head>
     <script dangerouslySetInnerHTML={{ __html: themeScript }} />
   </head>
 ```
 
-A fonte vem do semântico `--ds-font-sans` (padrão `"Figtree"`); com `next/font`, adicione ao CSS: `:root { --ds-font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif; }` ou carregue a Figtree pelo Google Fonts no `<head>` (como no showcase). Marcas podem trocar a fonte ([temas](../fundamentos/temas-e-dark-mode.md)).
+A fonte vem do semântico `--ds-font-sans` (padrão `"Manrope"`, do KV G4 OS); com `next/font`, adicione ao CSS: `:root { --ds-font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif; }` ou carregue a Manrope pelo Google Fonts no `<head>` (como no showcase). Marcas podem trocar a fonte ([temas](../fundamentos/temas-e-dark-mode.md)).
 
 - `ds-app` trava a rolagem do documento: só as áreas de trabalho rolam. Em site de conteúdo, não use.
 - `lang="pt-BR"` é obrigatório (leitores de tela e hifenização).
@@ -84,7 +84,7 @@ Imports por módulo também funcionam: `@g4ai/ds/components/charts`, `@g4ai/ds/l
 - [ ] `data-theme="dark"` no `<html>` deixa tudo escuro sem mexer em componente → tokens OK.
 - [ ] Classes como `bg-soft`, `text-muted` funcionam no seu código → tokens carregados.
 - [ ] `Select` abre por cima de um `Drawer` → portais OK.
-- [ ] Figtree nos títulos → fonte OK.
+- [ ] Manrope nos títulos → fonte OK.
 
 Starter pronto: [`templates/next-app`](../../templates/next-app/README.md). Detalhes de Next: [next.md](next.md).
 

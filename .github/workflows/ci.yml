@@ -15,6 +15,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run test:layout
+      - run: node scripts/test-chart-gaps.mjs
       - run: npm run build
       - run: npm run showcase:build
       - run: node scripts/test-catch-up.mjs

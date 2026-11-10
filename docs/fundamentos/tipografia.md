@@ -1,6 +1,6 @@
 # Tipografia
 
-Uma família: **Figtree** (Google Fonts, pesos 400, 500, 600, 700). Mono: `ui-monospace, "SF Mono", "JetBrains Mono"` só para código, IDs técnicos e chaves.
+Uma família: **Manrope** (Google Fonts, pesos 400, 500, 600, 700), a do KV G4 OS. A Figtree anterior continua disponível com `data-type="classica"`. Assinaturas de marca ("Sua empresa no *piloto automático*") usam **Libre Baskerville** itálica (`--ds-font-tagline`), nunca no corpo da interface. Mono: `ui-monospace, "SF Mono", "JetBrains Mono"` só para código, IDs técnicos e chaves.
 
 ## Escala nomeada por papel
 

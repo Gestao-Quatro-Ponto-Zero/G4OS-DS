@@ -15,6 +15,7 @@ Evolução no tempo com volume (receita, visitantes, vagas abertas).
 | `label` * | `string` |  | Resumo em uma frase para leitor de tela: "Receita mensal de jan a set". |
 | `activeIndex` | `number \| undefined` |  | Barras: destaca um item (os outros ficam esmaecidos). |
 | `activeSeries` | `string[] \| undefined` |  | Séries visíveis (controlado). |
+| `axisWidth` | `number \| undefined` |  | Largura fixa do eixo de valores, para alinhar gráficos empilhados. |
 | `categoryInside` | `boolean \| undefined` |  | Barras horizontais: nome da categoria dentro da barra em vez do eixo. |
 | `className` | `string \| undefined` |  |  |
 | `colorBy` | `((datum: ChartDatum, index: number) => string \| undefined) \| undefined` |  | Barras: cor por item (série única), ex. |
@@ -61,6 +62,7 @@ Comparação entre categorias ou períodos discretos.
 | `label` * | `string` |  | Resumo em uma frase para leitor de tela: "Receita mensal de jan a set". |
 | `activeIndex` | `number \| undefined` |  | Barras: destaca um item (os outros ficam esmaecidos). |
 | `activeSeries` | `string[] \| undefined` |  | Séries visíveis (controlado). |
+| `axisWidth` | `number \| undefined` |  | Largura fixa do eixo de valores, para alinhar gráficos empilhados. |
 | `categoryInside` | `boolean \| undefined` |  | Barras horizontais: nome da categoria dentro da barra em vez do eixo. |
 | `className` | `string \| undefined` |  |  |
 | `colorBy` | `((datum: ChartDatum, index: number) => string \| undefined) \| undefined` |  | Barras: cor por item (série única), ex. |
@@ -349,6 +351,7 @@ Tendência sem volume (taxa, preço, NPS): só a linha.
 | `label` * | `string` |  | Resumo em uma frase para leitor de tela: "Receita mensal de jan a set". |
 | `activeIndex` | `number \| undefined` |  | Barras: destaca um item (os outros ficam esmaecidos). |
 | `activeSeries` | `string[] \| undefined` |  | Séries visíveis (controlado). |
+| `axisWidth` | `number \| undefined` |  | Largura fixa do eixo de valores, para alinhar gráficos empilhados. |
 | `categoryInside` | `boolean \| undefined` |  | Barras horizontais: nome da categoria dentro da barra em vez do eixo. |
 | `className` | `string \| undefined` |  |  |
 | `colorBy` | `((datum: ChartDatum, index: number) => string \| undefined) \| undefined` |  | Barras: cor por item (série única), ex. |

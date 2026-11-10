@@ -652,7 +652,7 @@ export function HeroSection({
     );
   return (
     <section className={cn("relative isolate overflow-hidden", className)}>
-      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[520px]" style={{ background: "radial-gradient(60% 60% at 50% 0%, color-mix(in oklab, var(--ds-accent) 14%, transparent), transparent 70%)" }} />
+      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[560px]" style={{ background: "radial-gradient(55% 65% at 50% 0%, var(--ds-haze), transparent 72%), radial-gradient(28% 34% at 82% 8%, color-mix(in oklab, var(--ds-ai-accent) 14%, transparent), transparent 70%)" }} />
       <div className="mx-auto max-w-[900px] px-5 pb-12 pt-20 text-center sm:px-8 sm:pt-28">{text}</div>
       {media && (
         <div className="enter mx-auto max-w-[1160px] px-5 pb-16 sm:px-8" style={s(4)}>
