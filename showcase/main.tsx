@@ -2,7 +2,7 @@ import { ArrowRight, Blocks, BookOpen, FileDiff, LayoutTemplate, Menu, Rows3, Se
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { AgentOrb, AiOrb, BrandHaze, Breadcrumb, Button, ChipRow, CopyButton, Empty, FilterChip, G4OSLogo, Popover, SearchInput, StatCell, StatGrid, Tabs, Toaster, cn, normalize, notify, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
+import { AgentOrb, Breadcrumb, Button, ChipRow, CopyButton, Empty, FilterChip, G4OSLogo, Popover, SearchInput, StatCell, StatGrid, Toaster, cn, normalize, notify, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
 import { Palette } from "lucide-react";
 import { blocks, pages } from "./.generated/registry";
 import { BlockCard, BlockPreview, ShadcnContext, anatomies, anatomyOf, blockCategories, blockHref, categorySlug, groups, type AnatomyId, type BlockModule, type PageModule } from "./kit";
@@ -380,14 +380,12 @@ function Home() {
   const components = pages.filter((p) => !isDoc(p)).length;
   return (
     <div className="mx-auto max-w-[1440px] overflow-x-clip px-4 pb-20 sm:px-6">
-      <section className="relative isolate mx-auto max-w-[760px] py-14 text-center sm:py-20">
-        <BrandHaze size={760} className="absolute left-1/2 top-[-30%] -z-10 -translate-x-1/2" />
-        <AiOrb size={240} blur={30} live className="absolute -right-72 top-40 -z-10 opacity-25" />
+      <section className="mx-auto max-w-[760px] py-14 text-center sm:py-20">
         <a href="#/p/ia-rosto-do-agente" className="inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1 pl-1.5 pr-3 text-[12px] text-muted hover:border-line-strong hover:text-ink">
           <AgentOrb seed="galt:atlas" size={20} expression="happy" />
           Novo: rosto do agente, código e diff <ArrowRight className="h-3 w-3" aria-hidden />
         </a>
-        <h1 className="m-0 mt-5 text-[34px] font-medium leading-[1.12] tracking-[-0.04em] sm:text-[52px]"><span className="text-ink-soft">Construa qualquer</span> <span className="ds-gradient-text">produto G4 OS</span> <span className="text-ink-soft">com os mesmos blocos</span></h1>
+        <h1 className="m-0 mt-5 text-[34px] font-semibold leading-[1.1] tracking-[-0.04em] sm:text-[48px]">Construa qualquer produto G4 OS com os mesmos blocos</h1>
         <p className="mx-auto mt-4 max-w-[600px] text-[15px] leading-relaxed text-muted">
           CRM, ATS, ERP, financeiro, portais. Componentes React acessíveis, gráficos sem dependência e telas inteiras prontas para copiar, tudo na mesma linguagem visual.
         </p>
@@ -421,17 +419,22 @@ function Home() {
 
       {current && (
         <section className="pt-16">
-          <SectionTitle
-            title="Telas inteiras, não peças soltas"
-            text="Cada bloco é uma tela de um produto de exemplo navegável. Copie o arquivo, troque os dados do topo e ajuste."
-            action={
-              <a href="#/blocos" className="inline-flex h-9 items-center gap-1 rounded-lg bg-soft px-3 text-[12.5px] font-medium hover:bg-line">
-                Todos os {blocks.length} blocos <ArrowRight className="h-3.5 w-3.5" />
-              </a>
-            }
-          />
-          <div className="border-b border-line">
-            <Tabs label="Blocos em destaque" overflow="scroll" value={current.slug} onChange={setTab} items={featured.map((b) => ({ id: b.slug, label: b.meta.category === "SaaS" ? "Dashboard" : b.meta.category }))} className="[&_.entity-tab]:text-[13.5px]" />
+          <SectionTitle title="Telas inteiras, não peças soltas" text="Cada bloco é uma tela de um produto de exemplo navegável. Copie o arquivo, troque os dados do topo e ajuste." />
+          {/* Uma faixa só: as categorias em pílulas à esquerda (rolam de lado quando não cabem) e o
+              caminho para a galeria inteira à direita, na mesma linha de base. */}
+          <div className="flex items-center gap-3 border-b border-line pb-3">
+            <ChipRow label="Blocos em destaque" wrap={false} className="min-w-0 flex-1">
+              {featured.map((b) => (
+                <FilterChip key={b.slug} shape="pill" on={b.slug === current.slug} onClick={() => setTab(b.slug)}>
+                  {b.meta.category === "SaaS" ? "Dashboard" : b.meta.category}
+                </FilterChip>
+              ))}
+            </ChipRow>
+            <a href="#/blocos" className="inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-3 text-[13px] font-medium text-ink-soft ring-1 ring-inset ring-line hover:bg-soft hover:text-ink">
+              <span className="max-sm:hidden">Todos os {blocks.length} blocos</span>
+              <span className="sm:hidden">Todos</span>
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </a>
           </div>
           <BlockPreview key={current.slug} block={current} />
         </section>

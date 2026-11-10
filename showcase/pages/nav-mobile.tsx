@@ -20,7 +20,7 @@ const tabs: NavItem[] = [
 function Phone({ title, children, top }: { title: string; children: ReactNode; top?: ReactNode }) {
   return (
     <figure className="m-0">
-      <div className="relative mx-auto h-[560px] w-[290px] overflow-hidden rounded-[36px] border-[6px] border-ink/85 bg-page shadow-raised">
+      <div className="relative mx-auto h-[560px] w-[290px] max-w-full overflow-hidden rounded-[36px] border-[6px] border-ink/85 bg-page shadow-raised">
         <div className="flex h-7 items-center justify-between px-6 text-[10px] font-semibold text-ink">
           <span>9:41</span>
           <span className="h-3 w-14 rounded-full bg-ink/85" />
@@ -69,7 +69,7 @@ export default function Page() {
   return (
     <DocPage title={meta.title} kicker="Navegação" description={meta.description}>
       <DocSection title="Os três modos" rule="Os exemplos são clicáveis. Na tela real a pílula só aparece abaixo de 768px; acima disso vale a sidebar.">
-        <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3" onClickCapture={(e) => {
+        <div className="grid gap-8 md:grid-cols-2 2xl:grid-cols-3" onClickCapture={(e) => {
           const a = (e.target as HTMLElement).closest("a");
           if (a) {
             e.preventDefault();

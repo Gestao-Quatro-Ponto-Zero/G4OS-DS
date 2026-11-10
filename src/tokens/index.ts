@@ -180,4 +180,4 @@ export const duration = { press: 100, state: 160, toast: 180, panel: 220, page: 
 export const z = { stickyLocal: 15, sticky: 20, stickyShell: 30, nav: 40, floating: 50, toast: 80, backdrop: 90, modal: 95, popup: 100 } as const;
 export const layout = { contentMax: 1440, readingMax: 620, sidebar: 224, sidebarRail: 64, drawer: 500 } as const;
 export const breakpoints = { sm: 640, md: 768, lg: 1024, xl: 1280 } as const;
-export const font = { family: '"Manrope", "Figtree", ui-sans-serif, system-ui, sans-serif' } as const;
+export const font = { family: '"Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif' } as const;

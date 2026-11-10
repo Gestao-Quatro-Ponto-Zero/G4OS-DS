@@ -63,7 +63,7 @@ try {
     assert.equal(values.ink, dark ? "#ececef" : "#202124");
     assert.equal(values.primary, dark ? "#ececef" : "#202124");
     assert.equal(values.radius, "1");
-    assert.match(values.font, /Manrope/);
+    assert.match(values.font, /^"Figtree"/);
 
     for (const [saved, expected] of [[null, null], ["g4", null], ["g4-classico", null], ["g4os", "g4os"], ["g4-institucional", "g4os"], ["oceano", "oceano"]]) {
       const result = await page.evaluate(({ saved, mode }) => {
@@ -79,6 +79,36 @@ try {
       }, { saved, mode });
       assert.deepEqual(result, { before: expected, after: expected }, `script e API concordam para ${saved}`);
     }
+    // Tipografia: Figtree é o padrão (sem atributo); "g4" era o id do padrão antigo; "g4os" é a Manrope opcional.
+    for (const [saved, expected, family] of [[null, null, "Figtree"], ["g4", null, "Figtree"], ["classica", null, "Figtree"], ["g4os", "g4os", "Manrope"], ["editorial", "editorial", "Inter"]]) {
+      const result = await page.evaluate(({ saved, mode }) => {
+        const root = globalThis.document.documentElement;
+        if (saved === null) globalThis.localStorage.removeItem("ds-type");
+        else globalThis.localStorage.setItem("ds-type", saved);
+        if (saved === null) root.removeAttribute("data-type");
+        else root.setAttribute("data-type", "stale");
+        (0, eval)(globalThis.window.themeApi.themeScript);
+        const before = root.getAttribute("data-type");
+        globalThis.window.themeApi.applyTheme(mode, undefined, root, saved ?? "classica");
+        const style = globalThis.getComputedStyle(root);
+        const out = { before, after: root.getAttribute("data-type"), font: style.getPropertyValue("--ds-font-sans"), weight: style.getPropertyValue("--ds-display-weight").trim() };
+        globalThis.localStorage.removeItem("ds-type");
+        root.removeAttribute("data-type");
+        return out;
+      }, { saved, mode });
+      assert.deepEqual([result.before, result.after], [expected, expected], `tipografia: script e API concordam para ${saved}`);
+      assert.ok(result.font.trim().startsWith(`"${family}"`), `tipografia ${saved}: ${result.font}`);
+      if (expected === null) assert.equal(result.weight, "600", "títulos do padrão em 600");
+    }
+    const kept = await page.evaluate(() => {
+      globalThis.localStorage.removeItem("ds-type");
+      globalThis.document.documentElement.setAttribute("data-type", "editorial");
+      (0, eval)(globalThis.window.themeApi.themeScript);
+      const value = globalThis.document.documentElement.getAttribute("data-type");
+      globalThis.document.documentElement.removeAttribute("data-type");
+      return value;
+    });
+    assert.equal(kept, "editorial", "sem preferência salva, respeita a tipografia do HTML");
     for (const [markup, expected] of [["g4os", "g4os"], ["oceano", "oceano"], ["g4-institucional", "g4os"]]) {
       const attribute = await page.evaluate(({ markup }) => {
         globalThis.localStorage.removeItem("ds-brand");

@@ -31,7 +31,7 @@ A aparência padrão é **G4 clássico** (`g4-classico`), com superfícies branc
 
 O preset **G4 OS** (`g4os`) oferece o visual do KV, com gelo, navy, dourado e destaque azul para IA. Ele reúne a opção institucional. Preferências salvas e atributos com `g4-institucional` continuam funcionando como alias de `g4os`. Os demais presets ficam em `src/styles/themes.css`, importado por `styles.css`.
 
-Tipografia é independente da marca. A fonte padrão continua Manrope. Use `data-type="classica"` para escolher Figtree.
+Tipografia é independente da marca. A fonte padrão é a Figtree, com títulos em 600. Use `data-type="g4os"` para escolher a Manrope do KV G4 OS.
 
 ```html
 <html data-theme="system" data-brand="oceano">
@@ -111,8 +111,8 @@ Tipo é independente da cor: qualquer marca combina com qualquer tipografia.
 
 | `data-type` | Texto | Títulos |
 | --- | --- | --- |
-| (nenhum) / `g4` | Manrope | Manrope 500 |
-| `classica` | Figtree | Figtree 600 |
+| (nenhum) / `classica` | Figtree | Figtree 600 |
+| `g4os` | Manrope | Manrope 500 |
 | `editorial` | Inter | Source Serif 4, 500 |
 | `tecnica` | IBM Plex Sans (+ Plex Mono) | Plex 600 |
 | `neutra` | Inter | Inter 650 |

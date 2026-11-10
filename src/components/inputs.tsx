@@ -1031,7 +1031,7 @@ export function Slider<V extends number | [number, number]>({
       {marks && (
         <div className="relative mt-1 h-4 text-[11px] tabular-nums text-muted">
           {marks.map((m) => (
-            <span key={m} className="absolute -translate-x-1/2" style={{ left: `${pct(m)}%` }}>
+            <span key={m} className={cn("absolute", pct(m) <= 0 ? "" : pct(m) >= 100 ? "-translate-x-full" : "-translate-x-1/2")} style={{ left: `${pct(m)}%` }}>
               {format(m)}
             </span>
           ))}

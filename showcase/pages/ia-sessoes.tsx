@@ -80,14 +80,14 @@ export default function Page() {
   return (
     <DocPage title={meta.title} kicker="IA e interação" description={meta.description}>
       <DocSection title="Anatomia" rule="Bloco pronto: Blocos › IA › Sessões do G4 OS (src/blocks/ai-sessions.tsx) e a tela inicial (ai-sessions-empty.tsx).">
-        <div className="grid gap-3 text-[12.5px] md:grid-cols-[48px_220px_1fr_200px]">
+        <div className="grid gap-3 text-[12.5px] md:grid-cols-[minmax(112px,auto)_220px_minmax(0,1fr)_200px]">
           {[
             ["Trilho", "IconRail: apps do workspace"],
             ["SessionSidebar", "Nova sessão · abas · etiquetas · grupos por data · status ao vivo · workspace"],
             ["Conversa", "SessionHeader · balões da pessoa · StepGroup recolhível · AnswerCard com ações · ThreadMinimap · SessionComposer + ToolsBar · Disclaimer · VoiceModeButton"],
             ["SessionInfoPanel", "Modo · nome · etiquetas · notas · arquivos · navegador do agente"],
           ].map(([t, d]) => (
-            <div key={t} className="rounded-xl border border-dashed border-line-strong p-3">
+            <div key={t} className="min-w-0 rounded-xl border border-dashed border-line-strong p-3 [overflow-wrap:anywhere]">
               <div className="font-medium">{t}</div>
               <div className="mt-1 text-muted">{d}</div>
             </div>

@@ -6852,6 +6852,11 @@
           "summary": "Marca padrão: G4 clássico, aplicada sem atributo data-brand."
         },
         {
+          "name": "DEFAULT_TYPE",
+          "kind": "const",
+          "summary": "Tipografia padrão: Figtree, aplicada sem atributo data-type."
+        },
+        {
           "name": "resolvedTheme",
           "kind": "function",
           "summary": "Tema efetivo agora (\"system\" resolvido pelo SO).",
@@ -35779,7 +35784,7 @@
       {
         "token": "--ds-font-sans",
         "utility": null,
-        "light": "\"Manrope\", \"Figtree\", ui-sans-serif, system-ui, sans-serif",
+        "light": "\"Figtree\", \"Figtree Fallback\", ui-sans-serif, system-ui, sans-serif",
         "dark": null,
         "note": null
       },
@@ -35800,7 +35805,7 @@
       {
         "token": "--ds-display-weight",
         "utility": null,
-        "light": "500",
+        "light": "600",
         "dark": null,
         "note": null
       },
