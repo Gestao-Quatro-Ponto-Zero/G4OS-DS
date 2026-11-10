@@ -325,6 +325,7 @@
 
 /* G4 clássico explícito também restaura a paleta em escopos de outras marcas. */
 [data-brand="g4-classico"] {
+  --ds-surface: var(--g4-white);
   --ds-page: var(--g4-white);
   --ds-soft: var(--g4-gray-50);
   --ds-rail: var(--g4-gray-25);

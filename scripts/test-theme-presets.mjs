@@ -94,11 +94,11 @@ try {
       globalThis.document.body.appendChild(panel);
       globalThis.window.themeApi.applyTheme(mode, "g4-classico", panel);
       const style = globalThis.getComputedStyle(panel);
-      const result = [style.getPropertyValue("--ds-page").trim(), style.getPropertyValue("--ds-radius-scale").trim()];
+      const result = [style.getPropertyValue("--ds-page").trim(), style.getPropertyValue("--ds-surface").trim(), style.getPropertyValue("--ds-radius-scale").trim()];
       panel.remove();
       return result;
     }, { mode });
-    assert.deepEqual(scoped, [values.page, "1"], "painel clássico não herda a marca do pai");
+    assert.deepEqual(scoped, [values.page, dark ? "#18181b" : "#ffffff", "1"], "painel clássico não herda a marca do pai");
     const aliases = await page.evaluate(({ mode }) => {
       const read = () => {
         const style = globalThis.getComputedStyle(globalThis.document.documentElement);
@@ -113,10 +113,12 @@ try {
     assert.deepEqual(aliases.canonical, [dark ? "#111113" : "#f9f9f9", dark ? "#ececef" : "#001f35", dark ? "#4fb3f0" : "#0084dd", "1.25"]);
 
     await page.evaluate(() => {
-      globalThis.localStorage.setItem("ds-brand", "g4-classico");
+      globalThis.localStorage.removeItem("ds-brand");
+      globalThis.document.documentElement.setAttribute("data-brand", "g4os");
+      (0, eval)(globalThis.window.themeApi.themeScript);
       globalThis.window.mountTheme();
     });
-    await page.waitForFunction(() => globalThis.document.querySelectorAll("output").length === 2 && [...globalThis.document.querySelectorAll("output")].every((node) => node.textContent === "g4-classico"));
+    await page.waitForFunction(() => globalThis.document.querySelectorAll("output").length === 2 && [...globalThis.document.querySelectorAll("output")].every((node) => node.textContent === "g4os"));
     await page.getByRole("button", { name: "Institucional" }).first().click();
     await page.waitForFunction(() => [...globalThis.document.querySelectorAll("output")].every((node) => node.textContent === "g4os"));
     assert.equal(await page.evaluate(() => globalThis.localStorage.getItem("ds-brand")), "g4os");

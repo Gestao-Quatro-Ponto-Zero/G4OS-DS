@@ -63,7 +63,7 @@ const write = (key: string, value: string) => {
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(LOCAL_EVENT, { detail: { key, value } }));
 };
 
-/** Aplica tema/marca no documento (ou em outro elemento raiz). */
+/** Aplica tema/marca no documento (ou em outro elemento raiz). Sem `brand`, restaura a marca padrão; `useTheme` herda a marca do HTML antes de chamar esta função. */
 export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = document.documentElement, type?: string) {
   const nextBrand = normalizeBrand(brand);
   const documentRoot = typeof document !== "undefined" && root === document.documentElement;
