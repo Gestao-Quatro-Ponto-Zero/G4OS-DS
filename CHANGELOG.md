@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.12.0
+
+### Minor Changes
+
+- 8de799e: Peças promovidas do Durable e APIs que ele precisava contornar.
+
+  Novos: `AgentOrb` e `AgentOrbStack` (rosto gerado do agente, com 18 expressões, forma, cor e selo da ferramenta em uso), `CodeBlock` e `DiffView` (com `parseDiff`/`wordDiff`), `RowList`, `ChipRow`, `PageSkeleton`, `ListSkeleton`, `useDelayed`, `useIsMobile`, `useMediaQuery`, `useScrollEdges` e `breakpoints`.
+
+  Props novas: `Tabs overflow="scroll"`; `Breadcrumb back`; `description` e `id` em `Section`, `RecordSection` e `SettingsSection` (título aceita nó); `ListRow description`/`actions`; `Card padding`; `StatGrid cols` até 6 e `dense`, `StatCell short`/`of`; `FilterChip shape="pill"`/`count`; `Slider onValueCommit`; `ThemeToggle variant="menu"`; `formatDate({ time, timeZone })`; `formatRelative(data, { short: true })`.
+
+  `ListRow` com `href` agora usa o link do app (`setLinkComponent`) e desenha o alvo no título, estendido sobre a linha: quem estilizava `a.list-row` deve mirar `.list-row`.
+
+### Patch Changes
+
+- 33d68d2: G4 clássico passa a ser a marca padrão, com tokens CSS e TypeScript alinhados. G4 OS reúne a opção institucional. Preferências salvas como `g4-institucional` continuam funcionando como alias de `g4os`. A tipografia permanece um eixo independente.
+- 8de799e: Correções que o Durable aplicava por patch ou CSS local.
+
+  - Cabeçalho fixo: o `PageHeading` compacto encosta no topo da área rolável. Antes ficava uma faixa do tamanho do respiro do `Page` acima dele, com o conteúdo aparecendo por trás; `PageToolbar` e `.page-aside` grudavam deslocados pelo mesmo valor.
+  - Marcas (`data-brand`) escurecem também em `data-theme="system"`.
+  - `AttachmentTrigger` volta a cobrir o card dentro de `.linked-card` ("Abrir" não respondia).
+  - Menus só reservam o espaço do ícone quando algum item tem ícone.
+  - `IconRail` não corta mais o anel de foco do primeiro e do último item.
+  - Campos de texto têm no mínimo 16 px em tela de toque, para o Safari do iOS não dar zoom ao focar.
+
+- 68c245b: A tipografia padrão volta a ser a Figtree, com títulos em 600 (`--ds-display-weight`), como antes do KV. A Manrope do KV G4 OS continua disponível, agora opcional: `data-type="g4os"` (preset "G4 OS · Manrope" em `typePresets`). Quem tinha `g4` salvo como tipografia (o id do padrão antigo) passa ao padrão atual; `data-type="classica"` segue valendo e equivale ao padrão. Novo export `DEFAULT_TYPE`.
+
+  Apps que carregam a fonte por conta própria devem carregar a Figtree (`next/font/google` ou Google Fonts); os templates e o guia de instalação já usam ela. Quem quiser manter a Manrope declara `data-type="g4os"` no `<html>`.
+
+  `Slider`: a primeira e a última marca da régua alinham pela borda, em vez de sair da largura do campo.
+
 ## 0.11.0
 
 ### Minor Changes
