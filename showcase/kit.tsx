@@ -11,8 +11,8 @@
  *   export default function Block() { … }   // tela inteira, dados de exemplo no topo do arquivo
  */
 import { ArrowUpRight, Check, Copy, Maximize2, Monitor, Moon, RotateCw, Smartphone, Sun, Tablet } from "lucide-react";
-import { createContext, useContext, useState, type ComponentType, type ReactNode } from "react";
-import { cn } from "@g4ai/ds";
+import { createContext, useContext, useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { CodeBlock as DsCodeBlock, cn, normalize } from "@g4ai/ds";
 import { blockFiles } from "./.generated/registry";
 
 export const groups = [
@@ -231,43 +231,9 @@ export function PropsTable({ rows }: { rows: [string, string, string, string][] 
 /* Código                                                              */
 /* ------------------------------------------------------------------ */
 
-function highlight(code: string) {
-  const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const re = /((?<![:\w])\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`)|\b(import|from|export|default|function|return|const|let|type|if|else|for|of|new|as|await|async|true|false|null|undefined)\b|(<\/?[A-Z][A-Za-z0-9.]*)/g;
-  let out = "";
-  let last = 0;
-  for (const m of code.matchAll(re)) {
-    out += esc(code.slice(last, m.index));
-    const [t, c, s, k, tag] = m;
-    out += c ? `<span class="tk-c">${esc(c)}</span>` : s ? `<span class="tk-s">${esc(s)}</span>` : k ? `<span class="tk-k">${k}</span>` : tag ? `<span class="tk-t">${esc(tag)}</span>` : esc(t);
-    last = (m.index ?? 0) + t.length;
-  }
-  return out + esc(code.slice(last));
-}
-
-export function CodeBlock({ code, maxHeight = 520, className }: { code: string; maxHeight?: number; className?: string }) {
-  const [copied, setCopied] = useState(false);
-  const text = code.replace(/^\n+|\s+$/g, "");
-  return (
-    <div className={cn("relative overflow-hidden rounded-xl border border-line bg-soft/50", className)}>
-      <button
-        type="button"
-        onClick={() => {
-          navigator.clipboard?.writeText(text);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1400);
-        }}
-        className="absolute right-2 top-2 z-10 inline-flex h-7 items-center gap-1.5 rounded-md border border-line bg-surface px-2 text-[11.5px] text-muted hover:text-ink"
-      >
-        {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
-        {copied ? "Copiado" : "Copiar"}
-      </button>
-      <pre tabIndex={0} role="region" aria-label="Código" className="code-view m-0 overflow-auto p-4 pr-24 font-mono text-[12px] leading-[1.65] text-ink outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted/50" style={{ maxHeight }}>
-        {/* g4os-ds-disable-next-line dangerous-html -- highlight() escapa o código antes de envolver em <span> */}
-        <code dangerouslySetInnerHTML={{ __html: highlight(text) }} />
-      </pre>
-    </div>
-  );
+/** Código do site: o CodeBlock do próprio DS (copiar, altura limitada, realce mínimo). */
+export function CodeBlock({ code, maxHeight = 520, title, className }: { code: string; maxHeight?: number; title?: string; className?: string }) {
+  return <DsCodeBlock language="tsx" title={title} code={code} maxHeight={maxHeight} className={className} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -276,7 +242,104 @@ export function CodeBlock({ code, maxHeight = 520, className }: { code: string; 
 
 const viewports = { desktop: "100%", tablet: "820px", mobile: "390px" } as const;
 
-export function BlockPreview({ block }: { block: BlockModule }) {
+/** As nove anatomias de docs/padroes/anatomia-de-pagina.md, pela letra que abre `concept.patterns`. */
+export const anatomies = {
+  A: "Lista",
+  B: "Painel",
+  C: "Registro",
+  D: "Configurações",
+  E: "Quadro",
+  F: "Mestre-detalhe",
+  G: "App de altura total",
+  H: "Fluxo focado",
+  I: "Público",
+} as const;
+export type AnatomyId = keyof typeof anatomies;
+/** Anatomia do bloco, lida do primeiro padrão do conceito ("Anatomia C · Registro com abas…"). */
+export function anatomyOf(block: BlockModule): AnatomyId | null {
+  const first = block.meta.concept?.patterns?.[0] ?? "";
+  const letter = /^Anatomia ([A-I]) ·/.exec(first)?.[1] as AnatomyId | undefined;
+  if (letter) return letter;
+  const n = normalize(first);
+  if (n.includes("publico")) return "I";
+  if (n.includes("conversa") || n.includes("casca de app")) return "G";
+  return null;
+}
+export const categorySlug = (c: string) => normalize(c).replace(/\s+/g, "-");
+export const blockHref = (b: BlockModule) => `#/blocos/${categorySlug(b.meta.category)}/${b.slug}`;
+
+const THUMB_W = 1280;
+const THUMB_H = 800;
+
+/**
+ * Miniatura viva do bloco: o próprio bloco num iframe de 1280×800 reduzido para caber no card.
+ * O iframe só é montado quando o card chega perto da tela e não recebe clique nem foco.
+ */
+export function BlockThumb({ block, theme }: { block: BlockModule; theme?: "light" | "dark" }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
+  const [near, setNear] = useState(false);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const measure = () => setScale(el.clientWidth / THUMB_W);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+    io.observe(el);
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+    };
+  }, []);
+  return (
+    <div ref={box} aria-hidden className="relative overflow-hidden rounded-lg border border-line bg-soft" style={{ aspectRatio: `${THUMB_W} / ${THUMB_H}` }}>
+      {near && scale > 0 && (
+        <iframe
+          title={`Miniatura de ${block.meta.title}`}
+          tabIndex={-1}
+          src={`${location.pathname}#/frame/${block.slug}${theme ? `?theme=${theme}` : ""}`}
+          onLoad={() => setReady(true)}
+          className={cn("pointer-events-none absolute left-0 top-0 origin-top-left border-0 bg-surface transition-opacity duration-300", ready ? "opacity-100" : "opacity-0")}
+          style={{ width: THUMB_W, height: THUMB_H, transform: `scale(${scale})` }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Card da galeria: miniatura, título, descrição e a anatomia. O card inteiro abre a página do bloco. */
+export function BlockCard({ block }: { block: BlockModule }) {
+  const anatomy = anatomyOf(block);
+  return (
+    <a href={blockHref(block)} className="group block rounded-2xl border border-line bg-surface p-2 transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-muted">
+      <BlockThumb block={block} />
+      <div className="px-2 pb-2 pt-3">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="m-0 min-w-0 truncate text-[14px] font-medium text-ink">{block.meta.title}</h3>
+          <ArrowUpRight aria-hidden className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
+        </div>
+        <p className="m-0 mt-1 line-clamp-2 min-h-[2.6em] text-[12.5px] leading-[1.3] text-muted">{block.meta.description}</p>
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-muted">
+          {anatomy && <span className="rounded-md bg-soft px-1.5 py-0.5 text-ink-soft">{anatomies[anatomy]}</span>}
+          <code className="truncate font-mono text-[11px]">{block.slug}.tsx</code>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+export function BlockPreview({ block, bare = false }: { block: BlockModule; /** Na página do próprio bloco: sem repetir título, descrição e caminho, que já estão no cabeçalho. */ bare?: boolean }) {
   const [tab, setTab] = useState<"preview" | "code" | "concept">("preview");
   const [vp, setVp] = useState<keyof typeof viewports>("desktop");
   const [reload, setReload] = useState(0);
@@ -300,13 +363,19 @@ export function BlockPreview({ block }: { block: BlockModule }) {
             Conceito
           </button>
         </div>
+{bare ? (
+          <span className="flex-1" />
+        ) : (
+          <>
         <span aria-hidden className="hidden h-5 w-px bg-line sm:block" />
         <p className="m-0 min-w-0 flex-1 truncate text-[13.5px]" title={`${block.meta.title} — ${block.meta.description}`}>
-          <a href={`#/blocos/${block.meta.category.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}#${block.slug}`} className="font-medium hover:underline">
+          <a href={blockHref(block)} className="font-medium hover:underline">
             {block.meta.title}
           </a>
           <span className="text-muted"> — {block.meta.description}</span>
         </p>
+          </>
+        )}
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-0.5 rounded-lg border border-line bg-soft/60 p-0.5 md:flex" role="group" aria-label="Largura">
             {(
@@ -346,7 +415,7 @@ export function BlockPreview({ block }: { block: BlockModule }) {
               setCopied(true);
               setTimeout(() => setCopied(false), 1400);
             }}
-            className="hidden h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-2.5 font-mono text-[11.5px] text-ink-soft hover:bg-soft lg:inline-flex"
+            className={cn("hidden h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-2.5 font-mono text-[11.5px] text-ink-soft hover:bg-soft", !bare && "lg:inline-flex")}
             title="Copiar caminho do arquivo"
           >
             {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5 text-muted" />}

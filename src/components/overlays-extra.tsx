@@ -186,6 +186,9 @@ function MenuShortcut({ shortcut }: { shortcut: string | string[] }) {
 }
 
 function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTMLElement | null }) {
+  // O espaço de 16 px à esquerda só existe quando algum item do menu tem ícone (ou é um rádio, que
+  // usa esse espaço para a marca): sem isso, um menu só de texto ficava com os rótulos empurrados.
+  const slot = items.some((it) => it.type === "radio" || ("icon" in it && !!it.icon));
   return (
     <>
       {items.map((it, i) => {
@@ -208,7 +211,7 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
           case "checkbox":
             return (
               <BaseMenu.CheckboxItem key={key} checked={it.checked} onCheckedChange={(c) => it.onCheckedChange(c)} closeOnClick={false} disabled={it.disabled} className={itemClass}>
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>
+                {slot && <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>}
                 <MenuText label={it.label} description={it.description} />
                 <BaseMenu.CheckboxItemIndicator className="shrink-0">
                   <Check className="h-4 w-4" aria-hidden />
@@ -243,7 +246,7 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
             return (
               <BaseMenu.SubmenuRoot key={key}>
                 <BaseMenu.SubmenuTrigger disabled={it.disabled} className={itemClass}>
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>
+                  {slot && <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>}
                   <span className="min-w-0 flex-1 truncate">{it.label}</span>
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
                 </BaseMenu.SubmenuTrigger>
@@ -260,7 +263,7 @@ function MenuEntries({ items, container }: { items: MenuEntry[]; container?: HTM
             const cls = cn(itemClass, it.tone === "danger" && "text-rose data-highlighted:bg-rose-soft/60");
             const body = (
               <>
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>
+                {slot && <span className="flex h-4 w-4 shrink-0 items-center justify-center [&_svg]:h-4 [&_svg]:w-4">{it.icon}</span>}
                 <MenuText label={it.label} description={it.description} />
                 {it.shortcut && <MenuShortcut shortcut={it.shortcut} />}
               </>

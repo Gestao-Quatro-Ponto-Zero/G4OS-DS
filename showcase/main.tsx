@@ -1,11 +1,11 @@
-import { ArrowRight, Blocks, BookOpen, Check, Copy, Menu, Search } from "lucide-react";
+import { ArrowRight, Blocks, BookOpen, FileDiff, LayoutTemplate, Menu, Rows3, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { AiOrb, BrandHaze, G4OSLogo, Popover, Toaster, cn, normalize, notify, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
+import { AgentOrb, AiOrb, BrandHaze, Breadcrumb, Button, ChipRow, CopyButton, Empty, FilterChip, G4OSLogo, Popover, SearchInput, StatCell, StatGrid, Tabs, Toaster, cn, normalize, notify, ThemeToggle, applyTheme, brandPresets, typePresets, useTheme, type ThemeMode } from "@g4ai/ds";
 import { Palette } from "lucide-react";
 import { blocks, pages } from "./.generated/registry";
-import { BlockPreview, ShadcnContext, blockCategories, groups, type BlockModule, type PageModule } from "./kit";
+import { BlockCard, BlockPreview, ShadcnContext, anatomies, anatomyOf, blockCategories, blockHref, categorySlug, groups, type AnatomyId, type BlockModule, type PageModule } from "./kit";
 import shadcnMap from "../scripts/data/shadcn-map.json";
 
 const shadcnNames = new Map(shadcnMap.components.map((c) => [c.shadcn, c.name]));
@@ -43,7 +43,7 @@ const firstOf = (pred: (p: PageModule) => boolean) => sortedPages.find(pred)?.sl
 const isDoc = (p: PageModule) => (docGroups as readonly string[]).includes(p.meta.group);
 const byCategory = (cat: string) => blocks.filter((b) => b.meta.category === cat).sort((a, b) => (a.meta.order ?? 50) - (b.meta.order ?? 50));
 const categories = blockCategories.filter((c) => byCategory(c).length);
-const slugCat = (c: string) => normalize(c).replace(/\s+/g, "-");
+const slugCat = categorySlug;
 const featuredSlugs = ["saas-dashboard", "crm-pipeline", "ats-pipeline", "erp-orders", "srv-work-orders", "fin-cashflow", "clm-contract", "comms-home", "ai-agents-dashboard", "auth-login", "app-presentation"];
 const featured = featuredSlugs.map((s) => blocks.find((b) => b.slug === s)).filter(Boolean) as BlockModule[];
 
@@ -155,7 +155,7 @@ function SiteHeader({ section, onMenu }: { section: string; onMenu: () => void }
         <div className="ml-auto flex items-center gap-2">
           <SiteSearch />
           <Appearance />
-          <span className="hidden rounded-md border border-line px-2 py-1 text-[11px] tabular-nums text-muted sm:inline">v0.2</span>
+          <a href="https://www.npmjs.com/package/@g4ai/ds" target="_blank" rel="noreferrer" title="Versão publicada no npm" className="hidden rounded-md border border-line px-2 py-1 text-[11px] tabular-nums text-muted hover:border-line-strong hover:text-ink sm:inline">v{__DS_VERSION__}</a>
         </div>
       </div>
     </header>
@@ -213,7 +213,7 @@ function SiteSearch() {
     const blocksHit = rank(blocks, (b) => [b.meta.title, `${b.meta.category} ${b.meta.description}`]).slice(0, n ? 8 : 5);
     return [
       { label: "Páginas", items: pagesHit.map((p) => ({ key: `p-${p.slug}`, href: `#/p/${p.slug}`, label: p.meta.title, kind: p.meta.group as string, Icon: BookOpen })) },
-      { label: "Blocos", items: blocksHit.map((b) => ({ key: `b-${b.slug}`, href: `#/blocos/${slugCat(b.meta.category)}#${b.slug}`, label: b.meta.title, kind: b.meta.category as string, Icon: Blocks })) },
+      { label: "Blocos", items: blocksHit.map((b) => ({ key: `b-${b.slug}`, href: blockHref(b), label: b.meta.title, kind: b.meta.category as string, Icon: Blocks })) },
     ].filter((g) => g.items.length);
   }, [q]);
   const flat = groupsOut.flatMap((g) => g.items);
@@ -237,7 +237,7 @@ function SiteSearch() {
       {open &&
         createPortal(
           <div className="fixed inset-0 z-[95] flex items-start justify-center px-4 pt-[10vh]" role="presentation">
-            <button type="button" aria-label="Fechar busca" className="animate-fade absolute inset-0 bg-black/25 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
+            <button type="button" aria-label="Fechar busca" className="animate-fade absolute inset-0 bg-[var(--ds-backdrop)] backdrop-blur-[2px]" onClick={() => setOpen(false)} />
             <div role="dialog" aria-modal="true" aria-label="Buscar no design system" className="enter relative flex max-h-[70vh] w-full max-w-[600px] flex-col overflow-hidden rounded-2xl border border-line bg-popover shadow-overlay">
               <div className="flex items-center gap-2.5 border-b border-line px-4">
                 <Search className="h-4 w-4 shrink-0 text-muted" />
@@ -337,44 +337,59 @@ function SiteSearch() {
 
 const INSTALL = "pnpm add @g4ai/ds";
 
-function InstallCommand() {
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(INSTALL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      notify(`Não foi possível copiar. Comando: ${INSTALL}`, undefined, "bad");
-    }
-  };
+/** O que cada categoria resolve, para a entrada "por tipo de produto" da home e o topo da galeria. */
+const categoryNote: Record<string, string> = {
+  SaaS: "Painel do produto, clientes, planos, uso e limites.",
+  CRM: "Funil, negócios, contas, contatos e propostas.",
+  ATS: "Vagas, candidatos, etapas e admissão.",
+  ERP: "Pedidos, produtos, estoque, compras e notas.",
+  Serviços: "Ordens de serviço, contratos, agenda e faturamento.",
+  Financeiro: "Fluxo de caixa, a pagar e a receber, DRE, conciliação.",
+  Contratos: "Ciclo do contrato: pedido, aprovação, obrigações.",
+  Comunicação: "Comunicados, pessoas, eventos e pesquisas internas.",
+  Autenticação: "Entrar, criar conta, código e recuperação.",
+  Configurações: "Perfil, time, papéis, cobrança, webhooks e dados.",
+  Onboarding: "Primeiros passos e assistente de implantação.",
+  Aplicação: "Paleta de comandos, arquivos, erros, páginas legais.",
+  IA: "Agentes, execuções, aprovações, conversa e workspace.",
+  Marketing: "Páginas públicas com palcos, preços e vagas.",
+};
+
+const news = [
+  { href: "#/p/ia-rosto-do-agente", title: "Rosto do agente", text: "AgentOrb: avatar gerado pelo id, com a expressão do que o agente está fazendo.", orb: true },
+  { href: "#/p/midia-codigo-e-diff", Icon: FileDiff, title: "Código e diff", text: "CodeBlock com copiar e altura limitada; DiffView com as palavras que mudaram." },
+  { href: "#/p/estrutura-pagina-e-listas", Icon: Rows3, title: "Seções, listas e faixas", text: "Linha de lista com ações, faixa de números densa, abas e chips em uma linha." },
+  { href: "#/p/fb-carregando", Icon: LayoutTemplate, title: "Esqueleto de página", text: "PageSkeleton na forma da anatomia, só depois de 180 ms de espera." },
+];
+
+function SectionTitle({ title, text, action }: { title: string; text: string; action?: React.ReactNode }) {
   return (
-    <button
-      type="button"
-      onClick={copy}
-      aria-label={copied ? "Comando copiado" : `Copiar comando: ${INSTALL}`}
-      className="mx-auto mt-5 inline-flex h-10 items-center gap-3 rounded-lg bg-soft px-4 font-mono text-[13px] text-ink ring-1 ring-line transition-colors hover:bg-surface"
-    >
-      <span className="text-muted">$</span> {INSTALL}
-      {copied ? <Check className="h-4 w-4 text-ok" aria-hidden /> : <Copy className="h-4 w-4 text-muted" aria-hidden />}
-    </button>
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div className="min-w-0">
+        <h2 className="m-0 text-[22px] font-semibold tracking-[-0.03em]">{title}</h2>
+        <p className="m-0 mt-1.5 max-w-[620px] text-[14px] leading-relaxed text-muted">{text}</p>
+      </div>
+      {action}
+    </div>
   );
 }
 
 function Home() {
   const [tab, setTab] = useState(featured[0]?.slug);
   const current = featured.find((b) => b.slug === tab) ?? featured[0];
+  const components = pages.filter((p) => !isDoc(p)).length;
   return (
-    <div className="mx-auto max-w-[1440px] overflow-x-clip px-4 sm:px-6">
+    <div className="mx-auto max-w-[1440px] overflow-x-clip px-4 pb-20 sm:px-6">
       <section className="relative isolate mx-auto max-w-[760px] py-14 text-center sm:py-20">
         <BrandHaze size={760} className="absolute left-1/2 top-[-30%] -z-10 -translate-x-1/2" />
         <AiOrb size={240} blur={30} live className="absolute -right-72 top-40 -z-10 opacity-25" />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-[12px] text-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" /> {blocks.length} blocos · {pages.length} páginas de componentes
-        </span>
+        <a href="#/p/ia-rosto-do-agente" className="inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1 pl-1.5 pr-3 text-[12px] text-muted hover:border-line-strong hover:text-ink">
+          <AgentOrb seed="galt:atlas" size={20} expression="happy" />
+          Novo: rosto do agente, código e diff <ArrowRight className="h-3 w-3" aria-hidden />
+        </a>
         <h1 className="m-0 mt-5 text-[34px] font-medium leading-[1.12] tracking-[-0.04em] sm:text-[52px]"><span className="text-ink-soft">Construa qualquer</span> <span className="ds-gradient-text">produto G4 OS</span> <span className="text-ink-soft">com os mesmos blocos</span></h1>
         <p className="mx-auto mt-4 max-w-[600px] text-[15px] leading-relaxed text-muted">
-          CRM, ATS, ERP, financeiro, portais. Componentes React acessíveis, gráficos sem dependência e telas inteiras prontas para copiar — tudo na mesma linguagem visual.
+          CRM, ATS, ERP, financeiro, portais. Componentes React acessíveis, gráficos sem dependência e telas inteiras prontas para copiar, tudo na mesma linguagem visual.
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
           <a href="#/blocos" className="ui-button ui-button-primary inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-[13.5px] font-medium text-on-primary hover:bg-primary/90">
@@ -384,32 +399,92 @@ function Home() {
             Começar
           </a>
         </div>
-        <InstallCommand />
+        <div className="mx-auto mt-5 inline-flex h-10 items-center gap-1 rounded-lg bg-soft pl-4 pr-1 font-mono text-[13px] text-ink ring-1 ring-line">
+          <span className="text-muted">$</span>
+          <span className="px-2">{INSTALL}</span>
+          <CopyButton value={INSTALL} iconOnly label="Copiar comando" copiedLabel="Comando copiado" />
+        </div>
         <p className="m-0 mt-3 text-[12px] text-muted">
           Para agentes de IA: <a href="./llms.txt" className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">llms.txt</a> · <a href="#/p/guia-agentes" className="text-blue underline decoration-blue/40 underline-offset-2 hover:decoration-blue">servidor MCP</a>
         </p>
       </section>
+
+      <section aria-label="O que tem no DS" className="mx-auto max-w-[1040px]">
+        <StatGrid cols={5} dense>
+          <StatCell label="Blocos de tela" short="Blocos" value={blocks.length} hint={`em ${categories.length} produtos`} />
+          <StatCell label="Páginas de componentes" short="Componentes" value={components} hint="com exemplo e código" />
+          <StatCell label="Anatomias de página" short="Anatomias" value={Object.keys(anatomies).length} hint="toda tela segue uma" />
+          <StatCell label="Marcas prontas" short="Marcas" value={brandPresets.length} hint="claro e escuro" />
+          <StatCell label="Dependências de gráfico" short="Deps. gráfico" value={0} hint="SVG próprio" />
+        </StatGrid>
+      </section>
+
       {current && (
-        <section>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line">
-            {featured.map((b) => (
-              <button
-                key={b.slug}
-                type="button"
-                onClick={() => setTab(b.slug)}
-                aria-pressed={b.slug === current.slug}
-                className={cn("-mb-px border-b-2 pb-2.5 text-[13.5px]", b.slug === current.slug ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
-              >
-                {b.meta.category === "SaaS" ? "Dashboard" : b.meta.category}
-              </button>
-            ))}
-            <a href="#/blocos" className="mb-2 ml-auto inline-flex h-8 items-center gap-1 rounded-lg bg-soft px-3 text-[12.5px] font-medium hover:bg-line">
-              Todos os blocos <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+        <section className="pt-16">
+          <SectionTitle
+            title="Telas inteiras, não peças soltas"
+            text="Cada bloco é uma tela de um produto de exemplo navegável. Copie o arquivo, troque os dados do topo e ajuste."
+            action={
+              <a href="#/blocos" className="inline-flex h-9 items-center gap-1 rounded-lg bg-soft px-3 text-[12.5px] font-medium hover:bg-line">
+                Todos os {blocks.length} blocos <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            }
+          />
+          <div className="border-b border-line">
+            <Tabs label="Blocos em destaque" overflow="scroll" value={current.slug} onChange={setTab} items={featured.map((b) => ({ id: b.slug, label: b.meta.category === "SaaS" ? "Dashboard" : b.meta.category }))} className="[&_.entity-tab]:text-[13.5px]" />
           </div>
           <BlockPreview key={current.slug} block={current} />
         </section>
       )}
+
+      <section className="pt-16">
+        <SectionTitle title="Comece pelo tipo de produto" text="Cada categoria é um produto completo: início, listas, registro e configurações que já conversam entre si." />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {categories.map((c) => {
+            const list = byCategory(c);
+            return (
+              <a key={c} href={`#/blocos/${slugCat(c)}`} className="group flex flex-col rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-line-strong">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="m-0 text-[15px] font-medium">{c}</h3>
+                  <span className="text-[12px] tabular-nums text-muted">{list.length} {list.length === 1 ? "tela" : "telas"}</span>
+                </div>
+                <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{categoryNote[c]}</p>
+                <ul className="m-0 mt-3 list-none space-y-1 border-t border-line p-0 pt-3 text-[12.5px] text-ink-soft">
+                  {list.slice(0, 3).map((b) => (
+                    <li key={b.slug} className="truncate">{b.meta.title}</li>
+                  ))}
+                </ul>
+                <span className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-ink-soft group-hover:text-ink">
+                  Abrir {c} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="pt-16">
+        <SectionTitle title="O que chegou agora" text="Peças que nasceram em produto em uso e foram promovidas ao DS." />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {news.map((n) => (
+            <a key={n.href} href={n.href} className="group rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-line-strong">
+              {n.orb ? (
+                <span className="flex h-9 items-center">
+                  <AgentOrb seed="galt:nina" size={32} expression="working" />
+                  <AgentOrb seed="galt:otto" size={32} expression="reading" className="-ml-2 ring-2 ring-surface" />
+                  <AgentOrb seed="galt:bia" size={32} expression="waiting" className="-ml-2 ring-2 ring-surface" />
+                </span>
+              ) : (
+                <span className="grid h-9 w-9 place-items-center rounded-lg bg-soft">
+                  {n.Icon && <n.Icon className="h-4 w-4 text-muted" aria-hidden />}
+                </span>
+              )}
+              <h3 className="m-0 mt-3 text-[14px] font-medium">{n.title}</h3>
+              <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{n.text}</p>
+            </a>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
@@ -418,38 +493,137 @@ function Home() {
 /* Blocos                                                              */
 /* ------------------------------------------------------------------ */
 
-function BlocksPage({ category }: { category?: string }) {
-  const list = category ? byCategory(category) : featured;
-  useEffect(() => {
-    const anchor = location.hash.split("#")[2];
-    if (anchor) setTimeout(() => document.getElementById(anchor)?.scrollIntoView(), 50);
-  }, [category]);
+const anatomyIds = Object.keys(anatomies) as AnatomyId[];
+
+function BlocksPage({ category, slug }: { category?: string; slug?: string }) {
+  const [q, setQ] = useState("");
+  const [anatomy, setAnatomy] = useState<AnatomyId | null>(null);
+  const block = slug ? blocks.find((b) => b.slug === slug) : undefined;
+  const pool = category ? byCategory(category) : blocks;
+  const n = normalize(q.trim());
+  const list = useMemo(
+    () => pool.filter((b) => (!anatomy || anatomyOf(b) === anatomy) && (!n || normalize(`${b.meta.title} ${b.meta.description} ${b.slug} ${b.meta.category}`).includes(n))),
+    [pool, anatomy, n],
+  );
+  const counts = useMemo(() => Object.fromEntries(anatomyIds.map((a) => [a, pool.filter((b) => anatomyOf(b) === a).length])) as Record<AnatomyId, number>, [pool]);
+
+  if (block) {
+    const siblings = byCategory(block.meta.category);
+    const i = siblings.indexOf(block);
+    const a = anatomyOf(block);
+    return (
+      <div className="mx-auto max-w-[1440px] px-4 pb-16 sm:px-6">
+        <section className="pb-2 pt-8">
+          <Breadcrumb back={{ label: `Voltar para ${block.meta.category}`, href: `#/blocos/${slugCat(block.meta.category)}` }} items={[{ label: "Blocos", href: "#/blocos" }, { label: block.meta.category, href: `#/blocos/${slugCat(block.meta.category)}` }]} />
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+            <div className="min-w-0">
+              <h1 className="m-0 text-[26px] font-semibold tracking-[-0.03em]">{block.meta.title}</h1>
+              <p className="m-0 mt-1.5 max-w-[720px] text-[14px] leading-relaxed text-muted">{block.meta.description}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted">
+              {a && <span className="rounded-md bg-soft px-2 py-1 text-ink-soft">Anatomia {a} · {anatomies[a]}</span>}
+              <CopyButton value={`src/blocks/${block.slug}.tsx`} label={`src/blocks/${block.slug}.tsx`} copiedLabel="Caminho copiado" className="font-mono text-[11.5px]" />
+            </div>
+          </div>
+        </section>
+        <BlockPreview key={block.slug} block={block} bare />
+        <div className="flex justify-between gap-3 border-t border-line pt-6">
+          {siblings[i - 1] ? (
+            <a href={blockHref(siblings[i - 1])} className="rounded-lg border border-line px-3 py-2 text-[12.5px] hover:bg-soft">
+              <span className="block text-[11px] text-muted">Anterior</span>
+              {siblings[i - 1].meta.title}
+            </a>
+          ) : (
+            <span />
+          )}
+          {siblings[i + 1] && (
+            <a href={blockHref(siblings[i + 1])} className="rounded-lg border border-line px-3 py-2 text-right text-[12.5px] hover:bg-soft">
+              <span className="block text-[11px] text-muted">Próximo</span>
+              {siblings[i + 1].meta.title}
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const groupsOut = category ? [{ name: category, items: list }] : categories.map((c) => ({ name: c, items: list.filter((b) => b.meta.category === c) })).filter((g) => g.items.length);
   return (
     <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
       <section className="py-10">
-        <h1 className="m-0 text-[30px] font-semibold tracking-[-0.035em]">Blocos</h1>
+        <h1 className="m-0 text-[30px] font-semibold tracking-[-0.035em]">{category ?? "Blocos"}</h1>
         <p className="m-0 mt-2 max-w-[640px] text-[14px] leading-relaxed text-muted">
-          Telas completas feitas só com componentes do DS. Copie o arquivo de <code className="font-mono text-[12.5px]">src/blocks/</code>, troque os dados de exemplo (topo do arquivo) pelos seus e ajuste.
+          {category ? (
+            categoryNote[category]
+          ) : (
+            <>
+              Telas completas feitas só com componentes do DS. Copie o arquivo de <code className="font-mono text-[12.5px]">src/blocks/</code>, troque os dados de exemplo (topo do arquivo) pelos seus e ajuste.
+            </>
+          )}
         </p>
       </section>
-      <nav aria-label="Categorias" className="sticky top-14 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-line bg-page/85 px-4 py-2.5 backdrop-blur-md [scrollbar-width:none] sm:-mx-6 sm:px-6">
-        {[["Destaque", "#/blocos", !category] as const, ...categories.map((c) => [c, `#/blocos/${slugCat(c)}`, c === category] as const)].map(([label, href, on]) => (
-          <a
-            key={label}
-            href={href}
-            aria-current={on ? "page" : undefined}
-            className={cn("shrink-0 rounded-lg px-3 py-1.5 text-[13px]", on ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-soft hover:text-ink")}
-          >
-            {label}
-            {label !== "Destaque" && <span className={cn("ml-1.5 text-[11px] tabular-nums", on ? "text-on-primary/60" : "text-muted")}>{byCategory(label).length}</span>}
-          </a>
+      <div className="sticky top-14 z-20 -mx-4 space-y-2.5 border-b border-line bg-page/90 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6">
+        <nav aria-label="Categorias">
+          <ChipRow label="Categorias" wrap={false}>
+            {[["Todos", "#/blocos", !category, blocks.length] as const, ...categories.map((c) => [c, `#/blocos/${slugCat(c)}`, c === category, byCategory(c).length] as const)].map(([label, href, on, count]) => (
+              <a
+                key={label}
+                href={href}
+                aria-current={on ? "page" : undefined}
+                className={cn("inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-[13px]", on ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-soft hover:text-ink")}
+              >
+                {label}
+                <span className={cn("text-[11px] tabular-nums", on ? "opacity-70" : "text-muted")}>{count}</span>
+              </a>
+            ))}
+          </ChipRow>
+        </nav>
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
+          <SearchInput value={q} onChange={setQ} placeholder={category ? `Buscar em ${category}…` : "Buscar entre os blocos…"} className="lg:w-72 [&_input]:h-9" />
+          <ChipRow label="Filtrar por anatomia" wrap={false} className="min-w-0 flex-1">
+            {anatomyIds
+              .filter((a) => counts[a] > 0)
+              .map((a) => (
+                <FilterChip key={a} shape="pill" on={anatomy === a} onClick={() => setAnatomy(anatomy === a ? null : a)} count={counts[a]}>
+                  {anatomies[a]}
+                </FilterChip>
+              ))}
+          </ChipRow>
+        </div>
+      </div>
+      <div className="pb-16">
+        {groupsOut.map((g) => (
+          <section key={g.name} aria-label={g.name} className="pt-8">
+            {!category && (
+              <div className="mb-4 flex items-baseline justify-between gap-3">
+                <h2 className="m-0 text-[18px] font-semibold tracking-tight">
+                  {g.name} <span className="ml-1 text-[12.5px] font-normal tabular-nums text-muted">{g.items.length}</span>
+                </h2>
+                <a href={`#/blocos/${slugCat(g.name)}`} className="inline-flex items-center gap-1 text-[12.5px] font-medium text-ink-soft hover:text-ink">
+                  Abrir {g.name} <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </a>
+              </div>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {g.items.map((b) => (
+                <BlockCard key={b.slug} block={b} />
+              ))}
+            </div>
+          </section>
         ))}
-      </nav>
-      <div className="divide-y divide-line pb-16">
-        {list.map((b) => (
-          <BlockPreview key={b.slug} block={b} />
-        ))}
-        {!list.length && <p className="py-16 text-center text-muted">Nenhum bloco nesta categoria ainda.</p>}
+        {!list.length && (
+          <div className="py-16">
+            <Empty
+              title="Nenhum bloco com esses filtros"
+              hint={q ? `Nada encontrado para “${q}”${anatomy ? ` em ${anatomies[anatomy]}` : ""}.` : "Esta categoria não tem bloco nessa anatomia."}
+              action={
+                <Button variant="ghost" onClick={() => { setQ(""); setAnatomy(null); }}>
+                  <X /> Limpar filtros
+                </Button>
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -664,7 +838,7 @@ function App() {
   const theme = useTheme("light"); // aplica tema/marca salvos (site e iframes, sincronizados via storage)
   const [pathAndQuery] = hash.split("#");
   const [path, query = ""] = pathAndQuery.split("?");
-  const [kind, slug] = path.replace(/^\//, "").split("/");
+  const [kind, slug, sub] = path.replace(/^\//, "").split("/");
   // #/frame/<slug>?theme=dark&brand=oceano força tema/marca (screenshots, links de revisão)
   useEffect(() => {
     const q = new URLSearchParams(query);
@@ -684,9 +858,9 @@ function App() {
     const saved = scrollMemory.get(path);
     if (!location.hash.split("#")[2]) window.scrollTo(0, navType.current === "pop" && saved != null ? saved : 0);
     navType.current = "push";
-    document.title = `${page?.meta.title ?? category ?? (kind === "blocos" ? "Blocos" : "Início")} · G4OS-DS`;
+    document.title = `${page?.meta.title ?? (kind === "blocos" && sub ? blocks.find((b) => b.slug === sub)?.meta.title : undefined) ?? category ?? (kind === "blocos" ? "Blocos" : "Início")} · G4OS-DS`;
     setMenu(false);
-  }, [path, frame, page, category, kind]);
+  }, [path, frame, page, category, kind, sub]);
 
   if (frame) return <Frame block={frame} />;
 
@@ -695,7 +869,7 @@ function App() {
       <SiteHeader section={section} onMenu={() => setMenu(true)} />
       {menu && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <button type="button" aria-label="Fechar menu" className="absolute inset-0 bg-black/20" onClick={() => setMenu(false)} />
+          <button type="button" aria-label="Fechar menu" className="animate-fade absolute inset-0 bg-[var(--ds-backdrop)]" onClick={() => setMenu(false)} />
           <div className="absolute inset-y-0 left-0 w-[280px] overflow-y-auto border-r border-line bg-surface px-4">
             <div className="flex flex-col gap-1 border-b border-line py-4 text-[14px]">
               <a href="#/">Início</a>
@@ -705,7 +879,7 @@ function App() {
           </div>
         </div>
       )}
-      {kind === "blocos" ? <BlocksPage category={category} /> : page ? <DocsLayout page={page} /> : <Home />}
+      {kind === "blocos" ? <BlocksPage key={`${category ?? ""}/${sub ?? ""}`} category={category} slug={sub} /> : page ? <DocsLayout page={page} /> : <Home />}
       <Toaster />
     </div>
   );

@@ -93,7 +93,7 @@
   },
   "scripts": {
     "typecheck": "node showcase/build.mjs --registry && tsc --noEmit",
-    "check:tokens": "node scripts/check-tokens.mjs",
+    "check:tokens": "node scripts/check-tokens.mjs && node scripts/sync-brand-system.mjs --check",
     "ai:build": "node scripts/build-ai-docs.mjs",
     "ai:check": "node scripts/build-ai-docs.mjs --check",
     "audit": "node scripts/cli.mjs audit",

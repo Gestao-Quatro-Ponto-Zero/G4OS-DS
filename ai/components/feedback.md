@@ -23,6 +23,25 @@ Exemplo (showcase `#/p/fb-avisos`):
 <Callout tone="warn" title="Integração com Google desconectada" action={<Button size="sm" variant="ghost">Reconectar</Button>}>…</Callout>
 ```
 
+## ListSkeleton
+
+Linhas de uma lista enquanto ela abre: marca, duas linhas de texto e um valor à direita, dentro da mesma moldura da lista final.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `label` * | `string` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `delay` | `number \| undefined` | `180` |  |
+| `rows` | `number \| undefined` | `4` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/fb-carregando`):
+
+```tsx
+{members.loading ? <ListSkeleton label="Abrindo os membros" rows={3} /> : <RowList>…</RowList>}
+```
+
 ## notify (function)
 
 Dispara um toast de qualquer lugar (não precisa de contexto React).
@@ -90,6 +109,31 @@ Bloco de erro com a saída certa.
 type OperationSuccess = { message: string; undo?: () => void; action?: NotifyAction }
 ```
 
+## PageSkeleton
+
+A página enquanto abre, na forma da anatomia que ela vai ter: cabeçalho, abas e o corpo certo (linhas de lista, cartões de indicador e gráfico, registro com coluna de propriedades, seções de configuração).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `label` * | `string` |  | Dito a leitores de tela: "Abrindo o time". |
+| `anatomy` | `"list" \| "dashboard" \| "record" \| "settings" \| undefined` | `"list"` | Forma do corpo: `list` (toolbar + linhas), `dashboard` (indicadores + gráfico), `record` (corpo + coluna de propriedades), `settings` (seções rótulo/campos). |
+| `className` | `string \| undefined` |  |  |
+| `delay` | `number \| undefined` | `180` |  |
+| `rows` | `number \| undefined` | `5` |  |
+| `tabs` | `number \| undefined` | `0` | Quantas abas o cabeçalho tem (0 = sem abas). |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/fb-carregando`):
+
+```tsx
+if (query.loading) return (
+  <Page>
+    <PageSkeleton label="Abrindo o agente" anatomy="record" tabs={4} />
+  </Page>
+);
+```
+
 ## Skeleton
 
 Esqueleto de carregamento: blocos gelo com pulso suave.
@@ -133,6 +177,14 @@ notify("Proposta enviada para Ana Lima");
 ## UncertainFailure (class)
 
 Falha em que não se sabe se o servidor gravou (rede caiu, timeout).
+
+## useDelayed (hook)
+
+`true` depois de `ms`: atrasa o que só deve aparecer se a espera for longa (esqueleto, "Carregando…").
+
+```ts
+useDelayed(ms?): boolean
+```
 
 ## useOperation (hook)
 

@@ -231,11 +231,14 @@ Prévia titulada dentro de um painel com vários assuntos (dashboard/home).
 
 ## ListRow
 
-Linha de uma ListPanel: marcador · (contexto / título) · meta · seta.
+Linha de lista: marcador · (contexto / título / descrição) · meta · ações.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `title` * | `ReactNode` |  |  |
+| `actions` | `ReactNode` |  | Controles da linha, à direita: `IconButton`, `Switch`, `ActionMenu`. |
+| `className` | `string \| undefined` |  |  |
+| `description` | `ReactNode` |  | Linha muda abaixo do título (até duas linhas). |
 | `href` | `string \| undefined` |  |  |
 | `kicker` | `ReactNode` |  |  |
 | `leading` | `ReactNode` |  |  |
@@ -243,6 +246,34 @@ Linha de uma ListPanel: marcador · (contexto / título) · meta · seta.
 | `onClick` | `(() => void) \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<RowList label="Domínios">
+  <ListRow
+    href={`/dominios/${d.id}\
+```
+
+## RowList
+
+Lista de linhas com borda: superfície, borda de 1 px e divisórias.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` * | `ReactNode` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `label` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<RowList label="Domínios">
+  <ListRow
+    href={`/dominios/${d.id}\
+```
 
 ## TableSort (type)
 

@@ -340,13 +340,31 @@ export function SettingsLayout({
   );
 }
 
-/** Seção de configuração: rótulo e explicação à esquerda, campos à direita (empilha abaixo de 1024px). */
-export function SettingsSection({ title, description, children, className }: { title: string; description?: ReactNode; children: ReactNode; className?: string }) {
+/**
+ * Seção de configuração: rótulo e explicação à esquerda, campos à direita (empilha abaixo de 1024px).
+ * `id` ancora a seção (#id) e liga a um `SectionNav`; `action` vai ao lado do título ("Adicionar").
+ */
+export function SettingsSection({
+  title,
+  description,
+  action,
+  id,
+  children,
+  className,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+  id?: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <section className={cn("grid gap-4 border-b border-line py-6 first:pt-0 last:border-0 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8", className)}>
+    <section id={id} className={cn("grid scroll-mt-24 gap-4 border-b border-line py-6 first:pt-0 last:border-0 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8", className)}>
       <div>
         <h3 className="m-0 text-[13.5px] font-medium">{title}</h3>
         {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
+        {action && <div className="mt-3">{action}</div>}
       </div>
       <div className="min-w-0 max-w-[560px]">{children}</div>
     </section>

@@ -151,11 +151,21 @@ Seção de configuração: rótulo e explicação à esquerda, campos à direita
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
-| `title` * | `string` |  |  |
+| `title` * | `ReactNode` |  |  |
+| `action` | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `description` | `ReactNode` |  |  |
+| `id` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<SettingsSection id="limites" title="Limite mensal" description="…">
+  <Slider label="Créditos por mês" value={limit} onChange={setLimit} onValueCommit={save} />
+</SettingsSection>
+```
 
 ## ShellBanner
 

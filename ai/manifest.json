@@ -277,9 +277,16 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "padding",
+              "type": "\"sm\" | \"md\" | \"lg\" | \"none\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": "Respiro interno. `md` (padrão) 16×12; `sm` 12×10 para card denso; `lg` 20×20 para card de formulário ou de destaque; `none` quando o conteúdo traz o próprio respiro (lista, tabela, mídia)."
             }
           ],
-          "examplePage": "midia-carrossel"
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "CardAction",
@@ -295,6 +302,42 @@
             }
           ],
           "examplePage": null
+        },
+        {
+          "name": "ChipRow",
+          "kind": "component",
+          "summary": "Linha de chips de filtro ou de categoria.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível do grupo: \"Categorias\", \"Filtrar por status\"."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "wrap",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "CriticalFlag",
@@ -502,9 +545,23 @@
               "required": true,
               "default": null,
               "description": null
+            },
+            {
+              "name": "count",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "shape",
+              "type": "\"default\" | \"pill\" | undefined",
+              "required": false,
+              "default": "\"default\"",
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "IconButton",
@@ -776,7 +833,7 @@
               "description": "Largura máxima do conteúdo (cabeçalho incluso)."
             }
           ],
-          "examplePage": "dash-como-montar"
+          "examplePage": "fb-carregando"
         },
         {
           "name": "Section",
@@ -792,7 +849,7 @@
             },
             {
               "name": "title",
-              "type": "string",
+              "type": "ReactNode",
               "required": true,
               "default": null,
               "description": null
@@ -810,9 +867,23 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "setLinkComponent",
@@ -847,6 +918,20 @@
               "description": null
             },
             {
+              "name": "of",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Base do número, em cinza ao lado: `value={3} of=\"de 4\"`."
+            },
+            {
+              "name": "short",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo curto para a grade densa no celular (\"Concluídas\" → \"Feitas\")."
+            },
+            {
               "name": "tone",
               "type": "\"ok\" | \"warn\" | \"bad\" | undefined",
               "required": false,
@@ -854,7 +939,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "StatGrid",
@@ -869,14 +954,28 @@
               "description": null
             },
             {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
               "name": "cols",
-              "type": "2 | 3 | 4 | undefined",
+              "type": "2 | 3 | 4 | 5 | 6 | undefined",
               "required": false,
               "default": "2",
               "description": null
+            },
+            {
+              "name": "dense",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "Tone",
@@ -1183,7 +1282,7 @@
               "description": null
             }
           ],
-          "examplePage": "ia-conversa"
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "popupClass",
@@ -2162,6 +2261,13 @@
               "description": null
             },
             {
+              "name": "back",
+              "type": "{ label: string; href?: string; onClick?: () => void; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Botão \"voltar\" antes da trilha, para tela aberta a partir de uma lista (volta ao lugar de onde a pessoa veio, que nem sempre é o ancestral)."
+            },
+            {
               "name": "className",
               "type": "string | undefined",
               "required": false,
@@ -2169,7 +2275,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "ContextBar",
@@ -2593,9 +2699,16 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "overflow",
+              "type": "\"wrap\" | \"scroll\" | undefined",
+              "required": false,
+              "default": "\"wrap\"",
+              "description": "O que fazer quando as abas não cabem."
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         }
       ],
       "doc": "components/navigation.md"
@@ -3107,7 +3220,7 @@
         {
           "name": "ListRow",
           "kind": "component",
-          "summary": "Linha de uma ListPanel: marcador · (contexto / título) · meta · seta.",
+          "summary": "Linha de lista: marcador · (contexto / título / descrição) · meta · ações.",
           "props": [
             {
               "name": "title",
@@ -3115,6 +3228,27 @@
               "required": true,
               "default": null,
               "description": null
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Controles da linha, à direita: `IconButton`, `Switch`, `ActionMenu`."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Linha muda abaixo do título (até duas linhas)."
             },
             {
               "name": "href",
@@ -3152,7 +3286,36 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
+        },
+        {
+          "name": "RowList",
+          "kind": "component",
+          "summary": "Lista de linhas com borda: superfície, borda de 1 px e divisórias.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "TableSort",
@@ -3296,6 +3459,42 @@
           "examplePage": "fb-avisos"
         },
         {
+          "name": "ListSkeleton",
+          "kind": "component",
+          "summary": "Linhas de uma lista enquanto ela abre: marca, duas linhas de texto e um valor à direita, dentro da mesma moldura da lista final.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "delay",
+              "type": "number | undefined",
+              "required": false,
+              "default": "180",
+              "description": null
+            },
+            {
+              "name": "rows",
+              "type": "number | undefined",
+              "required": false,
+              "default": "4",
+              "description": null
+            }
+          ],
+          "examplePage": "fb-carregando"
+        },
+        {
           "name": "notify",
           "kind": "function",
           "summary": "Dispara um toast de qualquer lugar (não precisa de contexto React).",
@@ -3398,6 +3597,56 @@
           "definition": "{ message: string; undo?: () => void; action?: NotifyAction }"
         },
         {
+          "name": "PageSkeleton",
+          "kind": "component",
+          "summary": "A página enquanto abre, na forma da anatomia que ela vai ter: cabeçalho, abas e o corpo certo (linhas de lista, cartões de indicador e gráfico, registro com coluna de propriedades, seções de configuração).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Dito a leitores de tela: \"Abrindo o time\"."
+            },
+            {
+              "name": "anatomy",
+              "type": "\"list\" | \"dashboard\" | \"record\" | \"settings\" | undefined",
+              "required": false,
+              "default": "\"list\"",
+              "description": "Forma do corpo: `list` (toolbar + linhas), `dashboard` (indicadores + gráfico), `record` (corpo + coluna de propriedades), `settings` (seções rótulo/campos)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "delay",
+              "type": "number | undefined",
+              "required": false,
+              "default": "180",
+              "description": null
+            },
+            {
+              "name": "rows",
+              "type": "number | undefined",
+              "required": false,
+              "default": "5",
+              "description": null
+            },
+            {
+              "name": "tabs",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": "Quantas abas o cabeçalho tem (0 = sem abas)."
+            }
+          ],
+          "examplePage": "fb-carregando"
+        },
+        {
           "name": "Skeleton",
           "kind": "component",
           "summary": "Esqueleto de carregamento: blocos gelo com pulso suave.",
@@ -3431,6 +3680,12 @@
           "name": "UncertainFailure",
           "kind": "class",
           "summary": "Falha em que não se sabe se o servidor gravou (rede caiu, timeout)."
+        },
+        {
+          "name": "useDelayed",
+          "kind": "hook",
+          "summary": "`true` depois de `ms`: atrasa o que só deve aparecer se a espera for longa (esqueleto, \"Carregando…\").",
+          "signature": "useDelayed(ms?): boolean"
         },
         {
           "name": "useOperation",
@@ -4107,8 +4362,15 @@
             },
             {
               "name": "title",
-              "type": "string",
+              "type": "ReactNode",
               "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
               "default": null,
               "description": null
             },
@@ -4125,9 +4387,16 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "ShellBanner",
@@ -4314,7 +4583,7 @@
             },
             {
               "name": "grid",
-              "type": "\"both\" | \"none\" | \"horizontal\" | undefined",
+              "type": "\"none\" | \"both\" | \"horizontal\" | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -4546,7 +4815,7 @@
             },
             {
               "name": "grid",
-              "type": "\"both\" | \"none\" | \"horizontal\" | undefined",
+              "type": "\"none\" | \"both\" | \"horizontal\" | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -5257,7 +5526,7 @@
             },
             {
               "name": "grid",
-              "type": "\"both\" | \"none\" | \"horizontal\" | undefined",
+              "type": "\"none\" | \"both\" | \"horizontal\" | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -6526,8 +6795,8 @@
         {
           "name": "formatDate",
           "kind": "function",
-          "summary": "\"30/09/2026\"; `short` → \"30 set\"",
-          "signature": "formatDate(date, { short = false }?): string"
+          "summary": "\"30/09/2026\"; `short` → \"30 set\"; `time` acrescenta a hora (\"30/09/2026, 14:05\").",
+          "signature": "formatDate(date, props?): string"
         },
         {
           "name": "formatDelta",
@@ -6550,8 +6819,8 @@
         {
           "name": "formatRelative",
           "kind": "function",
-          "summary": "Data relativa curta: \"há 5 min\", \"ontem\", \"em 3 dias\".",
-          "signature": "formatRelative(date, now?): string"
+          "summary": "Data relativa: \"há 5 min\", \"ontem\", \"em 3 dias\".",
+          "signature": "formatRelative(date, nowOrOptions?): string"
         }
       ],
       "doc": "components/lib-format.md"
@@ -6740,9 +7009,16 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "variant",
+              "type": "\"segmented\" | \"menu\" | undefined",
+              "required": false,
+              "default": "\"segmented\"",
+              "description": null
             }
           ],
-          "examplePage": "fund-temas"
+          "examplePage": "estrutura-pagina-e-listas"
         }
       ],
       "doc": "components/theme.md"
@@ -7733,6 +8009,13 @@
               "required": false,
               "default": "0",
               "description": null
+            },
+            {
+              "name": "onValueCommit",
+              "type": "((value: V) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Chamado uma vez quando a pessoa solta o controle (fim do arraste ou tecla)."
             },
             {
               "name": "showValue",
@@ -10144,7 +10427,7 @@
               "description": null
             }
           ],
-          "examplePage": "ov-sheet"
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "Tooltip",
@@ -14889,7 +15172,7 @@
             },
             {
               "name": "step",
-              "type": "10 | 5 | 60 | 15 | 30 | undefined",
+              "type": "5 | 10 | 60 | 15 | 30 | undefined",
               "required": false,
               "default": "15",
               "description": null
@@ -15457,7 +15740,7 @@
             },
             {
               "name": "step",
-              "type": "10 | 5 | 60 | 15 | 30 | undefined",
+              "type": "5 | 10 | 60 | 15 | 30 | undefined",
               "required": false,
               "default": "30",
               "description": null
@@ -16111,7 +16394,7 @@
             },
             {
               "name": "mobile",
-              "type": "\"cards\" | \"scroll\" | undefined",
+              "type": "\"scroll\" | \"cards\" | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -19149,7 +19432,7 @@
             },
             {
               "name": "glow",
-              "type": "\"top\" | \"none\" | \"top-right\" | \"bottom-left\" | undefined",
+              "type": "\"none\" | \"top\" | \"top-right\" | \"bottom-left\" | undefined",
               "required": false,
               "default": "\"top-right\"",
               "description": "Onde fica o brilho dourado."
@@ -22045,7 +22328,7 @@
             },
             {
               "name": "title",
-              "type": "string",
+              "type": "ReactNode",
               "required": true,
               "default": null,
               "description": null
@@ -22063,9 +22346,23 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
             }
           ],
-          "examplePage": "registros-painel-lateral"
+          "examplePage": "estrutura-pagina-e-listas"
         },
         {
           "name": "SectionAddButton",
@@ -27758,6 +28055,385 @@
         }
       ],
       "doc": "components/stage.md"
+    },
+    {
+      "name": "agent-orb",
+      "file": "src/components/agent-orb.tsx",
+      "summary": "Rosto gerado de agente: um personagem pequeno e chapado, desenhado em SVG inline e derivado de forma determinística de uma semente estável (id do agente, nome do subagente, id da sessão).",
+      "exports": [
+        {
+          "name": "AGENT_ORB_BODIES",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "AGENT_ORB_EXPRESSIONS",
+          "kind": "const",
+          "summary": "O que o rosto mostra."
+        },
+        {
+          "name": "AGENT_ORB_EYES",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "AGENT_ORB_MOUTHS",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "AGENT_ORB_PALETTE",
+          "kind": "const",
+          "summary": "Paleta dos rostos: um tom claro, um vizinho mais profundo e o matiz da tinta do rosto."
+        },
+        {
+          "name": "AGENT_ORB_SHAPES",
+          "kind": "const",
+          "summary": "Silhueta do rosto. `circle` é o disco padrão; as outras são para agentes que a pessoa nomeia e molda, para uma frota se distinguir de relance."
+        },
+        {
+          "name": "AgentOrb",
+          "kind": "component",
+          "summary": "Rosto do agente: avatar gerado a partir de uma semente, com expressão do que o agente está fazendo (pensando, lendo, trabalhando, esperando você) e movimento só em CSS.",
+          "props": [
+            {
+              "name": "seed",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Semente estável (id do agente): decide cor, corpo e rosto."
+            },
+            {
+              "name": "badge",
+              "type": "React.ReactNode",
+              "required": false,
+              "default": null,
+              "description": "O que o agente segura enquanto trabalha: um ícone ou logo num selo no canto do rosto (busca, terminal, o app que ele está usando)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "expression",
+              "type": "\"reading\" | \"idle\" | \"working\" | \"smile\" | \"happy\" | \"wink\" | \"flustered\" | \"focused\" | \"waiting\" | \"sad\" |…",
+              "required": false,
+              "default": null,
+              "description": "O que o rosto mostra (ver `AGENT_ORB_EXPRESSIONS`)."
+            },
+            {
+              "name": "glyph",
+              "type": "React.ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Substitui o rosto, ex.: um ícone de papel para um ajudante fixo."
+            },
+            {
+              "name": "labelled",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Expõe o rosto como imagem com o nome `name`, em vez de escondê-lo de leitores de tela."
+            },
+            {
+              "name": "motion",
+              "type": "AgentOrbMotion | undefined",
+              "required": false,
+              "default": "\"hover\"",
+              "description": null
+            },
+            {
+              "name": "name",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do agente. Por padrão o rosto é decorativo (o texto ou controle ao lado nomeia o agente); passe `labelled` quando o rosto aparece sozinho."
+            },
+            {
+              "name": "palette",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cor escolhida (índice em `AGENT_ORB_PALETTE`) no lugar da semeada."
+            },
+            {
+              "name": "shape",
+              "type": "\"circle\" | \"rounded-square\" | \"rounded-triangle\" | \"rounded-hexagon\" | undefined",
+              "required": false,
+              "default": "\"circle\"",
+              "description": "Silhueta; `circle` (padrão) é o disco clássico."
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "20",
+              "description": "Lado em px. Padrão 20."
+            }
+          ],
+          "examplePage": "ia-rosto-do-agente"
+        },
+        {
+          "name": "AgentOrbBody",
+          "kind": "type",
+          "summary": null,
+          "definition": "(typeof AGENT_ORB_BODIES)[number]"
+        },
+        {
+          "name": "AgentOrbDesign",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ palette: number; background: string; fill: string; ink: string; inverted: boolean; body: AgentOrbBody; eyes: AgentOrbEyes; mouth: AgentOrbMouth; eyeSpread: number; bodyX: number; bodyY: number; bodyTilt: number; faceTilt: number; }"
+        },
+        {
+          "name": "AgentOrbExpression",
+          "kind": "type",
+          "summary": null,
+          "definition": "(typeof AGENT_ORB_EXPRESSIONS)[number]"
+        },
+        {
+          "name": "AgentOrbEyes",
+          "kind": "type",
+          "summary": null,
+          "definition": "(typeof AGENT_ORB_EYES)[number]"
+        },
+        {
+          "name": "AgentOrbMotion",
+          "kind": "type",
+          "summary": "`hover` (padrão) pisca uma vez ao passar o mouse ou focar o rosto ou o controle que o contém; `live` balança e pisca devagar (agente em execução); `none` deixa parado.",
+          "definition": "\"hover\" | \"live\" | \"none\""
+        },
+        {
+          "name": "AgentOrbMouth",
+          "kind": "type",
+          "summary": null,
+          "definition": "(typeof AGENT_ORB_MOUTHS)[number]"
+        },
+        {
+          "name": "AgentOrbProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ seed: string; name?: string; size?: number; labelled?: boolean; glyph?: React.ReactNode; motion?: AgentOrbMotion; shape?: AgentOrbShape; expression?: AgentOrbExpression; palette?: number; badge?: React.ReactNode; className?: string; }"
+        },
+        {
+          "name": "AgentOrbShape",
+          "kind": "type",
+          "summary": null,
+          "definition": "(typeof AGENT_ORB_SHAPES)[number]"
+        },
+        {
+          "name": "AgentOrbStack",
+          "kind": "component",
+          "summary": "Pilha de rostos sobrepostos: quem participa de uma conversa, de um time ou de uma tarefa.",
+          "props": [
+            {
+              "name": "agents",
+              "type": "{ seed: string; name?: string; shape?: AgentOrbShape; palette?: number; expression?: AgentOrbExpression; }[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome acessível do grupo."
+            },
+            {
+              "name": "max",
+              "type": "number | undefined",
+              "required": false,
+              "default": "4",
+              "description": null
+            },
+            {
+              "name": "ring",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cor do anel entre os rostos: a do fundo onde a pilha está."
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "24",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-rosto-do-agente"
+        },
+        {
+          "name": "AgentOrbTier",
+          "kind": "type",
+          "summary": "Feature weights per rendered size, so a 14px face still has eyes a pixel or two wide and a 40px face does not turn heavy.",
+          "definition": "\"tiny\" | \"small\" | \"large\""
+        },
+        {
+          "name": "getAgentOrbArt",
+          "kind": "function",
+          "summary": "The drawn avatar (disc, body and face, or disc only when a glyph replaces the face), memoized per seed and size tier.",
+          "signature": "getAgentOrbArt(seed, size, withFace?, options?): React.ReactElement<unknown, string | React.JSXElementConstructor<any>>"
+        },
+        {
+          "name": "getAgentOrbClip",
+          "kind": "function",
+          "summary": null,
+          "signature": "getAgentOrbClip(shape, size): string | undefined"
+        },
+        {
+          "name": "getAgentOrbDesign",
+          "kind": "function",
+          "summary": "Memoized per seed (bounded), so re-renders of long lists never re-hash.",
+          "signature": "getAgentOrbDesign(seed, palette?): AgentOrbDesign"
+        },
+        {
+          "name": "getAgentOrbTier",
+          "kind": "function",
+          "summary": null,
+          "signature": "getAgentOrbTier(size): AgentOrbTier"
+        },
+        {
+          "name": "hashAgentSeed",
+          "kind": "function",
+          "summary": "FNV-1a, 32-bit: stable across runs and platforms.",
+          "signature": "hashAgentSeed(seed): number"
+        }
+      ],
+      "doc": "components/agent-orb.md"
+    },
+    {
+      "name": "code",
+      "file": "src/components/code.tsx",
+      "summary": "------------------------------------------------------------------",
+      "exports": [
+        {
+          "name": "CodeBlock",
+          "kind": "component",
+          "summary": "Bloco de código ou de texto para copiar: diz o que é (linguagem ou nome do arquivo), copia o bloco inteiro e tem altura limitada com rolagem própria, para um bloco longo não empurrar o resto da página.",
+          "props": [
+            {
+              "name": "code",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "O texto. É também o que o botão Copiar copia."
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações extras no cabeçalho, antes de Copiar (\"Abrir no editor\", \"Executar\")."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Conteúdo já realçado por outro realçador (shiki, prism)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "copy",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": null
+            },
+            {
+              "name": "highlightLines",
+              "type": "number[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Linhas em destaque (base 1): a mudança que a explicação ao lado comenta."
+            },
+            {
+              "name": "language",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"\"",
+              "description": "Linguagem do bloco (\"ts\", \"sql\", \"bash\"…): vira o rótulo e liga o realce."
+            },
+            {
+              "name": "lineNumbers",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Numera as linhas. Para código que a pessoa vai citar ou comparar; não em comando de uma linha."
+            },
+            {
+              "name": "maxHeight",
+              "type": "number | false | undefined",
+              "required": false,
+              "default": "360",
+              "description": "Altura máxima recolhido, em px."
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Rótulo no lugar da linguagem: nome do arquivo (`src/lib/format.ts`) ou do passo (\"Instalar\")."
+            }
+          ],
+          "examplePage": "midia-codigo-e-diff"
+        },
+        {
+          "name": "DiffView",
+          "kind": "component",
+          "summary": "Diff como quem revisa lê: o arquivo, quantas linhas entraram e saíram, cada linha com o número antigo e o novo, adicionadas em verde, removidas em vermelho (sempre com + e −, nunca só a cor) e as palavras que mudaram mar",
+          "props": [
+            {
+              "name": "diff",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "maxHeight",
+              "type": "number | false | undefined",
+              "required": false,
+              "default": "420",
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "midia-codigo-e-diff"
+        }
+      ],
+      "doc": "components/code.md"
     }
   ],
   "blocks": [

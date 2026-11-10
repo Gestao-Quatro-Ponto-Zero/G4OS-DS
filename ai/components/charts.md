@@ -26,7 +26,7 @@ Evolução no tempo com volume (receita, visitantes, vagas abertas).
 | `formatAxis` | `((n: number) => string) \| undefined` |  | Formato do valor no eixo Y (padrão: format). |
 | `formatIndex` | `((v: string) => string) \| undefined` |  |  |
 | `gradient` | `boolean \| undefined` |  | Preenchimento em degradê nas áreas (padrão true). |
-| `grid` | `"both" \| "none" \| "horizontal" \| undefined` |  |  |
+| `grid` | `"none" \| "both" \| "horizontal" \| undefined` |  |  |
 | `height` | `number \| undefined` |  | Altura em px (padrão 280). |
 | `labels` | `boolean \| "top" \| "inside" \| undefined` |  | Rótulos de valor: em barras ("top" padrão, "inside"); em linhas, acima do ponto. |
 | `layout` | `"horizontal" \| "vertical" \| undefined` |  | Barras: "vertical" (padrão) ou "horizontal" (categorias à esquerda). |
@@ -73,7 +73,7 @@ Comparação entre categorias ou períodos discretos.
 | `formatAxis` | `((n: number) => string) \| undefined` |  | Formato do valor no eixo Y (padrão: format). |
 | `formatIndex` | `((v: string) => string) \| undefined` |  |  |
 | `gradient` | `boolean \| undefined` |  | Preenchimento em degradê nas áreas (padrão true). |
-| `grid` | `"both" \| "none" \| "horizontal" \| undefined` |  |  |
+| `grid` | `"none" \| "both" \| "horizontal" \| undefined` |  |  |
 | `height` | `number \| undefined` |  | Altura em px (padrão 280). |
 | `labels` | `boolean \| "top" \| "inside" \| undefined` |  | Rótulos de valor: em barras ("top" padrão, "inside"); em linhas, acima do ponto. |
 | `layout` | `"horizontal" \| "vertical" \| undefined` |  | Barras: "vertical" (padrão) ou "horizontal" (categorias à esquerda). |
@@ -362,7 +362,7 @@ Tendência sem volume (taxa, preço, NPS): só a linha.
 | `formatAxis` | `((n: number) => string) \| undefined` |  | Formato do valor no eixo Y (padrão: format). |
 | `formatIndex` | `((v: string) => string) \| undefined` |  |  |
 | `gradient` | `boolean \| undefined` |  | Preenchimento em degradê nas áreas (padrão true). |
-| `grid` | `"both" \| "none" \| "horizontal" \| undefined` |  |  |
+| `grid` | `"none" \| "both" \| "horizontal" \| undefined` |  |  |
 | `height` | `number \| undefined` |  | Altura em px (padrão 280). |
 | `labels` | `boolean \| "top" \| "inside" \| undefined` |  | Rótulos de valor: em barras ("top" padrão, "inside"); em linhas, acima do ponto. |
 | `layout` | `"horizontal" \| "vertical" \| undefined` |  | Barras: "vertical" (padrão) ou "horizontal" (categorias à esquerda). |

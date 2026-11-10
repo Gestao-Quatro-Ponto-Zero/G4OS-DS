@@ -74,7 +74,7 @@ Painel de momento de marca.
 | `children` | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `description` | `ReactNode` |  |  |
-| `glow` | `"top" \| "none" \| "top-right" \| "bottom-left" \| undefined` | `"top-right"` | Onde fica o brilho dourado. |
+| `glow` | `"none" \| "top" \| "top-right" \| "bottom-left" \| undefined` | `"top-right"` | Onde fica o brilho dourado. |
 | `grid` | `boolean \| undefined` | `true` | Grade fina de fundo (textura de "papel técnico"). |
 | `kicker` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "lg" \| undefined` | `"md"` |  |

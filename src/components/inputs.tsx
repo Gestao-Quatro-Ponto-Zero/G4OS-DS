@@ -911,6 +911,7 @@ export function Slider<V extends number | [number, number]>({
   hint,
   value,
   onChange,
+  onValueCommit,
   min = 0,
   max = 100,
   step = 1,
@@ -924,6 +925,11 @@ export function Slider<V extends number | [number, number]>({
   hint?: ReactNode;
   value: V;
   onChange: (value: V) => void;
+  /**
+   * Chamado uma vez quando a pessoa solta o controle (fim do arraste ou tecla). Salve aqui, não em
+   * `onChange`, que dispara a cada movimento.
+   */
+  onValueCommit?: (value: V) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -940,12 +946,26 @@ export function Slider<V extends number | [number, number]>({
   const [drag, setDrag] = useState<number | null>(null);
   const pct = (v: number) => ((v - min) / (max - min || 1)) * 100;
   const snap = (v: number) => Math.min(max, Math.max(min, Math.round((v - min) / step) * step + min));
+  // Último valor emitido: é ele que vai para onValueCommit ao soltar (o `value` da prop pode estar um render atrás).
+  const latest = useRef<V>(value);
+  latest.current = value;
   const emit = (i: number, v: number) => {
     const n = snap(v);
-    if (!range) return onChange(n as V);
-    const next: [number, number] = [vals[0], vals[1]];
-    next[i] = i === 0 ? Math.min(n, next[1]) : Math.max(n, next[0]);
-    onChange(next as V);
+    let out: V;
+    if (!range) out = n as V;
+    else {
+      const next: [number, number] = [vals[0], vals[1]];
+      next[i] = i === 0 ? Math.min(n, next[1]) : Math.max(n, next[0]);
+      out = next as V;
+    }
+    latest.current = out;
+    onChange(out);
+    return out;
+  };
+  const release = () => {
+    if (drag == null) return;
+    setDrag(null);
+    onValueCommit?.(latest.current);
   };
   const fromPointer = (clientX: number) => {
     const r = trackRef.current!.getBoundingClientRect();
@@ -972,8 +992,8 @@ export function Slider<V extends number | [number, number]>({
         className="relative h-5 touch-none select-none"
         onPointerDown={onDown}
         onPointerMove={(e) => drag != null && emit(drag, fromPointer(e.clientX))}
-        onPointerUp={() => setDrag(null)}
-        onPointerCancel={() => setDrag(null)}
+        onPointerUp={release}
+        onPointerCancel={release}
       >
         <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-line" />
         <div className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-primary" style={{ left: `${lo}%`, width: `${hi - lo}%` }} />
@@ -991,11 +1011,13 @@ export function Slider<V extends number | [number, number]>({
             onKeyDown={(e) => {
               const k = e.key;
               const d = k === "ArrowRight" || k === "ArrowUp" ? step : k === "ArrowLeft" || k === "ArrowDown" ? -step : k === "PageUp" ? step * 10 : k === "PageDown" ? -step * 10 : null;
-              if (d != null) emit(i, v + d);
-              else if (k === "Home") emit(i, min);
-              else if (k === "End") emit(i, max);
+              let out: V;
+              if (d != null) out = emit(i, v + d);
+              else if (k === "Home") out = emit(i, min);
+              else if (k === "End") out = emit(i, max);
               else return;
               e.preventDefault();
+              onValueCommit?.(out);
             }}
             className={cn(
               "absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink bg-surface shadow-surface outline-none transition-shadow focus-visible:ring-4 focus-visible:ring-ink/10",

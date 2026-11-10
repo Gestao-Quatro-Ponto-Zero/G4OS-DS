@@ -1,7 +1,7 @@
 "use client";
 
 import { AlignJustify, Check, ChevronDown, Columns3, LayoutGrid, List, X } from "lucide-react";
-import { useEffect, useId, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
+import { Children, useEffect, useId, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../lib/cn";
 import { normalize } from "../lib/text";
@@ -9,7 +9,7 @@ import { SortHeader, type SortState } from "./data";
 import { Skeleton } from "./feedback";
 import { SearchInput } from "./forms";
 import { SegmentedControl } from "./navigation";
-import { Avatar, Button } from "./primitives";
+import { Avatar, Button, DsLink } from "./primitives";
 
 /*
  * Coleções: toolbar, filtros, visualização, densidade, tabela, kanban.
@@ -387,46 +387,73 @@ export function ListPanel({
   );
 }
 
-/** Linha de uma ListPanel: marcador · (contexto / título) · meta · seta. */
+/**
+ * Linha de lista: marcador · (contexto / título / descrição) · meta · ações. Dentro de `ListPanel`
+ * ou de `RowList`. Com `href`/`onClick` a linha inteira é o alvo; `actions` (botão, Switch, menu ⋯)
+ * ficam por cima e continuam clicáveis por conta própria.
+ */
 export function ListRow({
   href,
   onClick,
   leading,
   kicker,
   title,
+  description,
   meta,
+  actions,
+  className,
 }: {
   href?: string;
   onClick?: () => void;
   leading?: ReactNode;
   kicker?: ReactNode;
   title: ReactNode;
+  /** Linha muda abaixo do título (até duas linhas). */
+  description?: ReactNode;
   meta?: ReactNode;
+  /** Controles da linha, à direita: `IconButton`, `Switch`, `ActionMenu`. Não navegam junto com a linha. */
+  actions?: ReactNode;
+  className?: string;
 }) {
-  const body = (
-    <>
-      {leading}
+  const titleCls = "block truncate text-[13.5px] font-medium text-ink";
+  const interactive = Boolean(href || onClick);
+  return (
+    <div className={cn("list-row flex w-full items-center gap-3 px-4 py-3 text-left", interactive && "linked-card hover:bg-soft/40", className)}>
+      {leading && <div className="shrink-0">{leading}</div>}
       <div className="min-w-0 flex-1">
         {kicker && <div className="mb-0.5 truncate text-[11px] text-muted">{kicker}</div>}
-        <div className="truncate text-[13.5px] font-medium">{title}</div>
+        {href ? (
+          <DsLink href={href} onClick={onClick} className={cn("card-primary-link", titleCls)}>
+            {title}
+          </DsLink>
+        ) : onClick ? (
+          <button type="button" onClick={onClick} className={cn("card-primary-link w-full text-left", titleCls)}>
+            {title}
+          </button>
+        ) : (
+          <div className={titleCls}>{title}</div>
+        )}
+        {description && <div className="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-muted">{description}</div>}
+        {/* No celular, com ações à direita, a meta desce para baixo do texto: o título não é espremido. */}
+        {meta && actions != null && <div className="mt-1 text-[12px] tabular-nums text-muted sm:hidden">{meta}</div>}
       </div>
-      {meta && <div className="shrink-0 text-[12px] tabular-nums text-muted">{meta}</div>}
-    </>
+      {meta && <div className={cn("shrink-0 text-[12px] tabular-nums text-muted", actions != null && "max-sm:hidden")}>{meta}</div>}
+      {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}
+    </div>
   );
-  const cls = "flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-soft/40";
-  if (href)
-    return (
-      <a href={href} className={cls}>
-        {body}
-      </a>
-    );
-  if (onClick)
-    return (
-      <button type="button" onClick={onClick} className={cls}>
-        {body}
-      </button>
-    );
-  return <div className={cls.replace(" hover:bg-soft/40", "")}>{body}</div>;
+}
+
+/**
+ * Lista de linhas com borda: superfície, borda de 1 px e divisórias. É a lista padrão de página de
+ * configuração e de registro (domínios, chaves, membros, regras). Filhos são `ListRow`. Dentro de um
+ * painel de início com vários assuntos, use `ListPanel`.
+ */
+export function RowList({ children, label, className }: { children: ReactNode; /** Nome acessível da lista. */ label?: string; className?: string }) {
+  return (
+    <div role="list" aria-label={label} className={cn("row-list divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface", className)}>
+      {Children.map(children, (child) => (child == null || child === false ? null : <div role="listitem">{child}</div>))}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ */

@@ -31,7 +31,7 @@ function test(name, fn) {
 try {
   await build({
     stdin: {
-      contents: `export { ApprovalRequest, approvalRequestLabels } from "./src/components/ai-workspace"; export { PageHeading } from "./src/components/navigation"; export { Combobox } from "./src/components/forms";`,
+      contents: `export { ApprovalRequest, approvalRequestLabels } from "./src/components/ai-workspace"; export { PageHeading } from "./src/components/navigation"; export { Combobox } from "./src/components/forms"; export { Tabs, Breadcrumb } from "./src/components/navigation"; export { ListRow, RowList } from "./src/components/collections"; export { AgentOrb, getAgentOrbDesign } from "./src/components/agent-orb"; export { CodeBlock, DiffView } from "./src/components/code"; export { Menu } from "./src/components/overlays-extra"; export { formatDate, formatRelative } from "./src/lib/format"; export { readFileSync } from "node:fs";`,
       resolveDir: root,
       loader: "ts",
     },
@@ -44,7 +44,8 @@ try {
     logLevel: "error",
   });
   writeFileSync(join(dir, "package.json"), JSON.stringify({ type: "module" }));
-  const { ApprovalRequest, PageHeading, Combobox } = await import(pathToFileURL(out).href);
+  const mod = await import(pathToFileURL(out).href);
+  const { ApprovalRequest, PageHeading, Combobox } = mod;
   const { createElement: h } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const render = (props, ...children) => renderToStaticMarkup(h(ApprovalRequest, { title: "Enviar lembrete", ...props }, ...children));
@@ -180,6 +181,101 @@ try {
     assert.doesNotMatch(html, /sticky-page-header-anchor|sticky-page-header-overlay|sticky-page-header-flow/);
     assert.equal((html.match(/>Projetos</g) ?? []).length, 1);
     assert.equal((html.match(/>Novo projeto</g) ?? []).length, 1);
+  });
+
+  console.log("Cabeçalho fixo");
+
+  test("o cabeçalho compacto usa o --sticky-top do Page (padding negativo), nunca zero", () => {
+    const css = mod.readFileSync(join(root, "src/styles/components.css"), "utf8");
+    assert.doesNotMatch(css, /data-compact-page-header\]\s*\{[^}]*--sticky-top/);
+    assert.match(css, /\.sticky-page-header-anchor\s*\{[^}]*top:\s*var\(--sticky-top/);
+  });
+
+  console.log("Tabs, Breadcrumb, ListRow");
+
+  test("Tabs overflow=scroll: uma linha rolável, aba ativa marcada", () => {
+    const items = [{ id: "a", label: "Visão geral" }, { id: "b", label: "Membros", count: 3 }];
+    const html = renderToStaticMarkup(h(mod.Tabs, { label: "Seções", items, value: "b", overflow: "scroll" }));
+    assert.match(html, /scroll-fade-x/);
+    assert.match(html, /flex-nowrap/);
+    assert.match(html, /data-active=""[^>]*>Membros \(3\)</);
+    const wrap = renderToStaticMarkup(h(mod.Tabs, { label: "Seções", items, value: "a" }));
+    assert.match(wrap, /flex-wrap/);
+    assert.doesNotMatch(wrap, /scroll-fade-x/);
+  });
+
+  test("Breadcrumb back: botão de voltar nomeado antes da trilha", () => {
+    const html = renderToStaticMarkup(h(mod.Breadcrumb, { back: { label: "Voltar para Entregas", href: "/entregas" }, items: [{ label: "Entregas", href: "/entregas" }] }));
+    assert.match(html, /aria-label="Voltar para Entregas"/);
+    assert.ok(html.indexOf("Voltar para Entregas") < html.indexOf(">Entregas<"));
+  });
+
+  test("ListRow: com href e ações, o alvo é o título e as ações ficam fora do link", () => {
+    const html = renderToStaticMarkup(h(mod.RowList, { label: "Domínios" }, h(mod.ListRow, { href: "/d/1", title: "g4.com", description: "Verificado", actions: h("button", { type: "button" }, "Remover") })));
+    assert.match(html, /role="list"/);
+    assert.match(html, /linked-card/);
+    assert.match(html, /<a[^>]*class="[^"]*card-primary-link[^"]*"[^>]*>g4\.com<\/a>/);
+    assert.doesNotMatch(html, /<a[^>]*>(?:(?!<\/a>).)*Remover/);
+    const plain = renderToStaticMarkup(h(mod.ListRow, { title: "Sem alvo" }));
+    assert.doesNotMatch(plain, /linked-card|<a |<button/);
+  });
+
+  console.log("Menu");
+
+  test("menu sem ícones não reserva o espaço do ícone; com ícone, todos os itens reservam", () => {
+    // O popup só existe aberto e em portal; o contrato é verificado no código-fonte do item.
+    const src = mod.readFileSync(join(root, "src/components/overlays-extra.tsx"), "utf8");
+    assert.match(src, /const slot = items\.some/);
+    assert.equal((src.match(/\{slot && <span className="flex h-4 w-4 shrink-0/g) ?? []).length, 3);
+  });
+
+  console.log("AgentOrb, CodeBlock, DiffView");
+
+  test("AgentOrb: a mesma semente dá o mesmo rosto; decorativo sem labelled", () => {
+    assert.deepEqual(mod.getAgentOrbDesign("galt:atlas"), mod.getAgentOrbDesign("galt:atlas"));
+    const a = renderToStaticMarkup(h(mod.AgentOrb, { seed: "galt:atlas", size: 40, expression: "working" }));
+    assert.equal(a, renderToStaticMarkup(h(mod.AgentOrb, { seed: "galt:atlas", size: 40, expression: "working" })));
+    assert.match(a, /aria-hidden="true"/);
+    assert.match(a, /data-expression="working"/);
+    const named = renderToStaticMarkup(h(mod.AgentOrb, { seed: "galt:atlas", name: "Atlas", labelled: true }));
+    assert.match(named, /role="img" aria-label="Atlas"/);
+  });
+
+  test("AgentOrb badge: aparece de 24 px para cima, some abaixo", () => {
+    const badge = h("svg", { "data-testid": "tool" });
+    assert.match(renderToStaticMarkup(h(mod.AgentOrb, { seed: "x", size: 40, badge })), /agent-orb-badge/);
+    assert.doesNotMatch(renderToStaticMarkup(h(mod.AgentOrb, { seed: "x", size: 16, badge })), /agent-orb-badge/);
+  });
+
+  test("CodeBlock: rótulo da linguagem, linhas numeradas e código escapado", () => {
+    const html = renderToStaticMarkup(h(mod.CodeBlock, { language: "ts", lineNumbers: true, code: "const a = '<b>';\nreturn a;" }));
+    assert.match(html, />TypeScript</);
+    assert.match(html, /&lt;b&gt;/);
+    assert.doesNotMatch(html, /<b>/);
+    assert.match(html, />2<\/span>/);
+    assert.match(renderToStaticMarkup(h(mod.CodeBlock, { code: "Olá" })), />Texto</);
+  });
+
+  test("DiffView: saldo de linhas, sinais e palavras marcadas; texto que não é diff vira CodeBlock", () => {
+    const diff = "--- a/x.ts\n+++ b/x.ts\n@@ -1,2 +1,2 @@\n ctx\n-atraso há 5 dias\n+atraso há 7 dias\n";
+    const html = renderToStaticMarkup(h(mod.DiffView, { diff }));
+    assert.match(html, /x\.ts/);
+    assert.match(html, /aria-label="1 linhas adicionadas, 1 removidas"/);
+    assert.match(html, /<mark[^>]*>5<\/mark>/);
+    assert.match(html, /<mark[^>]*>7<\/mark>/);
+    assert.match(html, /aria-label="removida"/);
+    assert.match(renderToStaticMarkup(h(mod.DiffView, { diff: "nada mudou" })), /code-block/);
+  });
+
+  console.log("Formatação");
+
+  test("formatDate com fuso e hora; formatRelative curto e compatível com a assinatura antiga", () => {
+    assert.equal(mod.formatDate(new Date("2026-10-01T17:05:00Z"), { time: true, timeZone: "America/Sao_Paulo" }), "01/10/2026, 14:05");
+    assert.equal(mod.formatDate("2026-10-01"), "01/10/2026");
+    const now = new Date("2026-10-10T12:00:00Z");
+    assert.equal(mod.formatRelative(new Date("2026-10-10T11:55:00Z"), { now, short: true }), "5\u00A0min");
+    assert.equal(mod.formatRelative(new Date("2026-10-07T12:00:00Z"), { now, short: true }), "3\u00A0d");
+    assert.equal(mod.formatRelative(new Date("2026-10-07T12:00:00Z"), now), "há 3 dias");
   });
 } finally {
   rmSync(dir, { recursive: true, force: true });
