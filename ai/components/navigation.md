@@ -39,9 +39,16 @@ Trilha. REGRA: só ancestrais, nunca a página atual (o título é a página atu
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `items` * | `Crumb[]` |  |  |
+| `back` | `{ label: string; href?: string; onClick?: () => void; } \| undefined` |  | Botão "voltar" antes da trilha, para tela aberta a partir de uma lista (volta ao lugar de onde a pessoa veio, que nem sempre é o ancestral). |
 | `className` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<Breadcrumb back={{ label: "Voltar para Entregas", href: "/entregas" }} items={[{ label: "Entregas", href: "/entregas" }, { label: "Relatórios", href: "/entregas/relatorios" }]} />
+```
 
 ## ContextBar
 
@@ -284,5 +291,12 @@ Abas de seção de uma entidade: sublinhado de 2px ink na ativa, 12px.
 | `value` * | `string` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `onChange` | `((id: string) => void) \| undefined` |  |  |
+| `overflow` | `"wrap" \| "scroll" \| undefined` | `"wrap"` | O que fazer quando as abas não cabem. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<Tabs label="Seções do agente" overflow="scroll" items={tabs} value={tab} onChange={setTab} />
+```

@@ -207,25 +207,18 @@ Seção do painel: título, ação à direita ("+ Adicionar", "Ver tudo", "Filtr
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
-| `title` * | `string` |  |  |
+| `title` * | `ReactNode` |  |  |
 | `action` | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
+| `description` | `ReactNode` |  |  |
+| `id` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/registros-painel-lateral`):
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
 
 ```tsx
-<div className="flex gap-4">
-  <DataGrid … onRowOpen={(r) => setAberto(r.id)} />
-  <RecordPanel open={!!aberto} title={r.titulo} onTitleChange={…} position="3 de 18"
-    onPrev={…} onNext={…} onDelete={…} onClose={() => setAberto(null)}
-    properties={<PropertyPills><PropertyPill … /></PropertyPills>}>
-    <RecordSection title="Arquivos" action={<SectionAddButton onClick={…} />}><FilesList files={…} /></RecordSection>
-    <RecordSection title="Notas do documento"><NotesTable columns={…} rows={…} /></RecordSection>
-    <ActivitySection items={…} />
-  </RecordPanel>
-</div>
+<RecordSection title="Chaves de API" description="…" action={<button>Criar chave</button>}>…</RecordSection>
 ```
 
 ## SectionAddButton

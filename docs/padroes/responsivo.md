@@ -27,6 +27,14 @@ Breakpoints Tailwind: `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 (`tokens.br
 6. Gráficos medem o contêiner (`ResizeObserver`); rótulos do eixo X se espaçam sozinhos. Não fixe largura em px.
 7. Imagens e prévias com `aspect-ratio`, não altura fixa.
 
+### Largura em JavaScript
+
+CSS decide o que aparece; JavaScript só decide a **superfície**. `useIsMobile()` devolve `true` abaixo de 768 px (o corte do `md:` e da navegação de celular) e serve para abrir um `Sheet` no celular onde o desktop abre um `Popover`. `useMediaQuery(query)` cobre os outros casos e `breakpoints` tem os cortes (`compact` 640, `mobile` 768, `tablet` 1024, `desktop` 1280). Não copie `matchMedia` para dentro de cada tela.
+
+### Campos no toque
+
+Em tela de toque todo campo de texto tem no mínimo 16 px, inclusive dentro de `Drawer`, `Modal` e `Popover`: abaixo disso o Safari do iOS dá zoom na página ao focar. O DS já faz isso em `base.css`; não force `text-base` nos campos do app.
+
 ## Verificação
 
 Confira toda tela em **1440 × 900, 1024 × 768, 390 × 844 e 320 px**. O showcase tem botões de largura (desktop/tablet/celular) em cada bloco. Captura headless:

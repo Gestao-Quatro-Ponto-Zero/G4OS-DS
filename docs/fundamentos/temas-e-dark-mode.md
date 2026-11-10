@@ -118,3 +118,7 @@ Tipo é independente da cor: qualquer marca combina com qualquer tipografia.
 Tokens envolvidos: `--ds-font-sans`, `--ds-font-mono`, `--ds-font-display` (títulos de página, registro, hero; padrão = sans), `--ds-display-weight`, `--ds-display-tracking`. O app precisa carregar as fontes (next/font ou Google Fonts). No código: `useTheme()` expõe `type`/`setType`; `typePresets` lista as opções; `themeScript` aplica `data-type` antes da primeira pintura.
 
 Precedência: `data-type` vence a fonte definida por uma marca (fica depois em `themes.css`).
+
+## Marca em `data-theme="system"`
+
+Cada preset de marca escurece também quando o tema segue o sistema operacional: o bloco `[data-brand="x"][data-theme="dark"]` de `src/styles/themes.css` é espelhado em `@media (prefers-color-scheme: dark) { [data-brand="x"][data-theme="system"] }` por `node scripts/sync-brand-system.mjs` (o `check:tokens` falha se o espelho estiver desatualizado). Numa marca de cliente escrita no app, repita o bloco escuro dentro da mesma media query.

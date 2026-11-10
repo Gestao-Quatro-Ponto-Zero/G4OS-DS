@@ -66,7 +66,11 @@ const options = {
   jsx: "automatic",
   minify: !watch,
   alias: { "@g4ai/ds": join(root, "src/index.ts") },
-  define: { "process.env.NODE_ENV": watch ? '"development"' : '"production"' },
+  define: {
+    "process.env.NODE_ENV": watch ? '"development"' : '"production"',
+    // Versão publicada, para o selo do cabeçalho nunca ficar para trás do pacote.
+    __DS_VERSION__: JSON.stringify(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version),
+  },
   plugins: [raw, regen],
   logLevel: "warning",
 };

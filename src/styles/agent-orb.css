@@ -1,0 +1,371 @@
+/*
+ * Rosto do agente (AgentOrb): pisca ao passar o mouse ou focar, balança enquanto trabalha, e cada
+ * expressão tem o próprio ciclo. As transformações estão em unidades do viewBox. Com movimento
+ * reduzido o rosto fica parado.
+ */
+[data-agent-orb] [data-orb-eyes],
+[data-agent-orb] [data-orb-face],
+[data-agent-orb] [data-orb-mouth],
+[data-agent-orb] [data-orb-sparkle],
+[data-agent-orb] [data-orb-light] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-agent-orb] [data-orb-face] {
+    transition: transform var(--duration-state, 160ms) ease-out;
+  }
+  [data-agent-orb][data-motion="hover"]:hover [data-orb-face],
+  :where(button, a, [role="button"], [role="option"]):is(:hover, :focus-visible)
+    [data-agent-orb][data-motion="hover"]
+    [data-orb-face] {
+    transform: translateY(-1.2px);
+  }
+  [data-agent-orb][data-motion="hover"]:hover [data-orb-eyes],
+  :where(button, a, [role="button"], [role="option"]):is(:hover, :focus-visible)
+    [data-agent-orb][data-motion="hover"]
+    [data-orb-eyes] {
+    animation: agent-orb-blink-once 380ms ease-in-out 120ms 1;
+  }
+  [data-agent-orb][data-motion="live"] [data-orb-face] {
+    animation: agent-orb-bob 2.4s ease-in-out infinite;
+  }
+  [data-agent-orb][data-motion="live"] [data-orb-eyes] {
+    animation: agent-orb-blink 4.2s ease-in-out infinite;
+  }
+  [data-agent-orb][data-expression="idle"] [data-orb-gaze] {
+    animation: agent-orb-glance var(--orb-cycle, 13s) ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="working"] [data-orb-gaze] {
+    animation: agent-orb-scan 2.8s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="working"] [data-orb-face] {
+    animation: agent-orb-bob 2.4s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="focused"] [data-orb-face] {
+    animation: agent-orb-breathe 4.4s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="waiting"] [data-orb-face] {
+    animation: agent-orb-hop 3.6s ease-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="waiting"] [data-orb-eyes] {
+    animation: agent-orb-blink 5.2s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="happy"] [data-orb-face] {
+    animation: agent-orb-bounce 640ms ease-out 1;
+  }
+  [data-agent-orb][data-expression="wink"] [data-orb-face] {
+    animation: agent-orb-tilt 700ms ease-in-out 1;
+  }
+  [data-agent-orb][data-expression="flustered"] [data-orb-face] {
+    animation: agent-orb-shake 480ms ease-in-out 1;
+  }
+  [data-agent-orb][data-expression="flustered"] [data-orb-blush] {
+    animation: agent-orb-blush 520ms ease-out 1;
+  }
+  [data-agent-orb][data-expression="thinking"] [data-orb-gaze] {
+    animation: agent-orb-ponder 3.2s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="thinking"] [data-orb-thought] {
+    animation: agent-orb-thought 3.2s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="reading"] [data-orb-gaze] {
+    animation: agent-orb-read 2.6s linear var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="reading"] [data-orb-face] {
+    animation: agent-orb-breathe 4.4s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="talking"] [data-orb-mouth] {
+    animation: agent-orb-talk 900ms ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="talking"] [data-orb-face] {
+    animation: agent-orb-bob 2.4s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="sleepy"] [data-orb-face] {
+    animation: agent-orb-breathe 5.6s ease-in-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="sleepy"] [data-orb-z] {
+    animation: agent-orb-z 5.6s ease-out var(--orb-phase, 0s) infinite;
+  }
+  [data-agent-orb][data-expression="proud"] [data-orb-face] {
+    animation: agent-orb-proud 760ms ease-out 1;
+  }
+  [data-agent-orb][data-expression="proud"] [data-orb-sparkle] {
+    animation: agent-orb-pop 760ms ease-out 1;
+  }
+  [data-agent-orb][data-expression="aha"] [data-orb-light] {
+    animation: agent-orb-pop 640ms ease-out 1;
+  }
+  [data-agent-orb][data-expression="aha"] [data-orb-face] {
+    animation: agent-orb-bounce 640ms ease-out 1;
+  }
+  [data-agent-orb][data-expression="alert"] [data-orb-face] {
+    animation: agent-orb-start 420ms ease-out 1;
+  }
+}
+@keyframes agent-orb-blink-once {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  45% {
+    transform: scaleY(0.12);
+  }
+}
+@keyframes agent-orb-blink {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  94% {
+    transform: scaleY(0.12);
+  }
+}
+@keyframes agent-orb-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.4px);
+  }
+}
+@keyframes agent-orb-glance {
+  0%,
+  84%,
+  100% {
+    transform: translateX(0);
+  }
+  87%,
+  90% {
+    transform: translateX(-1.3px);
+  }
+  93%,
+  96% {
+    transform: translateX(1.3px);
+  }
+}
+@keyframes agent-orb-scan {
+  0%,
+  100% {
+    transform: translateX(-1px);
+  }
+  45%,
+  55% {
+    transform: translateX(1px);
+  }
+}
+@keyframes agent-orb-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(0.8px);
+  }
+}
+@keyframes agent-orb-hop {
+  0%,
+  72%,
+  100% {
+    transform: translateY(0);
+  }
+  78% {
+    transform: translateY(-1.8px);
+  }
+  84% {
+    transform: translateY(0);
+  }
+  88% {
+    transform: translateY(-0.7px);
+  }
+  92% {
+    transform: translateY(0);
+  }
+}
+@keyframes agent-orb-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-1.8px);
+  }
+  65% {
+    transform: translateY(0.4px);
+  }
+}
+@keyframes agent-orb-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(-6deg);
+  }
+}
+@keyframes agent-orb-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-0.8px);
+  }
+  50% {
+    transform: translateX(0.8px);
+  }
+  75% {
+    transform: translateX(-0.4px);
+  }
+}
+@keyframes agent-orb-ponder {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40%,
+  70% {
+    transform: translate(0.6px, -0.5px);
+  }
+}
+@keyframes agent-orb-thought {
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+  }
+  50%,
+  80% {
+    opacity: 1;
+  }
+}
+/* Along a line and back to the start of the next. */
+@keyframes agent-orb-read {
+  0% {
+    transform: translate(-1.1px, 0);
+  }
+  80% {
+    transform: translate(1.1px, 0);
+  }
+  90% {
+    transform: translate(-1.1px, 0.4px);
+  }
+  100% {
+    transform: translate(-1.1px, 0);
+  }
+}
+@keyframes agent-orb-talk {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.45);
+  }
+}
+@keyframes agent-orb-z {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  45% {
+    opacity: 1;
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: translate(1px, -2px);
+  }
+}
+@keyframes agent-orb-proud {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-2.6px);
+  }
+  60% {
+    transform: translateY(0.5px);
+  }
+}
+@keyframes agent-orb-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes agent-orb-start {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-1.6px) scale(1.04);
+  }
+}
+@keyframes agent-orb-blush {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* O que o agente segura (prop `badge`): selo no canto inferior direito do rosto. */
+.agent-orb-wrap {
+  position: relative;
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  line-height: 0;
+}
+.agent-orb-badge {
+  position: absolute;
+  right: -10%;
+  bottom: -8%;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: var(--ds-surface);
+  color: var(--ds-ink-soft);
+  box-shadow:
+    0 0 0 1.5px var(--ds-page),
+    var(--ds-shadow-surface);
+  pointer-events: none;
+}
+.agent-orb-badge > :is(svg, img) {
+  width: 60%;
+  height: 60%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .agent-orb-badge {
+    animation: agent-orb-badge-in 280ms ease-out 1;
+  }
+}
+@keyframes agent-orb-badge-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.6);
+  }
+}
+/* Pilha de rostos (AgentOrbStack): cada rosto recorta o anterior com um anel da cor do fundo. */
+.agent-orb-stack > * + * {
+  margin-left: calc(var(--orb-size) * -0.28);
+}
+.agent-orb-stack > [data-agent-orb],
+.agent-orb-stack > .agent-orb-wrap {
+  box-shadow: 0 0 0 2px var(--orb-ring, var(--ds-surface));
+}

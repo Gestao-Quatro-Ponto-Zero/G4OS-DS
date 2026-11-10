@@ -102,7 +102,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (483 componentes) → `components/<nome>.md`
+## Módulos (491 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -168,6 +168,8 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **meeting**: Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.
 - **lib-motion**: Movimento com contrato: o tempo só corre quando a pessoa vê, e movimento reduzido mostra o fim da cena (não uma cena congelada no meio).
 - **stage**: Camada expressiva (palcos).
+- **agent-orb**: Rosto gerado de agente: um personagem pequeno e chapado, desenhado em SVG inline e derivado de forma determinística de uma semente estável (id do agente, nome do subagente, id da sessão).
+- **code**: ------------------------------------------------------------------
 
 ## Blocos (143) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`

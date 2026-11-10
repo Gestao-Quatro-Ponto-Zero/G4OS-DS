@@ -2,7 +2,7 @@
 
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { ArrowUpRight, Inbox } from "lucide-react";
-import { forwardRef, useEffect, useId, useState } from "react";
+import { forwardRef, useEffect, useId, useRef, useState } from "react";
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
@@ -11,6 +11,7 @@ import type {
   ReactNode,
   RefAttributes,
 } from "react";
+import { scrollIntoRow, useScrollEdges } from "../lib/breakpoint";
 import { cn } from "../lib/cn";
 import { tintFill } from "../lib/color";
 import { initials as initialsOf } from "../lib/text";
@@ -476,15 +477,22 @@ export const IconButton = forwardRef(function IconButton({
   );
 });
 
-/** Chip de filtro binário. Ligado = tinta escura, desligado = contorno. */
+/**
+ * Chip de filtro binário. Ligado = tinta escura, desligado = contorno. `shape="pill"` é a pílula
+ * de categoria (dentro de `ChipRow`); `count` mostra quantos itens o filtro tem.
+ */
 export function FilterChip({
   on,
   onClick,
   children,
+  shape = "default",
+  count,
 }: {
   on: boolean;
   onClick: () => void;
   children: ReactNode;
+  shape?: "default" | "pill";
+  count?: number;
 }) {
   return (
     <button
@@ -492,12 +500,56 @@ export function FilterChip({
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] transition-colors",
-        on ? "bg-primary font-medium text-on-primary ring-1 ring-primary" : "bg-surface text-ink-soft ring-1 ring-line hover:bg-soft",
+        "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap px-3 text-[13px] transition-colors",
+        shape === "pill" ? "rounded-full" : "rounded-lg",
+        on ? "bg-primary font-medium text-on-primary ring-1 ring-inset ring-primary" : "bg-surface text-ink-soft ring-1 ring-inset ring-line hover:bg-soft",
       )}
     >
       {children}
+      {count != null && <span className={cn("text-[11px] tabular-nums", on ? "opacity-70" : "text-muted")}>{count}</span>}
     </button>
+  );
+}
+
+/**
+ * Linha de chips de filtro ou de categoria. No desktop quebra em linhas e mostra tudo; no celular
+ * vira uma linha só que rola de lado, com esmaecido na borda que tem mais chips, e o chip escolhido
+ * entra em vista quando muda (escolha feita em outro lugar, como um "Ver todos"). `wrap={false}`
+ * mantém a linha única também no desktop. Filhos: `FilterChip`, ou links com `aria-current`.
+ */
+export function ChipRow({
+  label,
+  children,
+  wrap = true,
+  className,
+}: {
+  /** Nome acessível do grupo: "Categorias", "Filtrar por status". */
+  label: string;
+  children: ReactNode;
+  wrap?: boolean;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const edge = useScrollEdges(ref, true, children);
+  // Só quando o chip escolhido muda: rolar a cada render brigaria com a rolagem da pessoa.
+  const chosen = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const on = ref.current?.querySelector<HTMLElement>('[aria-pressed="true"], [aria-current]') ?? null;
+    if (on === chosen.current) return;
+    chosen.current = on;
+    scrollIntoRow(ref.current, on, 32);
+  });
+  return (
+    <div
+      ref={ref}
+      role="group"
+      aria-label={label}
+      data-edge-start={edge.start ? "" : undefined}
+      data-edge-end={edge.end ? "" : undefined}
+      className={cn("chip-row scroll-fade-x flex gap-1.5 overflow-x-auto overscroll-x-contain", wrap && "sm:flex-wrap sm:overflow-visible", className)}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -669,34 +721,56 @@ export function Metric({
   );
 }
 
-/** Grade de células separadas por 1px de linha (sem gaps brancos). */
-export function StatGrid({ children, cols = 2 }: { children: ReactNode; cols?: 2 | 3 | 4 }) {
+/**
+ * Grade de células separadas por 1px de linha (sem gaps brancos). `cols` é o número de colunas no
+ * desktop (2 a 6). `dense` mantém a grade no celular (3 por linha) em vez de empilhar: faixa de
+ * números de um registro, em que cada célula é curta. Células que sobram na última linha são
+ * preenchidas com a superfície, sem buraco cinza.
+ */
+export function StatGrid({ children, cols = 2, dense = false, className }: { children: ReactNode; cols?: 2 | 3 | 4 | 5 | 6; dense?: boolean; className?: string }) {
+  const desktop = { 2: "sm:grid-cols-2", 3: "sm:grid-cols-3", 4: "grid-cols-2 lg:grid-cols-4", 5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5", 6: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6" }[cols];
+  const compact = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4", 5: "grid-cols-3 sm:grid-cols-5", 6: "grid-cols-3 sm:grid-cols-6" }[cols];
   return (
-    <div
-      className={cn(
-        "grid gap-px overflow-hidden rounded-2xl border border-line bg-line",
-        cols === 4 ? "grid-cols-2 lg:grid-cols-4" : cols === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2",
-      )}
-    >
+    <div className={cn("stat-grid grid gap-px overflow-hidden rounded-2xl border border-line bg-line", dense ? compact : desktop, dense && "stat-grid-dense", className)}>
       {children}
     </div>
   );
 }
 export function StatCell({
   label,
+  short,
   value,
+  of,
   hint,
   tone,
 }: {
   label: string;
+  /** Rótulo curto para a grade densa no celular ("Concluídas" → "Feitas"). Leitores de tela ouvem `label`. */
+  short?: string;
   value: ReactNode;
+  /** Base do número, em cinza ao lado: `value={3} of="de 4"`. */
+  of?: ReactNode;
   hint?: ReactNode;
   tone?: "ok" | "warn" | "bad";
 }) {
   return (
-    <div className="bg-surface px-4 py-3">
-      <div className="text-[12px] text-muted">{label}</div>
-      <div className={cn("mt-0.5 text-[17px] font-semibold tracking-tight tabular-nums", tone ? toneText[tone] : "text-ink")}>{value}</div>
+    <div className="stat-cell min-w-0 bg-surface px-4 py-3">
+      <div className="truncate text-[12px] text-muted">
+        {short ? (
+          <>
+            <span className="sm:hidden" aria-hidden>
+              {short}
+            </span>
+            <span className="max-sm:sr-only">{label}</span>
+          </>
+        ) : (
+          label
+        )}
+      </div>
+      <div className={cn("mt-0.5 text-[17px] font-semibold tracking-tight tabular-nums", tone ? toneText[tone] : "text-ink")}>
+        {value}
+        {of != null && <span className="ml-1 text-[12px] font-normal tracking-normal text-muted">{of}</span>}
+      </div>
       {hint && <div className="mt-0.5 text-[12px] text-muted">{hint}</div>}
     </div>
   );
@@ -744,14 +818,21 @@ export function Card({
   className,
   href,
   onClick,
+  padding = "md",
 }: {
   children: ReactNode;
   className?: string;
   href?: string;
   onClick?: () => void;
+  /**
+   * Respiro interno. `md` (padrão) 16×12; `sm` 12×10 para card denso; `lg` 20×20 para card de
+   * formulário ou de destaque; `none` quando o conteúdo traz o próprio respiro (lista, tabela, mídia).
+   */
+  padding?: "none" | "sm" | "md" | "lg";
 }) {
   const cls = cn(
-    "surface-card block rounded-xl border border-line bg-surface px-4 py-3 text-left",
+    "surface-card block rounded-xl border border-line bg-surface text-left",
+    { none: "overflow-hidden", sm: "px-3 py-2.5", md: "px-4 py-3", lg: "p-5" }[padding],
     (href || onClick) && "surface-interactive hover:border-line-strong",
     className,
   );
@@ -810,22 +891,32 @@ export function CardAction({ children }: { children: ReactNode }) {
   );
 }
 
-/** Seção titulada dentro de uma página de conteúdo (não é card). */
+/**
+ * Seção titulada dentro de uma página de conteúdo (não é card). `description` explica a seção em
+ * uma linha; `id` ancora (#id). Use no lugar de `<h2>` solto com classes de tipo.
+ */
 export function Section({
   title,
+  description,
   action,
+  id,
   children,
   className,
 }: {
-  title: string;
+  title: ReactNode;
+  description?: ReactNode;
   action?: ReactNode;
+  id?: string;
   children: ReactNode;
   className?: string;
 }) {
   return (
-    <section className={cn("min-w-0", className)}>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="m-0 text-[14px] font-medium">{title}</h2>
+    <section id={id} className={cn("min-w-0 scroll-mt-24", className)}>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="m-0 text-[14px] font-medium">{title}</h2>
+          {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
+        </div>
         {action && <div className="shrink-0 text-[12.5px] text-muted">{action}</div>}
       </div>
       {children}

@@ -206,8 +206,8 @@ export function AttachmentTrigger({
   ...rest
 }: { label: string; render?: ReactElement<{ className?: string; "aria-label"?: string }>; className?: string } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className" | "children">) {
   const cls = cn("absolute inset-0 z-0 rounded-[inherit] outline-none hover:bg-ink/[0.02] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40", className);
-  if (render) return cloneElement(render, { className: cn(cls, render.props.className), "aria-label": label });
-  return <button type="button" aria-label={label} {...rest} className={cls} />;
+  if (render) return cloneElement(render, { className: cn(cls, render.props.className), "aria-label": label, "data-card-overlay": "" } as Partial<{ className?: string; "aria-label"?: string }>);
+  return <button type="button" aria-label={label} data-card-overlay="" {...rest} className={cls} />;
 }
 
 /**

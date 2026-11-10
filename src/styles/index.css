@@ -17,6 +17,7 @@
 @import "./themes.css"; /* presets de marca: [data-brand="…"] */
 @import "./base.css";
 @import "./components.css";
+@import "./agent-orb.css"; /* rosto do agente: expressões e movimento */
 @import "./stage.css"; /* camada expressiva: palcos, vidro, movimento de páginas públicas */
 
 @source "../components";

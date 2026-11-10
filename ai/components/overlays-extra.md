@@ -176,13 +176,11 @@ Painel temporário que entra pela borda: filtros avançados, detalhes de um item
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ov-sheet`):
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
 
 ```tsx
-<Sheet open={open} onClose={() => setOpen(false)} title="Filtros" description="…"
-  footer={<><Button variant="ghost" size="sm">Limpar</Button><Button size="sm">Aplicar</Button></>}>
-  …
-</Sheet>
+const mobile = useIsMobile();
+return mobile ? <Sheet …>{filtros}</Sheet> : <Popover …>{filtros}</Popover>;
 ```
 
 ## Tooltip

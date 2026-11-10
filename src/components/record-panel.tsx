@@ -51,12 +51,33 @@ export function PropertyPills({ children, className }: { children: ReactNode; cl
   return <div className={cn("flex flex-wrap gap-1.5", className)}>{children}</div>;
 }
 
-/** Seção do painel: título, ação à direita ("+ Adicionar", "Ver tudo", "Filtro"). */
-export function RecordSection({ title, action, children, className }: { title: string; action?: ReactNode; children: ReactNode; className?: string }) {
+/**
+ * Seção do painel: título, ação à direita ("+ Adicionar", "Ver tudo", "Filtro").
+ * `description` explica a seção em uma linha abaixo do título; `id` permite ancorar (#id) e ligar
+ * a um `SectionNav`.
+ */
+export function RecordSection({
+  title,
+  description,
+  action,
+  id,
+  children,
+  className,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+  id?: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <section className={cn("border-t border-line pt-5", className)}>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="m-0 text-[15px] font-medium">{title}</h3>
+    <section id={id} className={cn("scroll-mt-24 border-t border-line pt-5", className)}>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="m-0 text-[15px] font-medium">{title}</h3>
+          {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
+        </div>
         {action && <div className="shrink-0 text-[12.5px] [&_button]:inline-flex [&_button]:items-center [&_button]:gap-1 [&_button]:font-medium [&_button]:text-blue [&_button:hover]:underline">{action}</div>}
       </div>
       {children}

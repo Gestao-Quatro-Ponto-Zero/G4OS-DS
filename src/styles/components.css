@@ -27,7 +27,10 @@
   scroll-padding-block: 24px;
   scroll-padding-top: var(--pinned-header-height, 24px);
 }
-.page-inset[data-compact-page-header] { --sticky-top: 0px; }
+/* O `top` de um elemento sticky é medido por dentro do padding do rolador: para o cabeçalho fixo
+   (e a barra, e a coluna lateral) encostarem na borda de cima, --sticky-top precisa ser o padding
+   de cima negativo, em todas as larguras. Zerar aqui deixava uma faixa do tamanho do padding acima
+   do cabeçalho compacto, com o conteúdo aparecendo por trás. */
 .page-gutter {
   padding-inline: 20px;
 }
@@ -347,6 +350,19 @@
     background-color var(--duration-state) ease;
 }
 .entity-tab:hover { background: var(--ds-soft); }
+/* Linha que rola de lado (Tabs overflow="scroll", ChipRow): sem barra de rolagem, com esmaecido
+   na borda que ainda tem itens. O esmaecido é máscara, então funciona sobre qualquer fundo e nos
+   dois temas. */
+.scroll-fade-x {
+  scrollbar-width: none;
+  --fade-start: 0px;
+  --fade-end: 0px;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+}
+.scroll-fade-x::-webkit-scrollbar { display: none; }
+.scroll-fade-x[data-edge-start] { --fade-start: 28px; }
+.scroll-fade-x[data-edge-end] { --fade-end: 28px; }
 .entity-content-enter { animation: fade-in 160ms ease; }
 
 /* ==================================================================== */
@@ -469,7 +485,8 @@
   border-radius: inherit;
   z-index: 0;
 }
-.linked-card :is(a, button, input, select, textarea, summary):not(.card-primary-link) {
+/* [data-card-overlay] é a área de clique que cobre o card (AttachmentTrigger): continua absoluta. */
+.linked-card :is(a, button, input, select, textarea, summary):not(.card-primary-link, [data-card-overlay]) {
   position: relative;
   z-index: 1;
 }
@@ -1028,4 +1045,23 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ds-orb[data-live], .ds-symbol-live, .ds-thinking-dot { animation: none; }
+}
+
+/* StatGrid: a última linha incompleta é preenchida com a superfície (sem buraco na cor da linha). */
+.stat-grid > :last-child { position: relative; }
+.stat-grid > :last-child::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: calc(100% + 1px);
+  width: 100vw;
+  background: var(--ds-surface);
+}
+
+/* Esqueleto com atraso (PageSkeleton, ListSkeleton): invisível até o prazo, para uma página que
+   abre da memória ou de uma resposta rápida nunca piscar o esqueleto. */
+.skeleton-delayed { opacity: 0; }
+.skeleton-delayed[data-shown] { opacity: 1; transition: opacity 160ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-delayed[data-shown] { transition: none; }
 }

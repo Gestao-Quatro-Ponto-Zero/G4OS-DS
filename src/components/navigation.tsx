@@ -1,8 +1,9 @@
 "use client";
 
 import { Menu as BaseMenu } from "@base-ui/react/menu";
-import { Check, ChevronRight, MoreHorizontal, PanelLeft, Search } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, MoreHorizontal, PanelLeft, Search } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
+import { scrollIntoRow, useScrollEdges } from "../lib/breakpoint";
 import { cn } from "../lib/cn";
 import { inertProps } from "../lib/inert";
 import { usePortalContainer } from "../lib/portal";
@@ -225,10 +226,33 @@ export type Crumb = { label: string; href?: string };
  * Trilha. REGRA: só ancestrais, nunca a página atual (o título é a página
  * atual). Se o único ancestral é o item da sidebar, não renderize trilha.
  */
-export function Breadcrumb({ items, className }: { items: Crumb[]; className?: string }) {
-  if (!items.length) return null;
+export function Breadcrumb({
+  items,
+  back,
+  className,
+}: {
+  items: Crumb[];
+  /**
+   * Botão "voltar" antes da trilha, para tela aberta a partir de uma lista (volta ao lugar de onde
+   * a pessoa veio, que nem sempre é o ancestral). `label` é o destino: "Voltar para Entregas".
+   */
+  back?: { label: string; href?: string; onClick?: () => void };
+  className?: string;
+}) {
+  if (!items.length && !back) return null;
+  const backCls = "-ml-1.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted hover:bg-soft hover:text-ink";
   return (
     <nav aria-label="Trilha de navegação" className={cn("flex flex-wrap items-center gap-x-1.5 text-[13px]", className)}>
+      {back &&
+        (back.href ? (
+          <DsLink href={back.href} onClick={back.onClick} aria-label={back.label} title={back.label} className={backCls}>
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+          </DsLink>
+        ) : (
+          <button type="button" onClick={back.onClick} aria-label={back.label} title={back.label} className={backCls}>
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+          </button>
+        ))}
       {items.map((item, i) => (
         <span key={`${item.label}-${i}`} className="inline-flex items-center gap-x-1.5">
           {i > 0 && <ChevronRight aria-hidden className="h-3.5 w-3.5 text-line-strong" />}
@@ -362,29 +386,50 @@ export function Tabs({
   value,
   onChange,
   label,
+  overflow = "wrap",
   className,
 }: {
   items: TabItem[];
   value: string;
   onChange?: (id: string) => void;
   label: string;
+  /**
+   * O que fazer quando as abas não cabem. `wrap` (padrão) quebra em outra linha; `scroll` mantém
+   * uma linha só que rola de lado, com a aba ativa sempre à vista e um esmaecido na borda que tem
+   * mais abas. Use `scroll` em cabeçalho de página no celular e quando a lista de abas é longa.
+   */
+  overflow?: "wrap" | "scroll";
   className?: string;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const scroll = overflow === "scroll";
+  const edge = useScrollEdges(ref, scroll, items.length);
+  // A aba ativa entra em vista sem mexer na rolagem da página (scrollIntoView rolaria os ancestrais).
+  useEffect(() => {
+    if (scroll) scrollIntoRow(ref.current, ref.current?.querySelector<HTMLElement>("[data-active]") ?? null);
+  }, [scroll, value]);
   return (
-    <div className={cn("entity-tabs flex flex-wrap items-center gap-1", className)} aria-label={label} role="navigation">
+    <div
+      ref={ref}
+      className={cn("entity-tabs flex items-center gap-1", scroll ? "scroll-fade-x flex-nowrap overflow-x-auto overscroll-x-contain" : "flex-wrap", className)}
+      data-edge-start={scroll && edge.start ? "" : undefined}
+      data-edge-end={scroll && edge.end ? "" : undefined}
+      aria-label={label}
+      role="navigation"
+    >
       {items.map((t) => {
         const on = t.id === value;
         const cls = cn(
-          "entity-tab shrink-0 rounded-t-lg border-b-2 px-2.5 pb-2.5 pt-2 text-[12px]",
+          "entity-tab shrink-0 whitespace-nowrap rounded-t-lg border-b-2 px-2.5 pb-2.5 pt-2 text-[12px]",
           on ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink",
         );
         const text = t.count ? `${t.label} (${t.count})` : t.label;
         return t.href ? (
-          <DsLink key={t.id} href={t.href} aria-current={on ? "page" : undefined} className={cls}>
+          <DsLink key={t.id} href={t.href} aria-current={on ? "page" : undefined} data-active={on ? "" : undefined} className={cls}>
             {text}
           </DsLink>
         ) : (
-          <button key={t.id} type="button" aria-pressed={on} onClick={() => onChange?.(t.id)} className={cls}>
+          <button key={t.id} type="button" aria-pressed={on} data-active={on ? "" : undefined} onClick={() => onChange?.(t.id)} className={cls}>
             {text}
           </button>
         );

@@ -296,3 +296,158 @@ export function OperationButton({
 export function Skeleton({ className }: { className?: string }) {
   return <span aria-hidden className={cn("block animate-pulse rounded-md bg-soft", className)} />;
 }
+
+/** `true` depois de `ms`: atrasa o que só deve aparecer se a espera for longa (esqueleto, "Carregando…"). */
+export function useDelayed(ms = 180) {
+  const [shown, setShown] = useState(ms <= 0);
+  useEffect(() => {
+    if (ms <= 0) return;
+    const timer = setTimeout(() => setShown(true), ms);
+    return () => clearTimeout(timer);
+  }, [ms]);
+  return shown;
+}
+
+const rowWidths = ["w-2/5", "w-1/3", "w-1/2", "w-1/4", "w-2/5", "w-1/3"];
+
+function SkeletonRows({ rows }: { rows: number }) {
+  return (
+    <>
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="flex items-center gap-3 px-4 py-3">
+          <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <Skeleton className={cn("h-3.5", rowWidths[i % rowWidths.length])} />
+            <Skeleton className="h-3 w-3/5 max-w-[320px]" />
+          </div>
+          <Skeleton className="h-3.5 w-14 shrink-0" />
+        </div>
+      ))}
+    </>
+  );
+}
+const skeletonList = "divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface";
+
+/**
+ * Linhas de uma lista enquanto ela abre: marca, duas linhas de texto e um valor à direita, dentro
+ * da mesma moldura da lista final. Aparece só depois de `delay` ms.
+ */
+export function ListSkeleton({ label, rows = 4, delay = 180, className }: { /** Dito a leitores de tela: "Abrindo os membros". */ label: string; rows?: number; delay?: number; className?: string }) {
+  const shown = useDelayed(delay);
+  return (
+    <div role="status" aria-label={label} data-shown={shown || undefined} className={cn("skeleton-delayed", skeletonList, className)}>
+      <SkeletonRows rows={rows} />
+    </div>
+  );
+}
+
+/**
+ * A página enquanto abre, na forma da anatomia que ela vai ter: cabeçalho, abas e o corpo certo
+ * (linhas de lista, cartões de indicador e gráfico, registro com coluna de propriedades, seções de
+ * configuração). Fica no lugar de "Carregando…" no canto. Aparece só depois de `delay` ms, então
+ * uma página que abre da memória nunca pisca o esqueleto. Renderize dentro de `Page`.
+ */
+export function PageSkeleton({
+  label,
+  anatomy = "list",
+  tabs = 0,
+  rows = 5,
+  delay = 180,
+  className,
+}: {
+  /** Dito a leitores de tela: "Abrindo o time". */
+  label: string;
+  /** Forma do corpo: `list` (toolbar + linhas), `dashboard` (indicadores + gráfico), `record` (corpo + coluna de propriedades), `settings` (seções rótulo/campos). */
+  anatomy?: "list" | "dashboard" | "record" | "settings";
+  /** Quantas abas o cabeçalho tem (0 = sem abas). */
+  tabs?: number;
+  rows?: number;
+  delay?: number;
+  className?: string;
+}) {
+  const shown = useDelayed(delay);
+  const record = anatomy === "record";
+  return (
+    <div role="status" aria-label={label} data-shown={shown || undefined} className={cn("skeleton-delayed", className)}>
+      <div className="flex items-start gap-4">
+        {record && <Skeleton className="h-12 w-12 shrink-0 rounded-xl" />}
+        <div className="min-w-0 flex-1 space-y-2.5">
+          <Skeleton className="h-6 w-56 max-w-[60%]" />
+          <Skeleton className="h-3.5 w-96 max-w-[85%]" />
+        </div>
+        <Skeleton className="hidden h-10 w-32 shrink-0 rounded-lg sm:block" />
+      </div>
+      {tabs > 0 && (
+        <div className="mt-6 flex gap-5 border-b border-line pb-3">
+          {Array.from({ length: tabs }, (_, i) => (
+            <Skeleton key={i} className={cn("h-3.5", i % 2 ? "w-20" : "w-14")} />
+          ))}
+        </div>
+      )}
+      <div className="mt-6">
+        {anatomy === "list" && (
+          <>
+            <div className="mb-4 flex gap-2">
+              <Skeleton className="h-9 w-64 max-w-[60%] rounded-lg" />
+              <Skeleton className="h-9 w-24 rounded-lg" />
+            </div>
+            <div className={skeletonList}>
+              <SkeletonRows rows={rows} />
+            </div>
+          </>
+        )}
+        {anatomy === "dashboard" && (
+          <>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="space-y-3 rounded-xl border border-line bg-surface p-4">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-6 w-28" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 space-y-4 rounded-xl border border-line bg-surface p-5">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-56 w-full rounded-lg" />
+            </div>
+          </>
+        )}
+        {record && (
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+            <div className="space-y-6">
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <div className={skeletonList}>
+                <SkeletonRows rows={Math.max(2, rows - 2)} />
+              </div>
+            </div>
+            <div className="space-y-4 rounded-xl border border-line bg-surface p-4">
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className="flex justify-between gap-4">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className={cn("h-3", i % 2 ? "w-24" : "w-32")} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {anatomy === "settings" && (
+          <div className="divide-y divide-line">
+            {Array.from({ length: Math.min(4, rows) }, (_, i) => (
+              <div key={i} className="grid gap-4 py-6 first:pt-0 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">
+                <div className="space-y-2">
+                  <Skeleton className="h-3.5 w-28" />
+                  <Skeleton className="h-3 w-40" />
+                </div>
+                <div className="max-w-[560px] space-y-3">
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                  {i % 2 === 0 && <Skeleton className="h-10 w-2/3 rounded-lg" />}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
