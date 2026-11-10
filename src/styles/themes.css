@@ -323,10 +323,9 @@
   --ds-display-tracking: -0.025em;
 }
 
-/* ---------------- G4 clássico: o tema padrão anterior ao KV G4 OS.
-   Branco, tinta grafite e Royal Gold; IA sem o azul-céu. Para
-   produtos que ainda não migraram. O escuro é o mesmo neutro do padrão. --- */
+/* G4 clássico explícito também restaura a paleta em escopos de outras marcas. */
 [data-brand="g4-classico"] {
+  --ds-surface: var(--g4-white);
   --ds-page: var(--g4-white);
   --ds-soft: var(--g4-gray-50);
   --ds-rail: var(--g4-gray-25);
@@ -387,74 +386,71 @@
   --ds-shadow-surface: 0 1px 2px #00000040;
   --ds-shadow-raised: 0 4px 16px #00000059;
 }
-@media (prefers-color-scheme: dark) {
-  [data-brand="g4-classico"][data-theme="system"] {
-    --ds-page: #111113;
-    --ds-surface: #18181b;
-    --ds-soft: #202024;
-    --ds-rail: #141416;
-    --ds-ink: #ececef;
-    --ds-ink-soft: #c5c6cc;
-    --ds-muted: #8f929a;
-    --ds-line: #2a2a2f;
-    --ds-line-strong: #3b3c43;
-    --ds-primary: #ececef;
-    --ds-brand-accent: #c9a46f;
-    --ds-nav-marker: #c9a46f;
-    --ds-blue: #8cb8da;
-    --ds-accent: #c9a46f;
-    --ds-accent-deep: #dcbd8e;
-    --ds-accent-soft: #2e2619;
-    --ds-info: #90b8f8;
-    --ds-chart-1: #ececef;
-    --ds-chart-2: #6fa8d6;
-    --ds-chart-3: #c9a46f;
-    --ds-chart-6: #6b6e76;
-    --ds-focus: #8f929a;
-    --ds-ai-accent: #c5c6cc;
-    --ds-ai-accent-soft: #202024;
-    --ds-gradient-brand: linear-gradient(90deg, #ececef 0%, #c5c6cc 100%);
-    --ds-haze: #1d1d21;
-    --ds-shadow-surface: 0 1px 2px #00000040;
-    --ds-shadow-raised: 0 4px 16px #00000059;
-  }
-}
 
-/* ---------------- G4 Institucional: a paleta do manual de marca aplicada à
-   interface. Para apresentações, portais, materiais e marketing. Fundo,
-   superfícies, texto e bordas iguais ao G4 clássico (neutros frios, nada de
-   bege); Navy na ação, Gold no destaque e nos gráficos. O escuro segue o
-   neutro do clássico com Silver na ação. --- */
+/* ---------------- G4 OS: visual do KV, opcional sobre o padrão clássico.
+   O identificador g4-institucional continua como alias para estilos existentes.
+   Tipografia é um eixo independente, controlado por data-type. --- */
+[data-brand="g4os"],
 [data-brand="g4-institucional"] {
+  --ds-page: var(--g4-kv-ice);
+  --ds-soft: var(--g4-kv-ice-blue);
+  --ds-rail: var(--g4-kv-rail);
+  --ds-ink: var(--g4-maua-blue);
+  --ds-ink-soft: var(--g4-scaling-blue);
+  --ds-muted: var(--g4-kv-muted);
+  --ds-line: var(--g4-kv-line);
+  --ds-line-strong: var(--g4-kv-line-strong);
   --ds-primary: var(--g4-navy-blue);
-  --ds-on-primary: var(--g4-royal-silver);
-  --ds-blue: var(--g4-scaling-blue);
-  --ds-navy: var(--g4-navy-blue);
-  --ds-accent: var(--g4-royal-gold);
-  --ds-accent-deep: #7d5e33;
-  --ds-accent-soft: #f5eee3;
+  --ds-brand-accent: var(--g4-kv-gold);
+  --ds-nav-marker: var(--g4-kv-gold);
+  --ds-blue: var(--g4-kv-deep);
+  --ds-accent: var(--g4-kv-gold);
+  --ds-accent-deep: var(--g4-kv-gold-deep);
+  --ds-accent-soft: var(--g4-kv-gold-soft);
+  --ds-info: var(--g4-kv-deep);
   --ds-chart-1: var(--g4-navy-blue);
-  --ds-chart-2: var(--g4-royal-gold);
-  --ds-chart-3: var(--g4-scaling-blue);
-  --ds-chart-4: var(--g4-ground-clay);
-  --ds-chart-5: var(--g4-mid-gray);
+  --ds-chart-2: var(--g4-kv-deep);
+  --ds-chart-3: var(--g4-kv-gold);
+  --ds-chart-6: var(--g4-kv-slate);
+  --ds-focus: var(--g4-kv-deep);
+  --ds-ai-accent: var(--g4-kv-sky);
+  --ds-ai-accent-soft: var(--g4-kv-sky-soft);
+  --ds-gradient-brand: linear-gradient(90deg, #a38e5a 0%, #3b5766 38%, #005b98 72%, #5f87a6 100%);
+  --ds-haze: #ebeae6;
+  --ds-shadow-surface: 0 1px 2px #031a260a, 0 8px 24px #031a260a;
+  --ds-shadow-raised: 0 24px 48px #031a2614, 0 2px 6px #031a260a;
+  --ds-radius-scale: 1.25;
 }
+[data-brand="g4os"][data-theme="dark"],
 [data-brand="g4-institucional"][data-theme="dark"] {
-  --ds-ink: var(--g4-royal-silver);
-  --ds-primary: var(--g4-royal-silver);
-  --ds-on-primary: var(--g4-navy-blue);
-  --ds-blue: #90b8d4;
+  --ds-page: #111113;
+  --ds-soft: #202024;
+  --ds-rail: #141416;
+  --ds-ink: #ececef;
+  --ds-ink-soft: #c5c6cc;
+  --ds-muted: #8f929a;
+  --ds-line: #2a2a2f;
+  --ds-line-strong: #3b3c43;
+  --ds-primary: #ececef;
+  --ds-brand-accent: #c9a46f;
+  --ds-nav-marker: #c9a46f;
+  --ds-blue: #8cb8da;
   --ds-accent: #c9a46f;
   --ds-accent-deep: #dcbd8e;
   --ds-accent-soft: #2e2619;
-  /* Semânticas do manual de marca (texto sobre escuro) */
-  --ds-ok: #a5d6a7;
-  --ds-amber: #ffcc80;
-  --ds-rose: #ef9a9a;
-  --ds-info: #90caf9;
-  --ds-chart-1: var(--g4-royal-silver);
-  --ds-chart-2: #c9a46f;
-  --ds-chart-3: #6fa8d6;
+  --ds-info: #90b8f8;
+  --ds-chart-1: #ececef;
+  --ds-chart-2: #6fa8d6;
+  --ds-chart-3: #c9a46f;
+  --ds-chart-6: #6b6e76;
+  --ds-focus: #8f929a;
+  --ds-ai-accent: #4fb3f0;
+  --ds-ai-accent-soft: #15324a;
+  --ds-gradient-brand: linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%);
+  --ds-haze: #1d1d21;
+  --ds-shadow-surface: 0 1px 2px #00000040;
+  --ds-shadow-raised: 0 4px 16px #00000059;
+  --ds-radius-scale: 1.25;
 }
 
 /* >>> gerado por scripts/sync-brand-system.mjs: não edite à mão <<< */
@@ -599,21 +595,35 @@
     --ds-shadow-surface: 0 1px 2px #00000040;
     --ds-shadow-raised: 0 4px 16px #00000059;
   }
+  [data-brand="g4os"][data-theme="system"],
   [data-brand="g4-institucional"][data-theme="system"] {
-    --ds-ink: var(--g4-royal-silver);
-    --ds-primary: var(--g4-royal-silver);
-    --ds-on-primary: var(--g4-navy-blue);
-    --ds-blue: #90b8d4;
+    --ds-page: #111113;
+    --ds-soft: #202024;
+    --ds-rail: #141416;
+    --ds-ink: #ececef;
+    --ds-ink-soft: #c5c6cc;
+    --ds-muted: #8f929a;
+    --ds-line: #2a2a2f;
+    --ds-line-strong: #3b3c43;
+    --ds-primary: #ececef;
+    --ds-brand-accent: #c9a46f;
+    --ds-nav-marker: #c9a46f;
+    --ds-blue: #8cb8da;
     --ds-accent: #c9a46f;
     --ds-accent-deep: #dcbd8e;
     --ds-accent-soft: #2e2619;
-    /* Semânticas do manual de marca (texto sobre escuro) */
-    --ds-ok: #a5d6a7;
-    --ds-amber: #ffcc80;
-    --ds-rose: #ef9a9a;
-    --ds-info: #90caf9;
-    --ds-chart-1: var(--g4-royal-silver);
-    --ds-chart-2: #c9a46f;
-    --ds-chart-3: #6fa8d6;
+    --ds-info: #90b8f8;
+    --ds-chart-1: #ececef;
+    --ds-chart-2: #6fa8d6;
+    --ds-chart-3: #c9a46f;
+    --ds-chart-6: #6b6e76;
+    --ds-focus: #8f929a;
+    --ds-ai-accent: #4fb3f0;
+    --ds-ai-accent-soft: #15324a;
+    --ds-gradient-brand: linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%);
+    --ds-haze: #1d1d21;
+    --ds-shadow-surface: 0 1px 2px #00000040;
+    --ds-shadow-raised: 0 4px 16px #00000059;
+    --ds-radius-scale: 1.25;
   }
 }

@@ -1,12 +1,12 @@
 import { ArrowRight, FileText, Sparkles, Trophy } from "lucide-react";
-import { AchievementCard, AiDots, AiGreeting, AiOrb, Badge, BrandBadge, BrandButton, BrandPanel, Button, G4OSLogo, G4OSSymbol, GradientText, cn, useTheme } from "@g4ai/ds";
+import { AchievementCard, AiDots, AiGreeting, AiOrb, Badge, BrandBadge, BrandButton, BrandPanel, Button, DEFAULT_BRAND, G4OSLogo, G4OSSymbol, GradientText, cn, useTheme } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
   title: "Marca G4 na interface",
   group: "Fundamentos",
   order: 3,
-  description: "O tema padrão segue o KV G4 OS: gelo, tinta navy, a esfera da IA e o gradiente dourado → azul nos momentos de marca. A paleta do manual (Navy Blue, Royal Gold, Royal Silver) continua no preset Institucional e no BrandPanel tone=\"navy\".",
+  description: "G4 clássico é o padrão neutro. O preset G4 OS reúne o visual do KV e a opção institucional, com gelo, navy, esfera da IA e gradiente de marca.",
 };
 
 const palette: { group: string; items: [string, string, string, string][] }[] = [
@@ -77,7 +77,7 @@ export default function Page() {
           {[
             ["1 · Toque (padrão G4)", "Interface neutra. A marca aparece no marcador dourado da navegação, no progresso e nos selos. É o tema de todos os produtos."],
             ["2 · Momento", "Um BrandPanel por tela (gelo, orb e título em gradiente do KV; ou tone=\"navy\"), onde há emoção ou abertura: login, fim de onboarding, capa de relatório, saudação da IA, conquista."],
-            ["3 · Institucional", "Preset data-brand=\"g4-institucional\": fundo do clássico, Navy na ação, Gold no destaque e nos gráficos. Para apresentações, portais e marketing."],
+            ["3 · Institucional", "Preset data-brand=\"g4os\": gelo, navy e dourado. Reúne o visual do KV e a opção institucional para apresentações, portais e marketing."],
           ].map(([title, body], i) => (
             <div key={title} className={cn("rounded-xl border p-4", i === 0 ? "border-accent/40 bg-accent-soft/30" : "border-line bg-surface")}>
               <div className="text-[13.5px] font-semibold">{title}</div>
@@ -188,20 +188,20 @@ export default function Page() {
         </Demo>
       </DocSection>
 
-      <DocSection title="Nível 3 · Preset G4 Institucional" rule="Para apresentações, portal do cliente, páginas públicas. Fundo e superfícies iguais ao clássico; o escuro continua neutro (não navy), com Royal Silver na ação e as semânticas do manual.">
+      <DocSection title="Nível 3 · Preset G4 OS" rule="Para apresentações, portal do cliente e páginas públicas. Reúne o visual do KV e a opção institucional. G4 clássico é o padrão neutro.">
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4">
           <span className="text-[13px] text-ink-soft">Ver o site inteiro com o preset:</span>
-          <Button size="sm" variant={t.brand === "g4-institucional" ? "primary" : "ghost"} onClick={() => t.setBrand(t.brand === "g4-institucional" ? "g4os" : "g4-institucional")}>
-            <FileText /> {t.brand === "g4-institucional" ? "Voltar ao G4" : "Aplicar G4 Institucional"}
+          <Button size="sm" variant={t.brand === "g4os" ? "primary" : "ghost"} onClick={() => t.setBrand(t.brand === "g4os" ? DEFAULT_BRAND : "g4os")}>
+            <FileText /> {t.brand === "g4os" ? "Voltar ao G4 clássico" : "Aplicar G4 OS"}
           </Button>
-          <code className="ml-auto font-mono text-[12px] text-muted">{'<html data-brand="g4-institucional">'}</code>
+          <code className="ml-auto font-mono text-[12px] text-muted">{'<html data-brand="g4os">'}</code>
         </div>
       </DocSection>
 
       <DocSection title="Regras">
         <Rules
           items={[
-            { do: "Gelo (#F9F9F9) como fundo e Navy na ação principal. O momento de marca é claro: névoa, orb e título em gradiente, um por tela.", dont: "Navy como fundo de app ou como modo escuro: o escuro do DS é neutro de propósito." },
+            { do: "G4 clássico como padrão neutro. No preset G4 OS, gelo e navy compõem a interface e o momento de marca pode usar névoa, orb e gradiente.", dont: "Navy como fundo de app ou como modo escuro: o escuro do DS é neutro de propósito." },
             { do: "Azul-céu (#0084DD) só na IA: enviar, orb, os três pontos.", dont: "Céu em botões comuns, links ou texto: link é o azul profundo (--ds-blue)." },
             { do: "Gradiente de marca em um título de momento (saudação da IA, capa, login).", dont: "Gradiente em texto de trabalho, botão, número, tabela ou em mais de um título por tela." },
             { do: "Dourado do KV como preenchimento e marcador (progresso, item ativo, selo). Texto dourado usa accent-deep (#6E5A2C).", dont: "Texto em #A38E5A sobre o gelo (reprova AA) ou botões dourados espalhados." },

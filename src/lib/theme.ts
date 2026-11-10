@@ -15,18 +15,16 @@ export type ThemeMode = "light" | "dark" | "system";
 export const THEME_KEY = "ds-theme";
 export const BRAND_KEY = "ds-brand";
 
-/** Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand. */
-export const DEFAULT_BRAND = "g4os";
+/** Marca padrão: G4 clássico, aplicada sem atributo data-brand. */
+export const DEFAULT_BRAND = "g4-classico";
 /** "g4" era o id do padrão antes do KV: quem o tem salvo passa ao padrão atual. */
 const LEGACY_DEFAULT_BRAND = "g4";
-const normalizeBrand = (b?: string | null) => (!b || b === LEGACY_DEFAULT_BRAND ? DEFAULT_BRAND : b);
-const isDefaultBrand = (b?: string | null) => normalizeBrand(b) === DEFAULT_BRAND;
+const normalizeBrand = (b?: string | null) => (!b || b === LEGACY_DEFAULT_BRAND ? DEFAULT_BRAND : b === "g4-institucional" ? "g4os" : b);
 
-/** Presets de themes.css. "g4os" = padrão (sem atributo); "g4-classico" = tema anterior ao KV. */
+/** Presets de themes.css. G4 clássico é o padrão; G4 OS reúne o visual institucional. */
 export const brandPresets = [
-  { id: "g4os", label: "G4 OS (padrão)", primary: "#001f35", accent: "#a38e5a" },
-  { id: "g4-classico", label: "G4 clássico", primary: "#202124", accent: "#b9915b" },
-  { id: "g4-institucional", label: "G4 Institucional", primary: "#001f35", accent: "#b9915b" },
+  { id: "g4-classico", label: "G4 clássico (padrão)", primary: "#202124", accent: "#b9915b" },
+  { id: "g4os", label: "G4 OS", primary: "#001f35", accent: "#a38e5a" },
   { id: "oceano", label: "Oceano", primary: "#1554d1", accent: "#1554d1" },
   { id: "floresta", label: "Floresta", primary: "#1f5f45", accent: "#c8963e" },
   { id: "vinho", label: "Vinho", primary: "#7a1f35", accent: "#b57b4a" },
@@ -39,7 +37,7 @@ export const brandPresets = [
 
 /** Presets de tipografia (eixo independente da cor): <html data-type="…">. */
 export const typePresets = [
-  { id: "g4", label: "G4 OS · Manrope", sample: "Manrope" },
+  { id: "g4", label: "Padrão · Manrope", sample: "Manrope" },
   { id: "classica", label: "Clássica · Figtree", sample: "Figtree" },
   { id: "editorial", label: "Editorial · Serifa nos títulos", sample: "Source Serif 4" },
   { id: "tecnica", label: "Técnica · IBM Plex", sample: "IBM Plex Sans" },
@@ -65,12 +63,14 @@ const write = (key: string, value: string) => {
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(LOCAL_EVENT, { detail: { key, value } }));
 };
 
-/** Aplica tema/marca no documento (ou em outro elemento raiz). */
+/** Aplica tema/marca no documento (ou em outro elemento raiz). Sem `brand`, restaura a marca padrão; `useTheme` herda a marca do HTML antes de chamar esta função. */
 export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = document.documentElement, type?: string) {
-  const changed = root.getAttribute("data-theme") !== mode || (root.getAttribute("data-brand") ?? DEFAULT_BRAND) !== (isDefaultBrand(brand) ? DEFAULT_BRAND : brand);
+  const nextBrand = normalizeBrand(brand);
+  const documentRoot = typeof document !== "undefined" && root === document.documentElement;
+  const changed = root.getAttribute("data-theme") !== mode || normalizeBrand(root.getAttribute("data-brand")) !== nextBrand;
   // Troca de tema sem "animar" cores: desliga transições por um quadro (como o next-themes).
   let restore: (() => void) | undefined;
-  if (changed && typeof document !== "undefined" && root === document.documentElement) {
+  if (changed && documentRoot) {
     const style = document.createElement("style");
     style.textContent = "*,*::before,*::after{transition:none!important}";
     document.head.appendChild(style);
@@ -80,7 +80,7 @@ export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = 
     };
   }
   root.setAttribute("data-theme", mode);
-  if (!isDefaultBrand(brand)) root.setAttribute("data-brand", brand as string);
+  if (nextBrand !== DEFAULT_BRAND || !documentRoot) root.setAttribute("data-brand", nextBrand);
   else root.removeAttribute("data-brand");
   if (type !== undefined) {
     if (type && type !== "g4") root.setAttribute("data-type", type);
@@ -113,7 +113,7 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
   useEffect(() => {
     const on = (e: StorageEvent) => {
       if (e.key === THEME_KEY && e.newValue) setModeState(e.newValue as ThemeMode);
-      if (e.key === BRAND_KEY && e.newValue) setBrandState(normalizeBrand(e.newValue));
+      if (e.key === BRAND_KEY) setBrandState(normalizeBrand(e.newValue));
       if (e.key === TYPE_KEY && e.newValue) setTypeState(e.newValue);
     };
     // Outras instâncias do hook no MESMO documento (storage só avisa outras abas/iframes).
@@ -136,8 +136,9 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
     setModeState(m);
   }, []);
   const setBrand = useCallback((b: string) => {
-    write(BRAND_KEY, b);
-    setBrandState(b);
+    const brand = normalizeBrand(b);
+    write(BRAND_KEY, brand);
+    setBrandState(brand);
   }, []);
   const setType = useCallback((t: string) => {
     write(TYPE_KEY, t);
@@ -147,4 +148,4 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
 }
 
 /** Script inline para o <head>: aplica o tema salvo antes da primeira pintura. */
-export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}"),y=localStorage.getItem("${TYPE_KEY}");d.setAttribute("data-theme",t);if(b&&b!=="${DEFAULT_BRAND}"&&b!=="${LEGACY_DEFAULT_BRAND}")d.setAttribute("data-brand",b);if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
+export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}")||d.getAttribute("data-brand"),y=localStorage.getItem("${TYPE_KEY}");b=!b||b==="${LEGACY_DEFAULT_BRAND}"?"${DEFAULT_BRAND}":b==="g4-institucional"?"g4os":b;d.setAttribute("data-theme",t);if(b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);else d.removeAttribute("data-brand");if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
