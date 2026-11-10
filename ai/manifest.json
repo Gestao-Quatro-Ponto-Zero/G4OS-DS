@@ -6580,7 +6580,7 @@
         {
           "name": "DEFAULT_BRAND",
           "kind": "const",
-          "summary": "Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand."
+          "summary": "Marca padrão: G4 clássico, aplicada sem atributo data-brand."
         },
         {
           "name": "resolvedTheme",
@@ -34543,7 +34543,7 @@
       {
         "token": "--ds-page",
         "utility": "page",
-        "light": "#f9f9f9",
+        "light": "#ffffff",
         "dark": "#111113",
         "note": "fundo da área de trabalho"
       },
@@ -34564,49 +34564,49 @@
       {
         "token": "--ds-soft",
         "utility": "soft",
-        "light": "#f1f4f6",
+        "light": "#f8f8f9",
         "dark": "#202024",
         "note": "gelo: hover, cabeçalho de tabela, rodapé"
       },
       {
         "token": "--ds-rail",
         "utility": "rail",
-        "light": "#f3f5f7",
+        "light": "#fbfbfc",
         "dark": "#141416",
         "note": "sidebar"
       },
       {
         "token": "--ds-ink",
         "utility": "ink",
-        "light": "#031a26",
+        "light": "#202124",
         "dark": "#ececef",
         "note": "texto principal"
       },
       {
         "token": "--ds-ink-soft",
         "utility": "ink-soft",
-        "light": "#184560",
+        "light": "#484a50",
         "dark": "#c5c6cc",
         "note": "texto secundário forte"
       },
       {
         "token": "--ds-muted",
         "utility": "muted",
-        "light": "#5b6670",
+        "light": "#63666e",
         "dark": "#8f929a",
         "note": "metadado, rótulo, placeholder (AA)"
       },
       {
         "token": "--ds-line",
         "utility": "line",
-        "light": "#e4e7ea",
+        "light": "#e9eaed",
         "dark": "#2a2a2f",
         "note": "toda borda e divisória"
       },
       {
         "token": "--ds-line-strong",
         "utility": "line-strong",
-        "light": "#d5dbe0",
+        "light": "#d2d4da",
         "dark": "#3b3c43",
         "note": "hover de card, borda de checkbox"
       },
@@ -34620,7 +34620,7 @@
       {
         "token": "--ds-primary",
         "utility": "primary",
-        "light": "#001f35",
+        "light": "#202124",
         "dark": "#ececef",
         "note": null
       },
@@ -34648,14 +34648,14 @@
       {
         "token": "--ds-brand-accent",
         "utility": "brand-accent",
-        "light": "#a38e5a",
+        "light": "#b9915b",
         "dark": "#c9a46f",
         "note": "Marcador do item ativo na navegação (gesto de marca discreto)."
       },
       {
         "token": "--ds-nav-marker",
         "utility": "nav-marker",
-        "light": "#a38e5a",
+        "light": "#b9915b",
         "dark": "#c9a46f",
         "note": "Marca"
       },
@@ -34669,7 +34669,7 @@
       {
         "token": "--ds-blue",
         "utility": "blue",
-        "light": "#005b98",
+        "light": "#184560",
         "dark": "#8cb8da",
         "note": "link, ação textual, \"em andamento\""
       },
@@ -34697,21 +34697,21 @@
       {
         "token": "--ds-accent",
         "utility": "accent",
-        "light": "#a38e5a",
+        "light": "#b9915b",
         "dark": "#c9a46f",
         "note": "SÓ preenchimento: progresso, foco, próximo passo"
       },
       {
         "token": "--ds-accent-deep",
         "utility": "accent-deep",
-        "light": "#6e5a2c",
+        "light": "#7d5e33",
         "dark": "#dcbd8e",
         "note": "texto na cor de destaque"
       },
       {
         "token": "--ds-accent-soft",
         "utility": "accent-soft",
-        "light": "#f4efe4",
+        "light": "#f5eee3",
         "dark": "#2e2619",
         "note": "Estados"
       },
@@ -34760,7 +34760,7 @@
       {
         "token": "--ds-info",
         "utility": "info",
-        "light": "#005b98",
+        "light": "#0d47a1",
         "dark": "#90b8f8",
         "note": null
       },
@@ -34776,27 +34776,27 @@
         "utility": "ai",
         "light": "#18181b",
         "dark": "#0e0e10",
-        "note": "IA no KV: azul-céu só em preenchimento (botão enviar, orb, pensamento)."
+        "note": "IA acompanha a marca; G4 OS usa azul-céu no preset."
       },
       {
         "token": "--ds-ai-accent",
         "utility": "ai-accent",
-        "light": "#0084dd",
-        "dark": "#4fb3f0",
+        "light": "#202124",
+        "dark": "#c5c6cc",
         "note": null
       },
       {
         "token": "--ds-ai-accent-soft",
         "utility": "ai-accent-soft",
-        "light": "#cadfeb",
-        "dark": "#15324a",
-        "note": "Gradiente de marca do KV: só em título de momento, um por tela."
+        "light": "#f5eee3",
+        "dark": "#202024",
+        "note": "Gradiente de marca: só em título de momento, um por tela."
       },
       {
         "token": "--ds-gradient-brand",
         "utility": null,
-        "light": "linear-gradient(90deg, #a38e5a 0%, #3b5766 38%, #005b98 72%, #5f87a6 100%)",
-        "dark": "linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%)",
+        "light": "linear-gradient(90deg, var(--g4-gray-900) 0%, var(--g4-gray-700) 100%)",
+        "dark": "linear-gradient(90deg, #ececef 0%, #c5c6cc 100%)",
         "note": "Marca G4 OS (símbolo e \"OS\" do logotipo): dourado → aço → névoa."
       },
       {
@@ -34830,7 +34830,7 @@
       {
         "token": "--ds-haze",
         "utility": "haze",
-        "light": "#ebeae6",
+        "light": "#f2f2f3",
         "dark": "#1d1d21",
         "note": null
       },
@@ -34844,21 +34844,21 @@
       {
         "token": "--ds-chart-1",
         "utility": "chart-1",
-        "light": "#001f35",
+        "light": "#202124",
         "dark": "#ececef",
         "note": null
       },
       {
         "token": "--ds-chart-2",
         "utility": "chart-2",
-        "light": "#005b98",
+        "light": "#184560",
         "dark": "#6fa8d6",
         "note": null
       },
       {
         "token": "--ds-chart-3",
         "utility": "chart-3",
-        "light": "#a38e5a",
+        "light": "#b9915b",
         "dark": "#c9a46f",
         "note": null
       },
@@ -34879,7 +34879,7 @@
       {
         "token": "--ds-chart-6",
         "utility": "chart-6",
-        "light": "#9ca3af",
+        "light": "#a3a7b0",
         "dark": "#6b6e76",
         "note": null
       },
@@ -35033,7 +35033,7 @@
       {
         "token": "--ds-focus",
         "utility": null,
-        "light": "#005b98",
+        "light": "#63666e",
         "dark": "#8f929a",
         "note": null
       },
@@ -35047,14 +35047,14 @@
       {
         "token": "--ds-shadow-surface",
         "utility": null,
-        "light": "0 1px 2px #031a260a, 0 8px 24px #031a260a",
+        "light": "0 1px 2px #20212403",
         "dark": "0 1px 2px #00000040",
         "note": null
       },
       {
         "token": "--ds-shadow-raised",
         "utility": null,
-        "light": "0 24px 48px #031a2614, 0 2px 6px #031a260a",
+        "light": "0 3px 12px #20212407",
         "dark": "0 4px 16px #00000059",
         "note": null
       },
@@ -35096,7 +35096,7 @@
       {
         "token": "--ds-radius-scale",
         "utility": null,
-        "light": "1.25",
+        "light": "1",
         "dark": null,
         "note": "0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável"
       },

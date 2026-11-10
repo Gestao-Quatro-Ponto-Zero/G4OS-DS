@@ -20,7 +20,7 @@ Presets de themes.css.
 
 ## DEFAULT_BRAND (const)
 
-Marca padrão: G4 OS (KV G4 OS), aplicada sem atributo data-brand.
+Marca padrão: G4 clássico, aplicada sem atributo data-brand.
 
 ## resolvedTheme (function)
 
