@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.0
+
+### Minor Changes
+
+- 1e5ccca: Aparência **G4 OS** (`g4os`) passa a ser a padrão em `brandPresets`, `useTheme` e `themeScript` (constante `DEFAULT_BRAND`). O tema anterior ao KV vira o preset **G4 clássico** (`data-brand="g4-classico"`: branco, grafite e Royal Gold, com escuro neutro; a Figtree continua em Tipografia › Clássica). Quem tinha `g4` salvo no navegador (o padrão antigo) passa ao G4 OS. O `Popover` aceita `open`/`onOpenChange` para ser controlado.
+- 6d95fd6: Resumo do período ("catch up"): `CatchUpSources`, `CatchUpSection`, `CatchUpRow`, `CatchUpRowSkeleton`, `CatchUpDone` e `catchUpSections`, com o bloco `ai-catch-up` e a página "Resumo do período". A IA lê as fontes de um período e devolve quatro seções fixas (Precisa de você, Decisões tomadas, Entregue, Para saber); em Precisa de você, a linha traz a oferta da IA com a ação. Lido recolhe a linha e passa o foco para a próxima.
+- 5fb5e6e: `Combobox`: cada opção aceita `icon` (elemento à esquerda, como no `Select`), na lista e ao lado do valor escolhido. Serve para listas longas de entidades com marca, como apps e integrações: o logo ajuda a achar o item antes de ler o nome.
+- 1e5ccca: Identidade KV G4 OS nos componentes: novos `G4OSSymbol` (a esfera, com estado `live`), `G4OSLogo`, `GradientText`, `AiOrb`, `BrandHaze`, `AiDots` e `AiGreeting`, e as classes `ds-gradient-text`, `ds-glass`, `ds-ai-action`, `ds-orb` e `ds-haze`. `ProductMark` e `AiMark` passam a mostrar a esfera; `ChatComposer` e `SessionComposer` ficam em vidro com o botão de enviar no azul da IA; `ThinkingIndicator` usa os três pontos do KV; `AiBadge` passa a azul. `BrandPanel` ganha `tone` e o padrão agora é o tom claro do KV (gelo, névoa, orb e título em gradiente); `tone="navy"` mantém o painel anterior. Saudações da IA, painel de login e faixa de CTA da landing seguem o KV.
+- 1e5ccca: Tema padrão no visual do KV G4 OS: fundo gelo `#f9f9f9`, texto em Maua Blue, ação em Navy, link e info em azul profundo `#005b98`, dourado terroso `#a38e5a` no marcador e no progresso, raio 25 % maior e sombras difusas. A fonte padrão passa a ser Manrope (a Figtree fica em `data-type="classica"`). Novos tokens: `--ds-ai-accent`, `--ds-ai-accent-soft`, `--ds-gradient-brand` e `--ds-font-tagline`. O tema escuro não muda.
+- 03e524b: Gráficos cartesianos (`LineChart`, `AreaChart`, `BarChart`):
+
+  - `LineChart` deixa uma lacuna num ponto `null`. Antes a linha desenhava o ponto como zero, mas o eixo ignorava o `null`: com o eixo fora do zero (taxas, preços), a linha saía da área do gráfico. Um ponto isolado entre lacunas vira um marcador, e o cursor não marca um ponto sem dado. `labels` e `endLabels` também omitem os pontos sem dado, sem desenhar zero ou marcadores fora do gráfico.
+  - `axisWidth` fixa a largura do eixo de valores. Serve para alinhar gráficos empilhados que têm rótulos de tamanhos diferentes ("US$ 60,00" e "150 mi"): o mesmo dia fica na mesma posição em todos.
+
 ## 0.10.2
 
 ### Patch Changes
