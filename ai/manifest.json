@@ -21519,6 +21519,215 @@
       "doc": "components/tasks-ai.md"
     },
     {
+      "name": "catch-up",
+      "file": "src/components/catch-up.tsx",
+      "summary": "Resumo do que aconteceu enquanto a pessoa esteve fora (\"catch up\").",
+      "exports": [
+        {
+          "name": "CatchUpDone",
+          "kind": "component",
+          "summary": "\"Tudo em dia\": o resumo terminou e não sobrou nada para ler.",
+          "props": [
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Tudo em dia\"",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "CatchUpItem",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; section: CatchUpSectionId; source: string; sourceIcon?: ReactNode; text: ReactNode; context?: string; when?: string; people?: CatchUpPerson[]; href?: string; }"
+        },
+        {
+          "name": "CatchUpPerson",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ name: string; initials?: string; tint?: string; src?: string }"
+        },
+        {
+          "name": "CatchUpRow",
+          "kind": "component",
+          "summary": "Uma linha do resumo: marca da fonte, a frase, onde e quando, quem.",
+          "props": [
+            {
+              "name": "item",
+              "type": "CatchUpItem",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "action",
+              "type": "ReactNode | ((markAsRead: () => boolean) => ReactNode)",
+              "required": false,
+              "default": null,
+              "description": "A função preserva o foco e retorna false se a leitura já começou."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Detalhe abaixo da frase (a oferta da IA, uma citação)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpen",
+              "type": "((item: CatchUpItem) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Padrão: abre `href` numa aba nova."
+            },
+            {
+              "name": "onRead",
+              "type": "((id: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "openLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Abrir\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-resumo-do-periodo"
+        },
+        {
+          "name": "CatchUpRowSkeleton",
+          "kind": "component",
+          "summary": "Reserva a estrutura da linha enquanto o resumo chega, incluindo oferta e ação quando previstas.",
+          "props": [
+            {
+              "name": "withAction",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-resumo-do-periodo"
+        },
+        {
+          "name": "CatchUpSection",
+          "kind": "component",
+          "summary": "Uma seção do resumo: ícone, título e contagem, e as linhas.",
+          "props": [
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "section",
+              "type": "CatchUpSectionId",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "count",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Linhas na seção. Padrão: não mostra contagem."
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Troca o título padrão da seção."
+            }
+          ],
+          "examplePage": "ia-resumo-do-periodo"
+        },
+        {
+          "name": "CatchUpSectionId",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"needs-you\" | \"decisions\" | \"shipped\" | \"fyi\""
+        },
+        {
+          "name": "catchUpSections",
+          "kind": "const",
+          "summary": "As quatro seções, na ordem em que aparecem."
+        },
+        {
+          "name": "CatchUpSource",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ id: string; label: string; icon?: ReactNode; count?: number; unit?: string; state?: CatchUpSourceState; }"
+        },
+        {
+          "name": "CatchUpSources",
+          "kind": "component",
+          "summary": "Fontes lidas para o resumo, com a contagem do período.",
+          "props": [
+            {
+              "name": "sources",
+              "type": "CatchUpSource[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-resumo-do-periodo"
+        },
+        {
+          "name": "CatchUpSourceState",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"idle\" | \"reading\" | \"done\" | \"error\""
+        }
+      ],
+      "doc": "components/catch-up.md"
+    },
+    {
       "name": "record-panel",
       "file": "src/components/record-panel.tsx",
       "summary": "Painel lateral de registro (estilo banco de dados): abre ao clicar numa linha da tabela sem tirar a pessoa da lista.",
@@ -28102,6 +28311,48 @@
         "ToolCall",
         "ToolCallsSection",
         "formatCurrency"
+      ]
+    },
+    {
+      "slug": "ai-catch-up",
+      "file": "src/blocks/ai-catch-up.tsx",
+      "title": "Resumo do período",
+      "description": "\\\"Enquanto você estava fora\\\": a IA lê Slack, e-mail, GitHub e tarefas de um período e devolve quatro seções (Precisa de você, Decisões tomadas, Entregue, Para saber). Em Precisa de você, cada linha traz a oferta da IA com a ação.",
+      "category": "IA",
+      "concept": {
+        "goal": "Pôr a pessoa em dia em um minuto depois de um dia fora e resolver ali mesmo o que espera por ela, sem abrir quatro apps.",
+        "patterns": [
+          "Anatomia B · Painel em coluna estreita: período no topo, fontes, depois o resumo",
+          "Quatro seções fixas, nesta ordem; seção vazia não aparece",
+          "Precisa de você: a linha diz o que espera; a oferta da IA diz o que ela faz e leva o primário",
+          "Linhas reservadas enquanto o resumo chega; lido recolhe a linha e passa o foco"
+        ],
+        "adapt": [
+          "Volta de férias, início do dia, passagem de turno de suporte, resumo de um canal ou projeto"
+        ],
+        "avoid": [
+          "Resumo sem as fontes e a contagem do período",
+          "Oferecer trabalho em Decisões, Entregue ou Para saber",
+          "Executar a oferta sem a pessoa tocar em Fazer"
+        ]
+      },
+      "uses": [
+        "Button",
+        "CatchUpDone",
+        "CatchUpItem",
+        "CatchUpRow",
+        "CatchUpRowSkeleton",
+        "CatchUpSection",
+        "CatchUpSource",
+        "CatchUpSources",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "ToolGlyph",
+        "catchUpSections",
+        "notify",
+        "prefersReducedMotion",
+        "useVisibleInterval"
       ]
     },
     {
