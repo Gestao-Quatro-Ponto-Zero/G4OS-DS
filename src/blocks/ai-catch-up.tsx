@@ -167,12 +167,13 @@ export default function CatchUp() {
   const total = Object.values(counts[range]).reduce((a, b) => a + b, 0);
   const startRef = useRef<() => void>(() => {});
 
-  function start() {
+  function start(gmailFailure = failGmail) {
+    setFailGmail(gmailFailure);
     setRead(new Set());
     setStoppedAt(null);
     if (prefersReducedMotion()) {
       setStep(sourceMeta.length + digest.length);
-      setPhase(failGmail ? "error" : "ready");
+      setPhase(gmailFailure ? "error" : "ready");
       return;
     }
     setStep(0);
@@ -256,7 +257,7 @@ export default function CatchUp() {
           {phase === "idle" && (
             <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-line px-4 py-5">
               <p className="m-0 text-[13.5px] text-ink-soft">O resumo traz o que espera você, o que foi decidido, o que saiu e o que vale saber.</p>
-              <Button onClick={start} data-catch-up-fallback="">
+              <Button onClick={() => start()} data-catch-up-fallback="">
                 <Sparkles className="h-4 w-4" aria-hidden /> {current.button}
               </Button>
             </div>
@@ -265,7 +266,7 @@ export default function CatchUp() {
           {phase === "error" && (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-rose-soft px-4 py-3 text-[13px] text-ink" role="alert">
               O Gmail não respondeu. O resumo saiu sem ele.
-              <Button variant="ghost" size="sm" className="ml-auto" onClick={() => { setFailGmail(false); start(); }}>
+              <Button variant="ghost" size="sm" className="ml-auto" onClick={() => start(false)}>
                 <RotateCcw className="h-3.5 w-3.5" aria-hidden /> Tentar de novo
               </Button>
             </div>
@@ -274,7 +275,7 @@ export default function CatchUp() {
           {phase !== "idle" && (
             <article aria-busy={writing || undefined} aria-label="Resumo" className="flex flex-col gap-5 rounded-xl border border-line bg-surface px-4 py-4">
               {left === 0 && !writing ? (
-                <CatchUpDone action={<Button variant="ghost" size="sm" onClick={start} data-catch-up-fallback="">Resumir de novo</Button>}>
+                <CatchUpDone action={<Button variant="ghost" size="sm" onClick={() => start()} data-catch-up-fallback="">Resumir de novo</Button>}>
                   Nada mais {current.since}. As próximas novidades aparecem aqui.
                 </CatchUpDone>
               ) : (
@@ -331,7 +332,7 @@ export default function CatchUp() {
                           Marcar tudo como lido
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm" onClick={() => { setFailGmail(true); start(); }}>
+                      <Button variant="ghost" size="sm" onClick={() => start(true)}>
                         Simular falha
                       </Button>
                     </>

@@ -17,6 +17,7 @@ jobs:
       - run: npm run test:layout
       - run: npm run build
       - run: npm run showcase:build
+      - run: node scripts/test-catch-up.mjs
   react-compat:
     # O DS suporta React 18.2+ e 19: tipos (@types/react da versão), render no
     # servidor e no cliente de todos os blocos e páginas do showcase.
