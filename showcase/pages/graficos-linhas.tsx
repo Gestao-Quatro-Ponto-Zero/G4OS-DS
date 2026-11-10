@@ -80,6 +80,9 @@ export default function Page() {
           <ChartDemo title="Com meta" description="Linha de referência tracejada" code={`<LineChart reference={{ value: 12, label: "Meta 12 %" }} … />`}>
             <LineChart label="Conversão contra a meta" reference={{ value: 12, label: "Meta 12 %" }} data={d.conversion9} index="mes" series={[conv[0]]} format={pct} height={220} />
           </ChartDemo>
+          <ChartDemo title="Sem dado" description="Um ponto null vira lacuna, nunca zero" code={`<LineChart data={[{ mes: "jan", pme: 12.4 }, { mes: "fev", pme: null }, …]} … />`}>
+            <LineChart label="Conversão com meses sem dado" data={d.conversion9.map((row, i) => (i === 3 || i === 4 ? { ...row, pme: null } : row))} index="mes" series={[conv[0]]} format={pct} height={220} />
+          </ChartDemo>
           <ChartDemo title="Comparação tracejada" description="2026 × 2025" code={`<LineChart series={[{ key: "receita", label: "2026" }, { key: "anterior", label: "2025", dashed: true, color: "var(--ds-chart-6)" }]} … />`}>
             <LineChart
               label="Receita 2026 contra 2025"
@@ -129,11 +132,13 @@ export default function Page() {
             ["dots · labels · endLabels", "boolean", "false", "Pontos, valor em cada ponto, valor no último ponto."],
             ["series[].dashed", "boolean", "false", "Comparação (meta, período anterior)."],
             ["reference", "{ value, label }", "—", "Linha de meta."],
+            ["data[].<série>", "number | null", "—", "null é um ponto sem dado: a linha tem uma lacuna ali e o eixo ignora o ponto."],
+            ["axisWidth", "number", "pelo maior rótulo", "Largura fixa do eixo de valores, para alinhar gráficos empilhados."],
           ]}
         />
       </DocSection>
       <DocSection title="Regras">
-        <Rules items={[{ do: "Até 3 linhas; rótulo no fim dispensa legenda.", dont: "Espaguete de 8 linhas cruzadas." }, { do: "Eixo Y pode não começar em zero em taxas — diga na descrição.", dont: "Zoom no eixo para dramatizar variação pequena." }]} />
+        <Rules items={[{ do: "Até 3 linhas; rótulo no fim dispensa legenda.", dont: "Espaguete de 8 linhas cruzadas." }, { do: "Sem dado é null: a linha mostra a lacuna.", dont: "Trocar a falta de dado por zero: parece uma queda que não houve." }, { do: "Eixo Y pode não começar em zero em taxas — diga na descrição.", dont: "Zoom no eixo para dramatizar variação pequena." }]} />
       </DocSection>
     </DocPage>
   );
