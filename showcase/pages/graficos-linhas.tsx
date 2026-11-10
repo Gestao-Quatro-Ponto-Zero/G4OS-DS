@@ -81,7 +81,7 @@ export default function Page() {
             <LineChart label="Conversão contra a meta" reference={{ value: 12, label: "Meta 12 %" }} data={d.conversion9} index="mes" series={[conv[0]]} format={pct} height={220} />
           </ChartDemo>
           <ChartDemo title="Sem dado" description="Um ponto null não desenha linha, marcador ou rótulo" code={`<LineChart labels dots endLabels data={[{ mes: "jan", pme: 12.4 }, { mes: "fev", pme: null }, …]} … />`}>
-            <LineChart label="Conversão com meses sem dado" labels dots endLabels data={d.conversion9.map((row, i) => (i === 3 || i === 4 || i === 8 ? { ...row, pme: null } : row))} index="mes" series={[conv[0]]} format={pct} height={220} />
+            <LineChart label="Conversão com meses sem dado" labels dots endLabels data={d.conversion9.slice(0, 5).map((row, i) => (i === 1 || i === 4 ? { ...row, pme: null } : row))} index="mes" series={[conv[0]]} format={pct} height={220} />
           </ChartDemo>
           <ChartDemo title="Comparação tracejada" description="2026 × 2025" code={`<LineChart series={[{ key: "receita", label: "2026" }, { key: "anterior", label: "2025", dashed: true, color: "var(--ds-chart-6)" }]} … />`}>
             <LineChart
