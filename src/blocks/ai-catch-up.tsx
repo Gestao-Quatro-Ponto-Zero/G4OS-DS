@@ -48,10 +48,10 @@ export const meta = {
 
 /* Dados de exemplo NO TOPO do arquivo: troque pela sua API. */
 type Range = "1d" | "3d" | "7d";
-const ranges: { value: Range; label: string; since: string; button: string }[] = [
-  { value: "1d", label: "Hoje", since: "desde ontem, 18:00", button: "Resumir o dia" },
-  { value: "3d", label: "3 dias", since: "desde sex., 24/10", button: "Resumir 3 dias" },
-  { value: "7d", label: "Semana", since: "desde seg., 20/10", button: "Resumir a semana" },
+const ranges: { value: Range; label: string; since: string; from: string; button: string }[] = [
+  { value: "1d", label: "Hoje", since: "desde ontem, 18:00", from: "2025-10-26T18:00:00-03:00", button: "Resumir o dia" },
+  { value: "3d", label: "3 dias", since: "desde sex., 24/10", from: "2025-10-24T00:00:00-03:00", button: "Resumir 3 dias" },
+  { value: "7d", label: "Semana", since: "desde seg., 20/10", from: "2025-10-20T00:00:00-03:00", button: "Resumir a semana" },
 ];
 
 // ds-audit-ignore-start hex-color: cores de marca das fontes (apps de terceiros)
@@ -75,7 +75,7 @@ const sourceMeta: { id: keyof typeof icons; label: string; unit: string }[] = [
   { id: "linear", label: "Linear", unit: "tarefas" },
 ];
 
-type Row = CatchUpItem & { offer?: string; offerLabel?: string };
+type Row = CatchUpItem & { occurredAt: string; offer?: string; offerLabel?: string };
 const marina = { name: "Marina Couto", initials: "MC", tint: "#7c3aed" };
 const rafael = { name: "Rafael Lima", initials: "RL", tint: "#0e7490" };
 const bia = { name: "Beatriz Ramos", initials: "BR", tint: "#b45309" };
@@ -90,6 +90,7 @@ const digest: Row[] = [
     text: "A Marina pediu a versão final do contrato da Vértice até qui., 30/10.",
     context: "Contrato Vértice · rev. 4",
     when: "dom., 13:10",
+    occurredAt: "2025-10-26T13:10:00-03:00",
     people: [marina],
     href: "#",
     offer: "Posso responder à Marina com a rev. 4 em anexo e confirmar a entrega na quinta.",
@@ -103,6 +104,7 @@ const digest: Row[] = [
     text: "O Rafael espera sua revisão do plano de onboarding desde sexta.",
     context: "#ops-clientes",
     when: "sex., 17:42",
+    occurredAt: "2025-10-24T17:42:00-03:00",
     people: [rafael, bia],
     href: "#",
     offer: "Posso ler o plano e deixar três comentários no fio com os pontos em aberto.",
@@ -116,6 +118,7 @@ const digest: Row[] = [
     text: "O time decidiu adiar a migração do faturamento para 10/11.",
     context: "#financeiro",
     when: "sáb., 10:05",
+    occurredAt: "2025-10-25T10:05:00-03:00",
     people: [bia, caio],
     href: "#",
   },
@@ -127,6 +130,7 @@ const digest: Row[] = [
     text: "Exportação de CSV com mais de 50 mil linhas foi para produção.",
     context: "PR #418 · app-web",
     when: "seg., 09:12",
+    occurredAt: "2025-10-27T09:12:00-03:00",
     people: [caio],
     href: "#",
   },
@@ -138,6 +142,7 @@ const digest: Row[] = [
     text: "Os 3 chamados P1 de exportação foram fechados.",
     context: "SUP-221, SUP-224, SUP-230",
     when: "seg., 11:40",
+    occurredAt: "2025-10-27T11:40:00-03:00",
     href: "#",
   },
   {
@@ -148,12 +153,24 @@ const digest: Row[] = [
     text: "A Vértice mudou o ponto focal de compras para a Beatriz.",
     context: "Vértice · Compras",
     when: "sex., 15:20",
+    occurredAt: "2025-10-24T15:20:00-03:00",
     people: [bia],
+    href: "#",
+  },
+  {
+    id: "f2",
+    section: "fyi",
+    source: "Slack",
+    sourceIcon: icons.slack,
+    text: "O guia de passagem de turno foi atualizado com os contatos de plantão.",
+    context: "#ops-clientes",
+    when: "ter., 14:30",
+    occurredAt: "2025-10-21T14:30:00-03:00",
     href: "#",
   },
 ];
 
-type Phase = "idle" | "reading" | "writing" | "ready" | "error";
+type Phase = "idle" | "reading" | "writing" | "ready" | "error" | "stopped";
 const STEP_MS = 420;
 
 export default function CatchUp() {
@@ -164,6 +181,7 @@ export default function CatchUp() {
   const [failGmail, setFailGmail] = useState(false);
   const [stoppedAt, setStoppedAt] = useState<number | null>(null);
   const current = ranges.find((r) => r.value === range)!;
+  const periodDigest = digest.filter((item) => Date.parse(item.occurredAt) >= Date.parse(current.from));
   const total = Object.values(counts[range]).reduce((a, b) => a + b, 0);
   const startRef = useRef<() => void>(() => {});
 
@@ -172,7 +190,7 @@ export default function CatchUp() {
     setRead(new Set());
     setStoppedAt(null);
     if (prefersReducedMotion()) {
-      setStep(sourceMeta.length + digest.length);
+      setStep(sourceMeta.length + periodDigest.length);
       setPhase(gmailFailure ? "error" : "ready");
       return;
     }
@@ -190,7 +208,7 @@ export default function CatchUp() {
           if (failGmail) setPhase("error");
           else setPhase("writing");
         }
-        if (phase === "writing" && next >= sourceMeta.length + digest.length) setPhase("ready");
+        if (phase === "writing" && next >= sourceMeta.length + periodDigest.length) setPhase("ready");
         return next;
       });
     },
@@ -221,15 +239,15 @@ export default function CatchUp() {
         ? "idle"
         : phase === "error" && s.id === "gmail"
           ? "error"
-          : phase !== "reading" || i < step
+          : i < step
             ? "done"
-            : i === step
+            : phase === "reading" && i === step
               ? "reading"
               : "idle",
   }));
 
-  const written = stoppedAt ?? (phase === "ready" || phase === "error" ? digest.length : Math.max(0, step - sourceMeta.length));
-  const visible = digest.filter((d, i) => !read.has(d.id) && i < written && (phase !== "error" || d.source !== "Gmail"));
+  const written = stoppedAt ?? (phase === "ready" || phase === "error" ? periodDigest.length : Math.max(0, step - sourceMeta.length));
+  const visible = periodDigest.filter((d, i) => !read.has(d.id) && i < written && (phase !== "error" || d.source !== "Gmail"));
   const writing = phase === "reading" || phase === "writing";
   const left = visible.length;
 
@@ -272,7 +290,14 @@ export default function CatchUp() {
             </div>
           )}
 
-          {phase !== "idle" && (
+          {phase === "stopped" && (
+            <div role="status" className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-soft px-4 py-3 text-[13px] text-ink">
+              <p className="m-0 flex-1">Resumo interrompido. {written === 0 ? "A leitura parou antes de gerar itens." : "O conteúdo abaixo é parcial."}</p>
+              <Button variant="ghost" size="sm" onClick={() => start()}>Refazer resumo</Button>
+            </div>
+          )}
+
+          {phase !== "idle" && (phase !== "stopped" || left > 0) && (
             <article aria-busy={writing || undefined} aria-label="Resumo" className="flex flex-col gap-5 rounded-xl border border-line bg-surface px-4 py-4">
               {left === 0 && !writing ? (
                 <CatchUpDone action={<Button variant="ghost" size="sm" onClick={() => start()} data-catch-up-fallback="">Resumir de novo</Button>}>
@@ -280,9 +305,9 @@ export default function CatchUp() {
                 </CatchUpDone>
               ) : (
                 catchUpSections.map((section) => {
-                  const all = digest.filter((d) => d.section === section.id && (phase !== "error" || d.source !== "Gmail"));
+                  const all = periodDigest.filter((d) => d.section === section.id && (phase !== "error" || d.source !== "Gmail"));
                   const rows = all.filter((d) => !read.has(d.id));
-                  const shown = rows.filter((d) => digest.indexOf(d) < written);
+                  const shown = rows.filter((d) => periodDigest.indexOf(d) < written);
                   const pending = writing ? rows.length - shown.length : 0;
                   if (!shown.length && !pending) return null;
                   return (
@@ -322,7 +347,7 @@ export default function CatchUp() {
                 </span>
                 <span className="ml-auto flex items-center gap-1">
                   {writing ? (
-                    <Button variant="ghost" size="sm" onClick={() => { setStoppedAt(written); setPhase("ready"); }}>
+                    <Button variant="ghost" size="sm" onClick={() => { setStoppedAt(written); setPhase("stopped"); }}>
                       <Square className="h-3.5 w-3.5" aria-hidden /> Parar
                     </Button>
                   ) : (

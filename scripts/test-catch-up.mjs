@@ -34,9 +34,22 @@ try {
     const page = await browser.newPage({ reducedMotion });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.setContent('<div id="root"></div>');
+    // Sem o CSS do showcase, oculta a cópia compacta do cabeçalho como no topo da página.
+    await page.setContent('<style>.sticky-page-header-overlay { display: none }</style><div id="root"></div>');
     await page.addScriptTag({ content: bundle.outputFiles[0].text });
     await page.getByRole("button", { name: "Resumir 3 dias", exact: true }).click();
+    if (reducedMotion === "no-preference") {
+      await page.getByRole("button", { name: "Parar", exact: true }).click();
+      await page.getByText("Resumo interrompido. A leitura parou antes de gerar itens.").waitFor();
+      assert.equal(await page.getByText("Tudo em dia", { exact: true }).count(), 0, "interromper não conclui o resumo");
+      assert.equal(await page.getByRole("img", { name: / lido$/ }).count(), 0, "fontes pendentes não aparecem como lidas");
+      await page.getByRole("button", { name: "Refazer resumo", exact: true }).click();
+      await page.locator("[data-catch-up-read]").first().waitFor();
+      await page.getByRole("button", { name: "Parar", exact: true }).click();
+      await page.getByText("Resumo interrompido. O conteúdo abaixo é parcial.").waitFor();
+      assert.ok(await page.locator("[data-catch-up-read]").count() < 6, "a interrupção preserva só os itens já gerados");
+      await page.getByRole("button", { name: "Refazer resumo", exact: true }).click();
+    }
     await page.waitForFunction(() => globalThis.document.querySelectorAll("[data-catch-up-read]").length === 6);
     for (let attempt = 0; attempt < 2; attempt++) {
       await page.getByRole("button", { name: "Simular falha", exact: true }).click();
@@ -49,8 +62,19 @@ try {
     await page.getByRole("button", { name: "Marcar tudo como lido", exact: true }).click();
     await page.getByRole("button", { name: "Resumir de novo", exact: true }).click();
     await page.waitForFunction(() => globalThis.document.querySelectorAll("[data-catch-up-read]").length === 6);
+    if (reducedMotion === "no-preference") {
+      await page.locator("[data-catch-up-read]").first().click();
+    }
+    await page.getByRole("button", { name: "Semana", exact: true }).first().click();
+    await page.waitForFunction(() => globalThis.document.querySelectorAll("[data-catch-up-read]").length === 7);
+    await page.getByText("A Marina pediu a versão final do contrato da Vértice até qui., 30/10.").waitFor();
+    await page.getByRole("button", { name: "Hoje", exact: true }).first().click();
+    await page.waitForFunction(() => globalThis.document.querySelectorAll("[data-catch-up-read]").length === 2);
+    assert.equal(await page.getByText("A Marina pediu a versão final do contrato da Vértice até qui., 30/10.").count(), 0, "Hoje exclui itens anteriores ao período");
+    await page.getByRole("button", { name: "3 dias", exact: true }).first().click();
+    await page.waitForFunction(() => globalThis.document.querySelectorAll("[data-catch-up-read]").length === 6);
     assert.deepEqual(errors, [], "nenhum erro de render no navegador");
-    console.log(`  ✓ movimento ${reducedMotion} · início, falha, recuperação e novo resumo`);
+    console.log(`  ✓ movimento ${reducedMotion} · períodos, interrupção, falha, recuperação e novo resumo`);
     await page.close();
   }
 } finally {

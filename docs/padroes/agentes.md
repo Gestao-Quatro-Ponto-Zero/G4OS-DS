@@ -40,7 +40,9 @@ O agente pede permissão antes de uma ação com efeito externo. O cartão mostr
 - **As fontes aparecem antes do resumo** (`CatchUpSources`), com a contagem do período e o estado de leitura de cada uma: o número explica o tamanho do resumo.
 - **Nada pula enquanto o resumo chega.** `CatchUpRowSkeleton` reserva a altura das linhas; a altura do card muda uma vez.
 - **Lido recolhe a linha** e o foco vai para a próxima; "Marcar tudo como lido" fecha com `CatchUpDone`. As ações ficam visíveis também no celular.
-- **Período** em `SegmentedControl` (Hoje · 3 dias · Semana). Trocar o período com um resumo aberto refaz o resumo.
+- **Período** em `SegmentedControl` (Hoje · 3 dias · Semana). Trocar o período com um resumo aberto refaz a leitura e filtra os itens pelo início do período.
+- **Interromper mantém o resultado parcial.** Mostre quais fontes terminaram e ofereça refazer o resumo. `CatchUpDone` só aparece depois de concluir a leitura ou marcar todos os itens como lidos.
+- **Reiniciar cancela as ações pendentes das linhas anteriores.** Uma animação de saída não pode marcar itens do novo resumo como lidos.
 
 ## Regras gerais
 

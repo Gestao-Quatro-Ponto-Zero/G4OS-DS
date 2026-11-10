@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, Check, CheckCheck, CircleAlert, ExternalLink, Gavel, Info, PackageCheck } from "lucide-react";
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { prefersReducedMotion } from "../lib/motion";
 import { AvatarGroup, IconButton } from "./primitives";
@@ -168,7 +168,12 @@ export function CatchUpRow({
   const [leaving, setLeaving] = useState(false);
   const row = useRef<HTMLLIElement>(null);
   const done = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const meta = [item.context, item.when].filter(Boolean).join(" · ");
+
+  useEffect(() => () => {
+    if (timer.current !== null) clearTimeout(timer.current);
+  }, []);
 
   function finish() {
     if (done.current) return;
@@ -187,7 +192,7 @@ export function CatchUpRow({
   function read() {
     if (prefersReducedMotion()) return finish();
     setLeaving(true);
-    window.setTimeout(finish, 220);
+    timer.current = setTimeout(finish, 220);
   }
 
   return (
