@@ -95,7 +95,7 @@ function Appearance() {
                   <span className="h-3.5 w-3.5 rounded-full ring-1 ring-surface" style={{ background: b.primary }} />
                   <span className="-ml-1 h-3.5 w-3.5 rounded-full ring-1 ring-surface" style={{ background: b.accent }} />
                 </span>
-                <span className="truncate">{b.label}</span>
+                <span className="min-w-0 leading-snug">{b.label}</span>
               </button>
             ))}
           </div>

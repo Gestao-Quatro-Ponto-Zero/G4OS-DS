@@ -6,7 +6,7 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 | --- | --- | --- |
 | 1 · Toque (padrão) | Todos os produtos | Marcador Royal Gold no item ativo da navegação (`--ds-nav-marker`), progresso dourado, selos (`BrandBadge`). |
 | 2 · Momento | Login, fim de onboarding, capa de relatório, saudação da IA, conquista | `BrandPanel` (navy `--ds-brand`, texto Royal Silver `--ds-on-brand`, brilho Royal Gold `--ds-brand-accent`), `BrandButton`, `AchievementCard`. **No máximo um por tela.** |
-| 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4-institucional">`: fundo e superfícies neutros (sem bege), Navy na ação, Gold no destaque, escuro neutro com Silver na ação e semânticas do manual. |
+| 3 · Institucional | Apresentações, portais, páginas públicas | `<html data-brand="g4os">` aplica o visual do KV, com gelo, navy e dourado. O identificador legado `g4-institucional` é um alias desse preset. |
 
 ## KV G4 OS
 
@@ -15,15 +15,15 @@ O tema padrão segue o key visual do G4 OS: fundo gelo `#F9F9F9`, texto em Maua 
 - **Gradiente de marca** (`--ds-gradient-brand`): dourado `#A38E5A` → aço `#3B5766` → azul `#005B98` → azul acinzentado `#5F87A6`. Aplicado como `background-clip: text` em títulos de momento. No KV ele se dissolve no fundo; na interface termina em um azul legível (3:1 ou mais sobre o gelo).
 - **Esfera G4 OS**: o símbolo da IA. Em movimento ela gira, recalcula e conduz; parada, aparece como orb azul desfocado (`--ds-ai-accent`) atrás do conteúdo da IA. Um por tela.
 - **Azul-céu** (`#0084DD`) é exclusivo da IA: botão enviar, orb, os três pontos de "pensando". Ações comuns continuam em Navy.
-- **Dourado terroso** (`#A38E5A`) substitui o Royal Gold no produto: marcador da navegação, progresso, destaque de série.
+- **Dourado terroso** (`#A38E5A`) substitui o Royal Gold no preset G4 OS: marcador da navegação, progresso, destaque de série.
 
 ## Paleta → tokens
 
 | Nome | Hex | Primitivo | Semântico |
 | --- | --- | --- | --- |
-| Navy Blue | `#001F35` | `--g4-navy-blue` | `--ds-brand`; `--ds-primary` no Institucional |
+| Navy Blue | `#001F35` | `--g4-navy-blue` | `--ds-brand`; `--ds-primary` no G4 OS |
 | Royal Gold | `#B9915B` | `--g4-royal-gold` | `--ds-accent`, `--ds-brand-accent`, `--ds-nav-marker` |
-| Royal Silver | `#F5F4F3` | `--g4-royal-silver` | `--ds-on-brand`; `--ds-soft` no Institucional |
+| Royal Silver | `#F5F4F3` | `--g4-royal-silver` | `--ds-on-brand`; superfícies de marca |
 | Maua Blue | `#031A26` | `--g4-maua-blue` | `--ds-navy` (painéis profundos, slides) |
 | Scaling Blue | `#184560` | `--g4-scaling-blue` | `--ds-blue` (links) |
 | Founders Red | `#441B1B` | `--g4-founders-red` | `--ds-founders` (só Founders) |

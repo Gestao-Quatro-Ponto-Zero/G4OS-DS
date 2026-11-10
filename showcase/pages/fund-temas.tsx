@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Delta,
+  DEFAULT_BRAND,
   KpiCard,
   SegmentedControl,
   StagePath,
@@ -178,7 +179,7 @@ export default function Page() {
                     onClick={() => {
                       setPrimary(b.primary);
                       setAccent(b.accent);
-                      setName(b.id === "g4os" ? "cliente" : b.id);
+                      setName(b.id === DEFAULT_BRAND ? "cliente" : b.id);
                     }}
                     className="inline-flex items-center gap-1.5 rounded-md bg-surface px-2 py-1 text-[12px] text-ink-soft ring-1 ring-line hover:bg-soft"
                   >

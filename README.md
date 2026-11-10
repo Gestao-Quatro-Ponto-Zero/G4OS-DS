@@ -95,7 +95,7 @@ Para começar uma tela, copie o bloco mais parecido de `node_modules/@g4ai/ds/sr
 
 ```html
 <html data-theme="dark">                <!-- light | dark | system; ThemeToggle/useTheme trocam e salvam -->
-<html data-brand="g4-institucional">    <!-- presets de marca; ou o seu [data-brand="acme"] com --ds-primary… -->
+<html data-brand="g4os">    <!-- presets de marca; ou o seu [data-brand="acme"] com --ds-primary… -->
 <html data-type="editorial">            <!-- presets de tipografia -->
 ```
 

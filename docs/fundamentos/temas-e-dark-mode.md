@@ -27,9 +27,11 @@ const { mode, setMode, brand, setBrand, resolved } = useTheme();
 
 ## Marca de cliente
 
-A aparência padrão é **G4 OS** (`g4os`, o visual do KV G4 OS): é aplicada sem `data-brand`, então não precisa de atributo. `useTheme` e `themeScript` tratam `g4os` como padrão (`DEFAULT_BRAND`).
+A aparência padrão é **G4 clássico** (`g4-classico`), com superfícies brancas, tinta grafite, Royal Gold e raio padrão. É aplicada sem `data-brand`. `useTheme` e `themeScript` tratam `g4-classico` e o identificador legado `g4` como padrão (`DEFAULT_BRAND`).
 
-Presets prontos em `src/styles/themes.css` (importado por `styles.css`): `g4-classico` (G4 clássico, o tema anterior ao KV: branco, grafite e Royal Gold; combine com `data-type="classica"` para a Figtree), `g4-institucional`, `oceano`, `floresta`, `vinho`, `grafite`, `violeta`.
+O preset **G4 OS** (`g4os`) oferece o visual do KV, com gelo, navy, dourado e destaque azul para IA. Ele reúne a opção institucional. Preferências salvas e atributos com `g4-institucional` continuam funcionando como alias de `g4os`. Os demais presets ficam em `src/styles/themes.css`, importado por `styles.css`.
+
+Tipografia é independente da marca. A fonte padrão continua Manrope. Use `data-type="classica"` para escolher Figtree.
 
 ```html
 <html data-theme="system" data-brand="oceano">
@@ -109,7 +111,8 @@ Tipo é independente da cor: qualquer marca combina com qualquer tipografia.
 
 | `data-type` | Texto | Títulos |
 | --- | --- | --- |
-| (nenhum) / `g4` | Figtree | Figtree 600 |
+| (nenhum) / `g4` | Manrope | Manrope 500 |
+| `classica` | Figtree | Figtree 600 |
 | `editorial` | Inter | Source Serif 4, 500 |
 | `tecnica` | IBM Plex Sans (+ Plex Mono) | Plex 600 |
 | `neutra` | Inter | Inter 650 |
