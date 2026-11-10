@@ -1,5 +1,5 @@
 import { Check, Monitor, Moon, RotateCcw, Sun } from "lucide-react";
-import { Badge, Button, Delta, SettingsSection, Switch, ThemeToggle, brandPresets, cn, notify, typePresets, useTheme } from "@g4ai/ds";
+import { Badge, Button, DEFAULT_BRAND, Delta, SettingsSection, Switch, ThemeToggle, brandPresets, cn, notify, typePresets, useTheme } from "@g4ai/ds";
 import { useState } from "react";
 import { org } from "./data/workspace";
 import { SettingsShell } from "./shells/settings-shell";
@@ -87,7 +87,7 @@ export default function SettingsAppearanceBlock() {
   const [compact, setCompact] = useState(false);
   const reset = () => {
     theme.setMode("light");
-    theme.setBrand("g4");
+    theme.setBrand(DEFAULT_BRAND);
     theme.setType("g4");
     notify("Aparência restaurada para o padrão G4");
   };

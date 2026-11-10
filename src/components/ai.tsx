@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { AiDots, G4OSSymbol } from "./g4os";
 import { formatNumber } from "../lib/format";
 
 /*
@@ -99,22 +100,22 @@ export function useStreamingText(text: string, { active = true, charsPerTick = 3
 /** Marca "gerado por IA". Use ao lado de conteúdo que a IA escreveu ou resumiu. */
 export function AiBadge({ label = "IA", className }: { label?: string; className?: string }) {
   return (
-    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-medium leading-4 text-accent-deep ring-1 ring-accent/25", className)}>
+    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-md bg-ai-accent-soft px-1.5 py-0.5 text-[11px] font-medium leading-4 text-blue ring-1 ring-ai-accent/25", className)}>
       <Sparkles className="h-3 w-3" aria-hidden />
       {label}
     </span>
   );
 }
 
-/** Marca do assistente (avatar redondo com brilho). */
-export function AiMark({ size = 28, className }: { size?: number; className?: string }) {
+/** Marca do assistente: a esfera G4 OS num disco de gelo. `live` = pensando. */
+export function AiMark({ size = 28, live = false, className }: { size?: number; live?: boolean; className?: string }) {
   return (
     <span
       aria-hidden
-      className={cn("inline-grid shrink-0 place-items-center rounded-full bg-primary text-on-primary", className)}
+      className={cn("inline-grid shrink-0 place-items-center rounded-full bg-surface ring-1 ring-line", className)}
       style={{ width: size, height: size }}
     >
-      <Sparkles style={{ width: size * 0.5, height: size * 0.5 }} strokeWidth={1.8} />
+      <G4OSSymbol size={size * 0.72} live={live} />
     </span>
   );
 }
@@ -130,11 +131,7 @@ export function ThinkingIndicator({ label = "Pensando", startedAt, className }: 
   const elapsed = startedAt ? now - startedAt : 0;
   return (
     <span role="status" aria-live="polite" className={cn("inline-flex items-center gap-2 text-[13px] text-muted", className)}>
-      <span className="inline-flex items-center gap-1" aria-hidden>
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="h-1.5 w-1.5 rounded-full bg-line-strong motion-safe:animate-pulse" style={{ animationDelay: `${i * 160}ms` }} />
-        ))}
-      </span>
+      <AiDots size={6} />
       {label}…
       {elapsed > 3000 && <span className="tabular-nums text-muted">{formatDuration(elapsed)}</span>}
     </span>
@@ -482,7 +479,7 @@ export function ChatComposer({
   };
   return (
     <div className={cn("min-w-0", className)}>
-      <div className="focus-field rounded-2xl border border-line bg-surface shadow-surface transition-colors">
+      <div className="focus-field ds-glass rounded-2xl transition-colors">
         {attachments && attachments.length > 0 && (
           <div className="flex flex-wrap gap-1.5 px-3 pt-3">
             {attachments.map((a) => (
@@ -519,7 +516,7 @@ export function ChatComposer({
           )}
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">{chips}</div>
           {busy && onStop ? (
-            <button type="button" onClick={onStop} aria-label="Parar resposta" title="Parar" className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary hover:bg-primary/90">
+            <button type="button" onClick={onStop} aria-label="Parar resposta" title="Parar" className="ds-ai-action inline-flex h-8 w-8 items-center justify-center rounded-full">
               <Square className="h-3 w-3 fill-current" />
             </button>
           ) : (
@@ -529,7 +526,7 @@ export function ChatComposer({
               disabled={!value.trim() || disabled}
               aria-label="Enviar"
               title="Enviar"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-30"
+              className="ds-ai-action inline-flex h-8 w-8 items-center justify-center rounded-full"
             >
               <ArrowUp className="h-4 w-4" />
             </button>

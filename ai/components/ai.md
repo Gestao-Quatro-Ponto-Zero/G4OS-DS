@@ -48,11 +48,12 @@ Exemplo (showcase `#/p/ia-assistente`):
 
 ## AiMark
 
-Marca do assistente (avatar redondo com brilho).
+Marca do assistente: a esfera G4 OS num disco de gelo.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `className` | `string \| undefined` |  |  |
+| `live` | `boolean \| undefined` | `false` |  |
 | `size` | `number \| undefined` | `28` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.

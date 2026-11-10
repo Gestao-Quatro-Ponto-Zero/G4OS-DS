@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ProductMark, Spinner, cn } from "@g4ai/ds";
+import { AiOrb, BrandHaze, G4OSSymbol, ProductMark, Spinner, cn } from "@g4ai/ds";
 import { org } from "../data/workspace";
 import { frameHref, goTo } from "./frame-route";
 import { atlasRoutes } from "./atlas-shell";
@@ -74,7 +74,7 @@ const brand = {
   ],
 };
 
-/** Formulário à esquerda + painel de marca navy à direita (some abaixo de 1024px). */
+/** Formulário à esquerda + painel de marca do KV à direita (some abaixo de 1024px). */
 export function AuthSplit({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   return (
     <div className="grid h-dvh overflow-y-auto bg-page lg:grid-cols-[minmax(0,1fr)_minmax(0,560px)]">
@@ -83,30 +83,25 @@ export function AuthSplit({ children, footer }: { children: ReactNode; footer?: 
         <main className="enter mx-auto flex w-full max-w-[380px] flex-1 flex-col justify-center py-10">{children}</main>
         <footer className="mx-auto w-full max-w-[380px] text-center text-[12px] text-muted">{footer ?? <AuthLegal />}</footer>
       </div>
-      {/* ds-audit-ignore-start white-black: painel de marca bg-navy fica escuro nos dois temas */}
-      <aside className="relative hidden overflow-hidden bg-navy p-10 text-white lg:flex lg:flex-col lg:justify-end">
-        <svg aria-hidden className="absolute -right-24 -top-24 h-[420px] w-[420px] opacity-[0.12]" viewBox="0 0 200 200" fill="none">
-          <circle cx="100" cy="100" r="99" stroke="currentColor" />
-          <circle cx="100" cy="100" r="70" stroke="currentColor" />
-          <circle cx="100" cy="100" r="41" stroke="var(--ds-accent)" />
-          <path d="M40 130 100 55l60 75" stroke="currentColor" />
-        </svg>
+      <aside className="relative isolate hidden overflow-hidden border-l border-line bg-soft p-10 lg:flex lg:flex-col lg:justify-end">
+        <BrandHaze size={720} className="absolute -right-48 -top-40 -z-10" />
+        <AiOrb size={340} blur={14} live className="absolute -right-20 top-16 -z-10 opacity-75" />
+        <G4OSSymbol size={260} className="absolute right-[44px] top-[76px] -z-10 opacity-20 mix-blend-soft-light" />
         <div className="relative">
           <div className="mb-8 grid grid-cols-2 gap-3">
             {brand.stats.map((s) => (
-              <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
-                <div className="text-[26px] font-semibold tabular-nums tracking-tight text-brand-accent">{s.value}</div>
-                <div className="mt-0.5 text-[12.5px] text-white/70">{s.label}</div>
+              <div key={s.label} className="ds-glass rounded-xl px-4 py-3">
+                <div className="text-[26px] font-semibold tabular-nums tracking-tight text-ink">{s.value}</div>
+                <div className="mt-0.5 text-[12.5px] text-muted">{s.label}</div>
               </div>
             ))}
           </div>
-          <blockquote className="m-0 text-[18px] font-medium leading-snug tracking-tight">“{brand.quote}”</blockquote>
-          <p className="m-0 mt-4 text-[13px] text-white/70">
-            <span className="font-medium text-white">{brand.author}</span> · {brand.role}
+          <blockquote className="m-0 text-balance text-[20px] font-medium leading-snug tracking-tight text-ink-soft">“{brand.quote}”</blockquote>
+          <p className="m-0 mt-4 text-[13px] text-muted">
+            <span className="font-medium text-ink">{brand.author}</span> · {brand.role}
           </p>
         </div>
       </aside>
-      {/* ds-audit-ignore-end */}
     </div>
   );
 }

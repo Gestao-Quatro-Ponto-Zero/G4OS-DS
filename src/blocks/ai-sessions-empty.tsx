@@ -1,6 +1,6 @@
-import { CalendarDays, FileText, FolderOpen, Mail, MessageSquareText, Paperclip, Search, Sparkles } from "lucide-react";
+import { CalendarDays, FileText, FolderOpen, Mail, MessageSquareText, Paperclip, Search } from "lucide-react";
 import { useState } from "react";
-import { ComposerChip, Disclaimer, FileCard, Page, SessionComposer, SessionStatusChip, ToolsBar, VoiceModeButton, notify, type SlashCommand } from "@g4ai/ds";
+import { AiGreeting, AiOrb, ComposerChip, Disclaimer, FileCard, Page, SessionComposer, SessionStatusChip, ToolsBar, VoiceModeButton, notify, type SlashCommand } from "@g4ai/ds";
 import { agents, osUser, sessions, tools as seedTools, type ContextSource } from "./data/os-sessions";
 import { frameHref, go } from "./shells/frame-route";
 import { OsShell, osRoutes } from "./shells/os-shell";
@@ -55,15 +55,10 @@ export default function AiSessionsEmpty() {
     <OsShell current={osRoutes.home}>
       <Page className="relative">
         <div className="mx-auto flex max-w-[760px] flex-col gap-8 pb-24 pt-6 sm:pt-12">
-          <header className="text-center">
-            <span className="mx-auto mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-ink/[0.06] text-ink">
-              <Sparkles className="h-5 w-5" />
-            </span>
-            <h1 className="m-0 text-[26px] font-semibold tracking-[-0.03em] sm:text-[30px]" style={{ fontFamily: "var(--ds-font-display)" }}>
-              {greeting}, {osUser.first}
-            </h1>
-            <p className="m-0 mt-2 text-[14px] text-muted">O que o G4 OS pode fazer por você agora?</p>
-          </header>
+          <div className="relative isolate">
+            <AiOrb size={360} blur={22} live className="absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 opacity-30" />
+            <AiGreeting align="center" greeting={greeting} name={osUser.first} question="qual decisão você precisa tomar hoje?" />
+          </div>
 
           <div>
             <SessionComposer

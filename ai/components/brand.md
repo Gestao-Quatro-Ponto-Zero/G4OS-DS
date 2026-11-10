@@ -2,7 +2,7 @@
 
 Arquivo: `src/components/brand.tsx` · importe de `@g4ai/ds`.
 
-Momentos de marca G4: Navy Blue + Royal Gold + Royal Silver, do manual de marca.
+Momentos de marca G4.
 
 ## AchievementCard
 
@@ -66,7 +66,7 @@ Exemplo (showcase `#/p/fund-marca`):
 
 ## BrandPanel
 
-Painel navy com brilho dourado sutil e grade fina.
+Painel de momento de marca.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
@@ -79,6 +79,7 @@ Painel navy com brilho dourado sutil e grade fina.
 | `kicker` | `ReactNode` |  |  |
 | `size` | `"sm" \| "md" \| "lg" \| undefined` | `"md"` |  |
 | `title` | `ReactNode` |  |  |
+| `tone` | `BrandTone \| undefined` | `"kv"` | "kv" (padrão, claro) ou "navy" (painel escuro do manual de marca). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

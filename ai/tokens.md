@@ -7,47 +7,55 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 
 | Utilitário (sufixo) | Variável | Claro | Escuro | Uso |
 | --- | --- | --- | --- | --- |
-| `page` | `--ds-page` | `#ffffff` | `#111113` | fundo da área de trabalho |
+| `page` | `--ds-page` | `#f9f9f9` | `#111113` | fundo da área de trabalho |
 | `surface` | `--ds-surface` | `#ffffff` | `#18181b` | card, painel, tabela, campo |
 | `popover` | `--ds-popover` | `#ffffff` | `#1f1f23` | menu, popover, modal, toast |
-| `soft` | `--ds-soft` | `#f8f8f9` | `#202024` | gelo: hover, cabeçalho de tabela, rodapé |
-| `rail` | `--ds-rail` | `#fbfbfc` | `#141416` | sidebar |
-| `ink` | `--ds-ink` | `#202124` | `#ececef` | texto principal |
-| `ink-soft` | `--ds-ink-soft` | `#484a50` | `#c5c6cc` | texto secundário forte |
-| `muted` | `--ds-muted` | `#63666e` | `#8f929a` | metadado, rótulo, placeholder (AA) |
-| `line` | `--ds-line` | `#e9eaed` | `#2a2a2f` | toda borda e divisória |
-| `line-strong` | `--ds-line-strong` | `#d2d4da` | `#3b3c43` | hover de card, borda de checkbox |
+| `soft` | `--ds-soft` | `#f1f4f6` | `#202024` | gelo: hover, cabeçalho de tabela, rodapé |
+| `rail` | `--ds-rail` | `#f3f5f7` | `#141416` | sidebar |
+| `ink` | `--ds-ink` | `#031a26` | `#ececef` | texto principal |
+| `ink-soft` | `--ds-ink-soft` | `#184560` | `#c5c6cc` | texto secundário forte |
+| `muted` | `--ds-muted` | `#5b6670` | `#8f929a` | metadado, rótulo, placeholder (AA) |
+| `line` | `--ds-line` | `#e4e7ea` | `#2a2a2f` | toda borda e divisória |
+| `line-strong` | `--ds-line-strong` | `#d5dbe0` | `#3b3c43` | hover de card, borda de checkbox |
 | `on-ink` | `--ds-on-ink` | `#ffffff` | `#121214` | texto sobre preenchimento forte (ink, rose, ok…) |
-| `primary` | `--ds-primary` | `#202124` | `#ececef` |  |
+| `primary` | `--ds-primary` | `#001f35` | `#ececef` |  |
 | `on-primary` | `--ds-on-primary` | `#ffffff` | `#121214` | Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela. |
 | `brand` | `--ds-brand` | `#001f35` | `#0a2236` |  |
 | `on-brand` | `--ds-on-brand` | `#f5f4f3` | `#f5f4f3` |  |
-| `brand-accent` | `--ds-brand-accent` | `#b9915b` | `#c9a46f` | Marcador do item ativo na navegação (gesto de marca discreto). |
-| `nav-marker` | `--ds-nav-marker` | `#b9915b` | `#c9a46f` | Marca |
+| `brand-accent` | `--ds-brand-accent` | `#a38e5a` | `#c9a46f` | Marcador do item ativo na navegação (gesto de marca discreto). |
+| `nav-marker` | `--ds-nav-marker` | `#a38e5a` | `#c9a46f` | Marca |
 | `navy` | `--ds-navy` | `#031a26` | `#0a2130` | superfícies escuras de marca (fica escura nos dois modos) |
-| `blue` | `--ds-blue` | `#184560` | `#8cb8da` | link, ação textual, "em andamento" |
+| `blue` | `--ds-blue` | `#005b98` | `#8cb8da` | link, ação textual, "em andamento" |
 | `magenta` | `--ds-clay` | `#842e20` | `#e59a8a` |  |
 | `magenta-soft` | `--ds-clay-soft` | `#f6e7e3` | `#3a211c` |  |
 | `founders` | `--ds-founders` | `#441b1b` | `#c98b8b` |  |
-| `accent` | `--ds-accent` | `#b9915b` | `#c9a46f` | SÓ preenchimento: progresso, foco, próximo passo |
-| `accent-deep` | `--ds-accent-deep` | `#7d5e33` | `#dcbd8e` | texto na cor de destaque |
-| `accent-soft` | `--ds-accent-soft` | `#f5eee3` | `#2e2619` | Estados |
+| `accent` | `--ds-accent` | `#a38e5a` | `#c9a46f` | SÓ preenchimento: progresso, foco, próximo passo |
+| `accent-deep` | `--ds-accent-deep` | `#6e5a2c` | `#dcbd8e` | texto na cor de destaque |
+| `accent-soft` | `--ds-accent-soft` | `#f4efe4` | `#2e2619` | Estados |
 | `ok` | `--ds-ok` | `#1b5e20` | `#7fd18b` |  |
 | `ok-soft` | `--ds-ok-soft` | `#e8f5e9` | `#15291a` |  |
 | `amber` | `--ds-amber` | `#b54500` | `#ffb163` |  |
 | `amber-soft` | `--ds-amber-soft` | `#fff3e0` | `#33240f` |  |
 | `rose` | `--ds-rose` | `#b71c1c` | `#ff8f86` |  |
 | `rose-soft` | `--ds-rose-soft` | `#ffebee` | `#3a1719` |  |
-| `info` | `--ds-info` | `#0d47a1` | `#90b8f8` |  |
+| `info` | `--ds-info` | `#005b98` | `#90b8f8` |  |
 | `info-soft` | `--ds-info-soft` | `#e3f2fd` | `#14233a` | Canvas escuros (grafo, IA) |
-| `ai` | `--ds-ai` | `#18181b` | `#0e0e10` |  |
+| `ai` | `--ds-ai` | `#18181b` | `#0e0e10` | IA no KV: azul-céu só em preenchimento (botão enviar, orb, pensamento). |
+| `ai-accent` | `--ds-ai-accent` | `#0084dd` | `#4fb3f0` |  |
+| `ai-accent-soft` | `--ds-ai-accent-soft` | `#cadfeb` | `#15324a` | Gradiente de marca do KV: só em título de momento, um por tela. |
+| — | `--ds-gradient-brand` | `linear-gradient(90deg, #a38e5a 0%, #3b5766 38%, #005b98 72%, #5f87a6 100%)` | `linear-gradient(90deg, #c9a46f 0%, #8cb8da 55%, #c5c6cc 100%)` | Marca G4 OS (símbolo e "OS" do logotipo): dourado → aço → névoa. |
+| — | `--ds-mark-gold` | `#caa977` | `#c9a46f` |  |
+| — | `--ds-mark-steel` | `#3b5766` | `#8cb8da` |  |
+| — | `--ds-mark-mist` | `#768086` | `#6b6e76` |  |
+| `orb-core` | `--ds-orb-core` | `#004777` | `#0a3a5e` | Névoa de fundo dos momentos de marca (o cinza quente desfocado do KV). |
+| `haze` | `--ds-haze` | `#ebeae6` | `#1d1d21` |  |
 | `graph` | `--ds-graph` | `#121214` | `#0b0b0d` | Dados |
-| `chart-1` | `--ds-chart-1` | `#202124` | `#ececef` |  |
-| `chart-2` | `--ds-chart-2` | `#184560` | `#6fa8d6` |  |
-| `chart-3` | `--ds-chart-3` | `#b9915b` | `#c9a46f` |  |
+| `chart-1` | `--ds-chart-1` | `#001f35` | `#ececef` |  |
+| `chart-2` | `--ds-chart-2` | `#005b98` | `#6fa8d6` |  |
+| `chart-3` | `--ds-chart-3` | `#a38e5a` | `#c9a46f` |  |
 | `chart-4` | `--ds-chart-4` | `#842e20` | `#e08d7c` |  |
 | `chart-5` | `--ds-chart-5` | `#5f7f6f` | `#8fbfa6` |  |
-| `chart-6` | `--ds-chart-6` | `#a3a7b0` | `#6b6e76` |  |
+| `chart-6` | `--ds-chart-6` | `#9ca3af` | `#6b6e76` |  |
 | `chart-grid` | `--ds-chart-grid` | `#eef0f2` | `#242428` | Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. |
 | `tag-gray-bg` | `--ds-tag-gray-bg` | `#f0f0ef` | `#2f2f31` |  |
 | `tag-gray-fg` | `--ds-tag-gray-fg` | `#4d4c49` | `#c9c8c4` |  |
@@ -69,22 +77,23 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `tag-red-fg` | `--ds-tag-red-fg` | `#a8302a` | `#f4a29b` | Marca de entidade (iniciais tingidas): quanto da cor da conta entra no texto/fundo |
 | — | `--ds-mark-text` | `70%` | `38%` |  |
 | — | `--ds-mark-bg` | `8%` | `16%` | Foco e sobreposição |
-| — | `--ds-focus` | `#63666e` | `#8f929a` |  |
+| — | `--ds-focus` | `#005b98` | `#8f929a` |  |
 | — | `--ds-backdrop` | `rgb(0 0 0 / 0.2)` | `rgb(0 0 0 / 0.55)` | Sombras: quase invisíveis no claro |
-| — | `--ds-shadow-surface` | `0 1px 2px #20212403` | `0 1px 2px #00000040` |  |
-| — | `--ds-shadow-raised` | `0 3px 12px #20212407` | `0 4px 16px #00000059` |  |
+| — | `--ds-shadow-surface` | `0 1px 2px #031a260a, 0 8px 24px #031a260a` | `0 1px 2px #00000040` |  |
+| — | `--ds-shadow-raised` | `0 24px 48px #031a2614, 0 2px 6px #031a260a` | `0 4px 16px #00000059` |  |
 | — | `--ds-shadow-pressed` | `0 1px 3px #20212408` | `0 1px 3px #00000059` |  |
 | — | `--ds-shadow-primary` | `inset 0 1px 0 #ffffff24, 0 1px 2px #20212418` | `inset 0 1px 0 #ffffff14, 0 1px 2px #00000066` |  |
 | — | `--ds-shadow-popup` | `0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a` | `0 20px 25px -5px #00000080, 0 8px 10px -6px #00000066, 0 0 0 1px #ffffff0a` |  |
 | — | `--ds-shadow-toast` | `0 8px 32px #20212412, 0 2px 4px #20212404` | `0 8px 32px #00000080, 0 0 0 1px #ffffff0a` |  |
 | — | `--ds-shadow-overlay` | `0 25px 50px -12px #00000026` | `0 25px 50px -12px #000000a6, 0 0 0 1px #ffffff0a` | Forma e tipo da marca |
-| — | `--ds-radius-scale` | `1` | `=` | 0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável |
-| — | `--ds-font-sans` | `"Figtree", "Figtree Fallback", ui-sans-serif, system-ui, sans-serif` | `=` |  |
+| — | `--ds-radius-scale` | `1.25` | `=` | 0 = quadrado · 0.75 = sóbrio · 1 = G4 · 1.35 = amigável |
+| — | `--ds-font-sans` | `"Manrope", "Figtree", ui-sans-serif, system-ui, sans-serif` | `=` |  |
 | — | `--ds-font-mono` | `ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace` | `=` | Títulos (h1 de página, título de registro, capa, hero). Pode ser serifada. |
 | — | `--ds-font-display` | `var(--ds-font-sans)` | `=` |  |
-| — | `--ds-display-weight` | `600` | `=` |  |
+| — | `--ds-display-weight` | `500` | `=` |  |
 | — | `--ds-display-tracking` | `-0.035em` | `=` | Leitura longa (documentos, políticas, relatórios): serifa editorial. |
-| — | `--ds-font-reading` | `"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif` | `=` |  |
+| — | `--ds-font-reading` | `"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif` | `=` | Assinatura do KV ("Sua empresa no piloto automático"): itálico serifado. |
+| — | `--ds-font-tagline` | `"Libre Baskerville", Georgia, serif` | `=` |  |
 
 ## Tipografia (px)
 
@@ -119,6 +128,6 @@ Valores arbitrários permitidos (iguais à escala ou meios-passos de componentes
 
 ## Marcas prontas (`<html data-brand=…>`)
 
-`cliente`, `oceano`, `floresta`, `vinho`, `grafite`, `violeta`, `pergaminho`, `ledger`, `caderno`, `g4-institucional`
+`cliente`, `oceano`, `floresta`, `vinho`, `grafite`, `violeta`, `pergaminho`, `ledger`, `caderno`, `g4-classico`, `g4-institucional`
 
 Nova marca: sobrescreva só `--ds-*` em `[data-brand="x"]` e `[data-brand="x"][data-theme="dark"]`. Detalhes: `docs/fundamentos/temas-e-dark-mode.md`.

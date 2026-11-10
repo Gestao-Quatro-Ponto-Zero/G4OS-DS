@@ -26,4 +26,4 @@ Página pública completa: navegação, hero com o produto real na moldura, logo
 
 ## Componentes usados
 
-`AreaChart`, `Button`, `FeatureGrid`, `HeroSection`, `ImageSphere`, `KpiCard`, `KpiGrid`, `LogoCloud`, `ScreenFrame`, `StatsBand`, `Testimonial`, `formatCompact`, `formatCurrency`
+`AiOrb`, `AreaChart`, `BrandHaze`, `Button`, `FeatureGrid`, `HeroSection`, `ImageSphere`, `KpiCard`, `KpiGrid`, `LogoCloud`, `ScreenFrame`, `StatsBand`, `Testimonial`, `formatCompact`, `formatCurrency`
