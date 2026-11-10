@@ -376,8 +376,9 @@ export function BoxPlot({
       <div className="grid grid-cols-[minmax(80px,140px)_1fr] gap-x-3">
         <span />
         <div className="relative mb-1 h-4 text-[10.5px] tabular-nums text-muted">
-          {ticks.map((t) => (
-            <span key={t} className="absolute -translate-x-1/2" style={{ left: pct(t) }}>
+          {ticks.map((t, i) => (
+            // A primeira e a última marca alinham pela borda do eixo, para o rótulo não sair do gráfico.
+            <span key={t} className={cn("absolute", i === 0 ? "" : i === ticks.length - 1 ? "-translate-x-full" : "-translate-x-1/2")} style={{ left: pct(t) }}>
               {format(t)}
             </span>
           ))}
