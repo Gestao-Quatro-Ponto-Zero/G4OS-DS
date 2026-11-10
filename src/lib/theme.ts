@@ -66,10 +66,11 @@ const write = (key: string, value: string) => {
 /** Aplica tema/marca no documento (ou em outro elemento raiz). */
 export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = document.documentElement, type?: string) {
   const nextBrand = normalizeBrand(brand);
+  const documentRoot = typeof document !== "undefined" && root === document.documentElement;
   const changed = root.getAttribute("data-theme") !== mode || normalizeBrand(root.getAttribute("data-brand")) !== nextBrand;
   // Troca de tema sem "animar" cores: desliga transições por um quadro (como o next-themes).
   let restore: (() => void) | undefined;
-  if (changed && typeof document !== "undefined" && root === document.documentElement) {
+  if (changed && documentRoot) {
     const style = document.createElement("style");
     style.textContent = "*,*::before,*::after{transition:none!important}";
     document.head.appendChild(style);
@@ -79,7 +80,7 @@ export function applyTheme(mode: ThemeMode, brand?: string, root: HTMLElement = 
     };
   }
   root.setAttribute("data-theme", mode);
-  if (nextBrand !== DEFAULT_BRAND) root.setAttribute("data-brand", nextBrand);
+  if (nextBrand !== DEFAULT_BRAND || !documentRoot) root.setAttribute("data-brand", nextBrand);
   else root.removeAttribute("data-brand");
   if (type !== undefined) {
     if (type && type !== "g4") root.setAttribute("data-type", type);
@@ -147,4 +148,4 @@ export function useTheme(initial: ThemeMode = "system", options: { apply?: boole
 }
 
 /** Script inline para o <head>: aplica o tema salvo antes da primeira pintura. */
-export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}"),y=localStorage.getItem("${TYPE_KEY}");b=!b||b==="${LEGACY_DEFAULT_BRAND}"?"${DEFAULT_BRAND}":b==="g4-institucional"?"g4os":b;d.setAttribute("data-theme",t);if(b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);else d.removeAttribute("data-brand");if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;
+export const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${THEME_KEY}")||"system",b=localStorage.getItem("${BRAND_KEY}")||d.getAttribute("data-brand"),y=localStorage.getItem("${TYPE_KEY}");b=!b||b==="${LEGACY_DEFAULT_BRAND}"?"${DEFAULT_BRAND}":b==="g4-institucional"?"g4os":b;d.setAttribute("data-theme",t);if(b!=="${DEFAULT_BRAND}")d.setAttribute("data-brand",b);else d.removeAttribute("data-brand");if(y&&y!=="g4")d.setAttribute("data-type",y)}catch(e){}})();`;

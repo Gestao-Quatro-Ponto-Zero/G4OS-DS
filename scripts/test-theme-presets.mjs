@@ -70,7 +70,8 @@ try {
         globalThis.localStorage.setItem("ds-theme", mode);
         if (saved === null) globalThis.localStorage.removeItem("ds-brand");
         else globalThis.localStorage.setItem("ds-brand", saved);
-        globalThis.document.documentElement.setAttribute("data-brand", "stale");
+        if (saved === null) globalThis.document.documentElement.removeAttribute("data-brand");
+        else globalThis.document.documentElement.setAttribute("data-brand", "stale");
         (0, eval)(globalThis.window.themeApi.themeScript);
         const before = globalThis.document.documentElement.getAttribute("data-brand");
         globalThis.window.themeApi.applyTheme(mode, saved);
@@ -78,6 +79,26 @@ try {
       }, { saved, mode });
       assert.deepEqual(result, { before: expected, after: expected }, `script e API concordam para ${saved}`);
     }
+    for (const [markup, expected] of [["g4os", "g4os"], ["oceano", "oceano"], ["g4-institucional", "g4os"]]) {
+      const attribute = await page.evaluate(({ markup }) => {
+        globalThis.localStorage.removeItem("ds-brand");
+        globalThis.document.documentElement.setAttribute("data-brand", markup);
+        (0, eval)(globalThis.window.themeApi.themeScript);
+        return globalThis.document.documentElement.getAttribute("data-brand");
+      }, { markup });
+      assert.equal(attribute, expected, "sem preferência salva, respeita a marca do HTML");
+    }
+    const scoped = await page.evaluate(({ mode }) => {
+      globalThis.window.themeApi.applyTheme(mode, "g4os");
+      const panel = globalThis.document.createElement("div");
+      globalThis.document.body.appendChild(panel);
+      globalThis.window.themeApi.applyTheme(mode, "g4-classico", panel);
+      const style = globalThis.getComputedStyle(panel);
+      const result = [style.getPropertyValue("--ds-page").trim(), style.getPropertyValue("--ds-radius-scale").trim()];
+      panel.remove();
+      return result;
+    }, { mode });
+    assert.deepEqual(scoped, [values.page, "1"], "painel clássico não herda a marca do pai");
     const aliases = await page.evaluate(({ mode }) => {
       const read = () => {
         const style = globalThis.getComputedStyle(globalThis.document.documentElement);

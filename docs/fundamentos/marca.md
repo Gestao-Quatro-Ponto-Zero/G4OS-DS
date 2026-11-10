@@ -10,7 +10,7 @@ A paleta do manual de marca (Navy Blue, Royal Gold, Royal Silver e secundárias)
 
 ## KV G4 OS
 
-O tema padrão segue o key visual do G4 OS: fundo gelo `#F9F9F9`, texto em Maua Blue, ação em Navy, raio 25 % maior (`--ds-radius-scale: 1.25`), sombras longas e difusas e a tipografia Manrope.
+O preset opcional G4 OS segue o key visual da marca, com fundo gelo `#F9F9F9`, texto em Maua Blue, ação em Navy, raio 25 % maior (`--ds-radius-scale: 1.25`), sombras longas e difusas e tipografia configurada separadamente.
 
 - **Gradiente de marca** (`--ds-gradient-brand`): dourado `#A38E5A` → aço `#3B5766` → azul `#005B98` → azul acinzentado `#5F87A6`. Aplicado como `background-clip: text` em títulos de momento. No KV ele se dissolve no fundo; na interface termina em um azul legível (3:1 ou mais sobre o gelo).
 - **Esfera G4 OS**: o símbolo da IA. Em movimento ela gira, recalcula e conduz; parada, aparece como orb azul desfocado (`--ds-ai-accent`) atrás do conteúdo da IA. Um por tela.
