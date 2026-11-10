@@ -146,15 +146,15 @@ Superfície branca, borda de 1px, raio 12.
 | `className` | `string \| undefined` |  |  |
 | `href` | `string \| undefined` |  |  |
 | `onClick` | `(() => void) \| undefined` |  |  |
+| `padding` | `"sm" \| "md" \| "lg" \| "none" \| undefined` | `"md"` | Respiro interno. `md` (padrão) 16×12; `sm` 12×10 para card denso; `lg` 20×20 para card de formulário ou de destaque; `none` quando o conteúdo traz o próprio respiro (lista, tabela, mídia). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/midia-carrossel`):
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
 
 ```tsx
-<Carousel label="Modelos" perView={3} perViewMobile={1.15} arrows>
-  {modelos.map((m) => <Card …/>)}
-</Carousel>
+<Card padding="lg">…</Card>
+<Card padding="none"><ListRow … /><ListRow … /></Card>
 ```
 
 ## CardAction
@@ -166,6 +166,29 @@ Exemplo (showcase `#/p/midia-carrossel`):
 | `children` * | `ReactNode` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+## ChipRow
+
+Linha de chips de filtro ou de categoria.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `children` * | `ReactNode` |  |  |
+| `label` * | `string` |  | Nome acessível do grupo: "Categorias", "Filtrar por status". |
+| `className` | `string \| undefined` |  |  |
+| `wrap` | `boolean \| undefined` | `true` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<ChipRow label="Categorias">
+  {categories.map((c) => (
+    <FilterChip key={c} shape="pill" on={c === cat} onClick={() => setCat(c)} count={…}>{c}</FilterChip>
+  ))}
+</ChipRow>
+```
 
 ## CriticalFlag
 
@@ -290,8 +313,20 @@ Chip de filtro binário.
 | `children` * | `ReactNode` |  |  |
 | `on` * | `boolean` |  |  |
 | `onClick` * | `() => void` |  |  |
+| `count` | `number \| undefined` |  |  |
+| `shape` | `"default" \| "pill" \| undefined` | `"default"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<ChipRow label="Categorias">
+  {categories.map((c) => (
+    <FilterChip key={c} shape="pill" on={c === cat} onClick={() => setCat(c)} count={…}>{c}</FilterChip>
+  ))}
+</ChipRow>
+```
 
 ## IconButton
 
@@ -428,18 +463,14 @@ Indicador. O valor é o protagonista (22px, tabular).
 
 - ✗ `<Page><PageHeading/><div className="mx-auto max-w-4xl">…` (título à esquerda, corpo no meio). Regra `page-width-wrapper`.
 
-Exemplo (showcase `#/p/dash-como-montar`):
+Exemplo (showcase `#/p/fb-carregando`):
 
 ```tsx
-<Page>
-  <PageHeading title="…" description="período e fonte" actions={<SegmentedControl …/>} />
-  <KpiGrid>          {/* 3–5 KPIs com delta e período */}
-  <ChartCard>        {/* a pergunta principal, largura total */}
-  <div className="grid gap-6 lg:grid-cols-2">   {/* ou 3/5 + 2/5 */}
-    <ChartCard/> <ChartCard/>                   {/* perguntas de apoio */}
-  </div>
-  <DataTable />      {/* o detalhe acionável: quem, qual, quanto */}
-</Page>
+if (query.loading) return (
+  <Page>
+    <PageSkeleton label="Abrindo o agente" anatomy="record" tabs={4} />
+  </Page>
+);
 ```
 
 ## Section
@@ -449,11 +480,21 @@ Seção titulada dentro de uma página de conteúdo (não é card).
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
-| `title` * | `string` |  |  |
+| `title` * | `ReactNode` |  |  |
 | `action` | `ReactNode` |  |  |
 | `className` | `string \| undefined` |  |  |
+| `description` | `ReactNode` |  |  |
+| `id` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<Section id="dominios" title="Domínios" description="Quem entra com um e-mail destes domínios cai neste workspace." action={<Button size="sm">Adicionar</Button>}>
+  …
+</Section>
+```
 
 ## setLinkComponent (function)
 
@@ -479,9 +520,21 @@ export function DsSetup() { return null; }
 | `label` * | `string` |  |  |
 | `value` * | `ReactNode` |  |  |
 | `hint` | `ReactNode` |  |  |
+| `of` | `ReactNode` |  | Base do número, em cinza ao lado: `value={3} of="de 4"`. |
+| `short` | `string \| undefined` |  | Rótulo curto para a grade densa no celular ("Concluídas" → "Feitas"). |
 | `tone` | `"ok" \| "warn" \| "bad" \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<StatGrid cols={5} dense>
+  <StatCell label="Tarefas concluídas" short="Feitas" value={18} of="de 24" />
+  <StatCell label="Aguardando você" short="Com você" value={3} tone="warn" />
+  …
+</StatGrid>
+```
 
 ## StatGrid
 
@@ -490,9 +543,21 @@ Grade de células separadas por 1px de linha (sem gaps brancos).
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `children` * | `ReactNode` |  |  |
-| `cols` | `2 \| 3 \| 4 \| undefined` | `2` |  |
+| `className` | `string \| undefined` |  |  |
+| `cols` | `2 \| 3 \| 4 \| 5 \| 6 \| undefined` | `2` |  |
+| `dense` | `boolean \| undefined` | `false` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<StatGrid cols={5} dense>
+  <StatCell label="Tarefas concluídas" short="Feitas" value={18} of="de 24" />
+  <StatCell label="Aguardando você" short="Com você" value={3} tone="warn" />
+  …
+</StatGrid>
+```
 
 ## Tone (type)
 

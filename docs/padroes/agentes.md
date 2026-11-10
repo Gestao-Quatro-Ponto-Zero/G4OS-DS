@@ -50,3 +50,16 @@ O agente pede permissão antes de uma ação com efeito externo. O cartão mostr
 - Sempre mostre o que o agente fez e quanto tempo levou.
 - Ação que sai da empresa (e-mail, post, pagamento) passa por aprovação humana (`ApprovalRequest`).
 - Toda decisão em massa tem desfazer.
+
+## Rosto do agente
+
+`AgentOrb` é o avatar de um agente: um rosto gerado a partir de uma semente estável (`seed`, o id do agente), sem upload de imagem. `expression` mostra o que ele está fazendo (`thinking`, `working`, `reading`, `waiting`, `proud`…) e `badge` a ferramenta em uso. `shape` e `palette` são a silhueta e a cor que a pessoa escolheu ao criar o agente. `AgentOrbStack` mostra quem participa de uma conversa ou de um time.
+
+- Use onde o agente aparece como alguém (cabeçalho da conversa, lista de agentes, menção). A marca genérica de IA continua sendo `AiMark`.
+- O rosto reforça, não substitui: nome e estado ficam em texto ao lado.
+- A expressão segue o estado real da execução. Em lista longa, `motion="none"` nos que não estão executando.
+- As cores são identidade do agente (como o `tint` de `Avatar`): iguais nos dois temas, fora dos tokens semânticos.
+
+## Código e diff na resposta
+
+Todo texto que a pessoa vai copiar vai num `CodeBlock` (linguagem ou nome do arquivo no cabeçalho, copiar, altura limitada com "Mostrar tudo"). Mudança em arquivo, texto ou configuração vai num `DiffView`, que recebe um diff unificado e marca as palavras que mudaram. O realce do DS é mínimo e sem dependência; realce por gramática é opcional e do app, passado em `children`.

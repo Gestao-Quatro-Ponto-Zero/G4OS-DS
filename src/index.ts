@@ -18,6 +18,7 @@ export * from "./components/pipeline";
 export { cn } from "./lib/cn";
 export { inertProps } from "./lib/inert";
 export { usePortalContainer } from "./lib/portal";
+export { breakpoints, useIsMobile, useMediaQuery, useScrollEdges } from "./lib/breakpoint";
 export * from "./lib/text";
 export * from "./lib/format";
 export * from "./lib/theme";
@@ -84,3 +85,8 @@ export * from "./components/meeting";
 // Camada expressiva: palcos, vidro, cabeçalho de site, capítulos e movimento com contrato (tempo só quando visível)
 export * from "./lib/motion";
 export * from "./components/stage";
+export * from "./components/agent-orb";
+// Código e diff: bloco para copiar com realce mínimo, diff unificado com palavras marcadas
+export * from "./components/code";
+export { parseDiff, wordDiff } from "./lib/diff";
+export type { DiffFile, DiffLine, DiffWord } from "./lib/diff";

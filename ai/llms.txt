@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 483 componentes, gráficos SVG e 143 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 491 componentes, gráficos SVG e 143 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -76,6 +76,8 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [meeting](components/meeting.md): Reuniões (notas com IA): LiveRecordingIndicator (saúde da gravação por faixa), CallDetectedPrompt, TranscriptView, MomentCitation, AiNotes/AiNotesToggle (autoria pessoa × IA), MeetingCard, MeetingHeader, TemplatePicker.
 - [lib-motion](components/lib-motion.md): Movimento com contrato: o tempo só corre quando a pessoa vê, e movimento reduzido mostra o fim da cena (não uma cena congelada no meio).
 - [stage](components/stage.md): Camada expressiva (palcos).
+- [agent-orb](components/agent-orb.md): Rosto gerado de agente: um personagem pequeno e chapado, desenhado em SVG inline e derivado de forma determinística de uma semente estável (id do agente, nome do subagente, id da sessão).
+- [code](components/code.md): ------------------------------------------------------------------
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)

@@ -81,11 +81,11 @@ Popover genérico: gatilho + painel com título e conteúdo.
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ia-conversa`):
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
 
 ```tsx
-<Bubble tooltip="Enviada às 09:41 · editada">Ajustei o valor.</Bubble>
-<Popover trigger={<SmilePlus />} triggerLabel="Reagir">…</Popover>
+const mobile = useIsMobile();
+return mobile ? <Sheet …>{filtros}</Sheet> : <Popover …>{filtros}</Popover>;
 ```
 
 ## popupClass (const)

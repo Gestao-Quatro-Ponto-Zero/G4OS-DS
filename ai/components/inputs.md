@@ -329,6 +329,7 @@ Faixa contínua. Passe `number` para um valor ou `[min, max]` para intervalo (fi
 | `marks` | `number[] \| undefined` |  | Marcas fixas na régua (ex.: [0, 50, 100]). |
 | `max` | `number \| undefined` | `100` |  |
 | `min` | `number \| undefined` | `0` |  |
+| `onValueCommit` | `((value: V) => void) \| undefined` |  | Chamado uma vez quando a pessoa solta o controle (fim do arraste ou tecla). |
 | `showValue` | `boolean \| undefined` | `true` |  |
 | `step` | `number \| undefined` | `1` |  |
 

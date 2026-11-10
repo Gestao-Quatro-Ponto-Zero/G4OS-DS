@@ -306,7 +306,8 @@ export function IconRail({
   return (
     <nav aria-label={label} className="hidden h-full w-14 shrink-0 flex-col items-center border-r border-line bg-rail py-3 md:flex">
       {mark && <div className="mb-3">{mark}</div>}
-      <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overflow-x-visible px-2">
+      {/* -my-1 py-1: folga para o anel de foco do primeiro e do último ícone não ser cortado pela rolagem. */}
+      <div className="-my-1 flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overflow-x-visible px-2 py-1">
         {groups.map((g, gi) => (
           <div key={gi} className={cn("flex flex-col items-center gap-1", gi > 0 && "border-t border-line pt-3")}>
             {g.map((it) => {

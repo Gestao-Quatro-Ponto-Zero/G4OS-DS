@@ -145,3 +145,12 @@
     }
   }
 }
+
+/* Toque: o Safari do iOS dá zoom na página ao focar um campo com texto menor que 16 px. Fora de
+   camada de propósito, para valer sobre o tamanho definido por utilitário (text-[14px]) e dentro
+   de portais (Drawer, Modal, Popover). No mouse nada muda. */
+@media (pointer: coarse) {
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select, [contenteditable]:not([contenteditable="false"])) {
+    font-size: max(16px, 1rem);
+  }
+}

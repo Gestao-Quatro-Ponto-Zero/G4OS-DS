@@ -56,3 +56,7 @@ Estados de página inteira em `states.tsx`: `NotFoundState` (404), `ErrorState`,
 - **`NotificationCenter`** (sino da barra superior): ponto só quando há não lida, nunca o total; "Marcar todas como lidas" só quando há o que marcar; filtro Todas/Não lidas a partir de 8 itens. Cada notificação diz quem fez o quê e onde, e abre o registro (`href`/`onSelect`, que também marca como lida).
 - **`Announcement`**: uma pílula "Novo · …" por vez, levando ao recurso ou ao changelog. Some quando a pessoa já viu.
 - **`Tour`** + `useTour(chave)`: 3–5 balões ancorados aos elementos reais para apresentar um recurso novo. Pode ser pulado (Esc), não volta sozinho depois de visto e pula etapas cujo alvo não está na tela. Se a tela precisa de tour para ser entendida, o problema costuma ser o rótulo.
+
+## A página enquanto abre
+
+`PageSkeleton` desenha a anatomia que a tela vai ter (`list`, `dashboard`, `record`, `settings`), no lugar de um "Carregando…" no canto, e só aparece depois de 180 ms: uma página que abre da memória ou de uma resposta rápida nunca pisca o esqueleto. Renderize dentro de `Page` e dê um `label` para leitores de tela ("Abrindo o time"). `ListSkeleton` faz o mesmo para uma lista dentro de uma tela já aberta, e `useDelayed(ms)` é o atraso para qualquer outro indicador.

@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { Button, DataTable, LoadingOverlay, LoadingState, Skeleton, Spinner, type Column } from "@g4ai/ds";
+import { Button, DataTable, ListSkeleton, LoadingOverlay, LoadingState, PageSkeleton, SegmentedControl, Skeleton, Spinner, type Column } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -22,8 +22,12 @@ const cols: Column<R>[] = [
   { key: "valor", header: "Valor", cell: (r) => r.valor, align: "right" },
 ];
 
+type Anatomy = "list" | "dashboard" | "record" | "settings";
+
 export default function Page() {
   const [busy, setBusy] = useState(false);
+  const [anatomy, setAnatomy] = useState<Anatomy>("record");
+  const [run, setRun] = useState(0);
   return (
     <DocPage title={meta.title} description={meta.description} kicker={meta.group}>
       <DocSection title="Skeleton: a forma do que vem" rule="Primeira carga de uma tela ou card com layout previsível. O esqueleto imita linhas, avatares e números — não um retângulo cinza genérico.">
@@ -56,6 +60,38 @@ export default function Page() {
             </div>
           </Demo>
         </div>
+      </DocSection>
+
+      <DocSection title="A página inteira enquanto abre" rule="`PageSkeleton` desenha a anatomia que a tela vai ter (lista, painel, registro, configurações), no lugar de um “Carregando…” no canto. Ele só aparece depois de 180 ms: uma página que abre da memória ou de uma resposta rápida nunca pisca o esqueleto. `ListSkeleton` faz o mesmo para uma lista dentro de uma tela já aberta.">
+        <Demo
+          className="block"
+          code={`if (query.loading) return (
+  <Page>
+    <PageSkeleton label="Abrindo o agente" anatomy="record" tabs={4} />
+  </Page>
+);`}
+        >
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <SegmentedControl
+              label="Anatomia"
+              value={anatomy}
+              onChange={setAnatomy}
+              options={[
+                { value: "list", label: "Lista" },
+                { value: "dashboard", label: "Painel" },
+                { value: "record", label: "Registro" },
+                { value: "settings", label: "Configurações" },
+              ]}
+            />
+            <Button variant="ghost" size="sm" onClick={() => setRun((r) => r + 1)}>
+              <RefreshCw /> Abrir de novo
+            </Button>
+          </div>
+          <PageSkeleton key={`${anatomy}-${run}`} label="Abrindo a página" anatomy={anatomy} tabs={anatomy === "record" ? 4 : 0} rows={4} />
+        </Demo>
+        <Demo title="ListSkeleton" className="block" code={`{members.loading ? <ListSkeleton label="Abrindo os membros" rows={3} /> : <RowList>…</RowList>}`}>
+          <ListSkeleton key={run} label="Abrindo os membros" rows={3} />
+        </Demo>
       </DocSection>
 
       <DocSection title="Spinner e LoadingState" rule="Quando não dá para prever a forma (resultado de busca externa, geração por IA) ou dentro de um botão/linha.">

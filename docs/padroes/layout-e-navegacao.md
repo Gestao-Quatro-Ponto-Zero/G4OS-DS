@@ -67,6 +67,14 @@ Quando o produto tem mais áreas do que cabem em 10 linhas, agrupe páginas irm�
 
 `PageHeading` e `EntityHeader` usam `StickyHeader`: grudam no topo da área rolável, recolhem descrição e trilha, reduzem o título e ganham uma linha inferior que atravessa as margens. Não crie cabeçalho fixo à mão.
 
+O cabeçalho compacto encosta na borda de cima da área rolável, sem faixa acima dele. Isso depende de `--sticky-top`, que o `Page` define como o próprio respiro de cima negativo (o `top` de um elemento sticky é medido por dentro do padding do rolador). Não redefina `--sticky-top` no app; `PageToolbar` e a coluna `.page-aside` usam a mesma variável para grudar coladas ao cabeçalho.
+
+### Abas, chips e trilha em pouco espaço
+
+- **Abas que não cabem:** `Tabs overflow="scroll"` mantém uma linha que rola de lado, com esmaecido na borda que tem mais abas e a aba ativa sempre à vista. O padrão (`wrap`) continua quebrando linha.
+- **Chips de filtro ou categoria:** `ChipRow` quebra em linhas no desktop e vira uma linha rolável no celular. `FilterChip shape="pill"` é a pílula de categoria; `count` mostra quantos itens o filtro tem.
+- **Voltar:** `Breadcrumb back={{ label: "Voltar para Entregas", href }}` acrescenta o botão de voltar antes da trilha. A trilha continua só com ancestrais.
+
 ## Ações no cabeçalho
 
 - Até **1 primário + 2 secundários** visíveis; o resto no `ActionMenu` (⋯).

@@ -161,7 +161,7 @@ Data + horário. Valor "2026-10-03T14:30" (hora local, sem fuso).
 | `min` | `string \| undefined` |  |  |
 | `now` | `string \| undefined` | `todayIso()` |  |
 | `showTimeZone` | `boolean \| undefined` | `true` |  |
-| `step` | `10 \| 5 \| 60 \| 15 \| 30 \| undefined` | `15` |  |
+| `step` | `5 \| 10 \| 60 \| 15 \| 30 \| undefined` | `15` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -382,7 +382,7 @@ Horário 24h digitável ("9", "930", "9h30", "14:30") com lista de sugestões a 
 | `max` | `string \| undefined` | `"24:00"` |  |
 | `min` | `string \| undefined` | `"00:00"` |  |
 | `showTimeZone` | `boolean \| undefined` |  |  |
-| `step` | `10 \| 5 \| 60 \| 15 \| 30 \| undefined` | `30` |  |
+| `step` | `5 \| 10 \| 60 \| 15 \| 30 \| undefined` | `30` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

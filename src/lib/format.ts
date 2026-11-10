@@ -50,12 +50,22 @@ export const formatDelta = (fraction: number, digits = 1) => {
 };
 
 const rtf = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
-/** Data relativa curta: "há 5 min", "ontem", "em 3 dias". Acima de 30 dias mostra a data. */
-export function formatRelative(date: Date | string | number, now: Date = new Date()) {
+/**
+ * Data relativa: "há 5 min", "ontem", "em 3 dias". Acima de 30 dias mostra a data.
+ * `short` é a forma de coluna estreita e de lista densa: "agora", "5 min", "3 h", "2 d", depois "30 set".
+ */
+export function formatRelative(date: Date | string | number, nowOrOptions: Date | { now?: Date; short?: boolean } = new Date()) {
+  const { now = new Date(), short = false } = nowOrOptions instanceof Date ? { now: nowOrOptions } : nowOrOptions;
   const d = toDate(date);
   const s = Math.round((d.getTime() - now.getTime()) / 1000);
   const a = Math.abs(s);
   if (a < 60) return "agora";
+  if (short) {
+    if (a < 3600) return `${Math.round(a / 60)}\u00A0min`;
+    if (a < 86400) return `${Math.round(a / 3600)}\u00A0h`;
+    if (a < 86400 * 30) return `${Math.round(a / 86400)}\u00A0d`;
+    return formatDate(d, { short: true });
+  }
   if (a < 3600) return rtf.format(Math.round(s / 60), "minute");
   if (a < 86400) return rtf.format(Math.round(s / 3600), "hour");
   if (a < 86400 * 30) return rtf.format(Math.round(s / 86400), "day");
@@ -65,10 +75,15 @@ export function formatRelative(date: Date | string | number, now: Date = new Dat
 /** "2026-10-01" (só data) é dia local, não meia-noite UTC — senão vira 30/09 no Brasil. */
 const toDate = (date: Date | string | number) => (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(`${date}T00:00:00`) : new Date(date));
 
-/** "30/09/2026"; `short` → "30 set" */
-export function formatDate(date: Date | string | number, { short = false } = {}) {
+/**
+ * "30/09/2026"; `short` → "30 set"; `time` acrescenta a hora ("30/09/2026, 14:05").
+ * `timeZone` (IANA, ex.: "America/Sao_Paulo") mostra o instante no fuso da pessoa ou do registro,
+ * não no do navegador.
+ */
+export function formatDate(date: Date | string | number, { short = false, time = false, timeZone }: { short?: boolean; time?: boolean; timeZone?: string } = {}) {
   const d = toDate(date);
+  const clock: Intl.DateTimeFormatOptions = time ? { hour: "2-digit", minute: "2-digit" } : {};
   return short
-    ? d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "")
-    : d.toLocaleDateString("pt-BR");
+    ? d.toLocaleString("pt-BR", { day: "2-digit", month: "short", ...clock, timeZone }).replace(".", "")
+    : d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", ...clock, timeZone });
 }

@@ -35,7 +35,7 @@ DataGrid: a tabela "de trabalho" do DS.
 | `loadMode` | `"button" \| "infinite" \| undefined` |  |  |
 | `manualSort` | `boolean \| undefined` |  | true = as linhas já chegam ordenadas (servidor); a grade só mostra o estado. |
 | `maxHeight` | `string \| number \| undefined` |  |  |
-| `mobile` | `"cards" \| "scroll" \| undefined` |  |  |
+| `mobile` | `"scroll" \| "cards" \| undefined` |  |  |
 | `noun` | `string \| undefined` |  |  |
 | `nounPlural` | `string \| undefined` |  |  |
 | `onClearFilters` | `(() => void) \| undefined` |  |  |

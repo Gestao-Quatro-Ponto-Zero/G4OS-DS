@@ -145,3 +145,7 @@ Toda coleção tem os três:
 - **Vazio de verdade**: `Empty` com a próxima ação ("Criar negócio", "Importar planilha").
 - **Vazio por filtro**: `Empty` "Nenhum X com esses filtros" + "Limpar filtros".
 - **Erro**: bloco com o que aconteceu e "Tentar de novo"; mantém filtros.
+
+## Lista de linhas
+
+Lista de configuração ou de registro (domínios, chaves, membros, regras) é `RowList` com `ListRow`: marca, título, `description` em uma linha muda, `meta` à direita e `actions` (botão, `Switch`, menu ⋯). Com `href` ou `onClick` a linha inteira é o alvo e as ações continuam clicáveis por conta própria. Não monte `<ul className="divide-y …">` à mão. Faixa de números de um registro: `StatGrid dense` com `StatCell short`/`of`.

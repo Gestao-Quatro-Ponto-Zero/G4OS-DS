@@ -28,10 +28,10 @@ Exemplo (showcase `#/p/dash-progresso-e-presenca`):
 
 ## formatDate (function)
 
-"30/09/2026"; `short` → "30 set"
+"30/09/2026"; `short` → "30 set"; `time` acrescenta a hora ("30/09/2026, 14:05").
 
 ```ts
-formatDate(date, { short = false }?): string
+formatDate(date, props?): string
 ```
 
 ## formatDelta (function)
@@ -78,8 +78,14 @@ Exemplo (showcase `#/p/colecoes-reordenar`):
 
 ## formatRelative (function)
 
-Data relativa curta: "há 5 min", "ontem", "em 3 dias".
+Data relativa: "há 5 min", "ontem", "em 3 dias".
 
 ```ts
-formatRelative(date, now?): string
+formatRelative(date, nowOrOptions?): string
+```
+
+Exemplo (showcase `#/p/estrutura-pagina-e-listas`):
+
+```tsx
+<ListRow leading={…} kicker="Time de vendas" title="Marina Couto" meta={formatRelative(date, { short: true })} />
 ```

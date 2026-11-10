@@ -67,3 +67,13 @@ Também em `charts-advanced.tsx`: `ComboChart` (barras + linha no mesmo eixo), `
 - Porcentagem recebe **fração**: `formatPercent(0.123)` → `12,3 %`, com espaço inseparável antes do sinal (norma brasileira). Texto escrito à mão segue a mesma forma: "12 %", nunca "12%". Nada de `Math.round(x * 100) + "%"`.
 - Variação: `formatDelta(0.125)` → `+12,5 %`. Em `KpiCard`, passe `delta={0.125}` e `goodWhen` (`"down"` para custo, churn, tempo de resposta, inadimplência).
 - Sempre `tabular-nums` em colunas e totais.
+
+### Datas, fuso e forma curta
+
+- `formatDate(data, { time: true, timeZone: "America/Sao_Paulo" })` mostra o instante no fuso da pessoa ou do registro, não no do navegador.
+- `formatRelative(data, { short: true })` é a forma de coluna estreita: "agora", "5 min", "3 h", "2 d" e, depois de 30 dias, "30 set".
+- Tamanho de arquivo: `formatBytes`. Duração de execução: `formatDuration`.
+
+### Lacunas em linha
+
+Em `LineChart`, um ponto `null` é uma lacuna: a linha se interrompe ali em vez de cair a zero, e um ponto isolado entre duas lacunas aparece como marca. Para alinhar gráficos empilhados, fixe a largura do eixo de valores com `axisWidth`.
