@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, MessageSquare, FolderOpen, Globe, ListChecks, LogIn, Sparkles, Wand2, Wrench } from "lucide-react";
+import { ChevronRight, FileText, Globe, ListChecks, LogIn, Sparkles, Wand2, Wrench } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   AddPropertyMenu,
@@ -9,18 +9,26 @@ import {
   Banner,
   BuilderSection,
   ChipPicker,
+  KnowledgeFiles,
+  ModelPicker,
   PropertyRow,
   Button,
   Modal,
   PublishBar,
   ResizableSplit,
+  SegmentedControl,
   TextField,
   RunSummary,
   ToolGlyph,
+  ToolToggleList,
   TriggerList,
   notify,
   type AgentStatus,
+  type KnowledgeFile,
+  type KnowledgeUpload,
   type MenuEntry,
+  type ModelEffort,
+  type ModelOption,
   type RunStatus,
 } from "@g4ai/ds";
 import { AgentShell, agentRoutes } from "./shells/agent-shell";
@@ -40,6 +48,7 @@ import {
   outputOptions,
   toolOptions,
   triggerOptions,
+  type AppId,
   type Prop,
   type Trigger,
 } from "./data/agent-builder";
@@ -47,7 +56,7 @@ import {
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
   title: "Construtor de agentes",
-  description: "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).",
+  description: "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, modelo e propriedades, ferramentas ligadas por app, arquivos de conhecimento com envio, instruções em editor rico com “Melhorar” e limite, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).",
   category: "IA",
   order: 6,
   height: 900,
@@ -55,14 +64,16 @@ export const meta = {
     goal: "Definir o que um agente faz sem sair da conversa com ele: quem configura automações monta gatilhos, ferramentas e instruções e testa na hora.",
     patterns: [
       "Anatomia G · App de altura total: conversa à esquerda, ficha à direita (ResizableSplit)",
-      "Ficha em seções: Gatilhos → Propriedades → Instruções, cada uma com '+ Adicionar'",
+      "Ficha em seções: Gatilhos → Propriedades → Ferramentas → Conhecimento → Instruções",
+      "Ferramentas em grade com Switch por app (ToolToggleList, '5 de 6 ligadas'); conhecimento com envio, cancelar e tentar de novo (KnowledgeFiles)",
+      "Modelo do agente no ModelPicker; instruções com limite e contador (maxLength)",
       "Uma ação primária no topo: Publicar (estado rascunho/publicado/alterado)",
       "Testar roda dentro da conversa com RunSummary, sem trocar de tela",
       "Instruções em editor rico com 'Melhorar com IA'",
     ],
     adapt: [
       "Construtor de automações, regras de CRM, playbooks de atendimento: troque os tipos de gatilho e propriedade",
-      "No celular, alterne Ficha/Conversa em vez de dividir a tela",
+      "No celular, o alternador Configurar / Testar troca a ficha pela conversa em vez de dividir a tela",
     ],
     avoid: [
       "Publicar sem estado visível (rascunho × publicado)",
@@ -77,10 +88,63 @@ const skillOptions: Prop[] = [
   { id: "escrita", label: "Escrita persuasiva" },
   { id: "seo", label: "SEO para redes" },
 ];
+/** Modelos do agente (API atual do ModelPicker). */
+const agentModels: ModelOption[] = [
+  { id: "sol", name: "Sol", group: "G4 OS", description: "Equilíbrio entre velocidade e cuidado (padrão)" },
+  { id: "sol-max", name: "Sol Max", group: "G4 OS", description: "Tarefas longas e análises profundas" },
+  { id: "brisa", name: "Brisa", group: "G4 OS", description: "Respostas rápidas e baratas" },
+];
+/** O que o agente faz com cada app, em linguagem simples. */
+const toolUse: Record<AppId, string> = {
+  slack: "Lê e posta mensagens nos canais escolhidos",
+  linear: "Cria e atualiza issues",
+  reddit: "Confere as regras de cada comunidade",
+  firecrawl: "Lê páginas e artigos da web",
+  linkedin: "Escreve rascunhos de posts",
+  gdrive: "Lê arquivos das pastas compartilhadas",
+  notion: "Busca páginas da base de conhecimento",
+  hubspot: "Consulta contatos e negócios",
+  sheets: "Lê e atualiza planilhas",
+  g4crm: "Consulta clientes e registra atividades",
+};
+type Tool = Prop & { on: boolean };
+/** Ferramentas do agente ligadas + as sugeridas, desligadas. */
+const toolsOf = (on: Prop[]): Tool[] => [...on.map((t) => ({ ...t, on: true })), ...toolOptions.filter((o) => !on.some((t) => t.id === o.id)).map((o) => ({ ...o, on: false }))];
+const defaultKnowledge: KnowledgeFile[] = [
+  { id: "guia-voz", name: "Guia de voz da marca.pdf", size: 253_952, meta: "atualizado em outubro" },
+  { id: "calendario", name: "Calendário editorial 2026.xlsx", size: 1_218_000 },
+];
+/** Envio simulado: progresso em passos; arquivos acima de 8 MB falham na primeira tentativa. */
+const failedOnce = new Set<string>();
+const simulateUpload: KnowledgeUpload = (file, report, signal) =>
+  new Promise((resolve, reject) => {
+    let p = 0;
+    let timer = 0;
+    const fail = file.size > 8 * 1024 * 1024 && !failedOnce.has(file.name);
+    const tick = () => {
+      if (signal.aborted) return;
+      p += 18 + Math.round(Math.random() * 14);
+      if (fail && p > 55) {
+        failedOnce.add(file.name);
+        return reject(new Error("A conexão caiu durante o envio."));
+      }
+      if (p >= 100) {
+        report(100);
+        return resolve();
+      }
+      report(p);
+      timer = window.setTimeout(tick, 380);
+    };
+    timer = window.setTimeout(tick, 300);
+    signal.addEventListener("abort", () => window.clearTimeout(timer));
+  });
+
 const glyph = (p: Prop | Trigger) => ("app" in p && p.app ? <ToolGlyph name={apps[p.app].name} color={apps[p.app].color} /> : <FileText className="h-3.5 w-3.5 text-muted" />);
 
 type Seed = {
   name: string;
+  /** Arquivos de conhecimento iniciais. */
+  knowledge?: KnowledgeFile[];
   description: string;
   status: AgentStatus;
   triggers: Trigger[];
@@ -161,7 +225,7 @@ function seedFrom(params: URLSearchParams): Seed {
         ? { user: pedido, answer: ["Comecei o rascunho com esse objetivo. Para rodar sozinho ele precisa de um gatilho: quando isso deve acontecer?", "Sugestão: adicione as ferramentas que ele vai usar em Propriedades e eu escrevo os passos nas instruções."] }
         : { user: "Quero criar um agente novo.", answer: ["Vamos lá. Conte o que ele deve fazer, quando e com quais ferramentas. Eu monto a ficha ao lado."] },
     };
-  return { name: agent.name, description: agent.description, status: agent.status, triggers: initialTriggers, tools: initialTools, inputs: initialInputs, outputs: initialOutputs, checks: initialChecks, instructions: initialInstructions, intro: chatIntro };
+  return { name: agent.name, description: agent.description, status: agent.status, knowledge: defaultKnowledge, triggers: initialTriggers, tools: initialTools, inputs: initialInputs, outputs: initialOutputs, checks: initialChecks, instructions: initialInstructions, intro: chatIntro };
 }
 
 function useMobile() {
@@ -184,22 +248,22 @@ export default function AgentBuilder() {
 
 function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
   const mobile = useMobile();
-  // Celular: uma tela por vez — a ficha do agente (padrão) ou a conversa.
+  // Celular: uma tela por vez — Configurar (a ficha, padrão) ou Testar (a conversa).
   const [pane, setPane] = useState<"ficha" | "conversa">("ficha");
+  const [model, setModel] = useState("sol");
+  const [effort, setEffort] = useState<ModelEffort>("padrao");
   const [name, setName] = useState(seed.name);
   const [description, setDescription] = useState(seed.description);
   const [status, setStatus] = useState<AgentStatus>(seed.status);
   const [triggers, setTriggers] = useState(seed.triggers);
-  const [tools, setTools] = useState(seed.tools);
+  const [tools, setTools] = useState<Tool[]>(() => toolsOf(seed.tools));
   const [editingTrigger, setEditingTrigger] = useState<Trigger | null>(null);
   const [triggerText, setTriggerText] = useState("");
   const [outputs, setOutputs] = useState(seed.outputs);
   const [inputs, setInputs] = useState(seed.inputs);
   const [checks, setChecks] = useState(seed.checks);
   const [skills, setSkills] = useState<Prop[]>([]);
-  const [files, setFiles] = useState<Prop[]>([]);
   const [archived, setArchived] = useState(false);
-  const fileInput = useRef<HTMLInputElement>(null);
   const [instructions, setInstructions] = useState(seed.instructions);
   const [enhancing, setEnhancing] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -276,9 +340,22 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
   };
   const asItems = (opts: Prop[], list: Prop[], set: (v: Prop[]) => void): MenuEntry[] =>
     opts.map((o) => ({ label: o.label, icon: glyph(o), onSelect: () => addProp(list, set, o) }));
+  const toggleTool = (id: string, on: boolean) => {
+    const t = tools.find((x) => x.id === id);
+    if (!t || t.on === on) return;
+    touched(setTools)(tools.map((x) => (x.id === id ? { ...x, on } : x)));
+    notify(on ? `${t.label} ligado` : `${t.label} desligado`, () => setTools(tools));
+  };
 
   const addMenu: MenuEntry[] = [
-    { type: "submenu", label: "Ferramentas", icon: <Wrench className="h-4 w-4" />, items: asItems(toolOptions, tools, setTools) },
+    {
+      type: "submenu",
+      label: "Ferramentas",
+      icon: <Wrench className="h-4 w-4" />,
+      items: tools.filter((t) => !t.on).length
+        ? tools.filter((t) => !t.on).map((t) => ({ label: t.label, icon: glyph(t), onSelect: () => toggleTool(t.id, true) }))
+        : [{ label: "Todas as ferramentas já estão ligadas", disabled: true }],
+    },
     { type: "submenu", label: "Saída", icon: <FileText className="h-4 w-4" />, items: asItems(outputOptions, outputs, setOutputs) },
     {
       type: "submenu",
@@ -291,26 +368,29 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
     },
     { label: "Verificações de qualidade", icon: <ListChecks className="h-4 w-4" />, onSelect: () => addProp(checks, setChecks, { id: `chk${Date.now()}`, label: "Revisão humana antes de publicar" }) },
     { type: "submenu", label: "Skills", icon: <Sparkles className="h-4 w-4" />, items: skillOptions.map((o) => ({ label: o.label, onSelect: () => addProp(skills, setSkills, o) })) },
-    {
-      type: "submenu",
-      label: "Arquivos",
-      icon: <FolderOpen className="h-4 w-4" />,
-      items: [{ label: "Guia de voz da marca.pdf", onSelect: () => addProp(files, setFiles, { id: "guia-voz", label: "Guia de voz da marca.pdf" }) }, { label: "Do computador…", onSelect: () => fileInput.current?.click() }],
-    },
   ];
 
   const busy = msgs.some((m) => m.role === "agent" && m.status === "running");
 
+  // Celular: Configurar (ficha) × Testar (a mesma conversa). No desktop as duas ficam lado a lado.
+  const modeSwitch = mobile && (
+    <div className="shrink-0 border-b border-line px-3 py-2">
+      <SegmentedControl
+        label="Modo do construtor"
+        value={pane}
+        onChange={setPane}
+        className="w-full [&>button]:flex-1 [&>button]:justify-center"
+        options={[
+          { value: "ficha", label: "Configurar" },
+          { value: "conversa", label: "Testar" },
+        ]}
+      />
+    </div>
+  );
+
   const chat = (
     <div className="flex min-h-0 flex-1 flex-col">
-      {mobile && (
-        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
-          <span className="min-w-0 flex-1 truncate text-[13px] font-medium">Conversa com o agente</span>
-          <button type="button" onClick={() => setPane("ficha")} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] ring-1 ring-line hover:bg-soft">
-            <Sparkles className="h-3.5 w-3.5" /> Ver ficha
-          </button>
-        </div>
-      )}
+      {modeSwitch}
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-[640px] space-y-6 px-4 py-6 sm:px-6">
           {msgs.map((m) =>
@@ -344,11 +424,6 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
   const builder = (
     <section className="flex min-h-0 flex-1 flex-col bg-page" aria-label="Definição do agente">
       <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-4">
-        {mobile && (
-          <button type="button" onClick={() => setPane("conversa")} aria-label="Abrir conversa com o agente" className="-ml-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-soft">
-            <MessageSquare className="h-4 w-4" />
-          </button>
-        )}
         <nav aria-label="Trilha" className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]">
           <a href={agentRoutes.agents} className="hidden shrink-0 text-muted hover:text-ink sm:inline">
             Agentes
@@ -393,6 +468,7 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
           ]}
         />
       </header>
+      {modeSwitch}
       {archived && (
         <Banner
           tone="warn"
@@ -452,8 +528,15 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
           </BuilderSection>
           <BuilderSection title="Propriedades" description="Dê ao agente acesso a apps e ferramentas." action={<AddPropertyMenu items={addMenu} />}>
             <div className="divide-y divide-line">
-              <PropertyRow label="Ferramentas">
-                <ChipPicker chips={tools.map((t) => ({ id: t.id, label: t.label, icon: glyph(t) }))} onRemove={removeProp(tools, setTools)} addItems={asItems(toolOptions, tools, setTools)} />
+              <PropertyRow label="Modelo" hint="responde em cada execução">
+                <ModelPicker
+                  models={agentModels}
+                  value={model}
+                  onChange={(v) => touched(setModel)(v)}
+                  effort={effort}
+                  onEffortChange={(v) => touched(setEffort)(v)}
+                  className="ring-1 ring-line"
+                />
               </PropertyRow>
               <PropertyRow label="Entrada">
                 <ChipPicker chips={inputs.map((t) => ({ id: t.id, label: t.label, icon: <Globe className="h-3.5 w-3.5 text-muted" /> }))} onRemove={removeProp(inputs, setInputs)} />
@@ -466,18 +549,26 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
                   <ChipPicker chips={skills.map((t) => ({ id: t.id, label: t.label, icon: <Sparkles className="h-3.5 w-3.5 text-muted" /> }))} onRemove={removeProp(skills, setSkills)} addItems={skillOptions.map((o) => ({ label: o.label, onSelect: () => addProp(skills, setSkills, o) }))} />
                 </PropertyRow>
               )}
-              {files.length > 0 && (
-                <PropertyRow label="Arquivos" hint="o agente consulta">
-                  <ChipPicker chips={files.map((t) => ({ id: t.id, label: t.label, icon: <FileText className="h-3.5 w-3.5 text-muted" /> }))} onRemove={removeProp(files, setFiles)} />
-                </PropertyRow>
-              )}
               <PropertyRow label="Verificações" hint="antes de entregar">
                 <ChipPicker chips={checks.map((t) => ({ id: t.id, label: t.label, icon: <ListChecks className="h-3.5 w-3.5 text-ok" /> }))} onRemove={removeProp(checks, setChecks)} empty="Nenhuma" />
               </PropertyRow>
             </div>
           </BuilderSection>
+          <BuilderSection title="Ferramentas" description="O que o agente pode usar quando roda. Desligar não apaga a conexão do app.">
+            <ToolToggleList tools={tools.map((t) => ({ id: t.id, name: t.label, description: t.app ? toolUse[t.app] : "Ferramenta do agente", color: t.app ? apps[t.app].color : undefined, on: t.on }))} onToggle={toggleTool} />
+          </BuilderSection>
+          <span id="secao-conhecimento" className="block scroll-mt-4" aria-hidden />
+          <BuilderSection title="Conhecimento" description="Arquivos que o agente consulta antes de responder. Ele cita a fonte quando usa um deles.">
+            <KnowledgeFiles
+              defaultFiles={seed.knowledge}
+              onUpload={simulateUpload}
+              onChange={() => setStatus((s) => (s === "publicado" ? "alterado" : s))}
+              hint="Solte aqui ou escolha · PDF, DOCX, MD ou CSV até 20 MB (acima de 8 MB a demonstração falha uma vez)"
+            />
+          </BuilderSection>
           <BuilderSection title="Instruções" description="O que o agente faz quando roda. Use # para títulos e - para listas.">
             <AgentInstructions
+              maxLength={2000}
               value={instructions}
               onChange={touched(setInstructions)}
               enhancing={enhancing}
@@ -507,20 +598,6 @@ function Builder({ seed, focus }: { seed: Seed; focus: string | null }) {
       ) : (
         <ResizableSplit left={chat} right={builder} storageKey="ai-agent-builder" defaultSize={0.4} min={0.3} max={0.6} />
       )}
-      <input
-        ref={fileInput}
-        type="file"
-        hidden
-        multiple
-        onChange={(e) => {
-          const picked = Array.from(e.target.files ?? []).map((f, i) => ({ id: `file-${Date.now()}-${i}`, label: f.name }));
-          e.target.value = "";
-          if (!picked.length) return;
-          const before = files;
-          touched(setFiles)([...files, ...picked.filter((p) => !files.some((x) => x.label === p.label))]);
-          notify(picked.length === 1 ? `${picked[0].label} adicionado ao agente` : `${picked.length} arquivos adicionados ao agente`, () => setFiles(before));
-        }}
-      />
       <Modal
         open={!!editingTrigger}
         onClose={() => setEditingTrigger(null)}
