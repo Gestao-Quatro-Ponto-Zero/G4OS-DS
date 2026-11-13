@@ -46,6 +46,15 @@ Em código: `chartColor(i)` devolve `var(--color-chart-N)`; em TS fora do CSS, `
 | Quando acontece? (dia × intensidade) | calendário de calor | `CalendarHeatmap` |
 | Matriz (coorte, dia × hora) | mapa de calor | `HeatmapMatrix` |
 | Real × meta em uma linha | bullet | `BulletChart` |
+| Como o saldo mudou e por quê? (MRR, caixa) | cascata com eixo quebrado e detalhe | `WaterfallChart` com `axisBreak` + `selected`/`onSelect` |
+| Quanto de cada safra continua? | coorte em triângulo + curvas | `HeatmapMatrix` com `rowMeta`, `summaryRow`, `scale`, `legend` + `RetentionCurves` |
+| Por onde as pessoas passam até converter? | sankey com etapas e rastro | `SankeyChart` com `columnLabels`, `nodeLabels="above"`, `selected` |
+| Como duas medidas andaram juntas no tempo? (CAC × LTV) | dispersão conectada | `ConnectedScatter` |
+| Muitas séries (8–20) contra a própria base | horizon | `HorizonChart` + `HorizonLegend` |
+| Onde no Brasil? (por UF) | mapa coroplético + lista ordenada | `ChoroplethMap` + `RankedRegionList` |
+| Análise livre (linhas × colunas × medidas) | tabela dinâmica | `PivotBuilder` / `PivotTable` |
+
+Peças compartilhadas em `charts-kit.tsx`: `ScaleLegend` (escala em degraus ou contínua, com hover que destaca a faixa), `ChartScrubber` (controle de tempo acessível, com tocar), `AxisBreak` e `useLinkedHighlight` (realce ligado entre gráfico e lista: hover/foco destaca, clique fixa, Esc solta).
 
 Também em `charts-advanced.tsx`: `ComboChart` (barras + linha no mesmo eixo), `ProportionBar` (barra 100 % com legenda) e `GanttChart` (cronograma). Todos no showcase em **Gráficos**.
 

@@ -191,7 +191,9 @@ const sign = { add: "+", del: "−", ctx: " " } as const;
 function Counts({ added, removed }: { added: number; removed: number }) {
   return (
     <span className="shrink-0 text-[12px] tabular-nums" aria-label={`${added} linhas adicionadas, ${removed} removidas`}>
-      <span className={toneText.ok}>+{added}</span> <span className={toneText.bad}>−{removed}</span>
+      {added > 0 || !removed ? <span className={toneText.ok}>+{added}</span> : null}
+      {added > 0 && removed > 0 ? " " : null}
+      {removed > 0 ? <span className={toneText.bad}>−{removed}</span> : null}
     </span>
   );
 }
