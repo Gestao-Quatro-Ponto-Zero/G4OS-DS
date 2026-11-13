@@ -5,9 +5,9 @@
 Gráficos analíticos, agentes de IA e revisão visual do DS inteiro.
 
 **Novos componentes**
-- Análise: `ConnectedScatter` (duas medidas no tempo, com meta e controle de tempo), `HorizonChart` + `HorizonLegend` (muitas séries contra a própria base), `ChoroplethMap` + `RankedRegionList` (mapa do Brasil por UF, dados do Natural Earth em `brUfs`), `PivotTable` + `PivotBuilder` (tabela dinâmica com motor `pivot()` testado) e `RetentionCurves`.
-- Peças compartilhadas: `ScaleLegend`, `ChartScrubber`, `AxisBreak`, `useLinkedHighlight`; escalas `sequentialColor`, `divergingColor`, `quantize`, `onScaleInk`; tokens `chart-pos` / `chart-neg` (escala divergente).
-- IA: `CitedText` (citação acende a frase que sustenta), `SourceCards`, `SourceStack`, `AnswerVersions`, `RelatedQuestions`; `AgentRunCard` com `DiffApproval` e `RunResult`; `EvalDotGrid`, `EvalCaseCompare`, `EvalRunHeader`; `ToolToggleList`, `KnowledgeFiles`, `AppAccessList`; `MorphIllustration`, `IntroCard` e `onboardingScenes`.
+- Análise: `ConnectedScatter` (duas medidas no tempo, com meta e controle de tempo), `HorizonChart` + `HorizonLegend` (muitas séries contra a própria base), `ChoroplethMap` + `RankedRegionList` (mapa do Brasil por UF, dados do Natural Earth em `brUfs`; `fitGeoViewBox`, `GeoRegion`), `PivotTable` + `PivotBuilder` (tabela dinâmica com motor `buildPivot()` testado) e `RetentionCurves`.
+- Peças compartilhadas: `ScaleLegend`, `ChartScrubber`, `AxisBreak`, `useLinkedHighlight`; escalas `sequentialColor`, `divergingColor`, `quantizeScale`, `onScaleInk`; tokens `chart-pos` / `chart-neg` (escala divergente).
+- IA: `CitedText` (citação acende a frase que sustenta), `SourceCards`, `SourceStack`, `AnswerVersions`, `RelatedQuestions`; `AgentRunCard` com `DiffApproval` e `AgentRunResult`; `EvalDotGrid`, `EvalCaseCompare`, `EvalRunHeader`; `ToolToggleList`, `KnowledgeFiles`, `AppAccessList`; `MorphIllustration`, `IntroCard` (`IntroCardStep`) e `onboardingScenes`.
 
 **Evoluções (aditivas)**
 - `WaterfallChart`: `axisBreak` (única exceção ao eixo em zero, com marca de quebra), `selected`/`onSelect`, transição ao trocar o período.
