@@ -21,6 +21,9 @@ import { customerById, customers, failingCount, healthLabel, healthTone, invoice
  * Casca do Pulso (SaaS de analytics). `current` = href do item ativo; páginas
  * de detalhe passam o item-pai (conta → Clientes).
  *
+ * Análises é item-pai (regra 13a): Aquisição, Receita, Retenção, Jornada,
+ * Eficiência, Regiões e Explorar dados como subitens.
+ *
  * mobileNav="both": é um back-office com 7 seções, usado sobretudo no desktop.
  * No celular, a pílula leva às 4 telas de plantão (visão geral, clientes,
  * cobrança, suporte) e o ☰ dá acesso ao resto.
@@ -31,9 +34,29 @@ export const saasNav: NavGroup[] = [
     label: "Produto",
     items: [
       { href: "#/frame/saas-dashboard", label: "Visão geral", icon: Home },
-      { href: "#/frame/saas-analytics", label: "Análises", icon: BarChart3 },
+      {
+        label: "Análises",
+        icon: BarChart3,
+        items: [
+          { href: "#/frame/saas-analytics", label: "Aquisição" },
+          { href: "#/frame/saas-mrr-bridge", label: "Receita" },
+          { href: "#/frame/saas-retention", label: "Retenção" },
+          { href: "#/frame/saas-journey", label: "Jornada" },
+          { href: "#/frame/saas-unit-economics", label: "Eficiência" },
+          { href: "#/frame/saas-regions", label: "Regiões" },
+          { href: "#/frame/saas-explore", label: "Explorar dados" },
+        ],
+      },
       { href: "#/frame/saas-customers", label: "Clientes", icon: Users },
-      { href: "#/frame/saas-usage", label: "Uso e limites", icon: Gauge },
+      {
+        href: "#/frame/saas-usage",
+        label: "Uso e limites",
+        icon: Gauge,
+        items: [
+          { href: "#/frame/saas-usage", label: "Consumo e limites" },
+          { href: "#/frame/saas-usage-horizon", label: "Uso por cidade" },
+        ],
+      },
     ],
   },
   {
