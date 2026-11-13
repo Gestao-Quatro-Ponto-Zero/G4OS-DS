@@ -54,6 +54,7 @@ export const RULES = {
   "native-date": { category: "componentes", severity: "error", fixable: false, title: '<input type="date|datetime-local|month">', hint: "DatePicker · DateTimePicker · MonthPicker · TimePicker." },
   "confirm-alert": { category: "componentes", severity: "error", fixable: false, title: "window.confirm / alert / prompt", hint: "ConfirmDialog para confirmar; notify para avisar; Modal com campo para perguntar." },
   "deprecated-export": { category: "componentes", severity: "error", fixable: true, title: "Export ou classe renomeada", hint: "Troque pelo nome novo (ai/renames.json)." },
+  "class-conflict": { category: "componentes", severity: "warn", fixable: false, title: "cn() com duas utilidades da mesma propriedade", hint: 'cn não resolve conflito: duas utilidades da mesma propriedade vencem pela ordem do CSS, não do código. Deixe as classes mutuamente exclusivas: cn("base", ativo ? "text-ink" : "text-muted").' },
   "as-any-props": { category: "componentes", severity: "info", fixable: false, title: "as any em prop de componente", hint: "Tipos do DS documentam o contrato: ajuste o dado, não silencie o tipo." },
   // a11y
   "icon-button-label": { category: "a11y", severity: "error", fixable: false, title: "Botão só com ícone sem nome acessível", hint: "IconButton label=… ou aria-label no <button>." },
@@ -665,6 +666,94 @@ export function checkCode({ code, strings, report, ext }) {
   for (const m of code.matchAll(/import\s+\*\s+as\s+\w+\s+from\s*["']lucide-react["']/g)) report("icon-star-import", m.index, m.index + m[0].length);
 
   checkCompositionCode({ code, strings, report });
+  checkClassConflicts({ code, strings, report });
+}
+
+/* ------------------------------------------------------------------ */
+/* class-conflict: cn("base", cond && "outra") disputando a propriedade */
+/* ------------------------------------------------------------------ */
+
+const TEXT_SIZES = new Set(["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl", "overline", "meta", "caption", "label", "control", "body", "input", "value", "section", "record", "metric", "title"]);
+const DISPLAY = new Set(["flex", "grid", "block", "inline", "inline-flex", "inline-block", "inline-grid", "hidden", "contents", "table", "flow-root"]);
+const FONT_WEIGHT = /^font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)$/;
+const BG_NOT_COLOR = /^bg-(cover|contain|auto|center|top|bottom|left|right|left-top|left-bottom|right-top|right-bottom|repeat|no-repeat|repeat-x|repeat-y|repeat-round|repeat-space|fixed|local|scroll|none|clip-.*|origin-.*|gradient-.*|linear-.*|radial.*|conic.*|blend-.*|size-.*|position-.*|\[url\(.*|\(image:.*)$/;
+const SIDES = "(?:x|y|t|r|b|l|s|e)";
+const isWidthValue = (v) => v === undefined || /^\d+$/.test(v) || /^\[[\d.]+(px|rem|em)\]$/.test(v) || /^\[length:/.test(v) || /^\(length:/.test(v);
+
+/** Grupo de propriedade de uma utilidade (sem variante), ou null se não é comparada. */
+export function conflictGroup(base) {
+  const t = base.replace(/^-/, "");
+  if (DISPLAY.has(t)) return "display";
+  let m;
+  if ((m = /^text-(.+)$/.exec(t))) {
+    const v = m[1];
+    if (/^(left|center|right|justify|start|end)$/.test(v)) return "text-align";
+    if (/^(ellipsis|clip)$/.test(v)) return "text-overflow";
+    if (/^(wrap|nowrap|balance|pretty)$/.test(v)) return "text-wrap";
+    if (TEXT_SIZES.has(v.split("/")[0])) return "font-size";
+    if (/^\[(length:|[\d.]+(px|rem|em)|calc|clamp|var\(--(text|font-size))/.test(v) || /^\((length:|--text)/.test(v)) return "font-size";
+    return "text-color";
+  }
+  if ((m = /^bg-(.+)$/.exec(t))) return BG_NOT_COLOR.test(t) ? null : "bg-color";
+  if ((m = /^(min-h|min-w|max-h|max-w|h|w)-/.exec(t))) return m[1];
+  if ((m = /^(p(?:x|y|t|r|b|l|s|e)?)-/.exec(t))) return m[1];
+  if ((m = /^(m(?:x|y|t|r|b|l|s|e)?)-/.exec(t))) return m[1];
+  if ((m = /^(gap(?:-x|-y)?)-/.exec(t))) return m[1];
+  if ((m = /^rounded(?:-(t|r|b|l|tl|tr|br|bl|s|e|ss|se|es|ee))?(?:-|$)/.exec(t))) return `rounded${m[1] ? `-${m[1]}` : ""}`;
+  if (/^items-(start|end|center|baseline|stretch|baseline-last|center-safe|end-safe)$/.test(t)) return "align-items";
+  if (/^justify-(start|end|center|between|around|evenly|stretch|baseline|normal|center-safe|end-safe)$/.test(t)) return "justify-content";
+  if (FONT_WEIGHT.test(t)) return "font-weight";
+  if ((m = new RegExp(`^border(?:-(${SIDES}))?(?:-(.+))?$`).exec(t))) {
+    const side = m[1] ? `-${m[1]}` : "";
+    const v = m[2];
+    if (v && /^(collapse|separate|spacing.*)$/.test(v)) return null;
+    if (v && /^(solid|dashed|dotted|double|hidden|none)$/.test(v)) return `border-style${side}`;
+    if (isWidthValue(v)) return `border-width${side}`;
+    return `border-color${side}`;
+  }
+  if ((m = /^ring(?:-(.+))?$/.exec(t))) {
+    const v = m[1];
+    if (v && /^(inset|offset.*)$/.test(v)) return null;
+    if (isWidthValue(v)) return "ring-width";
+    return "ring-color";
+  }
+  return null;
+}
+
+/** Utilidades (com a variante como chave) de uma string de classes, com offset relativo. */
+function classEntries(value) {
+  const out = [];
+  for (const m of value.matchAll(/[^\s"'`]+/g)) {
+    const { variants, base, important } = splitVariants(m[0]);
+    if (important || base.startsWith("[")) continue;
+    const group = conflictGroup(base);
+    if (group) out.push({ key: `${variants.join(":")}|${group}`, base, token: m[0], index: m.index });
+  }
+  return out;
+}
+
+function checkClassConflicts({ code, strings, report }) {
+  for (const call of code.matchAll(/(?<![\w$.])(cn|clsx|cx|classNames|twJoin)\(/g)) {
+    const open = call.index + call[0].length - 1;
+    const close = matchPair(code, open, "(", ")");
+    const inside = strings.filter((s) => s.start > open && s.end <= close && s.quote !== "`");
+    const first = inside[0];
+    // classes base = 1º argumento, uma string literal sozinha
+    if (!first || code.slice(open + 1, first.start - 1).trim() !== "" || !/^\s*[,)]/.test(code.slice(first.end + 1, first.end + 40))) continue;
+    const base = new Map();
+    for (const e of classEntries(first.value)) if (!base.has(e.key)) base.set(e.key, e);
+    if (!base.size) continue;
+    for (const s of inside.slice(1)) {
+      // operando de comparação (modo === "hidden") não é classe
+      if (/[=!]==?\s*$/.test(code.slice(Math.max(0, s.start - 6), s.start - 1)) || /^\s*[=!]==?/.test(code.slice(s.end + 1, s.end + 6))) continue;
+      for (const e of classEntries(s.value)) {
+        const b = base.get(e.key);
+        if (!b || b.base === e.base) continue;
+        const start = s.start + e.index;
+        report("class-conflict", start, start + e.token.length, { suggestion: `"${b.token}" (base) e "${e.token}" disputam a mesma propriedade e vence a ordem do CSS. Deixe exclusivas: cn("…", cond ? "${e.token}" : "${b.token}").` });
+      }
+    }
+  }
 }
 
 export const ENGLISH_UI = /^(save|save changes|cancel|delete|edit|submit|search|search\.\.\.|search…|loading|loading\.\.\.|loading…|close|back|next|previous|settings|sign in|sign out|sign up|log in|log out|logout|create|add|add new|no results|no data|confirm|continue|done|apply|reset|clear|clear filters|export|import|select|select\.\.\.|yes|no|actions|name|password|amount|due date|customer|customers|invoice|invoices|overview|details|view|view all|remove|update|send|retry|try again|something went wrong|are you sure\??)$/i;

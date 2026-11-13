@@ -161,6 +161,7 @@ pre-commit:
             ["native-date", "Componentes", "<input type=\"date|datetime-local|month\">", "erro", ""],
             ["confirm-alert", "Componentes", "window.confirm / alert / prompt", "erro", ""],
             ["deprecated-export", "Componentes", "Export ou classe renomeada", "erro", "sim"],
+            ["class-conflict", "Componentes", "cn() com duas utilidades da mesma propriedade", "aviso", ""],
             ["as-any-props", "Componentes", "as any em prop de componente", "info", ""],
             ["icon-button-label", "Acessibilidade", "Botão só com ícone sem nome acessível", "erro", ""],
             ["img-alt", "Acessibilidade", "<img> sem alt", "erro", ""],
