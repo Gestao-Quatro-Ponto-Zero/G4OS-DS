@@ -224,8 +224,8 @@ export function CapacityBar({
             minWidth: s.value > 0 ? 3 : 0,
             transition: ease,
             opacity: isClearing ? 0.4 : dimmed ? 0.38 : 1,
-            boxShadow: s.value > 0 ? "inset 0 0 0 1px color-mix(in oklab, var(--seg) 62%, transparent)" : undefined,
-            background: `color-mix(in oklab, var(--seg) ${isActive ? 55 : 30}%, transparent)`,
+            boxShadow: s.value > 0 ? "inset 0 0 0 1px color-mix(in oklab, var(--seg) 80%, transparent)" : undefined,
+            background: `color-mix(in oklab, var(--seg) ${isActive ? 80 : 55}%, transparent)`,
           } as CSSProperties;
           return (
             <div
