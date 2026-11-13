@@ -141,8 +141,9 @@ export function InputGroup({
         "focus-field flex w-full min-w-0 items-center rounded-lg border bg-surface text-ink",
         size === "sm" ? "min-h-8 text-[13px]" : "min-h-10 text-[14px]",
         "has-[>[data-align^=block]]:flex-col has-[>[data-align^=block]]:items-stretch",
-        "has-[:disabled]:cursor-not-allowed has-[:disabled]:bg-soft/60 has-[:disabled]:text-muted",
-        invalid ? "border-rose/50 focus-within:border-rose" : "border-line",
+        // Desabilitado é o campo, não um botão do complemento (enviar sem texto não apaga o grupo).
+        "has-[input:disabled,textarea:disabled]:cursor-not-allowed has-[input:disabled,textarea:disabled]:bg-soft/60 has-[input:disabled,textarea:disabled]:text-muted",
+        invalid ? "border-rose/50 focus-within:border-rose" : "border-line focus-within:border-muted",
         className,
       )}
     >
@@ -288,14 +289,14 @@ export function ColorPicker({
   };
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
-      <span id={`${id}-label`} className="text-[12.5px] font-medium text-ink">
+      <span id={`${id}-label`} className="text-[12.5px] text-muted">
         {label}
       </span>
       <BasePopover.Root>
         <BasePopover.Trigger
           disabled={disabled}
           aria-labelledby={`${id}-label ${id}-value`}
-          className="focus-field flex h-10 w-full items-center gap-2.5 rounded-lg border border-line bg-surface px-2.5 text-left text-[14px] text-ink outline-none hover:border-line-strong focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-soft/60 data-popup-open:border-line-strong"
+          className="flex h-10 w-full items-center gap-2.5 rounded-lg border border-line bg-surface px-2.5 text-left text-[14px] text-ink outline-none transition-[border-color,box-shadow] hover:border-line-strong focus-visible:border-muted focus-visible:shadow-[0_0_0_3px_color-mix(in_oklab,var(--ds-ink)_6%,transparent)] disabled:cursor-not-allowed disabled:bg-soft/60 data-popup-open:border-line-strong"
         >
           <span aria-hidden className="h-6 w-6 shrink-0 rounded-md ring-1 ring-inset ring-line-strong" style={{ background: current }} />
           <span id={`${id}-value`} className="min-w-0 flex-1 truncate font-mono text-[13px] uppercase">
@@ -337,7 +338,7 @@ export function ColorPicker({
                       className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     />
                   </label>
-                  <div className="focus-field flex h-9 min-w-0 flex-1 items-center rounded-lg border border-line bg-surface">
+                  <div className="focus-field flex h-9 min-w-0 flex-1 items-center rounded-lg border border-line bg-surface focus-within:border-muted">
                     <span className="pl-2.5 text-[13px] text-muted" aria-hidden>
                       Hex
                     </span>

@@ -99,7 +99,7 @@ export function DatePicker({
               ? className
               : cn(
                   fieldClass,
-                  "flex items-center justify-between gap-2 text-left font-normal outline-none hover:border-line-strong focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
+                  "flex items-center justify-between gap-2 text-left font-normal outline-none transition-[border-color,box-shadow] hover:border-line-strong focus-visible:shadow-[0_0_0_3px_color-mix(in_oklab,var(--ds-ink)_6%,transparent)] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
                   field.invalid && "border-rose/50",
                   clearable && value && "pr-16",
                   className,
