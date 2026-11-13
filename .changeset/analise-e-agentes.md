@@ -26,4 +26,10 @@ Gráficos analíticos, agentes de IA e revisão visual do DS inteiro.
 - KPIs alinhados na mesma linha com e sem sparkline; cabeçalho do `ChartCard` quebra no celular; legendas e tooltips alinhados; rótulos de barra e de eixo sem sumir nem vazar.
 - Tabela no celular: a ação "⋯" vai para o canto do cartão; rótulos de colunas com `SortHeader` aparecem.
 
+**Migração**
+- Se algum teste ou código seu compara a saída dos formatadores com hífen ("-R$ 20,00"), troque para "−" (U+2212) ou normalize antes de comparar.
+- `SankeyChart`: o hover agora traça o caminho inteiro (não só as faixas vizinhas) e `SankeyNode` aceita `color`.
+- `WaterfallChart`: valores de quedas ficam abaixo da barra; em faixa estreita só a barra em foco mostra o valor; o tooltip traz a variação com sinal.
+- `HeatmapMatrix`: células usam a mesma escala da legenda (`sequentialColor`); `tone="info"` passa a seguir o token `info`.
+
 **Auditoria**: regra `class-conflict` (duas utilidades da mesma propriedade no `cn`, que vence pela ordem do CSS e não do código).

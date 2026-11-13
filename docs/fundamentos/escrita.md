@@ -74,6 +74,7 @@ Três partes: **o que aconteceu, por quê (se souber), o que fazer.**
 - Datas relativas até 30 dias ("há 5 min", "ontem", "em 3 dias"); depois, data curta ("12 set") ou completa ("12/09/2026").
 - Plural correto com `plural(n, "tarefa")` → "1 tarefa", "3 tarefas".
 - Espaço antes de % (norma brasileira): "12,5 %". `formatPercent` e `formatDelta` já põem o espaço inseparável; o Intl pt-BR sozinho não põe.
+- Negativo com sinal de menos tipográfico: "−20", "−R$ 1,2 mil", "−12 %". Todos os formatadores já usam "−" (U+2212); o hífen do teclado fica só no que vai para planilha (Copiar da grade e da `WorkbookView` devolvem hífen) e no CSV.
 
 ## Glossário por produto
 
