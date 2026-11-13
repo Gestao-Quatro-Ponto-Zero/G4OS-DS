@@ -422,7 +422,8 @@ export function useFilters<T>(
 
 const popup = cn(popupClass, "bg-popover");
 const chipBase =
-  "inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-[12.5px] ring-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/40";
+  // Sem altura: cada uso decide (h-10 na barra, h-8 na linha de chips); duas alturas no mesmo elemento brigam.
+  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-[12.5px] ring-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/40";
 
 /** Popover controlado com o posicionamento padrão do DS. */
 function Pop({
@@ -531,7 +532,9 @@ export function Highlight({ text, query, className }: { text: string; query: str
 /* Editor de valor                                                     */
 /* ------------------------------------------------------------------ */
 
-const inputCls = "h-9 w-full min-w-0 rounded-lg border border-line bg-surface px-2.5 text-[13px] text-ink outline-none placeholder:text-muted";
+// Sem altura nem fundo: quem usa decide (cn não resolve conflito de utilitários).
+const inputBase = "w-full min-w-0 rounded-lg border border-line px-2.5 text-[13px] text-ink outline-none placeholder:text-muted focus-visible:border-muted";
+const inputCls = cn(inputBase, "h-9 bg-surface");
 
 function OptionList({ options, value, onChange, me, autoFocus }: { options: FilterOption[]; value: string[]; onChange: (v: string[]) => void; me?: string; autoFocus?: boolean }) {
   const [q, setQ] = useState("");
@@ -539,7 +542,7 @@ function OptionList({ options, value, onChange, me, autoFocus }: { options: Filt
   const toggle = (v: string) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v]);
   return (
     <div>
-      {options.length > 7 && <input autoFocus={autoFocus} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar opção…" aria-label="Buscar opção" className={cn(inputCls, "mb-1.5 h-8 bg-soft")} />}
+      {options.length > 7 && <input autoFocus={autoFocus} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar opção…" aria-label="Buscar opção" className={cn(inputBase, "mb-1.5 h-8 bg-soft")} />}
       <div className="-mx-1 max-h-[240px] overflow-y-auto" role="group">
         {list.map((o) => {
           const on = value.includes(o.value);
@@ -779,7 +782,7 @@ export function ActiveFilterChip<T>({ filters, condition }: { filters: FiltersAp
   if (!field) return null;
   const d = filters.describe(condition);
   return (
-    <span className="inline-flex h-8 items-stretch overflow-hidden rounded-lg bg-surface text-[12.5px] ring-1 ring-line-strong">
+    <span className="inline-flex h-8 items-stretch overflow-hidden rounded-lg bg-surface text-[12.5px] ring-1 ring-inset ring-line-strong">
       <Pop
         open={open}
         onOpenChange={(o) => {
@@ -955,7 +958,7 @@ export function MatchToggle<T>({ filters, className }: { filters: FiltersApi<T>;
       onClick={() => filters.setMatch(any ? "and" : "or")}
       aria-label={any ? "Mostrando o que atende a qualquer filtro. Trocar para todos os filtros" : "Mostrando o que atende a todos os filtros. Trocar para qualquer filtro"}
       title="Trocar entre E (todos) e OU (qualquer um)"
-      className={cn(chipBase, "bg-soft text-ink-soft ring-transparent hover:text-ink", className)}
+      className={cn(chipBase, "h-8 bg-soft text-ink-soft ring-transparent hover:text-ink", className)}
     >
       <span className="text-muted">Atende a</span>
       <span className="font-medium text-ink">{any ? "qualquer um" : "todos"}</span>

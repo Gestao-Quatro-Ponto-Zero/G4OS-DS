@@ -434,7 +434,8 @@ export function WorkbookView({
   const copy = () => {
     const lines: string[] = [];
     for (const r of allNav.filter((x) => x >= r0 && x <= r1).slice(0, 50000)) lines.push(cols.filter((c) => c >= c0 && c <= c1).map((c) => (cellAt(r, c) ? formatCell(cellAt(r, c)!) : "")).join("\t"));
-    void navigator.clipboard?.writeText(lines.join("\n"));
+    // Planilhas leem "−" (U+2212) como texto: na cópia, o sinal volta a ser hífen.
+    void navigator.clipboard?.writeText(lines.join("\n").replace(/\u2212/g, "-"));
   };
   const onKey = (e: KeyboardEvent) => {
     const { r, c } = active;
@@ -838,7 +839,7 @@ function DocBlockView({ block, rows, last = true, headingId, toc }: { block: Doc
                 ) : (
                   <tr>
                     {block.columns.map((c, i) => (
-                      <th key={i} scope="col" className={cn("border-b border-line-strong px-2.5 py-2 text-left text-[12px] font-semibold text-ink", numeric(i) && "text-right")}>
+                      <th key={i} scope="col" className={cn("border-b border-line-strong px-2.5 py-2 text-[12px] font-semibold text-ink", numeric(i) ? "text-right" : "text-left")}>
                         {c.header}
                       </th>
                     ))}

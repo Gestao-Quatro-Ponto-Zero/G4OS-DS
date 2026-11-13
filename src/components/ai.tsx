@@ -7,9 +7,11 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   CircleDashed,
   Copy,
+  CornerDownRight,
   FileText,
   Globe,
   Info,
@@ -30,6 +32,7 @@ import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type K
 import { cn } from "../lib/cn";
 import { AiDots, G4OSSymbol } from "./g4os";
 import { formatNumber } from "../lib/format";
+import { useLinkedHighlight, type LinkedHighlight } from "./charts-kit";
 
 /*
  * Padrões de IA (docs/padroes/ia.md). Regras que valem para todos:
@@ -142,23 +145,72 @@ export function ThinkingIndicator({ label = "Pensando", startedAt, className }: 
 /* Citações e fontes                                                   */
 /* ------------------------------------------------------------------ */
 
-export type AiSource = { id: string; title: string; href?: string; kind?: "web" | "doc" | "record" | "data"; domain?: string; snippet?: ReactNode };
+export type AiSource = {
+  id: string;
+  title: string;
+  href?: string;
+  kind?: "web" | "doc" | "record" | "data";
+  domain?: string;
+  snippet?: ReactNode;
+  /** Cor de identidade da fonte (marca do site/sistema) para o selo em SourceCards e SourceStack. Sem ela, o selo usa o ícone do tipo. */
+  tint?: string;
+};
 
 const sourceIcon: Record<NonNullable<AiSource["kind"]>, LucideIcon> = { web: Globe, doc: FileText, record: Search, data: Brain };
 
-/** Número de citação dentro do texto: “… 18 % [2]”. Hover mostra a fonte. */
-export function CitationChip({ index, source, onClick }: { index: number; source?: AiSource; onClick?: () => void }) {
-  const cls =
-    "ds-hit mx-0.5 inline-flex h-4 min-w-4 -translate-y-px items-center justify-center rounded bg-soft px-1 align-middle text-[10.5px] font-medium tabular-nums text-ink-soft ring-1 ring-line hover:bg-line hover:text-ink";
+/**
+ * Link de fonte vindo de modelo ou da web: só http(s), mailto e caminhos
+ * relativos viram <a>. `javascript:`, `data:` e afins são descartados.
+ */
+function safeSourceHref(href: string | undefined) {
+  if (!href) return undefined;
+  const h = href.trim();
+  if (/^(https?:|mailto:)/i.test(h) || /^[/#?.]/.test(h)) return h;
+  return /^[a-z][a-z0-9+.-]*:/i.test(h) ? undefined : h;
+}
+
+/**
+ * Número de citação dentro do texto: “… 18 % [2]”. Hover mostra a fonte.
+ * Com `onHighlight`, avisa quando o ponteiro ou o foco entra e sai (CitedText usa
+ * para acender a frase sustentada); `active` pinta o número aceso.
+ */
+export function CitationChip({
+  index,
+  source,
+  onClick,
+  active,
+  onHighlight,
+}: {
+  index: number;
+  source?: AiSource;
+  onClick?: () => void;
+  /** Citação acesa (a frase ou a fonte dela está em destaque). */
+  active?: boolean;
+  /** Ponteiro/foco entrou (true) ou saiu (false) da citação. */
+  onHighlight?: (on: boolean) => void;
+}) {
+  const cls = cn(
+    "ds-hit mx-0.5 inline-flex h-4 min-w-4 -translate-y-px items-center justify-center rounded px-1 align-middle text-[10.5px] font-medium tabular-nums ring-1 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-muted/40",
+    active ? "bg-accent-soft text-ink ring-accent/50" : "bg-soft text-ink-soft ring-line hover:bg-line hover:text-ink",
+  );
   const label = source ? `Fonte ${index}: ${source.title}` : `Fonte ${index}`;
-  if (source?.href)
+  const hl = onHighlight
+    ? {
+        onMouseEnter: () => onHighlight(true),
+        onMouseLeave: () => onHighlight(false),
+        onFocus: () => onHighlight(true),
+        onBlur: () => onHighlight(false),
+      }
+    : {};
+  const href = safeSourceHref(source?.href);
+  if (href)
     return (
-      <a href={source.href} target="_blank" rel="noreferrer" className={cls} title={label} aria-label={label}>
+      <a href={href} target="_blank" rel="noreferrer" className={cls} title={label} aria-label={label} onClick={onClick} {...hl}>
         {index}
       </a>
     );
   return (
-    <button type="button" className={cls} title={label} aria-label={label} onClick={onClick}>
+    <button type="button" className={cls} title={label} aria-label={label} onClick={onClick} {...hl}>
       {index}
     </button>
   );
@@ -195,8 +247,8 @@ export function SourceList({ sources, title = "Fontes", compact = false, classNa
             : "block rounded-lg border border-line bg-surface px-3 py-2 hover:border-line-strong";
           return (
             <li key={s.id} className="min-w-0">
-              {s.href ? (
-                <a href={s.href} target="_blank" rel="noreferrer" className={cls}>
+              {safeSourceHref(s.href) ? (
+                <a href={safeSourceHref(s.href)} target="_blank" rel="noreferrer" className={cls}>
                   {body}
                 </a>
               ) : (
@@ -206,6 +258,625 @@ export function SourceList({ sources, title = "Fontes", compact = false, classNa
           );
         })}
       </ol>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Resposta citada: selos de fonte, cartões, texto com citações        */
+/* ------------------------------------------------------------------ */
+
+/** Selo pequeno da fonte: inicial na cor de identidade (`tint`) ou ícone do tipo. Decorativo. */
+function SourceMark({ source, size = "sm", className }: { source: AiSource; size?: "sm" | "md"; className?: string }) {
+  const Icon = sourceIcon[source.kind ?? "doc"];
+  const box = size === "md" ? "h-5 w-5 text-[11px] [&_svg]:h-3 [&_svg]:w-3" : "h-4 w-4 text-[10px] [&_svg]:h-2.5 [&_svg]:w-2.5";
+  if (source.tint) {
+    const letter = (source.domain ?? source.title).replace(/^www\./, "").trim().charAt(0).toUpperCase();
+    return (
+      <span
+        aria-hidden
+        className={cn("inline-grid shrink-0 place-items-center rounded-[5px] font-semibold leading-none", box, className)}
+        style={{
+          background: `color-mix(in oklab, ${source.tint} 20%, var(--color-surface))`,
+          color: `color-mix(in oklab, ${source.tint} 72%, var(--color-ink))`,
+        }}
+      >
+        {letter}
+      </span>
+    );
+  }
+  return (
+    <span aria-hidden className={cn("inline-grid shrink-0 place-items-center rounded-[5px] bg-soft text-muted", box, className)}>
+      <Icon />
+    </span>
+  );
+}
+
+const sourceOrigin = (s: AiSource) => s.domain ?? (s.kind === "record" ? "Registro" : s.kind === "data" ? "Dados" : s.kind === "web" ? "Web" : "Documento");
+
+/**
+ * Resumo compacto das fontes para o topo da resposta: selos sobrepostos +
+ * "8 fontes ⌄". É um botão que abre e fecha os cartões (`SourceCards`).
+ */
+export function SourceStack({
+  sources,
+  expanded,
+  onToggle,
+  controls,
+  max = 4,
+  className,
+}: {
+  sources: AiSource[];
+  /** Cartões abertos (gira a seta e informa `aria-expanded`). */
+  expanded?: boolean;
+  onToggle?: () => void;
+  /** id dos cartões que o botão abre e fecha. */
+  controls?: string;
+  /** Quantos selos aparecem sobrepostos. */
+  max?: number;
+  className?: string;
+}) {
+  if (!sources.length) return null;
+  const n = sources.length;
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={onToggle ? !!expanded : undefined}
+      aria-controls={controls}
+      className={cn(
+        "inline-flex h-8 items-center gap-2 rounded-full pl-1.5 pr-2.5 text-[12.5px] text-ink-soft outline-none transition-colors hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40",
+        className,
+      )}
+    >
+      <span className="flex items-center" aria-hidden>
+        {sources.slice(0, max).map((s, i) => (
+          <SourceMark key={s.id} source={s} size="md" className={cn("ring-2 ring-page", i > 0 && "-ml-1")} />
+        ))}
+      </span>
+      <span className="tabular-nums">{n === 1 ? "1 fonte" : `${formatNumber(n)} fontes`}</span>
+      {onToggle && <ChevronDown className={cn("h-3.5 w-3.5 text-muted transition-transform", expanded && "rotate-180")} aria-hidden />}
+    </button>
+  );
+}
+
+/**
+ * Fontes de uma resposta como cartões pequenos (selo, origem, título, número).
+ * No celular viram uma linha rolável; acima disso, grade. Mostra `max` e um
+ * "+N fontes" que expande. Com `highlight` (o mesmo de `CitedText`), passar o
+ * ponteiro ou focar um cartão acende as frases que citam aquela fonte, e
+ * citar uma fonte no texto acende o cartão.
+ */
+export function SourceCards({
+  sources,
+  highlight,
+  max = 4,
+  id,
+  label = "Fontes",
+  className,
+}: {
+  sources: AiSource[];
+  /** Realce ligado (`useLinkedHighlight<number>()`), chave = número da fonte (1, 2, 3…). */
+  highlight?: LinkedHighlight<number>;
+  /** Células da grade; com mais fontes, a última vira "+N fontes". */
+  max?: number;
+  id?: string;
+  /** Nome acessível da lista. */
+  label?: string;
+  className?: string;
+}) {
+  const [all, setAll] = useState(false);
+  if (!sources.length) return null;
+  // Com sobra, o "+N fontes" ocupa a última vaga: a grade fica com `max` células.
+  const cut = sources.length > max ? Math.max(1, max - 1) : sources.length;
+  const extra = sources.length - cut;
+  const shown = all ? sources : sources.slice(0, cut);
+  const card =
+    "flex h-full min-h-[84px] flex-col gap-1.5 rounded-xl border border-line bg-surface px-3 py-2.5 text-left outline-none transition-colors hover:border-line-strong focus-visible:ring-2 focus-visible:ring-muted/40 data-active:border-accent/60 data-active:bg-accent-soft/40";
+  return (
+    <ol
+      id={id}
+      aria-label={label}
+      className={cn(
+        "-mx-1 flex list-none snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] sm:overflow-visible sm:px-0 sm:pb-0",
+        className,
+      )}
+    >
+      {shown.map((s) => {
+        const n = sources.indexOf(s) + 1;
+        const active = highlight?.active === n;
+        const hover = highlight
+          ? {
+              onMouseEnter: () => highlight.setHover(n),
+              onMouseLeave: () => highlight.setHover(null),
+              onFocus: () => highlight.setHover(n),
+              onBlur: () => highlight.setHover(null),
+            }
+          : {};
+        const body = (
+          <>
+            <span className="flex min-w-0 items-center gap-1.5 text-[11.5px] text-muted">
+              <SourceMark source={s} />
+              <span className="min-w-0 flex-1 truncate">{sourceOrigin(s)}</span>
+              <span className="tabular-nums" aria-hidden>
+                {n}
+              </span>
+            </span>
+            <span className="line-clamp-2 text-[12.5px] font-medium leading-snug text-ink">{s.title}</span>
+          </>
+        );
+        const name = `Fonte ${n}: ${s.title} (${sourceOrigin(s)})`;
+        return (
+          <li key={s.id} className="w-[176px] shrink-0 snap-start sm:w-auto">
+            {safeSourceHref(s.href) ? (
+              <a href={safeSourceHref(s.href)} target="_blank" rel="noreferrer" aria-label={name} className={card} data-active={active || undefined} {...hover}>
+                {body}
+              </a>
+            ) : highlight ? (
+              <button type="button" aria-label={name} aria-pressed={highlight.pinned === n} className={cn(card, "w-full")} {...highlight.bind(n)}>
+                {body}
+              </button>
+            ) : (
+              <div className={card}>{body}</div>
+            )}
+          </li>
+        );
+      })}
+      {extra > 0 && (
+        <li className="w-[120px] shrink-0 snap-start sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setAll((v) => !v)}
+            aria-expanded={all}
+            className="flex h-full min-h-[84px] w-full flex-col items-start justify-between gap-1.5 rounded-xl border border-dashed border-line px-3 py-2.5 text-left text-[12.5px] text-ink-soft outline-none hover:border-line-strong hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40"
+          >
+            {!all && (
+              <span className="flex items-center" aria-hidden>
+                {sources.slice(cut, cut + 4).map((s, i) => (
+                  <SourceMark key={s.id} source={s} className={cn("ring-2 ring-page", i > 0 && "-ml-0.5")} />
+                ))}
+              </span>
+            )}
+            <span className="font-medium tabular-nums">{all ? "Mostrar menos" : `+${formatNumber(extra)} fontes`}</span>
+          </button>
+        </li>
+      )}
+    </ol>
+  );
+}
+
+/* ---------- Parser mínimo de marcação (sem HTML, sem dependência) ---------- */
+
+type CiteInline = { t: "text"; v: string } | { t: "strong"; c: CiteInline[] } | { t: "em"; c: CiteInline[] } | { t: "code"; v: string } | { t: "cite"; n: number[] };
+
+type CiteBlock =
+  | { t: "p"; text: string }
+  | { t: "h"; level: 1 | 2 | 3; text: string }
+  | { t: "ol" | "ul"; items: string[]; start: number }
+  | { t: "code"; lang: string; code: string }
+  | { t: "table"; head: string[]; align: ("left" | "right" | "center")[]; rows: string[][] };
+
+const INLINE_RE = /(`[^`\n]+`)|(\*\*[^*\n]+?\*\*)|(\*[^*\s][^*\n]*?\*)|(\[\d+(?:\s*,\s*\d+)*\])/g;
+
+function parseInline(src: string): CiteInline[] {
+  const out: CiteInline[] = [];
+  let last = 0;
+  for (const m of src.matchAll(INLINE_RE)) {
+    const at = m.index ?? 0;
+    if (at > last) out.push({ t: "text", v: src.slice(last, at) });
+    const tok = m[0];
+    if (m[1]) out.push({ t: "code", v: tok.slice(1, -1) });
+    else if (m[2]) out.push({ t: "strong", c: parseInline(tok.slice(2, -2)) });
+    else if (m[3]) out.push({ t: "em", c: parseInline(tok.slice(1, -1)) });
+    else {
+      const n = tok.slice(1, -1).split(",").map((x) => Number(x.trim()));
+      const prev = out[out.length - 1];
+      // [1][2] e [1] [2] viram uma citação só: [1, 2].
+      if (prev?.t === "cite") prev.n.push(...n);
+      else if (prev?.t === "text" && !prev.v.trim() && out[out.length - 2]?.t === "cite") {
+        out.pop();
+        (out[out.length - 1] as { t: "cite"; n: number[] }).n.push(...n);
+      } else out.push({ t: "cite", n });
+    }
+    last = at + tok.length;
+  }
+  if (last < src.length) out.push({ t: "text", v: src.slice(last) });
+  return out;
+}
+
+const splitRow = (line: string) =>
+  line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((c) => c.trim());
+
+/** Divide a marcação simples em blocos: parágrafos, títulos (#), listas (1. / -), tabela (|) e código (```). */
+function parseBlocks(src: string): CiteBlock[] {
+  // Pontuação logo depois da citação vai para antes dela: "frase [1]." → "frase. [1]".
+  const text = src.replace(/((?:\s*\[\d+(?:\s*,\s*\d+)*\])+)([.,;:!?])/g, "$2$1");
+  const lines = text.split("\n");
+  const blocks: CiteBlock[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed) {
+      i++;
+      continue;
+    }
+    const fence = /^```\s*([\w-]*)/.exec(trimmed);
+    if (fence) {
+      const code: string[] = [];
+      i++;
+      while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+      i++;
+      blocks.push({ t: "code", lang: fence[1], code: code.join("\n") });
+      continue;
+    }
+    const h = /^(#{1,3})\s+(.*)$/.exec(trimmed);
+    if (h) {
+      blocks.push({ t: "h", level: h[1].length as 1 | 2 | 3, text: h[2] });
+      i++;
+      continue;
+    }
+    const listRe = /^(\d+)[.)]\s+(.*)$|^[-*]\s+(.*)$/;
+    const li = listRe.exec(trimmed);
+    if (li) {
+      const ordered = li[1] != null;
+      const items: string[] = [];
+      while (i < lines.length) {
+        const t = lines[i].trim();
+        const m = listRe.exec(t);
+        if (m && (m[1] != null) === ordered) items.push(m[2] ?? m[3]);
+        else if (t && /^\s+/.test(lines[i]) && items.length) items[items.length - 1] += ` ${t}`;
+        else break;
+        i++;
+      }
+      blocks.push({ t: ordered ? "ol" : "ul", items, start: ordered ? Number(li[1]) : 1 });
+      continue;
+    }
+    if (trimmed.startsWith("|")) {
+      const rows: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")) rows.push(lines[i++].trim());
+      const sep = rows[1] && /^\|?\s*:?-{2,}/.test(rows[1]) ? splitRow(rows[1]) : null;
+      const head = splitRow(rows[0]);
+      const align = head.map((_, c) => {
+        const s = sep?.[c] ?? "";
+        return s.endsWith(":") ? (s.startsWith(":") ? "center" : "right") : "left";
+      }) as ("left" | "right" | "center")[];
+      blocks.push({ t: "table", head, align, rows: rows.slice(sep ? 2 : 1).map(splitRow) });
+      continue;
+    }
+    const para: string[] = [];
+    while (i < lines.length) {
+      const t = lines[i].trim();
+      if (!t || /^```|^#{1,3}\s|^\|/.test(t) || listRe.test(t)) break;
+      para.push(t);
+      i++;
+    }
+    blocks.push({ t: "p", text: para.join(" ") });
+  }
+  return blocks;
+}
+
+/** Texto puro (sem marcação nem citações) de uma resposta: para Copiar e leitores. */
+export function citedPlainText(markdown: string) {
+  return markdown
+    .replace(/```[\w-]*\n?/g, "")
+    .replace(/\s*\[\d+(?:\s*,\s*\d+)*\]/g, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^#{1,3}\s+/gm, "")
+    .replace(/^\|?\s*:?-{2,}.*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+const streamCursor = <span aria-hidden className="ml-0.5 inline-block h-[1em] w-[7px] translate-y-[3px] rounded-[1px] bg-ink/70 motion-safe:animate-pulse" />;
+
+/**
+ * Resposta com marcação simples e citações [n]. Passar o ponteiro ou focar uma
+ * citação acende a frase que ela sustenta (e o cartão da fonte, com o mesmo
+ * `highlight` em `SourceCards`); clicar fixa, Esc solta.
+ * Marcação aceita: parágrafos, `#`/`##`/`###`, listas `1.` e `-`, **negrito**,
+ * *itálico*, `código`, blocos ``` e tabela com `|` (alinhamento com `:`).
+ * Nada vira HTML: o texto é seguro mesmo vindo do modelo. Para streaming,
+ * passe o texto parcial e `streaming` (cursor no fim).
+ */
+export function CitedText({
+  text,
+  sources = [],
+  highlight: highlightProp,
+  streaming = false,
+  size = "md",
+  headingLevel = 2,
+  className,
+}: {
+  /** Marcação simples com citações [1], [2, 3]. */
+  text: string;
+  /** Fontes na ordem da numeração ([1] = sources[0]). */
+  sources?: AiSource[];
+  /** Realce ligado com `SourceCards` (`useLinkedHighlight<number>()`). Sem ele, o realce é só local. */
+  highlight?: LinkedHighlight<number>;
+  /** Texto ainda chegando: mostra o cursor no fim e esconde citação incompleta. */
+  streaming?: boolean;
+  /** md = artigo (15 px); sm = conversa (13,5 px). */
+  size?: "md" | "sm";
+  /** Nível do `#`/`##` da resposta (h2 por padrão; `###` vira um nível abaixo). */
+  headingLevel?: 2 | 3 | 4;
+  className?: string;
+}) {
+  const own = useLinkedHighlight<number>();
+  const hl = highlightProp ?? own;
+  const [seg, setSeg] = useState<string | null>(null);
+  const body = streaming ? text.replace(/\[[\d,\s]*$/, "").replace(/\*{1,2}$/, "") : text;
+  const blocks = useMemo(() => parseBlocks(body), [body]);
+  const lastBlock = blocks.length - 1;
+  const [copied, setCopied] = useState<number | null>(null);
+
+  // Cada trecho entre citações é a "frase" que a citação seguinte sustenta.
+  const renderRun = (src: string, key: string, cursor: boolean) => {
+    const toks = parseInline(src);
+    const segs: { toks: CiteInline[]; n: number[] }[] = [];
+    let cur: CiteInline[] = [];
+    for (const t of toks) {
+      if (t.t === "cite") {
+        segs.push({ toks: cur, n: t.n });
+        cur = [];
+      } else cur.push(t);
+    }
+    if (cur.length) segs.push({ toks: cur, n: [] });
+    return (
+      <>
+        {segs.map((s, i) => {
+          const id = `${key}.${i}`;
+          const lit = s.n.length > 0 && (seg != null ? seg === id : hl.active != null && s.n.includes(hl.active));
+          return (
+            <span key={id}>
+              <span
+                data-cited={s.n.length ? s.n.join(" ") : undefined}
+                className={cn("rounded-[3px] [box-decoration-break:clone] motion-safe:transition-colors motion-safe:duration-150", lit && "bg-accent-soft text-ink")}
+              >
+                {s.toks.map((t, j) => renderTok(t, j))}
+              </span>
+              {s.n.map((n) => (
+                <CitationChip
+                  key={n}
+                  index={n}
+                  source={sources[n - 1]}
+                  active={hl.active === n && (seg == null || seg === id)}
+                  onHighlight={(on) => {
+                    setSeg(on ? id : null);
+                    hl.setHover(on ? n : null);
+                  }}
+                  onClick={safeSourceHref(sources[n - 1]?.href) ? undefined : () => hl.setPinned(hl.pinned === n ? null : n)}
+                />
+              ))}
+            </span>
+          );
+        })}
+        {cursor && streamCursor}
+      </>
+    );
+  };
+
+  const renderTok = (t: CiteInline, k: number): ReactNode => {
+    switch (t.t) {
+      case "text":
+        return t.v;
+      case "code":
+        return (
+          <code key={k} className={cn("rounded-md border border-line bg-soft px-1.5 py-px font-mono", size === "md" ? "text-[13.5px]" : "text-[12.5px]")}>
+            {t.v}
+          </code>
+        );
+      case "strong":
+        return (
+          <strong key={k} className="font-semibold text-ink">
+            {t.c.map(renderTok)}
+          </strong>
+        );
+      case "em":
+        return <em key={k}>{t.c.map(renderTok)}</em>;
+      default:
+        return null;
+    }
+  };
+
+  const text15 = size === "md" ? "text-[15px] leading-[1.7]" : "text-[13.5px] leading-[1.65]";
+  const hSize = (level: number) => (level <= 2 ? (size === "md" ? "text-[18px]" : "text-[15px]") : size === "md" ? "text-[15px]" : "text-[13.5px]");
+
+  return (
+    <div
+      className={cn("flex min-w-0 flex-col gap-3.5 text-ink", text15, className)}
+      aria-busy={streaming || undefined}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && hl.pinned != null) hl.setPinned(null);
+      }}
+    >
+      {blocks.map((b, bi) => {
+        const key = String(bi);
+        const cursor = streaming && bi === lastBlock;
+        switch (b.t) {
+          case "h": {
+            const lvl = Math.min(6, headingLevel + (b.level === 3 ? 1 : 0));
+            const H = `h${lvl}` as "h2" | "h3" | "h4" | "h5";
+            return (
+              <H key={key} className={cn("m-0 pt-2 font-semibold tracking-tight text-ink", hSize(b.level === 3 ? 3 : 2))}>
+                {renderRun(b.text, key, cursor)}
+              </H>
+            );
+          }
+          case "ol":
+          case "ul": {
+            const L = b.t;
+            return (
+              <L
+                key={key}
+                start={b.t === "ol" && b.start !== 1 ? b.start : undefined}
+                className={cn("m-0 flex flex-col gap-2 pl-6 marker:text-muted", b.t === "ol" ? "list-decimal marker:tabular-nums" : "list-disc")}
+              >
+                {b.items.map((it, ii) => (
+                  <li key={ii} className="pl-1">
+                    {renderRun(it, `${key}.${ii}`, cursor && ii === b.items.length - 1)}
+                  </li>
+                ))}
+              </L>
+            );
+          }
+          case "code":
+            return (
+              <div key={key} className="relative min-w-0 overflow-hidden rounded-lg border border-line bg-soft">
+                <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-[11.5px] text-muted">
+                  <span className="font-mono">{b.lang || "código"}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(b.code).catch(() => undefined);
+                      setCopied(bi);
+                      window.setTimeout(() => setCopied((c) => (c === bi ? null : c)), 1400);
+                    }}
+                    className="inline-flex h-6 items-center gap-1 rounded-md px-1.5 outline-none hover:bg-surface hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40"
+                  >
+                    {copied === bi ? <Check className="h-3 w-3 text-ok" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}
+                    {copied === bi ? "Copiado" : "Copiar"}
+                  </button>
+                </div>
+                <div role="region" tabIndex={0} aria-label={`Código ${b.lang}`.trim()} className="overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted/40">
+                  <pre className="m-0 w-max min-w-full px-3.5 py-3 font-mono text-[12.5px] leading-relaxed text-ink">
+                    <code>{b.code}</code>
+                    {cursor && streamCursor}
+                  </pre>
+                </div>
+              </div>
+            );
+          case "table":
+            return (
+              <div key={key} tabIndex={0} role="region" aria-label="Tabela" className="min-w-0 overflow-x-auto rounded-lg border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/40">
+                <table className="w-full border-collapse text-[13px] leading-snug">
+                  <thead className="bg-soft">
+                    <tr>
+                      {b.head.map((c, ci) => (
+                        <th key={ci} scope="col" className={cn("whitespace-nowrap border-b border-line px-3 py-2 font-medium text-ink-soft", b.align[ci] === "right" ? "text-right" : b.align[ci] === "center" ? "text-center" : "text-left")}>
+                          {renderRun(c, `${key}.h${ci}`, false)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {b.rows.map((r, ri) => (
+                      <tr key={ri} className="border-b border-line last:border-0">
+                        {b.head.map((_, ci) => (
+                          <td key={ci} className={cn("px-3 py-2 align-top text-ink", b.align[ci] === "right" ? "text-right tabular-nums" : b.align[ci] === "center" ? "text-center" : "text-left", ci === 0 && "font-medium")}>
+                            {renderRun(r[ci] ?? "", `${key}.${ri}.${ci}`, false)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {cursor && <span className="block px-3 py-1">{streamCursor}</span>}
+              </div>
+            );
+          default:
+            return (
+              <p key={key} className="m-0">
+                {renderRun(b.text, key, cursor)}
+              </p>
+            );
+        }
+      })}
+      {streaming && !blocks.length && <p className="m-0">{streamCursor}</p>}
+    </div>
+  );
+}
+
+/** Pager das versões de uma resposta: "‹ 2 de 3 ›". Some com uma versão só. `index` começa em 0. */
+export function AnswerVersions({ index, count, onIndexChange: onChange, className }: { index: number; count: number; onIndexChange: (index: number) => void; className?: string }) {
+  if (count < 2) return null;
+  const btn =
+    "grid h-7 w-7 place-items-center rounded-md text-muted outline-none transition-colors hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40 disabled:pointer-events-none disabled:opacity-40 [&_svg]:h-3.5 [&_svg]:w-3.5";
+  return (
+    <div role="group" aria-label="Versões da resposta" className={cn("inline-flex items-center", className)}>
+      <button type="button" className={btn} aria-label="Versão anterior" disabled={index <= 0} onClick={() => onChange(index - 1)}>
+        <ChevronLeft />
+      </button>
+      <span aria-live="polite" className="min-w-[44px] text-center text-[12px] tabular-nums text-muted">
+        {formatNumber(index + 1)} de {formatNumber(count)}
+      </span>
+      <button type="button" className={btn} aria-label="Próxima versão" disabled={index >= count - 1} onClick={() => onChange(index + 1)}>
+        <ChevronRight />
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Depois da resposta: campo "Pergunte algo relacionado" (com rótulo visível) e
+ * até três perguntas sugeridas. Tocar numa sugestão pergunta direto.
+ */
+export function RelatedQuestions({
+  items,
+  onAsk,
+  label = "Pergunte algo relacionado",
+  placeholder = "Ex.: e para quem não tem celular?",
+  className,
+}: {
+  /** Perguntas sugeridas (mostra até três). */
+  items: string[];
+  onAsk: (question: string) => void;
+  label?: string;
+  placeholder?: string;
+  className?: string;
+}) {
+  const [q, setQ] = useState("");
+  const id = useId();
+  const submit = () => {
+    const v = q.trim();
+    if (!v) return;
+    onAsk(v);
+    setQ("");
+  };
+  return (
+    <div className={cn("flex min-w-0 flex-col gap-2", className)}>
+      <label htmlFor={id} className="text-[12.5px] font-medium text-ink-soft">
+        {label}
+      </label>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+        className="focus-field flex h-11 items-center gap-2 rounded-xl border border-line bg-surface pl-3.5 pr-1.5"
+      >
+        <input id={id} value={q} onChange={(e) => setQ(e.target.value)} placeholder={placeholder} className="h-full min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-muted" />
+        <button
+          type="submit"
+          aria-label="Perguntar"
+          disabled={!q.trim()}
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-on-primary outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-muted/40 disabled:opacity-40"
+        >
+          <ArrowUp className="h-4 w-4" aria-hidden />
+        </button>
+      </form>
+      {items.length > 0 && (
+        <ul aria-label="Perguntas sugeridas" className="m-0 flex list-none flex-col p-0">
+          {items.slice(0, 3).map((it) => (
+            <li key={it} className="border-b border-line last:border-0">
+              <button
+                type="button"
+                onClick={() => onAsk(it)}
+                className="flex w-full items-center gap-2.5 rounded-md px-1 py-2.5 text-left text-[13.5px] text-ink-soft outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40"
+              >
+                <CornerDownRight className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
+                <span className="min-w-0 flex-1">{it}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -541,7 +1212,7 @@ export function ChatComposer({
 /** Chip do rodapé do composer (modelo, fonte, contexto). Clicável se tiver onClick. */
 export function ComposerChip({ icon, children, onClick, onRemove, active }: { icon?: ReactNode; children: ReactNode; onClick?: () => void; onRemove?: () => void; active?: boolean }) {
   const cls = cn(
-    "inline-flex h-7 max-w-[200px] items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[12px] [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0",
+    "inline-flex h-7 max-w-[min(320px,100%)] items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[12px] [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0",
     active ? "bg-ink/[0.08] text-ink" : "bg-soft text-ink-soft",
     onClick && "hover:bg-ink/[0.08] hover:text-ink",
     onRemove && "pr-6",

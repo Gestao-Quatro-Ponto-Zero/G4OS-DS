@@ -29,6 +29,15 @@ O starter em [`templates/next-app`](../../templates/next-app) segue exatamente i
 - `Sidebar` precisa do caminho atual: envolva num client component que usa `usePathname()` e passa `currentPath`.
 - `setLinkComponent` precisa rodar no cliente antes do primeiro render que usa links: um componente `"use client"` renderizado no `layout.tsx` raiz que chama `setLinkComponent(Link)` no corpo do módulo.
 - Gráficos medem o contêiner no cliente; no servidor renderizam só a moldura (altura reservada), sem salto de layout.
+- **Funções puras no servidor**: formatação, datas, escalas, pivô, mapa e tokens não têm `"use client"` quando importados pelo subcaminho. Use-os em Server Component, rota de API ou script:
+
+  ```tsx
+  import { formatCurrency } from "@g4ai/ds/lib/format";
+  import { buildPivot } from "@g4ai/ds/lib/pivot";   // agrega no servidor, manda só o resultado
+  import { color } from "@g4ai/ds/tokens";
+  ```
+
+  Pelo ponto de entrada principal (`@g4ai/ds`) tudo é cliente: num Server Component, chamar `buildPivot` de lá falha. Subcaminhos sem marca: `lib/format`, `lib/dates`, `lib/text`, `lib/cn`, `lib/color`, `lib/diff`, `lib/scale`, `lib/pivot`, `lib/geo-br`, `lib/office`, `lib/office-files`, `tokens`.
 
 ## Dados
 

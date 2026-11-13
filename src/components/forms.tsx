@@ -38,9 +38,20 @@ import { popupClass } from "./overlays";
  */
 
 export const fieldClass =
-  "h-10 w-full rounded-lg border border-line bg-surface px-3 text-[14px] text-ink placeholder:text-muted";
+  "h-10 w-full rounded-lg border border-line bg-surface px-3 text-[14px] text-ink placeholder:text-muted focus-visible:border-muted";
 export const areaClass =
-  "w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] leading-relaxed text-ink placeholder:text-muted";
+  "w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] leading-relaxed text-ink placeholder:text-muted focus-visible:border-muted";
+
+/*
+ * Foco de campo para gatilhos-botão (Select, Combobox, MultiSelect,
+ * DatePicker): o mesmo de TextField (borda escurece + halo de 3px), em vez do
+ * anel dourado dos botões. Uma borda de utilitário (`border-line`) vence a do
+ * base.css, por isso a cor de foco vem aqui, como utilitário.
+ */
+const triggerFocus =
+  "outline-none focus-visible:shadow-[0_0_0_3px_color-mix(in_oklab,var(--ds-ink)_6%,transparent)]";
+const triggerBorder = (invalid: boolean) =>
+  invalid ? "border-rose/50 focus-visible:border-rose" : "border-line hover:border-line-strong focus-visible:border-muted";
 
 /* ------------------------------------------------------------------ */
 /* Contexto de campo (FieldBlock → controle)                          */
@@ -120,7 +131,14 @@ export function FieldBlock({
 
 /** Grade de campos: 1 coluna no celular, 2 a partir de 640px. */
 export function FieldGrid({ children }: { children: ReactNode }) {
-  return <div className="grid gap-x-4 sm:grid-cols-2">{children}</div>;
+  // Última coisa do formulário (corpo de Modal/Drawer, card): a última linha não leva o mb-5 dos
+  // campos, senão o fim fica com o dobro do respiro do topo. No celular (1 coluna) só o último
+  // campo; de 640 px em diante também o penúltimo quando divide a linha com ele.
+  return (
+    <div className="grid gap-x-4 sm:grid-cols-2 [&:last-child>*:last-child]:mb-0 sm:[&:last-child>*:nth-last-child(2):nth-child(odd)]:mb-0">
+      {children}
+    </div>
+  );
 }
 
 /** Props de rótulo comuns a Select, Combobox, MultiSelect, NativeSelect, DatePicker. */
@@ -198,10 +216,16 @@ export type SelectOption = {
 };
 
 const selectTones = {
-  neutral: "border-line bg-surface text-ink hover:bg-soft/60",
-  ok: "border-ok/30 bg-ok-soft text-ok",
-  warn: "border-amber/30 bg-amber-soft/50 text-amber",
-  bad: "border-rose/30 bg-rose-soft/50 text-rose",
+  neutral: "bg-surface text-ink",
+  ok: "bg-ok-soft text-ok",
+  warn: "bg-amber-soft/50 text-amber",
+  bad: "bg-rose-soft/50 text-rose",
+};
+const selectToneBorders: Record<keyof typeof selectTones, string> = {
+  neutral: "border-line",
+  ok: "border-ok/30",
+  warn: "border-amber/30",
+  bad: "border-rose/30",
 };
 
 /** Lista curta e fixa (status, prioridade, tipo). Até ~12 opções. */
@@ -263,10 +287,14 @@ export function Select({
         aria-describedby={field.describedBy}
         aria-invalid={field.invalid || undefined}
         className={cn(
-          "flex min-w-0 items-center justify-between gap-2 rounded-lg border text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent/40 data-disabled:cursor-not-allowed data-disabled:bg-soft/60 data-disabled:text-muted",
+          "flex min-w-0 items-center justify-between gap-2 rounded-lg border text-left transition-[background-color,border-color,box-shadow] data-disabled:cursor-not-allowed data-disabled:bg-soft/60 data-disabled:text-muted",
+          triggerFocus,
           size === "field" ? "h-10 w-full px-3 text-[14px]" : "h-8 px-2.5 text-[12.5px] font-medium",
           selectTones[tone],
-          field.invalid && "border-rose/50",
+          // Uma cor de borda só (cn não resolve conflito): o erro troca a do tom.
+          field.invalid
+            ? triggerBorder(true)
+            : cn(selectToneBorders[tone], "focus-visible:border-muted", tone === "neutral" && (size === "field" ? "hover:border-line-strong" : "hover:bg-soft/60")),
           className,
         )}
       >
@@ -372,10 +400,10 @@ export function NativeSelect({
         aria-describedby={field.describedBy}
         aria-invalid={field.invalid || undefined}
         className={cn(
-          "focus-field w-full min-w-0 cursor-pointer appearance-none rounded-lg border bg-surface pl-3 pr-9 text-ink outline-none transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
+          "focus-field w-full min-w-0 cursor-pointer appearance-none rounded-lg border bg-surface pl-3 pr-9 outline-none transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
           size === "sm" ? "h-8 text-[13px]" : "h-10 text-[14px]",
-          field.invalid ? "border-rose/50" : "border-line hover:border-line-strong",
-          !value && placeholder && "text-muted",
+          triggerBorder(field.invalid),
+          !value && placeholder ? "text-muted" : "text-ink",
         )}
         {...rest}
       >
@@ -467,8 +495,9 @@ export function Combobox({ options, label, hideLabel, hint, error, optional, pla
         aria-describedby={field.describedBy}
         aria-invalid={field.invalid || undefined}
         className={cn(
-          "flex min-w-0 items-center justify-between gap-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
-          className ?? cn("h-10 w-full rounded-lg border bg-surface px-3 text-[14px]", field.invalid ? "border-rose/50" : "border-line hover:border-line-strong"),
+          "flex min-w-0 items-center justify-between gap-2 text-left transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
+          triggerFocus,
+          className ?? cn("h-10 w-full rounded-lg border bg-surface px-3 text-[14px]", triggerBorder(field.invalid)),
         )}
       >
         <span className="flex min-w-0 items-center gap-2 truncate">
@@ -481,7 +510,8 @@ export function Combobox({ options, label, hideLabel, hint, error, optional, pla
           ) : (
             <>
               {options.find((o) => o.value === selection.value)?.icon}
-              <span className="truncate">
+              {/* Placeholder em muted, como nos outros campos (o Value do Base UI herdaria a tinta). */}
+              <span className={cn("truncate", !options.some((o) => o.value === selection.value) && "text-muted")}>
                 <BaseCombobox.Value placeholder={placeholder} />
               </span>
             </>
@@ -550,7 +580,7 @@ export function Combobox({ options, label, hideLabel, hint, error, optional, pla
 
 function ComboSearch({ label }: { label: string }) {
   return (
-    <div className="focus-field flex shrink-0 items-center gap-2 border-b border-line px-3">
+    <div className="flex shrink-0 items-center gap-2 border-b border-line px-3">
       <Search aria-hidden className="h-4 w-4 shrink-0 text-muted" />
       <BaseCombobox.Input
         aria-label={`Buscar em ${label.toLocaleLowerCase("pt-BR")}`}
@@ -693,8 +723,9 @@ export function MultiSelect({
           aria-describedby={field.describedBy}
           aria-invalid={field.invalid || undefined}
           className={cn(
-            "flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-lg border bg-surface px-3 text-left text-[14px] outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
-            field.invalid ? "border-rose/50" : "border-line hover:border-line-strong",
+            "flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-lg border bg-surface px-3 text-left text-[14px] transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
+            triggerFocus,
+            triggerBorder(field.invalid),
             className,
           )}
         >
@@ -996,7 +1027,7 @@ export function Switch({
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "inline-flex min-h-10 max-w-full items-center gap-2.5 text-left text-[12.5px] text-muted outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed",
+        "inline-flex min-h-10 max-w-full items-center gap-2.5 text-left text-[13.5px] text-ink outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:text-muted",
         className,
       )}
     >
@@ -1022,14 +1053,14 @@ export function SearchInput({
 }) {
   return (
     <div className={cn("relative min-w-0", className)}>
-      <Search aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
+      <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
       <input
         type="search"
         aria-label={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-lg border border-line bg-surface pl-8 pr-3 text-[13.5px] outline-none placeholder:text-muted"
+        className="h-10 w-full rounded-lg border border-line bg-surface pl-9 pr-3 text-[13.5px] outline-none placeholder:text-muted focus-visible:border-muted"
       />
     </div>
   );

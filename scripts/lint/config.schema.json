@@ -216,6 +216,18 @@
           ],
           "description": "Export ou classe renomeada. Troque pelo nome novo (ai/renames.json)."
         },
+        "class-conflict": {
+          "enum": [
+            "off",
+            "info",
+            "warn",
+            "error",
+            0,
+            1,
+            2
+          ],
+          "description": "cn() com duas utilidades da mesma propriedade. cn não resolve conflito: duas utilidades da mesma propriedade vencem pela ordem do CSS, não do código. Deixe as classes mutuamente exclusivas: cn(\"base\", ativo ? \"text-ink\" : \"text-muted\")."
+        },
         "as-any-props": {
           "enum": [
             "off",
@@ -825,6 +837,18 @@
                   2
                 ],
                 "description": "Export ou classe renomeada. Troque pelo nome novo (ai/renames.json)."
+              },
+              "class-conflict": {
+                "enum": [
+                  "off",
+                  "info",
+                  "warn",
+                  "error",
+                  0,
+                  1,
+                  2
+                ],
+                "description": "cn() com duas utilidades da mesma propriedade. cn não resolve conflito: duas utilidades da mesma propriedade vencem pela ordem do CSS, não do código. Deixe as classes mutuamente exclusivas: cn(\"base\", ativo ? \"text-ink\" : \"text-muted\")."
               },
               "as-any-props": {
                 "enum": [

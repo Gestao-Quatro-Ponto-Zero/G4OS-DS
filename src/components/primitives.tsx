@@ -137,8 +137,9 @@ export function Avatar({
   const face = (
     <span
       className={cn(
+        // inset-ring de 10 % da tinta: invisível sobre o preenchimento escuro no tema claro, contorna o avatar no escuro (a tinta da pessoa não muda de tema)
         // ds-audit-ignore white-black: iniciais brancas sobre `tint` escuro (identidade da pessoa)
-        "inline-grid shrink-0 place-items-center overflow-hidden align-middle text-center font-medium leading-none whitespace-nowrap text-white",
+        "inline-grid shrink-0 place-items-center overflow-hidden align-middle text-center font-medium leading-none whitespace-nowrap text-white inset-ring inset-ring-ink/10",
         avatarDim[size],
         round,
         !(status || badge) && className,
@@ -166,8 +167,8 @@ export function Avatar({
         <span
           aria-hidden
           className={cn(
-            "absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface [&_svg]:h-2.5 [&_svg]:w-2.5",
-            size === "xl" ? "h-5 w-5 [&_svg]:h-3 [&_svg]:w-3" : "h-4 w-4",
+            "absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface",
+            size === "xl" ? "h-5 w-5 [&_svg]:h-3 [&_svg]:w-3" : "h-4 w-4 [&_svg]:h-2.5 [&_svg]:w-2.5",
           )}
         >
           {badge}
@@ -361,10 +362,10 @@ export function buttonClass({
   const sizes = size === "sm" ? "min-h-9 px-3 py-2 text-[13px]" : "min-h-10 px-4 py-2.5 text-[13.5px]";
   const variants: Record<ButtonVariant, string> = {
     primary: "ui-button-primary ui-button-solid bg-primary text-on-primary hover:bg-primary/90",
-    ghost: "ui-button-outline bg-surface text-ink ring-1 ring-line hover:bg-soft",
+    ghost: "ui-button-outline bg-surface text-ink ring-1 ring-inset ring-line hover:bg-soft",
     danger: "ui-button-solid bg-rose text-on-ink hover:bg-rose/90",
     quiet: "ui-button-text bg-transparent text-muted hover:bg-soft hover:text-ink",
-    "split-left": "ui-button-outline rounded-r-none bg-surface text-ink ring-1 ring-line hover:bg-soft",
+    "split-left": "ui-button-outline rounded-r-none bg-surface text-ink ring-1 ring-inset ring-line hover:bg-soft",
     "split-right": "ui-button-solid rounded-l-none bg-primary text-on-primary hover:bg-primary/90",
   };
   return cn(
@@ -709,7 +710,7 @@ export function Metric({
     </>
   );
   const cls = cn(
-    "metric-panel flex min-w-0 items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3",
+    "metric-panel flex min-w-0 items-start gap-3 rounded-xl border border-line bg-surface px-4 py-3",
     href && "surface-interactive hover:border-line-strong",
   );
   return href ? (

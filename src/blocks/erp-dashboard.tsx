@@ -264,11 +264,11 @@ export default function ErpDashboard() {
 
               <div className="grid gap-6 lg:grid-cols-2">
                 <ChartCard title="Por que atrasamos entregas?" description="Pedidos entregues fora do prazo em setembro, por causa">
-                  <ParetoChart items={lateReasons} height={240} />
+                  <ParetoChart items={lateReasons} height={370} />
                 </ChartCard>
                 <div className="grid gap-6">
                   <ChartCard title="Entregamos no prazo e completo?" description="OTIF por semana · meta 95 %">
-                    <LineChart label="OTIF por semana" data={otifByWeek} index="semana" series={[{ key: "otif", label: "OTIF" }]} reference={{ value: 95, label: "Meta 95 %" }} format={(n) => formatPercent(n / 100, 0)} height={150} />
+                    <LineChart label="OTIF por semana" data={otifByWeek} index="semana" series={[{ key: "otif", label: "OTIF" }]} reference={{ value: 95, label: "Meta 95 %" }} format={(n) => formatPercent(n / 100, 0)} formatAxis={(n) => formatPercent(n / 100, 1)} height={150} />
                   </ChartCard>
                   <ChartCard title="Quem mais compra?" description="Pedidos não cancelados no período">
                     <BarList items={byCustomer} format={(n) => formatCurrency(n, { compact: true })} limit={5} />

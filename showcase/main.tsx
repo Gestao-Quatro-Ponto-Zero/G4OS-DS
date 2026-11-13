@@ -72,7 +72,7 @@ function Appearance() {
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div>
           <p className="m-0 mb-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Modo</p>
           <ThemeToggle mode={t.mode} onChange={t.setMode} />

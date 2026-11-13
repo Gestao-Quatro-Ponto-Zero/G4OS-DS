@@ -436,7 +436,7 @@ export function Sheet({
               <X className="h-4 w-4" />
             </BaseDialog.Close>
           </header>
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 [&>:last-child]:mb-0 [&>:last-child>:last-child]:mb-0">{children}</div>
           {footer && <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-soft/35 px-5 py-3.5">{footer}</footer>}
         </BaseDialog.Popup>
       </BaseDialog.Portal>

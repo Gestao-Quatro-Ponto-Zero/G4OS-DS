@@ -4,7 +4,7 @@
 - Categoria: IA
 - Preview: showcase `#/frame/ai-agent-builder` (`?theme=dark` para o escuro)
 
-Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).
+Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, modelo e propriedades, ferramentas ligadas por app, arquivos de conhecimento com envio, instruções em editor rico com “Melhorar” e limite, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).
 
 ## Conceito
 
@@ -13,7 +13,9 @@ Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, proprieda
 **Padrões aplicados**
 
 - Anatomia G · App de altura total: conversa à esquerda, ficha à direita (ResizableSplit)
-- Ficha em seções: Gatilhos → Propriedades → Instruções, cada uma com '+ Adicionar'
+- Ficha em seções: Gatilhos → Propriedades → Ferramentas → Conhecimento → Instruções
+- Ferramentas em grade com Switch por app (ToolToggleList, '5 de 6 ligadas'); conhecimento com envio, cancelar e tentar de novo (KnowledgeFiles)
+- Modelo do agente no ModelPicker; instruções com limite e contador (maxLength)
 - Uma ação primária no topo: Publicar (estado rascunho/publicado/alterado)
 - Testar roda dentro da conversa com RunSummary, sem trocar de tela
 - Instruções em editor rico com 'Melhorar com IA'
@@ -21,7 +23,7 @@ Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, proprieda
 **Quando usar e o que adaptar**
 
 - Construtor de automações, regras de CRM, playbooks de atendimento: troque os tipos de gatilho e propriedade
-- No celular, alterne Ficha/Conversa em vez de dividir a tela
+- No celular, o alternador Configurar / Testar troca a ficha pela conversa em vez de dividir a tela
 
 **Evite**
 
@@ -30,4 +32,4 @@ Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, proprieda
 
 ## Componentes usados
 
-`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `Banner`, `BuilderSection`, `Button`, `ChipPicker`, `MenuEntry`, `Modal`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `TextField`, `ToolGlyph`, `TriggerList`, `notify`
+`AddPropertyMenu`, `AgentComposer`, `AgentHeader`, `AgentInstructions`, `AgentMessage`, `AgentStatus`, `Banner`, `BuilderSection`, `Button`, `ChipPicker`, `KnowledgeFile`, `KnowledgeFiles`, `KnowledgeUpload`, `MenuEntry`, `Modal`, `ModelEffort`, `ModelOption`, `ModelPicker`, `PropertyRow`, `PublishBar`, `ResizableSplit`, `RunStatus`, `RunSummary`, `SegmentedControl`, `TextField`, `ToolGlyph`, `ToolToggleList`, `TriggerList`, `notify`

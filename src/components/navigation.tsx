@@ -527,8 +527,8 @@ export function ActionMenu({
           <BaseMenu.Popup className={cn(popupClass, "min-w-[180px] p-1.5")}>
             {actions.map((action, index) => {
               const cls = cn(
-                "flex w-full cursor-default items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] outline-none data-highlighted:bg-soft data-disabled:opacity-40",
-                action.tone === "danger" && "text-rose data-highlighted:bg-rose-soft/60",
+                "flex w-full cursor-default items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] outline-none data-disabled:opacity-40",
+                action.tone === "danger" ? "text-rose data-highlighted:bg-rose-soft/60" : "data-highlighted:bg-soft",
               );
               const body = (
                 <>
@@ -621,7 +621,7 @@ export function Sidebar({
     <aside
       aria-label="Menu principal"
       className={cn(
-        "z-40 flex shrink-0 flex-col border-r border-line bg-rail transition-[width] duration-200",
+        "z-40 shrink-0 flex-col border-r border-line bg-rail transition-[width] duration-200",
         "fixed inset-y-12 bottom-0 left-0 md:static md:h-full",
         mobileOpen ? "flex w-[250px]" : "hidden md:flex",
         rail ? "md:w-[64px]" : "md:w-[224px]",
@@ -712,7 +712,7 @@ export function ProductMark({ size = 28 }: { size?: number }) {
 export function SyncStatus({ state, label, collapsed }: { state: "ok" | "pending" | "error"; label: string; collapsed?: boolean }) {
   const dot = state === "error" ? "bg-rose" : state === "pending" ? "bg-amber" : "bg-ok";
   return (
-    <div role="status" title={label} className={cn("flex items-center gap-2 px-4 text-[11px] text-muted", collapsed && "justify-center px-0")}>
+    <div role="status" title={label} className={cn("flex items-center gap-2 text-[11px] text-muted", collapsed ? "justify-center px-0" : "px-4")}>
       <span className={cn("inline-block h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
       {!collapsed && <span className="truncate">{label}</span>}
     </div>

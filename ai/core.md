@@ -103,7 +103,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (491 componentes) → `components/<nome>.md`
+## Módulos (520 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -171,8 +171,18 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **stage**: Camada expressiva (palcos).
 - **agent-orb**: Rosto gerado de agente: um personagem pequeno e chapado, desenhado em SVG inline e derivado de forma determinística de uma semente estável (id do agente, nome do subagente, id da sessão).
 - **code**: ------------------------------------------------------------------
+- **lib-scale**: Escalas de cor para dados de intensidade (mapa de calor, coorte, mapa por UF, pivô, horizon).
+- **charts-kit**: Peças compartilhadas pelos gráficos analíticos (coorte, mapa por UF, horizon, dispersão conectada, sankey, cascata): · ScaleLegend: legenda de escala em degraus ou contínua, com hover que destaca a faixa no gráfico · Cha
+- **charts-analytics**: Gráficos analíticos de série temporal: · ConnectedScatter: duas medidas ao longo do tempo (CAC × LTV, preço × volume).
+- **lib-geo-br**: Contornos das 27 unidades da federação, prontos para SVG.
+- **geo**: Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me
+- **lib-pivot**: Motor da tabela dinâmica (pivô).
+- **pivot**: Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento op
+- **agent-run**: ------------------------------------------------------------------
+- **agent-evals**: ------------------------------------------------------------------
+- **illustration**: Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).
 
-## Blocos (143) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
+## Blocos (152) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`
 - **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-legal`, `app-marketplace`, `app-meeting-notes`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
@@ -182,10 +192,10 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **Contratos**: `clm-approvals`, `clm-contract`, `clm-contracts`, `clm-counterparties`, `clm-dashboard`, `clm-obligations`, `clm-request`, `clm-templates`
 - **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-products`, `erp-purchase-order`, `erp-purchase-orders`, `erp-purchase-requests`, `erp-receiving`, `erp-shipping`, `erp-stock-movements`, `erp-suppliers`
 - **Financeiro**: `fin-bank-accounts`, `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
-- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-approvals`, `ai-assistant`, `ai-catch-up`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
+- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-answer`, `ai-approvals`, `ai-assistant`, `ai-catch-up`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
 - **Marketing**: `marketing-landing`, `marketing-pricing`, `marketing-stage`
-- **Onboarding**: `onboarding-checklist`, `onboarding-wizard`
-- **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-integrations`, `saas-plans`, `saas-reports`, `saas-support`, `saas-usage`
+- **Onboarding**: `onboarding-checklist`, `onboarding-intro`, `onboarding-wizard`
+- **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-explore`, `saas-integrations`, `saas-journey`, `saas-mrr-bridge`, `saas-plans`, `saas-regions`, `saas-reports`, `saas-retention`, `saas-support`, `saas-unit-economics`, `saas-usage-horizon`, `saas-usage`
 - **Serviços**: `srv-billing`, `srv-client`, `srv-clients`, `srv-contracts`, `srv-dashboard`, `srv-invoices`, `srv-quotes`, `srv-schedule`, `srv-work-order`, `srv-work-orders`
 
 ## Mais

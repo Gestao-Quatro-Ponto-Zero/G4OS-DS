@@ -282,7 +282,7 @@ export default function AtsCandidates() {
           </>
         }
       >
-        <div className="space-y-4">
+        <div>
           <TextField label="Nome completo" value={name} onChange={setName} />
           <TextField label="E-mail" value={email} onChange={setEmail} placeholder="nome@email.com" optional />
           <Select label="Vaga" value={job} onValueChange={setJob} options={jobs.filter((j) => j.status === "aberta").map((j) => ({ value: j.id, label: j.title }))} />

@@ -293,7 +293,7 @@ function NewActivityModal({ open, onClose, onCreate }: { open: boolean; onClose:
         </>
       }
     >
-      <div className="space-y-4">
+      <div>
         <FieldBlock label="Tipo">
           <Select label="Tipo" value={type} onValueChange={(v) => setType(v as ActivityType)} options={types.map((t) => ({ value: t, label: activityLabel[t] }))} />
         </FieldBlock>

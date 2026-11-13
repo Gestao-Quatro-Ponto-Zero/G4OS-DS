@@ -6,7 +6,7 @@ import { useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } 
 import { cn } from "../lib/cn";
 import { normalize } from "../lib/text";
 import { Menu, type MenuEntry } from "./overlays-extra";
-import { Avatar } from "./primitives";
+import { Avatar, Dot } from "./primitives";
 
 /*
  * Escrever e-mail (com ou sem IA): remetente, destinatários com busca,
@@ -159,7 +159,7 @@ export function RecipientInput({
         <div id={listId} role="listbox" aria-label="Destinatários" className="absolute inset-x-0 top-full z-20 mt-2 max-h-[300px] overflow-y-auto rounded-xl border border-line bg-popover p-1.5 shadow-popup">
           {groups.map((g) => (
             <div key={g.label} role="group" aria-label={g.label} className="pb-1">
-              <p className="m-0 px-2.5 pb-1 pt-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted">{g.label}</p>
+              <p className="m-0 px-2.5 pb-1 pt-2 text-[10px] font-medium uppercase tracking-overline text-muted">{g.label}</p>
               {g.items.map(({ p, asEmail }) => {
                 i += 1;
                 const me = i;
@@ -233,11 +233,12 @@ export function SplitButton({
 
 export type ComposeStatus = "draft" | "sending" | "scheduled" | "sent";
 
-const statusLabel: Record<ComposeStatus, { text: string; cls: string }> = {
-  draft: { text: "Rascunho", cls: "text-info" },
-  sending: { text: "Enviando", cls: "text-amber" },
-  scheduled: { text: "Agendado", cls: "text-accent-deep" },
-  sent: { text: "Enviado", cls: "text-ok" },
+// Status = ponto + palavra (a cor fica no ponto; o texto é tinta suave, em caixa normal).
+const statusLabel: Record<ComposeStatus, { text: string; tone: "info" | "warn" | "accent" | "ok" }> = {
+  draft: { text: "Rascunho", tone: "info" },
+  sending: { text: "Enviando", tone: "warn" },
+  scheduled: { text: "Agendado", tone: "accent" },
+  sent: { text: "Enviado", tone: "ok" },
 };
 
 type ComposeProps = {
@@ -287,7 +288,7 @@ export function ComposeEmail({
   className,
 }: ComposeProps) {
   const st = statusLabel[status];
-  const rowLabel = "w-12 shrink-0 pt-2 font-mono text-[11px] uppercase tracking-[0.12em] text-muted";
+  const rowLabel = "w-12 shrink-0 pt-2 text-[12px] text-muted";
   return (
     <section className={cn("flex min-h-0 flex-col rounded-2xl bg-popover ring-1 ring-line", className)} aria-label={title}>
       <header className="flex items-center gap-2.5 px-5 pb-3 pt-4">
@@ -352,8 +353,8 @@ export function ComposeEmail({
               {model.name}
             </span>
           ))}
-        <span className={cn("ml-auto inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.12em]", st.cls)} aria-live="polite">
-          <span className="h-2 w-2 rounded-full bg-current" aria-hidden />
+        <span className="ml-auto inline-flex items-center gap-1.5 text-[12px] text-ink-soft" aria-live="polite">
+          <Dot tone={st.tone} />
           {st.text}
         </span>
         <SplitButton onClick={onSend} items={sendOptions} menuLabel="Opções de envio" disabled={!to.length || status === "sending"}>

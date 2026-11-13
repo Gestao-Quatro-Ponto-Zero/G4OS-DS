@@ -90,3 +90,16 @@ export * from "./components/agent-orb";
 export * from "./components/code";
 export { parseDiff, wordDiff } from "./lib/diff";
 export type { DiffFile, DiffLine, DiffWord } from "./lib/diff";
+// Análise: escalas de cor, legenda de escala, controle de tempo, realce ligado,
+// coorte, dispersão conectada, horizon, mapa por UF, pivô
+export * from "./lib/scale";
+export * from "./components/charts-kit";
+export * from "./components/charts-analytics";
+export * from "./lib/geo-br";
+export * from "./components/geo";
+export * from "./lib/pivot";
+export * from "./components/pivot";
+// Agentes: execução ao vivo com aprovação de diff, suíte de avaliação, ilustração de onboarding
+export * from "./components/agent-run";
+export * from "./components/agent-evals";
+export * from "./components/illustration";

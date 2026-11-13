@@ -459,7 +459,8 @@ function CardRow({ children, onClick, active }: { children: ReactNode; onClick?:
 export function AgentConnectionRow({ c }: { c: AgentConnection }) {
   return (
     <CardRow onClick={c.status === "available" ? undefined : c.onClick} active={c.status === "active"}>
-      <AppIcon icon={c.icon} letter={c.letter} color={c.color} size="sm" variant={c.status === "active" ? "soft" : "plain"} />
+      {/* Sem fundo, o glifo ocupa a mesma caixa de 28 px: o nome alinha com o da linha ativa e com subagentes/resultados. */}
+      <AppIcon icon={c.icon} letter={c.letter} color={c.color} size="sm" variant={c.status === "active" ? "soft" : "plain"} className={c.status === "active" ? undefined : "h-7 w-7"} />
       <span className="min-w-0 flex-1 truncate text-[14px] text-ink-soft">{c.name}</span>
       {c.status === "connected" && <CheckCircle2 className="h-5 w-5 shrink-0 fill-ok text-surface" aria-label="Conectado" />}
       {c.status === "available" && (

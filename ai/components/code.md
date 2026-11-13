@@ -35,10 +35,12 @@ Diff como quem revisa lê: o arquivo, quantas linhas entraram e saíram, cada li
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `diff` * | `string` |  |  |
+| `diff` * | `string` |  | Diff unificado, como sai do `git diff`. |
+| `actions` | `ReactNode` |  | Ações extras no cabeçalho, antes de Copiar ("Abrir arquivo", "Ver no editor"). |
 | `className` | `string \| undefined` |  |  |
+| `collapsed` | `boolean \| undefined` | `false` | Só o cabeçalho (arquivo e saldo de linhas), sem o corpo: para um registro já revisado ou uma lista de arquivos. |
 | `maxHeight` | `number \| false \| undefined` | `420` |  |
-| `title` | `string \| undefined` |  |  |
+| `title` | `string \| undefined` |  | Título no lugar do nome do arquivo. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

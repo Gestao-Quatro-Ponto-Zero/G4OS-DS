@@ -146,7 +146,7 @@ export function Label({
   className?: string;
 }) {
   return (
-    <label htmlFor={htmlFor} className={cn("inline-flex items-baseline gap-1 text-[12.5px] font-medium text-ink", className)}>
+    <label htmlFor={htmlFor} className={cn("inline-flex items-baseline gap-1 text-[12.5px] text-muted", className)}>
       {children}
       {required && (
         <span className="text-rose" aria-hidden>
@@ -191,7 +191,8 @@ export function FieldSet({
 
 /** Empilha campos ou FieldSets com o espaçamento padrão de formulário. */
 export function FieldGroup({ children, className, gap = "md" }: { children: ReactNode; className?: string; gap?: "sm" | "md" | "lg" }) {
-  return <div className={cn("flex flex-col", { sm: "gap-3", md: "gap-5", lg: "gap-8" }[gap], className)}>{children}</div>;
+  // Os campos já trazem mb-5: dentro do grupo quem espaça é o gap (senão vira 40 px).
+  return <div className={cn("flex flex-col [&>*]:mb-0", { sm: "gap-3", md: "gap-5", lg: "gap-8" }[gap], className)}>{children}</div>;
 }
 
 /** Divisória entre grupos de um formulário, com rótulo opcional ("ou"). */

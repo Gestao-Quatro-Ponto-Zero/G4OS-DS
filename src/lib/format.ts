@@ -13,33 +13,36 @@ function nf(key: string, options: Intl.NumberFormatOptions) {
   return f;
 }
 
-/** 1234.5 → "1.234,5" */
+/** Negativo com sinal de menos tipográfico ("−20", "−R$ 1,2 mil"), não o hífen do Intl. */
+const minus = (s: string) => s.replace("-", "\u2212");
+
+/** 1234.5 → "1.234,5"; -20 → "−20" */
 export const formatNumber = (n: number, digits = 0) =>
-  nf(`n${digits}`, { maximumFractionDigits: digits, minimumFractionDigits: 0 }).format(n);
+  minus(nf(`n${digits}`, { maximumFractionDigits: digits, minimumFractionDigits: 0 }).format(n));
 
 /** 1234.5 → "R$ 1.234,50". `compact` → "R$ 1,2 mil". */
 export function formatCurrency(n: number, options: { compact?: boolean; currency?: string; cents?: boolean } = {}) {
   const { compact = false, currency = "BRL" } = options;
   const cents = options.cents ?? !compact;
-  return nf(`c${currency}${compact}${cents}`, {
+  return minus(nf(`c${currency}${compact}${cents}`, {
     style: "currency",
     currency,
     notation: compact ? "compact" : "standard",
     maximumFractionDigits: cents ? 2 : compact ? 1 : 0,
     minimumFractionDigits: cents ? 2 : 0,
-  }).format(n);
+  }).format(n));
 }
 
 /** 1250000 → "1,3 mi" */
 export const formatCompact = (n: number) =>
-  nf("compact", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+  minus(nf("compact", { notation: "compact", maximumFractionDigits: 1 }).format(n));
 
 /**
  * 0.1234 → "12,3 %". Recebe fração (0–1), não porcentagem.
  * Espaço inseparável antes do % (norma brasileira; o Intl pt-BR cola o sinal ao número).
  */
 export const formatPercent = (fraction: number, digits = 1) =>
-  nf(`p${digits}`, { style: "percent", maximumFractionDigits: digits }).format(fraction).replace(/\s?%/, "\u00A0%");
+  nf(`p${digits}`, { style: "percent", maximumFractionDigits: digits }).format(fraction).replace(/\s?%/, "\u00A0%").replace("-", "\u2212");
 
 /** Variação assinada: 0.125 → "+12,5 %", -0.2 → "−20 %" (sinal de menos tipográfico). */
 export const formatDelta = (fraction: number, digits = 1) => {

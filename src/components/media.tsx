@@ -276,8 +276,8 @@ export function Carousel({
               aria-current={i === index ? "true" : undefined}
               onClick={() => goTo(i)}
               className={cn(
-                "h-14 w-20 shrink-0 overflow-hidden rounded-lg ring-1 transition-[box-shadow,opacity] [&>img]:h-full [&>img]:w-full [&>img]:object-cover",
-                i === index ? "ring-2 ring-ink" : "opacity-70 ring-line hover:opacity-100",
+                "h-14 w-20 shrink-0 overflow-hidden rounded-lg transition-[box-shadow,opacity] [&>img]:h-full [&>img]:w-full [&>img]:object-cover",
+                i === index ? "ring-2 ring-ink" : "opacity-70 ring-1 ring-line hover:opacity-100",
               )}
             >
               {t}
@@ -566,7 +566,7 @@ export function SlideDeck({
               className="group relative flex w-[132px] shrink-0 items-start gap-2 text-left md:w-full"
             >
               <span className={cn("mt-0.5 w-4 shrink-0 text-right text-[11px] tabular-nums", i === index ? "font-semibold text-ink" : "text-muted")}>{i + 1}</span>
-              <span className={cn("block min-w-0 flex-1 overflow-hidden rounded-md ring-1 transition-shadow", i === index ? "ring-2 ring-accent" : "ring-line group-hover:ring-line-strong")}>
+              <span className={cn("block min-w-0 flex-1 overflow-hidden rounded-md transition-shadow", i === index ? "ring-2 ring-accent" : "ring-1 ring-line group-hover:ring-line-strong")}>
                 <SlideCanvas>{s.content}</SlideCanvas>
               </span>
               <span className="sr-only">{s.title}</span>

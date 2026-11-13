@@ -153,8 +153,8 @@ export function SortableList<T>({
                 onPointerUp={() => onPointerUp(item)}
                 onPointerCancel={() => finish(false)}
                 className={cn(
-                  "flex h-8 w-7 shrink-0 touch-none items-center justify-center rounded-md text-muted hover:bg-soft hover:text-ink disabled:cursor-not-allowed disabled:opacity-40",
-                  dragging ? "cursor-grabbing bg-soft text-ink" : "cursor-grab",
+                  "flex h-8 w-7 shrink-0 touch-none items-center justify-center rounded-md hover:bg-soft hover:text-ink disabled:cursor-not-allowed disabled:opacity-40",
+                  dragging ? "cursor-grabbing bg-soft text-ink" : "cursor-grab text-muted",
                 )}
               >
                 <GripVertical aria-hidden className="h-4 w-4" />

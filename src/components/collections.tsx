@@ -1,7 +1,7 @@
 "use client";
 
 import { AlignJustify, Check, ChevronDown, Columns3, LayoutGrid, List, X } from "lucide-react";
-import { Children, useEffect, useId, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
+import { Children, isValidElement, useEffect, useId, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../lib/cn";
 import { normalize } from "../lib/text";
@@ -460,6 +460,13 @@ export function RowList({ children, label, className }: { children: ReactNode; /
 /* DataTable                                                           */
 /* ------------------------------------------------------------------ */
 
+/** Texto do cabeçalho para o rótulo da célula no celular: string ou `<SortHeader label>`. */
+function headerText(header: ReactNode): string | undefined {
+  if (typeof header === "string") return header || undefined;
+  if (isValidElement<{ label?: unknown }>(header) && typeof header.props.label === "string") return header.props.label;
+  return undefined;
+}
+
 export type Column<T> = {
   key: string;
   header: ReactNode;
@@ -648,7 +655,7 @@ export function DataTable<T>({
                   {columns.map((c) => (
                     <td
                       key={c.key}
-                      data-label={typeof c.header === "string" && !c.primary && !c.selection ? c.header : undefined}
+                      data-label={!c.primary && !c.selection ? headerText(c.header) : undefined}
                       data-primary={c.primary ? "" : undefined}
                       data-wide={c.wide ? "" : undefined}
                       data-action={c.action && !c.selection ? "" : undefined}
@@ -671,7 +678,7 @@ export function DataTable<T>({
               {columns.map((c, i) => (
                 <td
                   key={c.key}
-                  data-label={typeof c.header === "string" && c.footer !== undefined ? c.header : undefined}
+                  data-label={c.footer !== undefined ? headerText(c.header) : undefined}
                   data-primary={i === labelAt ? "" : undefined}
                   data-mobile-hidden={c.footer === undefined && i !== labelAt ? "" : undefined}
                   className={cn("tabular-nums", alignCls(c.align))}
@@ -730,8 +737,8 @@ export function KanbanColumn({
         onDrop?.(e);
       }}
       className={cn(
-        "flex min-h-0 min-w-0 shrink-0 flex-col rounded-2xl border bg-soft/60 p-2 transition-colors",
-        over || dropActive ? "border-line-strong bg-soft" : "border-line",
+        "flex min-h-0 min-w-0 shrink-0 flex-col rounded-2xl border p-2 transition-colors",
+        over || dropActive ? "border-line-strong bg-soft" : "border-line bg-soft/60",
       )}
       // Mínimo `width`, cresce para ocupar telas largas (até 400px por coluna).
       style={{ flex: `1 0 ${width}px`, maxWidth: Math.max(width, 400) }}

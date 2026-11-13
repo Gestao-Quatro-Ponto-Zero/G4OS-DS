@@ -107,14 +107,22 @@ Intensidade em duas dimensões: coorte × mês (retenção), dia × hora (picos 
 | --- | --- | --- | --- |
 | `columns` * | `string[]` |  |  |
 | `rows` * | `string[]` |  |  |
-| `values` * | `(number \| null)[][]` |  | values[linha][coluna]; null = sem dado. |
+| `values` * | `(number \| null)[][]` |  | values[linha][coluna]; null = sem dado (célula vazia, sem fundo). |
 | `cell` | `number \| undefined` | `36` |  |
 | `className` | `string \| undefined` |  |  |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatNumber(n)` |  |
 | `label` | `string \| undefined` | `"Matriz"` |  |
+| `legend` | `ReactNode` | `false` | Legenda da escala acima da matriz. |
+| `legendTitle` | `string \| undefined` |  | Título curto da legenda ("% retido"). |
 | `max` | `number \| undefined` |  |  |
+| `rowMeta` | `ReactNode[] \| undefined` |  | Coluna extra depois do rótulo de cada linha (tamanho da coorte, total). |
+| `rowMetaLabel` | `string \| undefined` |  | Cabeçalho da coluna de `rowMeta` ("Espaços"). |
+| `rowsLabel` | `string \| undefined` |  | Cabeçalho da coluna de rótulos ("Coorte"). |
+| `scale` | `{ steps: number; domain?: [number, number]; } \| undefined` |  | Escala em degraus (`quantizeScale`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados. |
 | `showValues` | `boolean \| undefined` | `true` |  |
+| `summaryRow` | `{ label: string; values: (number \| null)[]; meta?: ReactNode; } \| undefined` |  | Linha de resumo separada no fim ("Média"), pintada na mesma escala. |
 | `tone` | `"ok" \| "info" \| "accent" \| "ink" \| undefined` | `"ink"` |  |
+| `valueLabel` | `string \| undefined` | `"Valor"` | Rótulo do valor no tooltip ("Retidos"). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -174,18 +182,51 @@ Exemplo (showcase `#/p/graficos-radar`):
 <RadarChart gridFill … />
 ```
 
+## RetentionCurves
+
+Curvas de retenção por coorte: uma linha por coorte (as recentes mais escuras), a média em destaque.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `columns` * | `string[]` |  | Rótulo de cada ponto do eixo X ("1", "2"… meses desde o cadastro). |
+| `label` * | `string` |  | Nome acessível (obrigatório): o que as curvas respondem. |
+| `rows` * | `{ label: string; values: (number \| null)[]; }[]` |  | Uma linha por coorte, da mais antiga para a mais recente. |
+| `average` | `{ label?: string; values: (number \| null)[]; } \| undefined` |  | Curva média, desenhada em destaque. |
+| `className` | `string \| undefined` |  |  |
+| `format` | `((n: number) => string) \| undefined` | `(n) => formatPercent(n, 0)` |  |
+| `formatAxis` | `((n: number) => string) \| undefined` |  |  |
+| `height` | `number \| undefined` | `280` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/graficos-saas`):
+
+```tsx
+<RetentionCurves
+  rows={[{ label: "jan", values: [0.74, 0.63, 0.55] }, { label: "fev", values: [0.75, 0.64, null] }]}
+  columns={["1", "2", "3"]}
+  average={{ label: "Média", values: [0.745, 0.635, 0.55] }}
+  label="Curvas de retenção por coorte"
+/>
+```
+
 ## SankeyChart
 
-Fluxos entre etapas (origem do lead → etapa → ganho/perdido; receita → centros de custo).
+Fluxos entre etapas (origem do lead → etapa → ganho/perdido; visita → conta → plano).
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `links` * | `SankeyLink[]` |  |  |
 | `nodes` * | `SankeyNode[]` |  |  |
 | `className` | `string \| undefined` |  |  |
+| `columnLabels` | `string[] \| undefined` |  | Rótulo de cada coluna, embaixo ("Visita", "Conta", "Plano"). |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatNumber(n)` |  |
 | `height` | `number \| undefined` | `300` |  |
 | `label` | `string \| undefined` | `"Fluxo"` |  |
+| `minWidth` | `number \| undefined` |  | Largura mínima do desenho. |
+| `nodeLabels` | `"side" \| "above" \| undefined` | `"side"` | "side": nome e valor à direita do nó. |
+| `onSelect` | `((id: string \| null) => void) \| undefined` |  | Com `onSelect`, os nós viram botões: setas percorrem (↑↓ na coluna, ←→ entre colunas), Enter seleciona, Esc solta. |
+| `selected` | `string \| null \| undefined` |  | Nó selecionado (id): traça os fluxos que chegam e saem dele; o resto esmaece. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -207,7 +248,7 @@ type SankeyLink = { source: string; target: string; value: number }
 ## SankeyNode (type)
 
 ```ts
-type SankeyNode = { id: string; label: string; column: number }
+type SankeyNode = { id: string; label: string; column: number; color?: string; }
 ```
 
 ## ScatterChart
@@ -270,16 +311,21 @@ type TreemapItem = { label: string; value: number; color?: string; hint?: ReactN
 
 ## WaterfallChart
 
-Ponte entre um valor inicial e um final (receita bruta → lucro líquido; caixa inicial → final).
+Ponte entre um valor inicial e um final (receita bruta → lucro líquido; caixa inicial → final; MRR de início → fim).
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `steps` * | `WaterfallStep[]` |  |  |
+| `axisBreak` | `boolean \| { min: number; } \| undefined` | `false` | Eixo truncado (exceção da regra do zero): começa perto do menor valor, com a marca de quebra no eixo e na base de cada barra de total. |
 | `className` | `string \| undefined` |  |  |
+| `connectors` | `boolean \| undefined` | `true` | Linhas tracejadas ligando o topo de uma barra ao início da seguinte. |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatNumber(n)` |  |
 | `formatAxis` | `((n: number) => string) \| undefined` |  |  |
 | `height` | `number \| undefined` | `260` |  |
 | `label` | `string \| undefined` | `"Ponte de valores"` |  |
+| `onSelect` | `((index: number \| null) => void) \| undefined` |  | Clique ou Enter numa barra (índice), ou null ao soltar. |
+| `selected` | `number \| null \| undefined` |  | Barra selecionada (índice). |
+| `showValues` | `boolean \| undefined` | `true` | Valor escrito junto da barra (acima dos aumentos e totais, abaixo das quedas). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

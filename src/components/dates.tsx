@@ -84,9 +84,12 @@ function Field({ label, hint, error, optional, htmlFor, descId, className, child
   );
 }
 
-const shell = "focus-field flex h-10 w-full items-center rounded-lg border bg-surface text-[14px] text-ink transition-[border-color,box-shadow]";
+const shell = "focus-field flex h-10 w-full items-center rounded-lg border text-[14px] text-ink transition-[border-color,box-shadow]";
+// Borda e fundo numa decisão só (cn não resolve conflito): foco escurece a borda, desabilitado é gelo.
+const shellTone = (bad: unknown, disabled?: boolean) =>
+  cn(bad ? "border-rose/50 focus-within:border-rose" : "border-line focus-within:border-muted", disabled ? "bg-soft/60 text-muted" : "bg-surface");
 const triggerBtn =
-  "inline-flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-left text-[14px] text-ink outline-none hover:border-line-strong focus-visible:border-muted data-popup-open:border-muted disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-left text-[14px] text-ink outline-none transition-[border-color,box-shadow] hover:border-line-strong focus-visible:border-muted focus-visible:shadow-[0_0_0_3px_color-mix(in_oklab,var(--ds-ink)_6%,transparent)] data-popup-open:border-muted disabled:cursor-not-allowed disabled:opacity-50";
 
 /** Popover padrão dos seletores (portal dentro de <dialog> quando preciso). */
 function PickerPopover({
@@ -541,7 +544,7 @@ export function DateInput({
 
   return (
     <Field label={label} hint={shownError ? undefined : preview ? <span className="inline-block first-letter:uppercase">{preview}</span> : hint} error={shownError} optional={optional} htmlFor={inputId} descId={descId} className={className}>
-      <div className={cn(shell, shownError ? "border-rose/50" : "border-line", disabled && "bg-soft/60 text-muted")}>
+      <div className={cn(shell, shellTone(shownError, disabled))}>
         <input
           id={inputId}
           value={text}
@@ -1282,7 +1285,7 @@ export function TimePicker({
   const commit = () => parsed && !bad && onChange(parsed);
   return (
     <Field label={label} hint={bad ? undefined : hint ?? (showTimeZone ? describeTimeZone() : undefined)} error={error ?? bad} htmlFor={inputId} descId={`${inputId}-d`} className={className}>
-      <div className={cn(shell, error || bad ? "border-rose/50" : "border-line", "w-[140px]", disabled && "bg-soft/60")}>
+      <div className={cn(shell, shellTone(error || bad, disabled), "w-[140px]")}>
         <Clock className="ml-3 h-4 w-4 shrink-0 text-muted" aria-hidden />
         <input
           id={inputId}

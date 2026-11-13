@@ -382,7 +382,7 @@ export function NavTreeItem({
               aria-controls={panel}
               onClick={() => setOpen(id, !isOpen)}
               onKeyDown={(e) => arrowToggle(e, isOpen, (v) => setOpen(id, v))}
-              className="flex h-full min-w-0 flex-1 items-center gap-2.5 rounded-[inherit] pl-2.5 pr-1.5 focus-visible:outline-offset-[-2px]"
+              className="flex h-full min-w-0 flex-1 items-center gap-2.5 rounded-[inherit] pl-2.5 pr-[11px] focus-visible:outline-offset-[-2px]"
             >
               {content}
               <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200 motion-reduce:transition-none", isOpen && "rotate-90")} aria-hidden />
@@ -628,7 +628,7 @@ export type Workspace = {
 };
 
 function WorkspaceLogo({ ws, size = 32 }: { ws: Workspace; size?: 24 | 32 }) {
-  if (ws.logo) return <span className={cn("grid shrink-0 place-items-center overflow-hidden rounded-lg [&>img]:h-full [&>img]:w-full [&>svg]:h-full [&>svg]:w-full", size === 32 ? "h-8 w-8" : "h-6 w-6 rounded-md")}>{ws.logo}</span>;
+  if (ws.logo) return <span className={cn("grid shrink-0 place-items-center overflow-hidden [&>img]:h-full [&>img]:w-full [&>svg]:h-full [&>svg]:w-full", size === 32 ? "h-8 w-8 rounded-lg" : "h-6 w-6 rounded-md")}>{ws.logo}</span>;
   const initials = ws.name
     .split(/\s+/)
     .slice(0, 2)
@@ -774,7 +774,7 @@ export function SidebarUserMenu({ user, collapsed = false, mobile = false }: { u
       {user.menu ? <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden /> : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />}
     </>
   );
-  const box = cn("flex min-h-16 w-full shrink-0 items-center border-t border-line px-4 py-3 transition-colors hover:bg-soft", collapsed ? "justify-center px-0" : "gap-3");
+  const box = cn("flex min-h-16 w-full shrink-0 items-center border-t border-line py-3 transition-colors hover:bg-soft", collapsed ? "justify-center px-0" : "gap-3 px-4");
   if (!user.menu) {
     return (
       <DsLink href={user.href ?? "#"} title={user.name} className={box}>

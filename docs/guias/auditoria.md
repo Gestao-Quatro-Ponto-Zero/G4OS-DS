@@ -211,6 +211,7 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 | [`native-date`](#native-date) | Componentes | erro | erro | aviso |  |
 | [`confirm-alert`](#confirm-alert) | Componentes | erro | erro | aviso |  |
 | [`deprecated-export`](#deprecated-export) | Componentes | erro | erro | erro | sim |
+| [`class-conflict`](#class-conflict) | Componentes | aviso | aviso | aviso |  |
 | [`as-any-props`](#as-any-props) | Componentes | info | info | aviso |  |
 | [`icon-button-label`](#icon-button-label) | Acessibilidade | erro | erro | aviso |  |
 | [`img-alt`](#img-alt) | Acessibilidade | erro | erro | erro |  |
@@ -458,6 +459,15 @@ Gravidade por preset. `--fix` = o `g4os-ds audit --fix` e o `eslint --fix` fazem
 - Gravidade: erro (strict: erro) · corrigível com `--fix`
 - Evite: `import { NomeAntigo } from "@g4ai/ds"`
 - Use: `import { NomeNovo as NomeAntigo } from "@g4ai/ds" (troca automática)`
+
+#### `class-conflict`
+
+**cn() com duas utilidades da mesma propriedade.** cn não resolve conflito: duas utilidades da mesma propriedade vencem pela ordem do CSS, não do código. Deixe as classes mutuamente exclusivas: cn("base", ativo ? "text-ink" : "text-muted").
+
+- Gravidade: aviso (strict: aviso)
+- Evite: `cn("text-muted", ativo && "text-ink") · cn("flex", oculto && "hidden") · cn("h-8 border-line", grande && "h-9 border-primary")`
+- Use: `cn(ativo ? "text-ink" : "text-muted") · cn(oculto ? "hidden" : "flex") · cn(grande ? "h-9 border-primary" : "h-8 border-line")`
+- O `cn` do DS só concatena (não é tailwind-merge): com `text-muted` e `text-ink` no mesmo elemento, vence a que vem depois no CSS gerado, não a que vem depois no código. Compara o 1º argumento string de `cn`/`clsx`/`cx` com as strings seguintes (condicional, ternário ou literal), por grupo de propriedade e mesma variante: display, cor e tamanho de texto, alinhamento, `bg-*` (cor), `h`/`w`/`min-*`/`max-*`, `p*`, `m*`, `gap*`, `rounded*`, `items-*`, `justify-*`, peso da fonte, largura, estilo e cor da borda, largura e cor do anel. Não conflitam: variantes diferentes (`bg-surface` × `md:bg-soft`), `border` × `border-line`, `ring-1` × `ring-line`, `text-[13px]` × `text-ink`, `size-*` × `h-*`/`w-*`, classe com `!`. Classe vinda de variável (`className`, `cur.cls`) não é vista.
 
 #### `as-any-props`
 

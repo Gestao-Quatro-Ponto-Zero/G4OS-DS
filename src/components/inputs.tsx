@@ -105,9 +105,12 @@ function Frame({
 
 const shellSizes = { sm: "h-8 text-[13px]", md: "h-10 text-[14px]", lg: "h-12 text-[15px]" } as const;
 const shellBase =
-  "focus-field flex w-full items-center rounded-lg border bg-surface text-ink transition-[border-color,box-shadow] has-[input:disabled]:cursor-not-allowed has-[input:disabled]:bg-soft/60 has-[input:disabled]:text-muted";
+  "focus-field flex w-full items-center rounded-lg border text-ink transition-[border-color,box-shadow] has-[input:disabled]:cursor-not-allowed has-[input:disabled]:bg-soft/60 has-[input:disabled]:text-muted";
+// Borda e fundo decididos aqui, uma cor de cada (cn não resolve conflito de utilitários):
+// foco escurece a borda (o utilitário border-line venceria a regra do base.css);
+// somente leitura é gelo, não superfície.
 const shellTone = (error?: ReactNode, readOnly?: boolean) =>
-  cn(error ? "border-rose/50 focus-within:border-rose" : "border-line", readOnly && "bg-soft/50");
+  cn(error ? "border-rose/50 focus-within:border-rose" : "border-line focus-within:border-muted", readOnly ? "bg-soft/50" : "bg-surface");
 const bareInput = "h-full min-w-0 flex-1 bg-transparent px-3 outline-none placeholder:text-muted disabled:cursor-not-allowed";
 
 /* ------------------------------------------------------------------ */
@@ -285,8 +288,9 @@ export function TextareaField({
         aria-invalid={error ? true : undefined}
         aria-describedby={error || hint ? ids.desc : undefined}
         className={cn(
-          "block w-full resize-none rounded-lg border bg-surface px-3 py-2 text-[14px] leading-relaxed text-ink outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:bg-soft/60",
-          error ? "border-rose/50" : "border-line",
+          "block w-full resize-none rounded-lg border px-3 py-2 text-[14px] leading-relaxed text-ink outline-none placeholder:text-muted disabled:cursor-not-allowed disabled:bg-soft/60",
+          error ? "border-rose/50 focus-visible:border-rose" : "border-line focus-visible:border-muted",
+          rest.readOnly ? "bg-soft/50" : "bg-surface",
           !autosize && "resize-y",
         )}
         {...rest}
@@ -434,7 +438,8 @@ export function NumberField({
   const clamp = (n: number) => Math.min(max ?? Infinity, Math.max(min ?? -Infinity, n));
   const bump = (dir: 1 | -1, mult = 1) => onChange(clamp(Number(((value ?? 0) + dir * step * mult).toFixed(digits))));
   const commit = () => {
-    const n = parseFloat(draft.replace(/\./g, "").replace(",", "."));
+    // Aceita o "−" tipográfico do formatNumber e o hífen digitado.
+    const n = parseFloat(draft.replace(/\u2212/g, "-").replace(/\./g, "").replace(",", "."));
     if (draft.trim() === "") onChange(null);
     else if (Number.isFinite(n)) onChange(clamp(n));
     else setDraft(value == null ? "" : formatNumber(value, digits));
@@ -1020,7 +1025,7 @@ export function Slider<V extends number | [number, number]>({
               onValueCommit?.(out);
             }}
             className={cn(
-              "absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink bg-surface shadow-surface outline-none transition-shadow focus-visible:ring-4 focus-visible:ring-ink/10",
+              "absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-surface shadow-surface outline-none transition-shadow focus-visible:ring-4 focus-visible:ring-ink/10",
               drag === i && "ring-4 ring-ink/10",
               disabled ? "cursor-not-allowed" : "cursor-grab active:cursor-grabbing",
             )}

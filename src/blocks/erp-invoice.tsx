@@ -156,15 +156,16 @@ ${items.map((it, i) => `      <det nItem="${i + 1}"><prod><cProd>${xmlEscape(it.
               </div>
               <div className="mt-0.5 text-[12.5px] text-muted">Venda de mercadoria adquirida de terceiros</div>
             </div>
-            <div className="text-right">
+            <div className="sm:text-right">
               <Badge tone={invoiceStatus[status].tone}>{status === "autorizada" ? "Autorizada pela SEFAZ-GO" : invoiceStatus[status].label}</Badge>
               {status === "autorizada" && <div className="mt-2 text-[11.5px] tabular-nums text-muted">Protocolo 1522600004{invoice.id} · {br(invoice.issuedAt)}</div>}
             </div>
           </header>
 
           <div className="flex flex-wrap items-center gap-3 border-b border-line bg-soft/50 px-5 py-3">
-            <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted">Chave de acesso</span>
-            <code className="min-w-0 flex-1 break-all font-mono text-[12.5px] tracking-wide">{keyGroups}</code>
+            <span className="w-full text-[10px] font-medium uppercase tracking-[0.1em] text-muted sm:w-auto">Chave de acesso</span>
+            {/* Quebra só entre os grupos de 4 dígitos (nunca no meio de um grupo). */}
+            <code className="min-w-0 flex-1 font-mono text-[12.5px] tracking-wide">{keyGroups}</code>
             <button
               type="button"
               className="no-print inline-flex h-7 items-center gap-1.5 rounded-md border border-line bg-surface px-2 text-[11.5px] text-muted hover:text-ink"

@@ -86,7 +86,9 @@
     "!scripts/lint/test-lint.mjs",
     "!scripts/eval",
     "!scripts/test-react18.mjs",
-    "!scripts/test-components.mjs"
+    "!scripts/test-components.mjs",
+    "!scripts/test-pivot.mjs",
+    "!scripts/test-server-libs.mjs"
   ],
   "bin": {
     "g4os-ds": "scripts/cli.mjs"
@@ -98,7 +100,7 @@
     "ai:check": "node scripts/build-ai-docs.mjs --check",
     "audit": "node scripts/cli.mjs audit",
     "audit:self": "node scripts/cli.mjs audit",
-    "check": "npm run check:tokens && npm run typecheck && npm run lint && npm run ai:check && npm run audit:self && npm run test:lint && npm run test:mcp && npm run test:components",
+    "check": "npm run check:tokens && npm run typecheck && npm run lint && npm run ai:check && npm run audit:self && npm run test:lint && npm run test:mcp && npm run test:components && npm run test:pivot",
     "showcase:build": "node showcase/build.mjs",
     "showcase": "npm run showcase:build && npx --yes serve showcase/dist -l 4173",
     "showcase:watch": "node showcase/build.mjs --watch",
@@ -109,6 +111,7 @@
     "test:mcp": "node scripts/test-mcp.mjs",
     "test:react": "node scripts/test-react18.mjs",
     "test:components": "node scripts/test-components.mjs",
+    "test:pivot": "node scripts/test-pivot.mjs",
     "test:layout": "node scripts/test-page-heading-layout.mjs",
     "lint": "eslint .",
     "test:lint": "node scripts/lint/test-lint.mjs",

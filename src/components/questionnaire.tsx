@@ -203,7 +203,7 @@ export function Questionnaire({
 
         {input && (
           <div className="mt-3">
-            <label htmlFor={`${uid}-text`} className={cn("mb-1.5 block text-[12.5px] font-medium text-ink", !q.choices?.length && "sr-only")}>
+            <label htmlFor={`${uid}-text`} className={cn("mb-1.5 block text-[12.5px] text-muted", !q.choices?.length && "sr-only")}>
               {input.label ?? (q.choices?.length ? "Outra resposta" : q.prompt)}
             </label>
             {input.multiline ? (
@@ -213,7 +213,7 @@ export function Questionnaire({
                 value={a.text}
                 placeholder={input.placeholder}
                 onChange={(e) => update({ ...a, text: e.target.value })}
-                className="w-full resize-y rounded-lg border border-line bg-surface px-3 py-2.5 text-[14px] leading-relaxed text-ink placeholder:text-muted"
+                className="w-full resize-y rounded-lg border border-line bg-surface px-3 py-2.5 text-[14px] leading-relaxed text-ink placeholder:text-muted focus-visible:border-muted"
               />
             ) : (
               <input
@@ -222,14 +222,14 @@ export function Questionnaire({
                 value={a.text}
                 placeholder={input.placeholder}
                 onChange={(e) => update({ ...a, text: e.target.value })}
-                className="h-10 w-full rounded-lg border border-line bg-surface px-3 text-[14px] text-ink placeholder:text-muted"
+                className="h-10 w-full rounded-lg border border-line bg-surface px-3 text-[14px] text-ink placeholder:text-muted focus-visible:border-muted"
               />
             )}
           </div>
         )}
 
         {error && (
-          <p id={`${uid}-err`} role="alert" className="m-0 mt-3 text-[12.5px] text-rose">
+          <p id={`${uid}-err`} role="alert" className="m-0 mt-3 text-[12px] leading-5 text-rose">
             {error}
           </p>
         )}

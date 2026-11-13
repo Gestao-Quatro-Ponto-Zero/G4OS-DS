@@ -13,8 +13,11 @@ Gráficos do DS são SVG puro (`src/components/charts.tsx` e, para os complexos,
 | `chart-5` | `#5f7f6f` | quinta categoria |
 | `chart-6` | `#a3a7b0` | "Outros", sem dado, referência |
 | `chart-grid` | `#eef0f2` | linhas de grade (mais claras que `line`) |
+| `chart-pos` / `chart-neg` | `#2f6ea8` / `#c2621d` | escala **divergente**: acima × abaixo de uma base (horizon, crescimento no mapa). Não é bom × ruim |
 
 Em código: `chartColor(i)` devolve `var(--color-chart-N)`; em TS fora do CSS, `tokens.chart[i]`.
+
+**Escalas de intensidade** (mapa de calor, coorte, mapa por UF, pivô) saem de `src/lib/scale.ts`: `sequentialColor(t, tone)` (uma cor, de claro a forte), `divergingColor(t)` (de `chart-neg` a `chart-pos` passando por neutro), `quantizeScale(domain, steps)` (degraus com limites legíveis) e `onScaleInk(t)` (cor do texto sobre a célula, legível nos dois temas). A legenda é o `ScaleLegend` (degraus ou contínua).
 
 **Ordem fixa.** A mesma categoria tem a mesma cor em todos os gráficos da tela (se "Orgânico" é chart-3 no donut, é chart-3 na barra ao lado). Passe `color` explícito quando a ordem dos dados variar.
 
@@ -43,13 +46,22 @@ Em código: `chartColor(i)` devolve `var(--color-chart-N)`; em TS fora do CSS, `
 | Quando acontece? (dia × intensidade) | calendário de calor | `CalendarHeatmap` |
 | Matriz (coorte, dia × hora) | mapa de calor | `HeatmapMatrix` |
 | Real × meta em uma linha | bullet | `BulletChart` |
+| Como o saldo mudou e por quê? (MRR, caixa) | cascata com eixo quebrado e detalhe | `WaterfallChart` com `axisBreak` + `selected`/`onSelect` |
+| Quanto de cada safra continua? | coorte em triângulo + curvas | `HeatmapMatrix` com `rowMeta`, `summaryRow`, `scale`, `legend` + `RetentionCurves` |
+| Por onde as pessoas passam até converter? | sankey com etapas e rastro | `SankeyChart` com `columnLabels`, `nodeLabels="above"`, `selected` |
+| Como duas medidas andaram juntas no tempo? (CAC × LTV) | dispersão conectada | `ConnectedScatter` |
+| Muitas séries (8–20) contra a própria base | horizon | `HorizonChart` + `HorizonLegend` |
+| Onde no Brasil? (por UF) | mapa coroplético + lista ordenada | `ChoroplethMap` + `RankedRegionList` |
+| Análise livre (linhas × colunas × medidas) | tabela dinâmica | `PivotBuilder` / `PivotTable` |
+
+Peças compartilhadas em `charts-kit.tsx`: `ScaleLegend` (escala em degraus ou contínua, com hover que destaca a faixa), `ChartScrubber` (controle de tempo acessível, com tocar), `AxisBreak` e `useLinkedHighlight` (realce ligado entre gráfico e lista: hover/foco destaca, clique fixa, Esc solta).
 
 Também em `charts-advanced.tsx`: `ComboChart` (barras + linha no mesmo eixo), `ProportionBar` (barra 100 % com legenda) e `GanttChart` (cronograma). Todos no showcase em **Gráficos**.
 
 ## Regras
 
 1. **Um gráfico responde uma pergunta.** O título do `ChartCard` é a pergunta ("De onde vêm os leads?"), a descrição dá período e unidade ("Últimos 90 dias · em R$").
-2. **Eixo Y começa em zero** em barras e áreas. `niceDomain` já faz isso; não "dê zoom" para exagerar variação. Linhas de taxa podem não começar em zero, e a escala diz isso.
+2. **Eixo Y começa em zero** em barras e áreas. `niceDomain` já faz isso; não "dê zoom" para exagerar variação. Linhas de taxa podem não começar em zero, e a escala diz isso. **Exceção única: cascata de saldo** (`WaterfallChart` com `axisBreak`), em que o início e o fim são grandes e os movimentos pequenos (ponte de MRR, de caixa). O eixo começa perto do menor valor e as barras de total levam a **marca de quebra** desenhada; a tabela de leitor de tela mantém os valores reais.
 3. **Grade horizontal clara, sem eixo vertical desenhado**, sem borda de plotagem, sem 3D, sem sombra, sem gradiente além do da área.
 4. **Valor exato sempre alcançável**: tooltip no hover e nas setas do teclado; tabela `sr-only` para leitor de tela (feito pelo componente, passe `label`).
 5. **Rotule direto quando der**; legenda só com 2+ séries. Legenda acima do gráfico, alinhada à esquerda.
@@ -64,6 +76,7 @@ Também em `charts-advanced.tsx`: `ComboChart` (barras + linha no mesmo eixo), `
 ## Números
 
 - Moeda: `formatCurrency(1234.5)` → `R$ 1.234,50`; compacto `R$ 1,2 mil`.
+- Negativo: `formatNumber(-20)` → `−20`, `formatCurrency(-20000, { compact: true })` → `−R$ 20 mil` (sinal de menos tipográfico, não hífen). Campos numéricos aceitam os dois ao digitar.
 - Porcentagem recebe **fração**: `formatPercent(0.123)` → `12,3 %`, com espaço inseparável antes do sinal (norma brasileira). Texto escrito à mão segue a mesma forma: "12 %", nunca "12%". Nada de `Math.round(x * 100) + "%"`.
 - Variação: `formatDelta(0.125)` → `+12,5 %`. Em `KpiCard`, passe `delta={0.125}` e `goodWhen` (`"down"` para custo, churn, tempo de resposta, inadimplência).
 - Sempre `tabular-nums` em colunas e totais.

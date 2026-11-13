@@ -1,6 +1,7 @@
-import { CalendarClock, Check, ClipboardCheck, Clock, Database, FileText, PencilLine, RotateCcw, Search, Sparkles, X } from "lucide-react";
+import { CalendarClock, Check, ClipboardCheck, Clock, Database, FileText, PencilLine, Radio, RotateCcw, Search, Sparkles, X } from "lucide-react";
 import { useMemo, useState, type KeyboardEvent } from "react";
 import {
+  AgentRunCard,
   AgentTrace,
   AiBadge,
   Badge,
@@ -24,9 +25,12 @@ import {
   TokenUsageMeter,
   ToolCallsSection,
   formatCurrency,
+  formatDate,
   formatDuration,
   formatNumber,
+  notify,
   useOperation,
+  type AgentRunScript,
   type ToolCall,
   type TraceStep,
 } from "@g4ai/ds";
@@ -37,7 +41,7 @@ import { frameHref, go, useFrameParam } from "./shells/frame-route";
 /** Metadados do showcase. Pode apagar ao copiar para o seu app. */
 export const meta = {
   title: "Execução de agente",
-  description: "Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado.",
+  description: "Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado. Ao vivo (?estado=ao-vivo): AgentRunCard com passos chegando, portão de aprovação com diff e resultado.",
   category: "IA",
   order: 12,
   height: 1120,
@@ -49,6 +53,7 @@ export const meta = {
       "Custo, tokens e tempo sempre visíveis",
       "Executar de novo com useOperation (o botão informa enquanto roda)",
       "Fim da execução: 'O que você quer fazer agora?' com 3 opções numeradas (↑ ↓ Enter, 1–3, Esc) e campo livre",
+      "Ao vivo (?estado=ao-vivo): AgentRunCard — passos chegam um a um (o atual brilha), o agente para num portão com o diff (Aprovar e aplicar / Devolver com comentário) e, ao concluir, os passos recolhem numa linha e aparece o resultado com as verificações",
     ],
     adapt: [
       "Logs de automação, jobs de integração, pipelines de dados",
@@ -57,6 +62,7 @@ export const meta = {
     avoid: [
       "Mostrar só o resultado final sem como chegou nele",
       "Terminar a execução sem próximo passo (o usuário volta para a lista sem saber o que fazer)",
+      "Agente que escreve (lançamentos, arquivos, e-mails) sem parar para aprovação com o diff à vista",
     ],
   },
 } as const;
@@ -127,6 +133,8 @@ function NextActions({ agentId, agentName, onRerun, onDismiss }: { agentId: stri
 
 export default function AiAgentRun() {
   const id = useFrameParam("id", "RUN-4821");
+  const estado = useFrameParam("estado");
+  if (estado === "ao-vivo") return <LiveRun />;
   const run = runById(id) ?? runs[0];
   // key: trocar de execução (?id=) zera passo selecionado e sugestões.
   return <RunRecord key={run.id} run={run} />;
@@ -173,6 +181,11 @@ function RunRecord({ run }: { run: Run }) {
           description={`${run.id} · v${run.version} · ${triggerText} · ${runWhen(run.startedAt)}`}
           actions={
             <>
+              {run.status === "executando" && (
+                <Button variant="ghost" href={frameHref("ai-agent-run", { id: run.id, estado: "ao-vivo" })}>
+                  <Radio /> Acompanhar ao vivo
+                </Button>
+              )}
               <Button variant="ghost" href={frameHref("ai-agent-builder", agent.id)}>
                 <PencilLine /> Editar agente
               </Button>
@@ -329,6 +342,118 @@ function RunRecord({ run }: { run: Run }) {
           )}
 
           {finished && showNext && <NextActions agentId={agent.id} agentName={agent.name} onRerun={doRerun} onDismiss={() => setShowNext(false)} />}
+        </div>
+      </Page>
+    </AgentShell>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Ao vivo (?estado=ao-vivo)                                           */
+/* ------------------------------------------------------------------ */
+
+const ledgerDiff = `--- a/lancamentos/2026-10.csv
++++ b/lancamentos/2026-10.csv
+@@ -212,3 +212,9 @@ data;historico;valor;conta
+ 2026-10-27;Pix recebido · Vértice Logística;18400,00;Clientes a receber
+ 2026-10-27;Boleto pago · Aço Forte Distribuidora;-9230,15;Fornecedores
+ 2026-10-28;Pix recebido · Rede Horizonte;12000,00;Clientes a receber
++2026-10-28;Tarifa de manutenção de conta;-38,90;Despesas bancárias
++2026-10-29;Pix recebido · Constr. Alicerce (título 3381);7350,00;Clientes a receber
++2026-10-29;TED recebida · Grupo Aurora (parcela 2 de 3);15360,00;Clientes a receber
++2026-10-30;IOF sobre aplicação;-4,12;Impostos sobre operações financeiras
++2026-10-31;Rendimento da aplicação automática;612,47;Receitas financeiras
++2026-10-31;Estorno de Pix em duplicidade · Hospital São Lucas;-2100,00;Clientes a receber
+`;
+
+const rulesDiff = `--- a/regras/conciliacao.yaml
++++ b/regras/conciliacao.yaml
+@@ -8,6 +8,10 @@ regras:
+   - quando: historico contém "TARIFA"
+     lancar_em: Despesas bancárias
+-    tolerancia_dias: 0
++    tolerancia_dias: 2
+   - quando: favorecido abreviado
+     casar_por: [valor, cnpj_raiz]
++  - quando: historico contém "REND APLIC"
++    lancar_em: Receitas financeiras
++  - quando: historico contém "IOF"
++    lancar_em: Impostos sobre operações financeiras
+`;
+
+const liveScript: AgentRunScript = {
+  steps: [
+    { id: "plan", kind: "plan", label: "Planejou a conciliação de outubro", durationMs: 1400, detail: "Ler o extrato, casar cada movimento com um título ou lançamento existente e propor só o que faltar. Nada é lançado sem aprovação." },
+    { id: "ofx", kind: "tool", label: "Leu o extrato de outubro da conta principal", durationMs: 1200, tool: { name: "banco.ler_extrato", input: { conta: "Conta principal · Banco Horizonte", periodo: "2026-10" }, output: { movimentos: 214, saldo_final: 1284310.52 } } },
+    { id: "csv", kind: "read", label: "Leu lancamentos/2026-10.csv", durationMs: 800 },
+    { id: "titulos", kind: "search", label: "Buscou títulos em aberto para os Pix e TEDs recebidos", durationMs: 1600, tool: { name: "erp.buscar_titulos", input: { situacao: "em aberto", vencimento_ate: "2026-10-31" }, output: { encontrados: 37, casados: 31 } } },
+    { id: "regras", kind: "read", label: "Leu regras/conciliacao.yaml", durationMs: 700 },
+    { id: "casar", kind: "plan", label: "Casou 208 de 214 movimentos", durationMs: 1900, detail: "Sobraram 6: tarifa, IOF, rendimento, um Pix com favorecido abreviado, uma TED parcial e um estorno em duplicidade." },
+    { id: "propor", kind: "edit", label: "Preparou 6 lançamentos e 3 regras novas", durationMs: 1500 },
+    { id: "aplicar", kind: "edit", label: "Aplicou os lançamentos no razão de outubro", durationMs: 1100 },
+    { id: "saldo", kind: "test", label: "Conferiu o saldo final com o extrato", durationMs: 1300 },
+    { id: "fechamento", kind: "test", label: "Rodou as verificações de fechamento", durationMs: 1500 },
+  ],
+  approvalAt: 7,
+  approval: {
+    id: "chg-out",
+    title: "Revisar mudanças em 2 arquivos",
+    summary: "Lançar as 6 sobras do extrato (tarifa, IOF, rendimento, Pix abreviado, TED parcial e estorno) e criar 3 regras para que elas se casem sozinhas em novembro.",
+    files: [
+      { path: "lancamentos/2026-10.csv", diff: ledgerDiff },
+      { path: "regras/conciliacao.yaml", diff: rulesDiff },
+    ],
+  },
+  result: {
+    summary: `Outubro conciliado: 214 de 214 movimentos casados. O saldo final confere com o extrato (${formatCurrency(1284310.52)}).`,
+    checks: [
+      { label: "Saldo final igual ao do extrato", status: "passed" },
+      { label: "Nenhum movimento sem lançamento", status: "passed", detail: "214 de 214" },
+      { label: "Contas do plano de contas válidas", status: "passed" },
+      { label: "Período de outubro ainda aberto", status: "passed", detail: `fecha em ${formatDate("2026-11-05")}` },
+    ],
+    openLabel: "Ver lançamentos",
+  },
+};
+
+function LiveRun() {
+  const agent = agentById("conciliacao") ?? agents[0];
+  return (
+    <AgentShell current={agentRoutes.runs}>
+      <Page>
+        <PageHeading
+          crumbs={[
+            { label: "Execuções", href: agentRoutes.runs },
+            { label: agent.name, href: frameHref("ai-agent", agent.id) },
+          ]}
+          title="Conciliar extrato de outubro e propor lançamentos"
+          description={`RUN-4832 · v${agent.version} · pedido por Camila Duarte · ao vivo`}
+          actions={
+            <Button variant="ghost" href={frameHref("ai-agent-builder", agent.id)}>
+              <PencilLine /> Editar agente
+            </Button>
+          }
+        />
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <AgentRunCard
+            title="Conciliar extrato de outubro e propor lançamentos"
+            agent={agent.name}
+            model={modelById(agent.model).name}
+            script={liveScript}
+            onReject={() => notify("Comentário enviado ao agente")}
+            onOpenResult={() => go("fin-reconciliation")}
+          />
+          <aside className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1 rounded-xl border border-line bg-surface p-4 text-[12.5px] leading-relaxed text-muted">
+              <p className="m-0 flex items-center gap-1.5 font-medium text-ink">
+                <Clock className="h-3.5 w-3.5" /> Aprovação humana
+              </p>
+              <p className="m-0">O agente para antes de escrever no razão. Você vê cada linha que entra e pode devolver com um comentário; ele ajusta e pede de novo.</p>
+            </div>
+            <div className="rounded-xl border border-line bg-surface p-4">
+              <TokenUsageMeter used={creditPlan.used} limit={creditPlan.limit} label="Créditos da Acme neste mês" unit="reais" resetsIn="em 1º de novembro" />
+            </div>
+          </aside>
         </div>
       </Page>
     </AgentShell>

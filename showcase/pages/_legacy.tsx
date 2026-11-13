@@ -220,7 +220,7 @@ export function Foundations() {
 export function Actions() {
   const [chips, setChips] = useState({ mine: true, late: false });
   return (
-    <Block id="acoes" title="Botões e ações" rule="Um primário (tinta) por área. Demais ações em ghost. Destrutivo só dentro de confirmação. Ações secundárias de linha vão no menu ⋯.">
+    <Block id="acoes" title="Hierarquia de ações" rule="Um primário (tinta) por área. Demais ações em ghost. Destrutivo só dentro de confirmação. Ações secundárias de linha vão no menu ⋯.">
       <div className="grid gap-4 lg:grid-cols-2">
         <Specimen label="Variantes">
           <Button>
@@ -280,7 +280,7 @@ export function Actions() {
 
 export function Display() {
   return (
-    <Block id="exibicao" title="Identidade, estado e números" rule="Cor sempre acompanhada de palavra. Badge neutro é o padrão. Número bom não grita: só warn/bad pintam o valor.">
+    <Block id="exibicao" title="Avatar, selos, status e números" rule="Cor sempre acompanhada de palavra. Badge neutro é o padrão. Número bom não grita: só warn/bad pintam o valor.">
       <div className="grid gap-4 lg:grid-cols-2">
         <Specimen label="Pessoas e entidades">
           <Avatar initials="AL" name="Ana Beatriz Lopes" tint="#202124" />

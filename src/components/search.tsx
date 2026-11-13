@@ -90,8 +90,8 @@ export function TableSearch({
   const ph = placeholder ?? (total != null ? `Buscar em ${formatNumber(total)} ${total === 1 ? noun : plural}` : `Buscar ${plural}`);
   return (
     <div className={cn("relative min-w-0", className)}>
-      <label className="focus-field flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-2.5">
-        <Search className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
+      <label className="focus-field flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 focus-within:border-muted">
+        <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden />
         <input
           ref={ref}
           type="search"
@@ -540,7 +540,7 @@ export function SearchPalette({
                       </div>
                     )}
                     {row.kind === "query" && (
-                      <div {...common} className={cn("flex cursor-default items-center gap-3 rounded-lg px-2.5 py-1.5 text-[13px] text-ink-soft", on && "bg-soft text-ink")}>
+                      <div {...common} className={cn("flex cursor-default items-center gap-3 rounded-lg px-2.5 py-1.5 text-[13px]", on ? "bg-soft text-ink" : "text-ink-soft")}>
                         <Clock className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
                         <span className="min-w-0 flex-1 truncate">{row.q}</span>
                         {on && <span className="text-[11.5px] text-muted">buscar de novo</span>}

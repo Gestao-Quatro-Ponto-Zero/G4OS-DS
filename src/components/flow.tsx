@@ -869,8 +869,8 @@ export function InlineSelect<V extends string = string>({
       disabled={blocked}
       aria-label={`${label}: ${current?.label ?? "sem valor"}`}
       className={cn(
-        "inline-flex h-7 max-w-full items-center gap-1.5 rounded-md bg-surface px-2 text-[12.5px] text-ink ring-1 ring-line transition-colors hover:bg-soft data-popup-open:bg-soft",
-        blocked && "cursor-not-allowed text-ink-soft hover:bg-surface",
+        "inline-flex h-7 max-w-full items-center gap-1.5 rounded-md bg-surface px-2 text-[12.5px] ring-1 ring-inset ring-line transition-colors data-popup-open:bg-soft",
+        blocked ? "cursor-not-allowed text-ink-soft" : "text-ink hover:bg-soft",
         className,
       )}
     >
