@@ -61,7 +61,34 @@ Marca do assistente: a esfera G4 OS num disco de gelo.
 ## AiSource (type)
 
 ```ts
-type AiSource = { id: string; title: string; href?: string; kind?: "web" | "doc" | "record" | "data"; domain?: string; snippet?: ReactNode }
+type AiSource = { id: string; title: string; href?: string; kind?: "web" | "doc" | "record" | "data"; domain?: string; snippet?: ReactNode; tint?: string; }
+```
+
+## AnswerVersions
+
+Pager das versões de uma resposta: "‹ 2 de 3 ›".
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `count` * | `number` |  |  |
+| `index` * | `number` |  |  |
+| `onChange` * | `(index: number) => void` |  |  |
+| `className` | `string \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+<MessageActions
+  text={citedPlainText(markdown)}
+  markdown={markdown}
+  onFeedback={avaliar}
+  onShare={compartilhar}
+  onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
+  versions={{ index, count, onChange: setIndex }}
+/>
+<AnswerVersions index={1} count={3} onChange={setIndex} />
 ```
 
 ## AskAILauncher
@@ -198,7 +225,9 @@ Número de citação dentro do texto: “… 18 % [2]”.
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `index` * | `number` |  |  |
+| `active` | `boolean \| undefined` |  | Citação acesa (a frase ou a fonte dela está em destaque). |
 | `onClick` | `(() => void) \| undefined` |  |  |
+| `onHighlight` | `((on: boolean) => void) \| undefined` |  | Ponteiro/foco entrou (true) ou saiu (false) da citação. |
 | `source` | `AiSource \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
@@ -207,6 +236,51 @@ Exemplo (showcase `#/p/ia-avisos`):
 
 ```tsx
 <p>… proposta de R$ 460,8 mil <CitationChip index={1} source={fontes[0]} /></p>\n<SourceList sources={fontes} />
+```
+
+## citedPlainText (function)
+
+Texto puro (sem marcação nem citações) de uma resposta: para Copiar e leitores.
+
+```ts
+citedPlainText(markdown): string
+```
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+<MessageActions
+  text={citedPlainText(markdown)}
+  markdown={markdown}
+  onFeedback={avaliar}
+  onShare={compartilhar}
+  onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
+  versions={{ index, count, onChange: setIndex }}
+/>
+<AnswerVersions index={1} count={3} onChange={setIndex} />
+```
+
+## CitedText
+
+Resposta com marcação simples e citações [n].
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `text` * | `string` |  | Marcação simples com citações [1], [2, 3]. |
+| `className` | `string \| undefined` |  |  |
+| `headingLevel` | `2 \| 3 \| 4 \| undefined` | `2` | Nível do `#`/`##` da resposta (h2 por padrão; `###` vira um nível abaixo). |
+| `highlight` | `LinkedHighlight<number> \| undefined` |  | Realce ligado com `SourceCards` (`useLinkedHighlight<number>()`). |
+| `size` | `"sm" \| "md" \| undefined` | `"md"` | md = artigo (15 px); sm = conversa (13,5 px). |
+| `sources` | `AiSource[] \| undefined` | `[]` | Fontes na ordem da numeração ([1] = sources[0]). |
+| `streaming` | `boolean \| undefined` | `false` | Texto ainda chegando: mostra o cursor no fim e esconde citação incompleta. |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+const { text, done } = useStreamingText(resposta);
+<CitedText text={text} sources={fontes} streaming={!done} size="sm" />
 ```
 
 ## ComposerAttachment (type)
@@ -328,6 +402,48 @@ Exemplo (showcase `#/p/ia-avisos`):
 <RateLimitNotice retryIn={75} onRetry={reenviar} action={<Button size="sm" variant="ghost">Ver planos</Button>} />
 ```
 
+## RelatedQuestions
+
+Depois da resposta: campo "Pergunte algo relacionado" (com rótulo visível) e até três perguntas sugeridas.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `items` * | `string[]` |  | Perguntas sugeridas (mostra até três). |
+| `onAsk` * | `(question: string) => void` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `label` | `string \| undefined` | `"Pergunte algo relacionado"` |  |
+| `placeholder` | `string \| undefined` | `"Ex.: e para quem não tem celular?"` |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+<RelatedQuestions items={sugestoes} onAsk={(pergunta) => perguntar(pergunta)} />
+```
+
+## SourceCards
+
+Fontes de uma resposta como cartões pequenos (selo, origem, título, número).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `sources` * | `AiSource[]` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `highlight` | `LinkedHighlight<number> \| undefined` |  | Realce ligado (`useLinkedHighlight<number>()`), chave = número da fonte (1, 2, 3…). |
+| `id` | `string \| undefined` |  |  |
+| `label` | `string \| undefined` | `"Fontes"` | Nome acessível da lista. |
+| `max` | `number \| undefined` | `4` | Células da grade; com mais fontes, a última vira "+N fontes". |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+<SourceStack sources={fontes} expanded={aberto} onToggle={() => setAberto(!aberto)} controls="fontes" />
+{aberto && <SourceCards id="fontes" sources={fontes} />}
+```
+
 ## SourceList
 
 Lista de fontes abaixo de uma resposta.
@@ -345,6 +461,28 @@ Exemplo (showcase `#/p/ia-avisos`):
 
 ```tsx
 <p>… proposta de R$ 460,8 mil <CitationChip index={1} source={fontes[0]} /></p>\n<SourceList sources={fontes} />
+```
+
+## SourceStack
+
+Resumo compacto das fontes para o topo da resposta: selos sobrepostos + "8 fontes ⌄".
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `sources` * | `AiSource[]` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `controls` | `string \| undefined` |  | id dos cartões que o botão abre e fecha. |
+| `expanded` | `boolean \| undefined` |  | Cartões abertos (gira a seta e informa `aria-expanded`). |
+| `max` | `number \| undefined` | `4` | Quantos selos aparecem sobrepostos. |
+| `onToggle` | `(() => void) \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+<SourceStack sources={fontes} expanded={aberto} onToggle={() => setAberto(!aberto)} controls="fontes" />
+{aberto && <SourceCards id="fontes" sources={fontes} />}
 ```
 
 ## SystemMessage
@@ -469,4 +607,11 @@ Simula streaming de texto (demos e protótipos).
 
 ```ts
 useStreamingText(text, props?): { text: string; done: boolean; }
+```
+
+Exemplo (showcase `#/p/ia-resposta`):
+
+```tsx
+const { text, done } = useStreamingText(resposta);
+<CitedText text={text} sources={fontes} streaming={!done} size="sm" />
 ```

@@ -56,7 +56,9 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `chart-4` | `--ds-chart-4` | `#842e20` | `#e08d7c` |  |
 | `chart-5` | `--ds-chart-5` | `#5f7f6f` | `#8fbfa6` |  |
 | `chart-6` | `--ds-chart-6` | `#a3a7b0` | `#6b6e76` |  |
-| `chart-grid` | `--ds-chart-grid` | `#eef0f2` | `#242428` | Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. |
+| `chart-grid` | `--ds-chart-grid` | `#eef0f2` | `#242428` |  |
+| `chart-pos` | `--ds-chart-pos` | `#2f6ea8` | `#74aee6` |  |
+| `chart-neg` | `--ds-chart-neg` | `#c2621d` | `#f0a05a` | Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. |
 | `tag-gray-bg` | `--ds-tag-gray-bg` | `#f0f0ef` | `#2f2f31` |  |
 | `tag-gray-fg` | `--ds-tag-gray-fg` | `#4d4c49` | `#c9c8c4` |  |
 | `tag-brown-bg` | `--ds-tag-brown-bg` | `#f4eeea` | `#3a2e26` |  |

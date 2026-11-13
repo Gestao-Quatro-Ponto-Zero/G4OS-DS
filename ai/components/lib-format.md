@@ -42,9 +42,24 @@ Variação assinada: 0.125 → "+12,5 %", -0.2 → "−20 %" (sinal de menos tip
 formatDelta(fraction, digits?): string
 ```
 
+Exemplo (showcase `#/p/graficos-mapa`):
+
+```tsx
+<ChoroplethMap
+  label="Crescimento da receita em 12 meses por estado"
+  values={crescimentoPorUf}
+  scale={{ scheme: "diverging", steps: 6, domain: [-0.3, 0.3] }}
+  format={(n) => formatDelta(n, 0)}
+  valueLabel="Crescimento"
+  selected={uf}
+  onSelect={setUf}
+  zoomTo={uf}
+/>
+```
+
 ## formatNumber (function)
 
-1234.5 → "1.234,5"
+1234.5 → "1.234,5"; -20 → "−20"
 
 ```ts
 formatNumber(n, digits?): string
@@ -58,22 +73,13 @@ formatNumber(n, digits?): string
 formatPercent(fraction, digits?): string
 ```
 
-Exemplo (showcase `#/p/colecoes-reordenar`):
+Exemplo (showcase `#/p/graficos-mapa`):
 
 ```tsx
-<SortableList
-  label="Etapas do pipeline"
-  items={etapas}
-  getKey={(e) => e.id}
-  getLabel={(e) => e.nome}
-  onReorder={(next) => { setEtapas(next); notify("Ordem das etapas salva"); }}
-  renderItem={(e, { index }) => (
-    <div className="flex items-center justify-between gap-3">
-      <span>{index + 1}. {e.nome}</span>
-      <Badge>{formatPercent(e.prob, 0)}</Badge>
-    </div>
-  )}
-/>
+// Só a região Sul; PR sem dado
+const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
+<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitViewBox(sul)}
+  values={{ PR: null, SC: 0.024, RS: 0.014 }} scale={{ tone: "info" }} format={(n) => formatPercent(n, 1)} />
 ```
 
 ## formatRelative (function)

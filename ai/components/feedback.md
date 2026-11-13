@@ -91,6 +91,16 @@ Botão que conta o progresso ("Salvando…") e se desabilita enquanto confirma o
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
+Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
+
+```tsx
+<EvalRunHeader title="Agente de atendimento" candidate={{ label: "v12", model: "G4 Pro" }} baseline={{ label: "v11" }}
+  judge="G4 Analítico" caseCount={48} score={0.854} baselineScore={0.833} history={ultimas8}
+  cost={2.9} durationMs={180000} action={<OperationButton operation={op} onClick={rodar}>Rodar</OperationButton>} />
+<EvalDotGrid categories={[{ id: "refund", label: "Reembolso", baseline: 0.88, cases: [{ id, title, status: "regression" }, …] }]}
+  baselineLabel="v11" onOpenCase={(c) => abrir(c.id)} />
+```
+
 ## OperationFeedback
 
 Bloco de erro com a saída certa.

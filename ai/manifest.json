@@ -3559,7 +3559,7 @@
               "description": null
             }
           ],
-          "examplePage": null
+          "examplePage": "ia-execucao-e-avaliacao"
         },
         {
           "name": "OperationFeedback",
@@ -6807,7 +6807,7 @@
         {
           "name": "formatNumber",
           "kind": "function",
-          "summary": "1234.5 → \"1.234,5\"",
+          "summary": "1234.5 → \"1.234,5\"; -20 → \"−20\"",
           "signature": "formatNumber(n, digits?): string"
         },
         {
@@ -8707,7 +8707,7 @@
               "type": "(number | null)[][]",
               "required": true,
               "default": null,
-              "description": "values[linha][coluna]; null = sem dado."
+              "description": "values[linha][coluna]; null = sem dado (célula vazia, sem fundo)."
             },
             {
               "name": "cell",
@@ -8738,11 +8738,53 @@
               "description": null
             },
             {
+              "name": "legend",
+              "type": "ReactNode",
+              "required": false,
+              "default": "false",
+              "description": "Legenda da escala acima da matriz."
+            },
+            {
+              "name": "legendTitle",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Título curto da legenda (\"% retido\")."
+            },
+            {
               "name": "max",
               "type": "number | undefined",
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "rowMeta",
+              "type": "ReactNode[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Coluna extra depois do rótulo de cada linha (tamanho da coorte, total)."
+            },
+            {
+              "name": "rowMetaLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cabeçalho da coluna de `rowMeta` (\"Espaços\")."
+            },
+            {
+              "name": "rowsLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cabeçalho da coluna de rótulos (\"Coorte\")."
+            },
+            {
+              "name": "scale",
+              "type": "{ steps: number; domain?: [number, number]; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Escala em degraus (`quantize`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados."
             },
             {
               "name": "showValues",
@@ -8752,11 +8794,25 @@
               "description": null
             },
             {
+              "name": "summaryRow",
+              "type": "{ label: string; values: (number | null)[]; meta?: ReactNode; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Linha de resumo separada no fim (\"Média\"), pintada na mesma escala."
+            },
+            {
               "name": "tone",
               "type": "\"ok\" | \"info\" | \"accent\" | \"ink\" | undefined",
               "required": false,
               "default": "\"ink\"",
               "description": null
+            },
+            {
+              "name": "valueLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Valor\"",
+              "description": "Rótulo do valor no tooltip (\"Retidos\")."
             }
           ],
           "examplePage": "graficos-padroes"
@@ -8918,9 +8974,73 @@
           "examplePage": "graficos-radar"
         },
         {
+          "name": "RetentionCurves",
+          "kind": "component",
+          "summary": "Curvas de retenção por coorte: uma linha por coorte (as recentes mais escuras), a média em destaque.",
+          "props": [
+            {
+              "name": "columns",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": "Rótulo de cada ponto do eixo X (\"1\", \"2\"… meses desde o cadastro)."
+            },
+            {
+              "name": "rows",
+              "type": "{ label: string; values: (number | null)[]; }[]",
+              "required": true,
+              "default": null,
+              "description": "Uma linha por coorte, da mais antiga para a mais recente."
+            },
+            {
+              "name": "average",
+              "type": "{ label?: string; values: (number | null)[]; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Curva média, desenhada em destaque."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n) => formatPercent(n, 0)",
+              "description": null
+            },
+            {
+              "name": "formatAxis",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "280",
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Curvas de retenção por coorte\"",
+              "description": null
+            }
+          ],
+          "examplePage": "graficos-saas"
+        },
+        {
           "name": "SankeyChart",
           "kind": "component",
-          "summary": "Fluxos entre etapas (origem do lead → etapa → ganho/perdido; receita → centros de custo).",
+          "summary": "Fluxos entre etapas (origem do lead → etapa → ganho/perdido; visita → conta → plano).",
           "props": [
             {
               "name": "links",
@@ -8944,6 +9064,13 @@
               "description": null
             },
             {
+              "name": "columnLabels",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Rótulo de cada coluna, embaixo (\"Visita\", \"Conta\", \"Plano\")."
+            },
+            {
               "name": "format",
               "type": "((n: number) => string) | undefined",
               "required": false,
@@ -8963,6 +9090,34 @@
               "required": false,
               "default": "\"Fluxo\"",
               "description": null
+            },
+            {
+              "name": "minWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Largura mínima do desenho."
+            },
+            {
+              "name": "nodeLabels",
+              "type": "\"side\" | \"above\" | undefined",
+              "required": false,
+              "default": "\"side\"",
+              "description": "\"side\": nome e valor à direita do nó."
+            },
+            {
+              "name": "onSelect",
+              "type": "((id: string | null) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Com `onSelect`, os nós viram botões: setas percorrem (↑↓ na coluna, ←→ entre colunas), Enter seleciona, Esc solta."
+            },
+            {
+              "name": "selected",
+              "type": "string | null | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nó selecionado (id): traça os fluxos que chegam e saem dele; o resto esmaece."
             }
           ],
           "examplePage": "graficos-conversao"
@@ -8977,7 +9132,7 @@
           "name": "SankeyNode",
           "kind": "type",
           "summary": null,
-          "definition": "{ id: string; label: string; column: number }"
+          "definition": "{ id: string; label: string; column: number; color?: string; }"
         },
         {
           "name": "ScatterChart",
@@ -9122,7 +9277,7 @@
         {
           "name": "WaterfallChart",
           "kind": "component",
-          "summary": "Ponte entre um valor inicial e um final (receita bruta → lucro líquido; caixa inicial → final).",
+          "summary": "Ponte entre um valor inicial e um final (receita bruta → lucro líquido; caixa inicial → final; MRR de início → fim).",
           "props": [
             {
               "name": "steps",
@@ -9132,11 +9287,25 @@
               "description": null
             },
             {
+              "name": "axisBreak",
+              "type": "boolean | { min: number; } | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Eixo truncado (exceção da regra do zero): começa perto do menor valor, com a marca de quebra no eixo e na base de cada barra de total."
+            },
+            {
               "name": "className",
               "type": "string | undefined",
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "connectors",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Linhas tracejadas ligando o topo de uma barra ao início da seguinte."
             },
             {
               "name": "format",
@@ -9165,6 +9334,27 @@
               "required": false,
               "default": "\"Ponte de valores\"",
               "description": null
+            },
+            {
+              "name": "onSelect",
+              "type": "((index: number | null) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Clique ou Enter numa barra (índice), ou null ao soltar."
+            },
+            {
+              "name": "selected",
+              "type": "number | null | undefined",
+              "required": false,
+              "default": null,
+              "description": "Barra selecionada (índice)."
+            },
+            {
+              "name": "showValues",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Valor escrito junto da barra (acima dos aumentos e totais, abaixo das quedas)."
             }
           ],
           "examplePage": "graficos-metas"
@@ -11632,7 +11822,43 @@
           "name": "AiSource",
           "kind": "type",
           "summary": null,
-          "definition": "{ id: string; title: string; href?: string; kind?: \"web\" | \"doc\" | \"record\" | \"data\"; domain?: string; snippet?: ReactNode }"
+          "definition": "{ id: string; title: string; href?: string; kind?: \"web\" | \"doc\" | \"record\" | \"data\"; domain?: string; snippet?: ReactNode; tint?: string; }"
+        },
+        {
+          "name": "AnswerVersions",
+          "kind": "component",
+          "summary": "Pager das versões de uma resposta: \"‹ 2 de 3 ›\".",
+          "props": [
+            {
+              "name": "count",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "index",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onChange",
+              "type": "(index: number) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-resposta"
         },
         {
           "name": "AskAILauncher",
@@ -11966,11 +12192,25 @@
               "description": null
             },
             {
+              "name": "active",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Citação acesa (a frase ou a fonte dela está em destaque)."
+            },
+            {
               "name": "onClick",
               "type": "(() => void) | undefined",
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "onHighlight",
+              "type": "((on: boolean) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Ponteiro/foco entrou (true) ou saiu (false) da citação."
             },
             {
               "name": "source",
@@ -11981,6 +12221,69 @@
             }
           ],
           "examplePage": "ia-avisos"
+        },
+        {
+          "name": "citedPlainText",
+          "kind": "function",
+          "summary": "Texto puro (sem marcação nem citações) de uma resposta: para Copiar e leitores.",
+          "signature": "citedPlainText(markdown): string"
+        },
+        {
+          "name": "CitedText",
+          "kind": "component",
+          "summary": "Resposta com marcação simples e citações [n].",
+          "props": [
+            {
+              "name": "text",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Marcação simples com citações [1], [2, 3]."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "headingLevel",
+              "type": "2 | 3 | 4 | undefined",
+              "required": false,
+              "default": "2",
+              "description": "Nível do `#`/`##` da resposta (h2 por padrão; `###` vira um nível abaixo)."
+            },
+            {
+              "name": "highlight",
+              "type": "LinkedHighlight<number> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Realce ligado com `SourceCards` (`useLinkedHighlight<number>()`)."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": "md = artigo (15 px); sm = conversa (13,5 px)."
+            },
+            {
+              "name": "sources",
+              "type": "AiSource[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": "Fontes na ordem da numeração ([1] = sources[0])."
+            },
+            {
+              "name": "streaming",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Texto ainda chegando: mostra o cursor no fim e esconde citação incompleta."
+            }
+          ],
+          "examplePage": "ia-resposta"
         },
         {
           "name": "ComposerAttachment",
@@ -12165,6 +12468,99 @@
           "examplePage": "ia-avisos"
         },
         {
+          "name": "RelatedQuestions",
+          "kind": "component",
+          "summary": "Depois da resposta: campo \"Pergunte algo relacionado\" (com rótulo visível) e até três perguntas sugeridas.",
+          "props": [
+            {
+              "name": "items",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": "Perguntas sugeridas (mostra até três)."
+            },
+            {
+              "name": "onAsk",
+              "type": "(question: string) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Pergunte algo relacionado\"",
+              "description": null
+            },
+            {
+              "name": "placeholder",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Ex.: e para quem não tem celular?\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-resposta"
+        },
+        {
+          "name": "SourceCards",
+          "kind": "component",
+          "summary": "Fontes de uma resposta como cartões pequenos (selo, origem, título, número).",
+          "props": [
+            {
+              "name": "sources",
+              "type": "AiSource[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "highlight",
+              "type": "LinkedHighlight<number> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Realce ligado (`useLinkedHighlight<number>()`), chave = número da fonte (1, 2, 3…)."
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Fontes\"",
+              "description": "Nome acessível da lista."
+            },
+            {
+              "name": "max",
+              "type": "number | undefined",
+              "required": false,
+              "default": "4",
+              "description": "Células da grade; com mais fontes, a última vira \"+N fontes\"."
+            }
+          ],
+          "examplePage": "ia-resposta"
+        },
+        {
           "name": "SourceList",
           "kind": "component",
           "summary": "Lista de fontes abaixo de uma resposta.",
@@ -12199,6 +12595,56 @@
             }
           ],
           "examplePage": "ia-avisos"
+        },
+        {
+          "name": "SourceStack",
+          "kind": "component",
+          "summary": "Resumo compacto das fontes para o topo da resposta: selos sobrepostos + \"8 fontes ⌄\".",
+          "props": [
+            {
+              "name": "sources",
+              "type": "AiSource[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "controls",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "id dos cartões que o botão abre e fecha."
+            },
+            {
+              "name": "expanded",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Cartões abertos (gira a seta e informa `aria-expanded`)."
+            },
+            {
+              "name": "max",
+              "type": "number | undefined",
+              "required": false,
+              "default": "4",
+              "description": "Quantos selos aparecem sobrepostos."
+            },
+            {
+              "name": "onToggle",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-resposta"
         },
         {
           "name": "SystemMessage",
@@ -14264,7 +14710,7 @@
         {
           "name": "ParetoChart",
           "kind": "component",
-          "summary": "Causas ordenadas (barras) + % acumulado (linha).",
+          "summary": null,
           "props": [
             {
               "name": "items",
@@ -18058,6 +18504,13 @@
               "description": null
             },
             {
+              "name": "onRegenerate",
+              "type": "((option: RegenerateOption) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Refazer com opções; substitui o botão de `onRetry` (\"Tentar de novo\" chama com \"retry\")."
+            },
+            {
               "name": "onRetry",
               "type": "(() => void) | undefined",
               "required": false,
@@ -18077,9 +18530,16 @@
               "required": false,
               "default": "\"md\"",
               "description": "\"xs\": ícones mínimos (estilo Codex), implica `compact`."
+            },
+            {
+              "name": "versions",
+              "type": "{ index: number; count: number; onChange: (index: number) => void; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Versões da resposta (cada refazer gera uma): `index` começa em 0."
             }
           ],
-          "examplePage": "ia-layout-agente"
+          "examplePage": "ia-resposta"
         },
         {
           "name": "MinimapItem",
@@ -18097,7 +18557,7 @@
           "name": "ModelOption",
           "kind": "type",
           "summary": null,
-          "definition": "{ id: string; name: string; group?: string; description?: string; icon?: ReactNode }"
+          "definition": "{ id: string; name: string; group?: string; description?: string; icon?: ReactNode; featured?: boolean; note?: string; context?: number; priceIn?: number; priceOut?: number; provider?: string; }"
         },
         {
           "name": "ModelPicker",
@@ -18147,6 +18607,13 @@
               "description": null
             },
             {
+              "name": "currency",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"BRL\"",
+              "description": "Moeda dos preços (`priceIn`/`priceOut`), código ISO: \"BRL\", \"USD\"."
+            },
+            {
               "name": "effort",
               "type": "ModelEffort | undefined",
               "required": false,
@@ -18166,9 +18633,23 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "side",
+              "type": "\"top\" | \"bottom\" | undefined",
+              "required": false,
+              "default": "\"top\"",
+              "description": "Lado em que o menu abre."
+            },
+            {
+              "name": "summary",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Resumo abaixo do chip: nota do modelo + Contexto, Entrada, Saída e Esforço."
             }
           ],
-          "examplePage": "ia-sessoes"
+          "examplePage": "ia-resposta"
         },
         {
           "name": "PermissionMode",
@@ -18268,6 +18749,17 @@
             }
           ],
           "examplePage": null
+        },
+        {
+          "name": "RegenerateOption",
+          "kind": "type",
+          "summary": "Como refazer uma resposta: de novo, mais curta, mais detalhada ou mais simples.",
+          "definition": "\"retry\" | \"shorter\" | \"longer\" | \"simpler\""
+        },
+        {
+          "name": "regenerateOptionLabels",
+          "kind": "const",
+          "summary": "Rótulos (pt-BR) do menu de refazer, na ordem em que aparecem."
         },
         {
           "name": "SessionComposer",
@@ -21294,6 +21786,13 @@
               "description": null
             },
             {
+              "name": "maxLength",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Limite de caracteres do texto (sem marcações)."
+            },
+            {
               "name": "onEnhance",
               "type": "(() => void) | undefined",
               "required": false,
@@ -21308,6 +21807,55 @@
           "kind": "type",
           "summary": null,
           "definition": "\"rascunho\" | \"publicado\" | \"alterado\""
+        },
+        {
+          "name": "AppAccessItem",
+          "kind": "type",
+          "summary": "App que o agente pede para acessar: escopo em linguagem simples e estado da conexão.",
+          "definition": "{ id: string; name: string; color?: string; icon?: ReactNode; scope: string; connected: boolean; granted: boolean; required?: boolean; error?: string; }"
+        },
+        {
+          "name": "AppAccessList",
+          "kind": "component",
+          "summary": "Conceder acesso app a app: marca, nome, escopo em linguagem simples e, por app, \"Conectar\" (se a conta ainda não está ligada) ou um `Switch` de acesso.",
+          "props": [
+            {
+              "name": "apps",
+              "type": "AppAccessItem[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onGrantChange",
+              "type": "(id: string, granted: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Acesso aos apps\"",
+              "description": null
+            },
+            {
+              "name": "onConnect",
+              "type": "((id: string) => Promise<unknown> | void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
         },
         {
           "name": "BuilderSection",
@@ -21407,6 +21955,96 @@
             }
           ],
           "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "KnowledgeFile",
+          "kind": "type",
+          "summary": "Arquivo de conhecimento do agente.",
+          "definition": "{ id: string; name: string; size: number; status?: \"pronto\" | \"enviando\" | \"erro\"; progress?: number; error?: string; meta?: ReactNode; }"
+        },
+        {
+          "name": "KnowledgeFiles",
+          "kind": "component",
+          "summary": "Arquivos que o agente consulta: tipo, tamanho, progresso de envio, cancelar, erro com \"Tentar de novo\" e remover.",
+          "props": [
+            {
+              "name": "onUpload",
+              "type": "KnowledgeUpload",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "accept",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\".pdf,.docx,.md,.txt,.csv,.xlsx\"",
+              "description": "Tipos aceitos (atributo `accept` do input)."
+            },
+            {
+              "name": "addLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Adicionar arquivo\"",
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultFiles",
+              "type": "KnowledgeFile[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": null
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Texto da área de adicionar."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Arquivos de conhecimento\"",
+              "description": null
+            },
+            {
+              "name": "maxSize",
+              "type": "number | undefined",
+              "required": false,
+              "default": "20 * 1024 * 1024",
+              "description": "Tamanho máximo em bytes; maior que isso vira erro sem enviar."
+            },
+            {
+              "name": "onChange",
+              "type": "((files: KnowledgeFile[]) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Arquivos prontos depois de cada envio ou remoção."
+            },
+            {
+              "name": "onRemove",
+              "type": "((file: KnowledgeFile) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
+        },
+        {
+          "name": "KnowledgeUpload",
+          "kind": "type",
+          "summary": "Envio de um arquivo: chame `report(0–100)` durante o envio, resolva no fim, rejeite com `Error(mensagem)` se falhar e pare quando `signal` abortar (o usuário cancelou).",
+          "definition": "(file: File, report: (progress: number) => void, signal: AbortSignal) => Promise<void>"
         },
         {
           "name": "PropertyRow",
@@ -21536,6 +22174,55 @@
             }
           ],
           "examplePage": null
+        },
+        {
+          "name": "ToolToggleItem",
+          "kind": "type",
+          "summary": "Ferramenta do agente: marca do app, nome, o que o agente faz com ela e se está ligada.",
+          "definition": "{ id: string; name: string; description: string; color?: string; icon?: ReactNode; on: boolean; disabled?: boolean; }"
+        },
+        {
+          "name": "ToolToggleList",
+          "kind": "component",
+          "summary": "Ferramentas do agente em grade (2 colunas; 1 em contêiner estreito): marca do app, nome, o que o agente faz com ela e um `Switch` por ferramenta, com o contador \"5 de 6 ligadas\".",
+          "props": [
+            {
+              "name": "onToggle",
+              "type": "(id: string, on: boolean) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "tools",
+              "type": "ToolToggleItem[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Ferramentas\"",
+              "description": "Nome acessível da lista."
+            },
+            {
+              "name": "showCount",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Mostra \"5 de 6 ligadas\" acima da grade."
+            }
+          ],
+          "examplePage": "ia-construtor-de-agentes"
         },
         {
           "name": "TriggerItem",
@@ -28411,7 +29098,14 @@
               "type": "string",
               "required": true,
               "default": null,
-              "description": null
+              "description": "Diff unificado, como sai do `git diff`."
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações extras no cabeçalho, antes de Copiar (\"Abrir arquivo\", \"Ver no editor\")."
             },
             {
               "name": "className",
@@ -28419,6 +29113,13 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "collapsed",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Só o cabeçalho (arquivo e saldo de linhas), sem o corpo: para um registro já revisado ou uma lista de arquivos."
             },
             {
               "name": "maxHeight",
@@ -28432,13 +29133,1989 @@
               "type": "string | undefined",
               "required": false,
               "default": null,
-              "description": null
+              "description": "Título no lugar do nome do arquivo."
             }
           ],
           "examplePage": "midia-codigo-e-diff"
         }
       ],
       "doc": "components/code.md"
+    },
+    {
+      "name": "lib-scale",
+      "file": "src/lib/scale.ts",
+      "summary": "Escalas de cor para dados de intensidade (mapa de calor, coorte, mapa por UF, pivô, horizon).",
+      "exports": [
+        {
+          "name": "divergingColor",
+          "kind": "function",
+          "summary": "Cor de uma posição `t` (-1 a 1) numa escala divergente: negativo em `chart-neg`, positivo em `chart-pos`, zero quase transparente.",
+          "signature": "divergingColor(t): string"
+        },
+        {
+          "name": "extent",
+          "kind": "function",
+          "summary": "Mínimo e máximo de uma lista ignorando null/NaN.",
+          "signature": "extent(values): [number, number]"
+        },
+        {
+          "name": "onScaleInk",
+          "kind": "function",
+          "summary": "Cor do texto sobre uma célula de intensidade `t`: tinta normal até o meio da escala, tinta invertida acima (legível nos dois temas).",
+          "signature": "onScaleInk(t): \"var(--color-on-ink)\" | \"var(--color-ink)\""
+        },
+        {
+          "name": "quantize",
+          "kind": "function",
+          "summary": "Divide um domínio em `steps` degraus de limites \"redondos\" (escala em degraus: mais fácil de ler e comparar do que contínua).",
+          "signature": "quantize(domain, steps?, { nice = true }?): Quantized"
+        },
+        {
+          "name": "Quantized",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ thresholds: number[]; bin: (v: number) => number; level: (v: number) => number; steps: number; domain: [number, number]; }"
+        },
+        {
+          "name": "scaleShade",
+          "kind": "function",
+          "summary": "Curva de opacidade: degraus baixos ficam distinguíveis do fundo e os altos não \"estouram\" (mesmo critério do HeatmapMatrix).",
+          "signature": "scaleShade(t): number"
+        },
+        {
+          "name": "ScaleTone",
+          "kind": "type",
+          "summary": null,
+          "definition": "\"ink\" | \"accent\" | \"ok\" | \"info\" | \"pos\" | \"neg\""
+        },
+        {
+          "name": "sequentialColor",
+          "kind": "function",
+          "summary": "Cor de uma intensidade `t` (0–1) numa escala de uma cor só.",
+          "signature": "sequentialColor(t, tone?): string"
+        }
+      ],
+      "doc": "components/lib-scale.md"
+    },
+    {
+      "name": "charts-kit",
+      "file": "src/components/charts-kit.tsx",
+      "summary": "Peças compartilhadas pelos gráficos analíticos (coorte, mapa por UF, horizon, dispersão conectada, sankey, cascata): · ScaleLegend: legenda de escala em degraus ou contínua, com hover que destaca a faixa no gráfico · Cha",
+      "exports": [
+        {
+          "name": "AxisBreak",
+          "kind": "component",
+          "summary": "Marca de quebra (duas barras inclinadas) para um eixo que não começa em zero.",
+          "props": [
+            {
+              "name": "x",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "width",
+              "type": "number | undefined",
+              "required": false,
+              "default": "14",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "ChartScrubber",
+          "kind": "component",
+          "summary": "Controle de tempo para gráficos: arraste, clique ou use as setas (Home/End vão ao início e ao fim).",
+          "props": [
+            {
+              "name": "count",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Quantidade de posições (meses, dias)."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível (\"Mês\")."
+            },
+            {
+              "name": "onChange",
+              "type": "(index: number) => void",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((index: number) => string) | undefined",
+              "required": false,
+              "default": "(i) => String(i + 1)",
+              "description": "Texto de cada posição (\"jun 2026\"): vai para aria-valuetext e para o rótulo."
+            },
+            {
+              "name": "interval",
+              "type": "number | undefined",
+              "required": false,
+              "default": "700",
+              "description": null
+            },
+            {
+              "name": "playable",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Mostra tocar/pausar: avança uma posição por `interval` ms (só com a aba visível)."
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "ChartScrubberProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ count: number; value: number; onChange: (index: number) => void; format?: (index: number) => string; label: string; playable?: boolean; interval?: number; className?: string; }"
+        },
+        {
+          "name": "LinkedHighlight",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ active: K | null; pinned: K | null; setPinned: (k: K | null) => void; setHover: (k: K | null) => void; isDimmed: (k: K) => boolean; bind: (k: K) => { onMouseEnter: () => void; onMouseLeave: () => void; onFocus: () => void; onBlur: () => void; onClick: () => void; onKeyDown: (e: KeyboardEvent) => void; \"data-active\": boolean | undefined; \"data-dimmed\": boolean | undefined; }; }"
+        },
+        {
+          "name": "ScaleLegend",
+          "kind": "component",
+          "summary": "Legenda de escala de intensidade.",
+          "props": [
+            {
+              "name": "thresholds",
+              "type": "number[]",
+              "required": true,
+              "default": null,
+              "description": "Limites inferiores de cada degrau (de `quantize(...).thresholds`)."
+            },
+            {
+              "name": "activeBin",
+              "type": "number | null | undefined",
+              "required": false,
+              "default": "null",
+              "description": "Degrau em destaque (vindo do gráfico)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n) => formatNumber(n)",
+              "description": null
+            },
+            {
+              "name": "max",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Fim do último degrau (de `quantize(...).domain[1]`)."
+            },
+            {
+              "name": "mode",
+              "type": "\"stepped\" | \"continuous\" | undefined",
+              "required": false,
+              "default": "\"stepped\"",
+              "description": null
+            },
+            {
+              "name": "onHoverBin",
+              "type": "((bin: number | null) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Hover/foco num degrau: o gráfico destaca as células daquela faixa."
+            },
+            {
+              "name": "scheme",
+              "type": "\"sequential\" | \"diverging\" | undefined",
+              "required": false,
+              "default": "\"sequential\"",
+              "description": "Escala de uma cor (`tone`) ou divergente (centrada em zero)."
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Título curto à esquerda (\"% retido\", \"Receita\")."
+            },
+            {
+              "name": "tone",
+              "type": "ScaleTone | undefined",
+              "required": false,
+              "default": "\"ink\"",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "ScaleLegendProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ thresholds: number[]; max?: number; mode?: \"stepped\" | \"continuous\"; scheme?: \"sequential\" | \"diverging\"; tone?: ScaleTone; format?: (n: number) => string; title?: ReactNode; activeBin?: number | null; onHoverBin?: (bin: number | null) => void; className?: string; }"
+        },
+        {
+          "name": "useLinkedHighlight",
+          "kind": "hook",
+          "summary": "Realce ligado entre várias vistas do mesmo dado (mapa + lista, sankey + painel, horizon + tabela).",
+          "signature": "useLinkedHighlight(props?): LinkedHighlight<K>"
+        }
+      ],
+      "doc": "components/charts-kit.md"
+    },
+    {
+      "name": "charts-analytics",
+      "file": "src/components/charts-analytics.tsx",
+      "summary": "Gráficos analíticos de série temporal: · ConnectedScatter: duas medidas ao longo do tempo (CAC × LTV, preço × volume).",
+      "exports": [
+        {
+          "name": "ConnectedScatter",
+          "kind": "component",
+          "summary": "Dispersão conectada: como duas medidas andaram juntas no tempo (CAC × LTV, preço × volume, custo × satisfação).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Descrição acessível do gráfico (obrigatória)."
+            },
+            {
+              "name": "series",
+              "type": "ConnectedScatterSeries[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "xLabel",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome da medida do eixo horizontal (\"CAC\")."
+            },
+            {
+              "name": "yLabel",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome da medida do eixo vertical (\"LTV em 12 meses\")."
+            },
+            {
+              "name": "active",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Série em destaque (key)."
+            },
+            {
+              "name": "arrows",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Setas discretas de direção no meio de cada trecho."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "compare",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Mostra as outras séries bem esmaecidas, para comparar."
+            },
+            {
+              "name": "curve",
+              "type": "\"linear\" | \"smooth\" | undefined",
+              "required": false,
+              "default": "\"smooth\"",
+              "description": "Caminho suave (padrão) ou em segmentos retos."
+            },
+            {
+              "name": "formatAxisX",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Formato dos rótulos dos eixos (compacto)."
+            },
+            {
+              "name": "formatAxisY",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "formatX",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n) => formatNumber(n)",
+              "description": null
+            },
+            {
+              "name": "formatY",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n) => formatNumber(n)",
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "340",
+              "description": null
+            },
+            {
+              "name": "index",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Posição da cabeça (índice do ponto)."
+            },
+            {
+              "name": "legend",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Legenda acima do gráfico."
+            },
+            {
+              "name": "onIndexChange",
+              "type": "((index: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "reference",
+              "type": "ConnectedScatterReference | undefined",
+              "required": false,
+              "default": null,
+              "description": "Linha de razão tracejada (y = ratio · x) com zona saudável opcional."
+            },
+            {
+              "name": "scrubber",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Controle de tempo embaixo (tocar/pausar)."
+            }
+          ],
+          "examplePage": "graficos-analise"
+        },
+        {
+          "name": "ConnectedScatterPoint",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ x: number; y: number; label: string; note?: string; }"
+        },
+        {
+          "name": "ConnectedScatterProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ series: ConnectedScatterSeries[]; active?: string; compare?: boolean; index?: number; onIndexChange?: (index: number) => void; xLabel: string; yLabel: string; formatX?: (n: number) => string; formatY?: (n: number) => string; formatAxisX?: (n: number) => string; formatAxisY?: (n: number) => string; reference?: ConnectedScatterReference; curve?: \"smooth\" | \"linear\"; arrows?: boolean; scrubber?:…"
+        },
+        {
+          "name": "ConnectedScatterReference",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ ratio: number; label: string; zone?: \"above\" | \"below\"; zoneLabel?: string; }"
+        },
+        {
+          "name": "ConnectedScatterSeries",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ key: string; label: string; points: ConnectedScatterPoint[]; color?: string; }"
+        },
+        {
+          "name": "HorizonChart",
+          "kind": "component",
+          "summary": "Horizon: muitas séries diárias (8–20) contra a própria base, cada uma numa linha baixa dobrada em faixas.",
+          "props": [
+            {
+              "name": "days",
+              "type": "string[]",
+              "required": true,
+              "default": null,
+              "description": "Rótulo de cada dia (mesmo comprimento de `values`): vai para o cabeçalho e o leitor de tela."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Descrição acessível do gráfico (obrigatória)."
+            },
+            {
+              "name": "series",
+              "type": "HorizonSeries[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "bands",
+              "type": "1 | 2 | 3 | 4 | undefined",
+              "required": false,
+              "default": "3",
+              "description": "Em quantas faixas cada linha dobra."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "extent",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Desvio máximo coberto (fração)."
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "horizonDelta",
+              "description": "Formato do desvio. Padrão: formatDelta sem casas (\"+12 %\"; perto de zero, \"0 %\")."
+            },
+            {
+              "name": "header",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Cabeçalho com o dia em foco."
+            },
+            {
+              "name": "index",
+              "type": "number | null | undefined",
+              "required": false,
+              "default": null,
+              "description": "Dia sob a cruz (índice) ou null."
+            },
+            {
+              "name": "legend",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Legenda das faixas (HorizonLegend)."
+            },
+            {
+              "name": "onIndexChange",
+              "type": "((index: number | null) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "rowHeight",
+              "type": "number | undefined",
+              "required": false,
+              "default": "32",
+              "description": "Altura de cada linha em px."
+            },
+            {
+              "name": "sort",
+              "type": "\"name\" | \"peak\" | \"latest\" | undefined",
+              "required": false,
+              "default": "\"name\"",
+              "description": "Ordem das linhas: nome, pico (maior desvio) ou último dia."
+            },
+            {
+              "name": "ticks",
+              "type": "{ index: number; label: string; }[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Marcas do eixo de tempo embaixo (ex.: o 1º de cada mês)."
+            }
+          ],
+          "examplePage": "graficos-analise"
+        },
+        {
+          "name": "HorizonChartProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ series: HorizonSeries[]; days: string[]; bands?: 1 | 2 | 3 | 4; extent?: number; sort?: \"name\" | \"peak\" | \"latest\"; rowHeight?: number; index?: number | null; onIndexChange?: (index: number | null) => void; format?: (n: number) => string; ticks?: { index: number; label: string }[]; header?: boolean; legend?: boolean; label: string; className?: string; }"
+        },
+        {
+          "name": "HorizonLegend",
+          "kind": "component",
+          "summary": "Legenda do horizon: faixas abaixo e acima da base e a frase de leitura.",
+          "props": [
+            {
+              "name": "bands",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Número de faixas (1–4)."
+            },
+            {
+              "name": "extent",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Desvio máximo coberto (fração: 0.36 = 36 %)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "horizonDelta",
+              "description": "Formato dos extremos."
+            }
+          ],
+          "examplePage": "graficos-analise"
+        },
+        {
+          "name": "HorizonLegendProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ bands: number; extent: number; format?: (n: number) => string; className?: string; }"
+        },
+        {
+          "name": "HorizonSeries",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ key: string; label: string; values: (number | null)[]; }"
+        }
+      ],
+      "doc": "components/charts-analytics.md"
+    },
+    {
+      "name": "lib-geo-br",
+      "file": "src/lib/geo-br.ts",
+      "summary": "Contornos das 27 unidades da federação, prontos para SVG.",
+      "exports": [
+        {
+          "name": "BrRegion",
+          "kind": "type",
+          "summary": "Grande região do IBGE.",
+          "definition": "\"Norte\" | \"Nordeste\" | \"Centro-Oeste\" | \"Sudeste\" | \"Sul\""
+        },
+        {
+          "name": "brRegions",
+          "kind": "const",
+          "summary": "Grandes regiões e suas UFs (IBGE)."
+        },
+        {
+          "name": "BrUf",
+          "kind": "type",
+          "summary": "Uma UF desenhável: contorno SVG, centróide (do maior polígono) e caixa.",
+          "definition": "{ id: BrUfId; name: string; region: BrRegion; path: string; centroid: readonly [number, number]; bbox: readonly [number, number, number, number]; }"
+        },
+        {
+          "name": "BrUfId",
+          "kind": "type",
+          "summary": "Sigla de uma UF.",
+          "definition": "\"AC\" | \"AL\" | \"AM\" | \"AP\" | \"BA\" | \"CE\" | \"DF\" | \"ES\" | \"GO\" | \"MA\" | \"MG\" | \"MS\" | \"MT\" | \"PA\" | \"PB\" | \"PE\" | \"PI\" | \"PR\" | \"RJ\" | \"RN\" | \"RO\" | \"RR\" | \"RS\" | \"SC\" | \"SE\" | \"SP\" | \"TO\""
+        },
+        {
+          "name": "brUfs",
+          "kind": "const",
+          "summary": "As 27 UFs em ordem alfabética do nome."
+        },
+        {
+          "name": "brViewBox",
+          "kind": "const",
+          "summary": "viewBox do mapa do Brasil (use com `brUfs`)."
+        }
+      ],
+      "doc": "components/lib-geo-br.md"
+    },
+    {
+      "name": "geo",
+      "file": "src/components/geo.tsx",
+      "summary": "Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me",
+      "exports": [
+        {
+          "name": "ChoroplethMap",
+          "kind": "component",
+          "summary": "Mapa coroplético (padrão: Brasil por UF).",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível do mapa (\"Receita por estado em outubro de 2026\")."
+            },
+            {
+              "name": "values",
+              "type": "MapValues",
+              "required": true,
+              "default": null,
+              "description": "Valor por id de região."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n) => formatNumber(n)",
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Altura em px. Padrão: proporção do viewBox, até `maxHeight`."
+            },
+            {
+              "name": "highlight",
+              "type": "LinkedHighlight<string> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Realce compartilhado com outra vista (`useLinkedHighlight`): substitui `selected`/`onSelect`."
+            },
+            {
+              "name": "legend",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Legenda em degraus abaixo do mapa (passar o mouse destaca a faixa)."
+            },
+            {
+              "name": "legendFormat",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Formato curto dos limites da legenda (padrão: `format`)."
+            },
+            {
+              "name": "legendTitle",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "maxHeight",
+              "type": "number | undefined",
+              "required": false,
+              "default": "640",
+              "description": "Teto da altura automática (recortes altos, como o Nordeste)."
+            },
+            {
+              "name": "onSelect",
+              "type": "((id: string | null) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Clique ou Enter numa região (de novo na mesma solta: `null`)."
+            },
+            {
+              "name": "onZoomOut",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Ação do botão de voltar que aparece com zoom."
+            },
+            {
+              "name": "regionLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"UF\"",
+              "description": "Cabeçalho da coluna de regiões na tabela de leitor de tela."
+            },
+            {
+              "name": "regions",
+              "type": "readonly MapRegion[] | undefined",
+              "required": false,
+              "default": "brUfs",
+              "description": "Regiões desenháveis. Padrão: as 27 UFs (`brUfs`)."
+            },
+            {
+              "name": "scale",
+              "type": "ChoroplethScaleOptions | undefined",
+              "required": false,
+              "default": null,
+              "description": "Escala em degraus (sequencial ou divergente)."
+            },
+            {
+              "name": "selected",
+              "type": "string | null | undefined",
+              "required": false,
+              "default": null,
+              "description": "Região selecionada (controlado)."
+            },
+            {
+              "name": "showLabels",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Sigla sobre as regiões que cabem (padrão: sim)."
+            },
+            {
+              "name": "valueLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Valor\"",
+              "description": "Nome do número no tooltip e na tabela (\"Receita\")."
+            },
+            {
+              "name": "viewBox",
+              "type": "string | undefined",
+              "required": false,
+              "default": "brViewBox",
+              "description": "viewBox das regiões. Padrão: `brViewBox`."
+            },
+            {
+              "name": "zoomOutLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Voltar ao Brasil\"",
+              "description": null
+            },
+            {
+              "name": "zoomTo",
+              "type": "string | null | undefined",
+              "required": false,
+              "default": "null",
+              "description": "Aproxima o mapa da região (anima o viewBox)."
+            }
+          ],
+          "examplePage": "graficos-mapa"
+        },
+        {
+          "name": "ChoroplethMapProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ label: string; values: MapValues; regions?: readonly MapRegion[]; viewBox?: string; scale?: ChoroplethScaleOptions; format?: (n: number) => string; valueLabel?: string; regionLabel?: string; selected?: string | null; onSelect?: (id: string | null) => void; highlight?: LinkedHighlight<string>; zoomTo?: string | null; onZoomOut?: () => void; zoomOutLabel?: string; legend?: boolean; legendTitle?…"
+        },
+        {
+          "name": "choroplethScale",
+          "kind": "function",
+          "summary": "Escala em degraus de um mapa coroplético.",
+          "signature": "choroplethScale(values, props?): ChoroplethScale"
+        },
+        {
+          "name": "ChoroplethScale",
+          "kind": "type",
+          "summary": "Escala pronta: degraus, cor de cada valor e dados para a legenda.",
+          "definition": "{ scheme: \"sequential\" | \"diverging\"; tone: ScaleTone; thresholds: number[]; max: number; bin: (v: number) => number; color: (v: number | null | undefined) => string | null; level: (v: number) => number; }"
+        },
+        {
+          "name": "ChoroplethScaleOptions",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ steps?: number; domain?: [number, number]; scheme?: \"sequential\" | \"diverging\"; tone?: ScaleTone; breaks?: \"equal\" | \"quantile\"; }"
+        },
+        {
+          "name": "fitViewBox",
+          "kind": "function",
+          "summary": "viewBox que enquadra um conjunto de regiões (recorte por grande região, só os estados com dado).",
+          "signature": "fitViewBox(regions, pad?): string"
+        },
+        {
+          "name": "MapRegion",
+          "kind": "type",
+          "summary": "Uma região desenhável: contorno SVG no sistema do `viewBox`.",
+          "definition": "{ id: string; name: string; path: string; centroid?: readonly [number, number]; bbox?: readonly [number, number, number, number]; }"
+        },
+        {
+          "name": "MapValues",
+          "kind": "type",
+          "summary": "Valores por id de região; `null` = sem dado (hachura).",
+          "definition": "Record<string, number | null | undefined>"
+        },
+        {
+          "name": "RankedRegionList",
+          "kind": "component",
+          "summary": "Lista ordenada (posição, nome, barra proporcional, valor) que acompanha um `ChoroplethMap`: passar o mouse ou focar uma linha acende a região no mapa e vice-versa; clique ou Enter seleciona.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível da lista (\"Receita por estado, do maior ao menor\")."
+            },
+            {
+              "name": "values",
+              "type": "MapValues",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "(n) => formatNumber(n)",
+              "description": null
+            },
+            {
+              "name": "highlight",
+              "type": "LinkedHighlight<string> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Realce compartilhado com o mapa (`useLinkedHighlight`)."
+            },
+            {
+              "name": "hint",
+              "type": "((id: string) => ReactNode) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Detalhe curto à direita do nome (\"128 clientes\")."
+            },
+            {
+              "name": "limit",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Mostra as primeiras N e um botão \"Ver todas\"."
+            },
+            {
+              "name": "regions",
+              "type": "readonly MapRegion[] | undefined",
+              "required": false,
+              "default": "brUfs",
+              "description": "Regiões (para os nomes)."
+            },
+            {
+              "name": "scale",
+              "type": "ChoroplethScaleOptions | undefined",
+              "required": false,
+              "default": null,
+              "description": "Mesma escala do mapa (o quadradinho de cor bate com a região)."
+            }
+          ],
+          "examplePage": "graficos-mapa"
+        },
+        {
+          "name": "RankedRegionListProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ label: string; values: MapValues; regions?: readonly MapRegion[]; scale?: ChoroplethScaleOptions; format?: (n: number) => string; highlight?: LinkedHighlight<string>; limit?: number; hint?: (id: string) => ReactNode; className?: string; }"
+        }
+      ],
+      "doc": "components/geo.md"
+    },
+    {
+      "name": "lib-pivot",
+      "file": "src/lib/pivot.ts",
+      "summary": "Motor da tabela dinâmica (pivô).",
+      "exports": [
+        {
+          "name": "emptyPivotLayout",
+          "kind": "const",
+          "summary": "Layout vazio."
+        },
+        {
+          "name": "formatPivotValue",
+          "kind": "function",
+          "summary": "Formata um valor do pivô conforme o campo e a agregação.",
+          "signature": "formatPivotValue(n, spec, options?): string"
+        },
+        {
+          "name": "pivot",
+          "kind": "function",
+          "summary": "Calcula o pivô. Campos desconhecidos no layout são ignorados; medidas em Linhas/Colunas também.",
+          "signature": "pivot(records, fields, layout): PivotResult"
+        },
+        {
+          "name": "PIVOT_BLANK",
+          "kind": "const",
+          "summary": "Rótulo de registros sem valor na dimensão."
+        },
+        {
+          "name": "PIVOT_TOTAL",
+          "kind": "const",
+          "summary": "Chave do total (linha \"Total geral\" e coluna \"Total\")."
+        },
+        {
+          "name": "PivotAgg",
+          "kind": "type",
+          "summary": "Agregação de um valor do pivô.",
+          "definition": "\"sum\" | \"avg\" | \"count\" | \"min\" | \"max\" | \"distinct\""
+        },
+        {
+          "name": "pivotAggLabel",
+          "kind": "const",
+          "summary": "Rótulo pt-BR de cada agregação."
+        },
+        {
+          "name": "pivotAggsFor",
+          "kind": "function",
+          "summary": "Agregações oferecidas para um campo (as declaradas ou as padrão do tipo).",
+          "signature": "pivotAggsFor(field): PivotAgg[]"
+        },
+        {
+          "name": "PivotArea",
+          "kind": "type",
+          "summary": "Áreas do construtor.",
+          "definition": "\"rows\" | \"columns\" | \"values\" | \"filters\""
+        },
+        {
+          "name": "pivotCanDrop",
+          "kind": "function",
+          "summary": "O campo pode ir para a área?",
+          "signature": "pivotCanDrop(field, area): boolean"
+        },
+        {
+          "name": "PivotCells",
+          "kind": "type",
+          "summary": null,
+          "definition": "Record<string, Record<string, (number | null)[]>>"
+        },
+        {
+          "name": "PivotColumn",
+          "kind": "type",
+          "summary": "Combinação de colunas (folha do cabeçalho).",
+          "definition": "{ key: string; path: string[] }"
+        },
+        {
+          "name": "PivotField",
+          "kind": "type",
+          "summary": "Campo disponível para o pivô: dimensão (agrupa) ou medida (soma, média…).",
+          "definition": "{ id: string; label: string; kind: \"dimension\" | \"measure\"; format?: \"currency\" | \"number\" | \"percent\"; aggs?: PivotAgg[]; values?: string[]; }"
+        },
+        {
+          "name": "PivotFilterSpec",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ field: string; include?: string[]; }"
+        },
+        {
+          "name": "PivotHeaderCell",
+          "kind": "type",
+          "summary": "Célula de cabeçalho de coluna num nível, já com a extensão (em combinações).",
+          "definition": "{ label: string; span: number; key: string }"
+        },
+        {
+          "name": "PivotLayout",
+          "kind": "type",
+          "summary": "Configuração do pivô: dimensões em Linhas e Colunas, medidas em Valores, recortes em Filtros.",
+          "definition": "{ rows: string[]; columns: string[]; values: PivotValueSpec[]; filters: PivotFilterSpec[]; }"
+        },
+        {
+          "name": "pivotMove",
+          "kind": "function",
+          "summary": "Move um campo entre áreas (ou para fora, `to.area = null`).",
+          "signature": "pivotMove(layout, fields, from, to): PivotLayout"
+        },
+        {
+          "name": "PivotMoveSource",
+          "kind": "type",
+          "summary": "Origem de uma movimentação: área + posição (ou a lista de campos, `area: null`).",
+          "definition": "{ area: PivotArea | null; index?: number; field: string }"
+        },
+        {
+          "name": "PivotRecord",
+          "kind": "type",
+          "summary": null,
+          "definition": "Record<string, unknown>"
+        },
+        {
+          "name": "PivotResolvedValue",
+          "kind": "type",
+          "summary": "Valor com campo e rótulo resolvidos (\"Receita (Soma)\").",
+          "definition": "PivotValueSpec & { label: string; fieldLabel: string; aggLabel: string; format?: PivotField[\"format\"] }"
+        },
+        {
+          "name": "PivotResult",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ layout: PivotLayout; rowFields: PivotField[]; columnFields: PivotField[]; values: PivotResolvedValue[]; rows: PivotRowNode[]; columns: PivotColumn[]; columnHeaders: PivotHeaderCell[][]; value: PivotCells; grandTotal: (number | null)[]; recordCount: number; totalRecords: number; }"
+        },
+        {
+          "name": "PivotRowNode",
+          "kind": "type",
+          "summary": "Nó da árvore de linhas: grupo (com filhos e subtotal) ou folha.",
+          "definition": "{ key: string; path: string[]; label: string; field: string; depth: number; children: PivotRowNode[]; count: number; }"
+        },
+        {
+          "name": "pivotSwap",
+          "kind": "function",
+          "summary": "Troca Linhas e Colunas.",
+          "signature": "pivotSwap(layout): PivotLayout"
+        },
+        {
+          "name": "pivotToRows",
+          "kind": "function",
+          "summary": "Achata o resultado numa tabela (CSV, cópia): cabeçalho + uma linha por nó (grupos com subtotal, folhas) + \"Total geral\".",
+          "signature": "pivotToRows(result): { header: string[]; rows: (string | number | null)[][]; }"
+        },
+        {
+          "name": "pivotValues",
+          "kind": "function",
+          "summary": "Valores distintos de uma dimensão nos registros, na ordem de exibição (para o filtro).",
+          "signature": "pivotValues(records, field): string[]"
+        },
+        {
+          "name": "PivotValueSpec",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ field: string; agg: PivotAgg }"
+        }
+      ],
+      "doc": "components/lib-pivot.md"
+    },
+    {
+      "name": "pivot",
+      "file": "src/components/pivot.tsx",
+      "summary": "Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento opciona",
+      "exports": [
+        {
+          "name": "PivotBuilder",
+          "kind": "component",
+          "summary": "Construtor de tabela dinâmica: escolha o que agrupar (Linhas, Colunas), o que calcular (Valores, com Soma/Média/Contagem/Mín./Máx./Distintos) e o recorte (Filtros).",
+          "props": [
+            {
+              "name": "fields",
+              "type": "PivotBuilderField[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "records",
+              "type": "PivotRecord[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "compact",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": null
+            },
+            {
+              "name": "defaultLayout",
+              "type": "PivotLayout | undefined",
+              "required": false,
+              "default": null,
+              "description": "Layout inicial quando não controlado."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "fileName",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"tabela-dinamica\"",
+              "description": "Nome do arquivo de \"Exportar CSV\" (sem extensão)."
+            },
+            {
+              "name": "heat",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Sombreamento por intensidade nas células de detalhe."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome acessível da tabela."
+            },
+            {
+              "name": "layout",
+              "type": "PivotLayout | undefined",
+              "required": false,
+              "default": null,
+              "description": "Layout controlado (use com `onLayoutChange`)."
+            },
+            {
+              "name": "maxHeight",
+              "type": "string | number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Altura máxima da tabela."
+            },
+            {
+              "name": "onLayoutChange",
+              "type": "((layout: PivotLayout) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Título do card (\"Vendas por região\")."
+            },
+            {
+              "name": "toolbar",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Controles extras à esquerda das ações (visões salvas, período)."
+            }
+          ],
+          "examplePage": "colecoes-tabela-dinamica"
+        },
+        {
+          "name": "PivotBuilderField",
+          "kind": "type",
+          "summary": "Campo do construtor: o do motor + ícone lucide opcional no chip.",
+          "definition": "PivotField & { icon?: ReactNode }"
+        },
+        {
+          "name": "PivotBuilderProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ records: PivotRecord[]; fields: PivotBuilderField[]; layout?: PivotLayout; defaultLayout?: PivotLayout; onLayoutChange?: (layout: PivotLayout) => void; title?: ReactNode; description?: ReactNode; label?: string; fileName?: string; heat?: boolean; compact?: boolean; maxHeight?: number | string; toolbar?: ReactNode; className?: string; }"
+        },
+        {
+          "name": "PivotTable",
+          "kind": "component",
+          "summary": "Tabela dinâmica: grupos de linha recolhíveis (chevron, ←/→), subtotais em faixa, total geral em negrito, números à direita.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível da tabela (\"Receita por região e trimestre\")."
+            },
+            {
+              "name": "result",
+              "type": "PivotResult",
+              "required": true,
+              "default": null,
+              "description": "Resultado de `pivot(records, fields, layout)`."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "compact",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Moeda e contagens abreviadas (\"R$ 1,2 mi\")."
+            },
+            {
+              "name": "defaultCollapsed",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Grupos que começam recolhidos (chaves de `PivotRowNode.key`)."
+            },
+            {
+              "name": "empty",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Conteúdo quando não há valores ou registros (padrão: Empty genérico)."
+            },
+            {
+              "name": "heat",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Sombreia as células de detalhe pela intensidade, uma escala por valor."
+            },
+            {
+              "name": "maxHeight",
+              "type": "string | number | undefined",
+              "required": false,
+              "default": "520",
+              "description": "Altura máxima do contêiner (rola dentro dele, nunca a página)."
+            }
+          ],
+          "examplePage": "colecoes-tabela-dinamica"
+        },
+        {
+          "name": "PivotTableProps",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ result: PivotResult; label: string; heat?: boolean; maxHeight?: number | string; compact?: boolean; defaultCollapsed?: string[]; empty?: ReactNode; className?: string; }"
+        }
+      ],
+      "doc": "components/pivot.md"
+    },
+    {
+      "name": "agent-run",
+      "file": "src/components/agent-run.tsx",
+      "summary": "------------------------------------------------------------------",
+      "exports": [
+        {
+          "name": "AgentRunCard",
+          "kind": "component",
+          "summary": "Um cartão que acompanha uma execução de agente do começo ao fim: tarefa, agente e modelo, status (ponto + palavra) e cronômetro; passos que chegam um a um (o atual brilha); portão de aprovação com o diff quando o agente",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "A tarefa, como a pessoa pediu (\"Adicionar limite de requisições na API pública\")."
+            },
+            {
+              "name": "agent",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do agente."
+            },
+            {
+              "name": "autoPlay",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "No modo demonstração, anda sozinho."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "model",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Modelo usado (nome do catálogo do app)."
+            },
+            {
+              "name": "onApprove",
+              "type": "((change: RunChange) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpenResult",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Abre o resultado (pull request, lançamentos)."
+            },
+            {
+              "name": "onReject",
+              "type": "((change: RunChange, reason: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRestart",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Executar de novo. No modo demonstração recomeça o roteiro mesmo sem este callback."
+            },
+            {
+              "name": "run",
+              "type": "AgentRunState | undefined",
+              "required": false,
+              "default": null,
+              "description": "Estado controlado: status, tempo, passos, aprovação pendente e resultado."
+            },
+            {
+              "name": "script",
+              "type": "AgentRunScript | undefined",
+              "required": false,
+              "default": null,
+              "description": "Modo demonstração: roteiro simulado quando `run` não vem."
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "AgentRunScript",
+          "kind": "type",
+          "summary": "Roteiro do modo demonstração: passos, onde o portão de aprovação para a execução e o resultado.",
+          "definition": "{ steps: RunStep[]; approvalAt?: number; approval?: RunChange; result: RunOutcome; }"
+        },
+        {
+          "name": "AgentRunState",
+          "kind": "type",
+          "summary": "Estado controlado do AgentRunCard.",
+          "definition": "{ status: AgentRunStatus; elapsedMs: number; steps: RunStep[]; approval?: RunChange; result?: RunOutcome; error?: ReactNode; }"
+        },
+        {
+          "name": "AgentRunStatus",
+          "kind": "type",
+          "summary": "Situação da execução inteira.",
+          "definition": "\"running\" | \"waiting\" | \"done\" | \"failed\""
+        },
+        {
+          "name": "DiffApproval",
+          "kind": "component",
+          "summary": "Portão de aprovação de uma mudança proposta pelo agente: resumo, diff com uma aba por arquivo (com +/−), \"Aprovar e aplicar\" e \"Devolver com comentário\" (abre o campo do motivo).",
+          "props": [
+            {
+              "name": "change",
+              "type": "RunChange",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "autoFocus",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Leva o foco ao portão quando ele aparece."
+            },
+            {
+              "name": "busy",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Aplicando: os botões ficam ocupados."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onApprove",
+              "type": "((change: RunChange) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onReject",
+              "type": "((change: RunChange, reason: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Devolve ao agente com o comentário (obrigatório)."
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "RunChange",
+          "kind": "type",
+          "summary": "A mudança que o agente quer aplicar e que espera aprovação.",
+          "definition": "{ id: string; title: string; summary?: ReactNode; files: RunChangeFile[] }"
+        },
+        {
+          "name": "RunChangeFile",
+          "kind": "type",
+          "summary": "Um arquivo da mudança proposta, como diff unificado.",
+          "definition": "{ path: string; diff: string }"
+        },
+        {
+          "name": "RunCheck",
+          "kind": "type",
+          "summary": "Uma verificação ao fim da execução (testes, lint, conferência de saldo).",
+          "definition": "{ label: string; status: \"passed\" | \"failed\"; detail?: string }"
+        },
+        {
+          "name": "RunOutcome",
+          "kind": "type",
+          "summary": "O que a execução entregou.",
+          "definition": "{ summary?: ReactNode; files?: { path: string; added: number; removed: number }[]; checks?: RunCheck[]; openLabel?: string; openIcon?: ReactNode; }"
+        },
+        {
+          "name": "RunResult",
+          "kind": "component",
+          "summary": "Fim de uma execução: arquivos alterados com +/−, verificações que passaram, abrir o resultado e executar de novo.",
+          "props": [
+            {
+              "name": "result",
+              "type": "RunOutcome",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpen",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRestart",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "RunStep",
+          "kind": "type",
+          "summary": "Um passo da execução: texto curto no particípio (\"Leu src/api/rotas.ts\"), duração e, se for ferramenta, entrada e saída.",
+          "definition": "{ id: string; kind: RunStepKind; label: string; status?: RunStepStatus; durationMs?: number; tool?: { name: string; input?: unknown; output?: unknown; error?: string }; detail?: ReactNode; }"
+        },
+        {
+          "name": "RunStepKind",
+          "kind": "type",
+          "summary": "O que o agente fez naquele passo.",
+          "definition": "\"plan\" | \"read\" | \"search\" | \"edit\" | \"test\" | \"tool\""
+        },
+        {
+          "name": "RunStepList",
+          "kind": "component",
+          "summary": "Passos de uma execução de agente, um por linha: ícone do tipo (planejar, ler, buscar, editar, testar, ferramenta), texto, duração e check.",
+          "props": [
+            {
+              "name": "steps",
+              "type": "RunStep[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Passos da execução\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "RunStepStatus",
+          "kind": "type",
+          "summary": "Situação de um passo.",
+          "definition": "\"pending\" | \"running\" | \"done\" | \"error\""
+        }
+      ],
+      "doc": "components/agent-run.md"
+    },
+    {
+      "name": "agent-evals",
+      "file": "src/components/agent-evals.tsx",
+      "summary": "------------------------------------------------------------------",
+      "exports": [
+        {
+          "name": "EvalCase",
+          "kind": "type",
+          "summary": "Um caso de teste da suíte.",
+          "definition": "{ id: string; title: string; status: EvalCaseStatus }"
+        },
+        {
+          "name": "EvalCaseCompare",
+          "kind": "component",
+          "summary": "Um caso da avaliação aberto lado a lado: a entrada, o que a versão-base e a candidata responderam, a rubrica do juiz (✓/× por critério nas duas) e a nota.",
+          "props": [
+            {
+              "name": "evalCase",
+              "type": "EvalCaseDetail",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onAccept",
+              "type": "((evalCase: EvalCaseDetail) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"Aceitar mudança\": a saída da candidata vira a referência do caso."
+            },
+            {
+              "name": "onClose",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpenIssue",
+              "type": "((evalCase: EvalCaseDetail) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "EvalCaseDetail",
+          "kind": "type",
+          "summary": "Um caso aberto para comparar: entrada, saída da base e da candidata, rubrica do juiz.",
+          "definition": "{ id: string; title: string; category?: string; status: EvalCaseStatus; input: ReactNode; baseline: EvalSide; candidate: EvalSide; criteria: { label: string; baseline: boolean; candidate: boolean }[]; judge?: { name: string; note?: ReactNode }; }"
+        },
+        {
+          "name": "EvalCaseStatus",
+          "kind": "type",
+          "summary": "Resultado de um caso na versão candidata.",
+          "definition": "\"pass\" | \"fail\" | \"error\" | \"regression\" | \"improved\" | \"pending\""
+        },
+        {
+          "name": "EvalCategory",
+          "kind": "type",
+          "summary": "Uma categoria da suíte (Reembolso, Frete, Tom…) com os seus casos e o score da versão-base (fração).",
+          "definition": "{ id: string; label: string; cases: EvalCase[]; baseline?: number }"
+        },
+        {
+          "name": "EvalDotGrid",
+          "kind": "component",
+          "summary": "Resultado de uma suíte de avaliação caso a caso: por categoria, o score com a marca da versão-base e uma grade de pontos (um por caso) que se preenche conforme os resultados chegam.",
+          "props": [
+            {
+              "name": "categories",
+              "type": "EvalCategory[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "baselineLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"base\"",
+              "description": "Nome da versão-base na legenda e na marca da barra (\"v11\")."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "filter",
+              "type": "EvalFilter | undefined",
+              "required": false,
+              "default": null,
+              "description": "Recorte controlado. Sem ele, a grade guarda o próprio."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Resultados por caso\"",
+              "description": "Nome acessível da grade."
+            },
+            {
+              "name": "onFilterChange",
+              "type": "((filter: EvalFilter) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onOpenCase",
+              "type": "((evalCase: EvalCase, category: EvalCategory) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "selectedId",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Caso aberto (destacado na grade)."
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "EvalFilter",
+          "kind": "type",
+          "summary": "Recorte da grade: todos, só falhas (falhou, erro, regressão), só regressões ou só melhorias.",
+          "definition": "\"all\" | \"failed\" | \"regressions\" | \"improved\""
+        },
+        {
+          "name": "EvalRunHeader",
+          "kind": "component",
+          "summary": "Cabeçalho de uma execução de suíte: candidata × base, juiz, score atual contra o da base, as últimas execuções numa linha, custo e tempo estimados e a ação de rodar (passe um `OperationButton`).",
+          "props": [
+            {
+              "name": "baseline",
+              "type": "EvalVersion",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "baselineScore",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "candidate",
+              "type": "EvalVersion",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "caseCount",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "score",
+              "type": "number | null",
+              "required": true,
+              "default": null,
+              "description": "Score da candidata (fração) ou `null` se ainda não rodou."
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome da suíte ou do agente avaliado."
+            },
+            {
+              "name": "action",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ação de rodar (`OperationButton`)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "cost",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Custo estimado da execução, em reais."
+            },
+            {
+              "name": "durationMs",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Tempo estimado da execução."
+            },
+            {
+              "name": "history",
+              "type": "{ label: string; score: number; }[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": "Últimas execuções, da mais antiga à mais recente (fração)."
+            },
+            {
+              "name": "judge",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Modelo ou pessoa que julga as respostas."
+            },
+            {
+              "name": "progress",
+              "type": "{ done: number; total: number; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Casos já rodados nesta execução."
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
+        },
+        {
+          "name": "EvalSide",
+          "kind": "type",
+          "summary": "Saída de uma versão num caso: rótulo (\"Base · v11\"), texto e nota do juiz (fração).",
+          "definition": "{ label: string; output: ReactNode; score: number }"
+        },
+        {
+          "name": "EvalStatusMark",
+          "kind": "component",
+          "summary": "Marca de um estado, para legenda e cabeçalhos (mesma forma do ponto da grade).",
+          "props": [
+            {
+              "name": "status",
+              "type": "EvalCaseStatus",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | undefined",
+              "required": false,
+              "default": "\"md\"",
+              "description": null
+            }
+          ],
+          "examplePage": null
+        },
+        {
+          "name": "EvalVersion",
+          "kind": "type",
+          "summary": "Uma versão avaliada: rótulo (\"v12\") e modelo.",
+          "definition": "{ label: string; model?: string }"
+        }
+      ],
+      "doc": "components/agent-evals.md"
+    },
+    {
+      "name": "illustration",
+      "file": "src/components/illustration.tsx",
+      "summary": "Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).",
+      "exports": [
+        {
+          "name": "IllustrationFrame",
+          "kind": "type",
+          "summary": "Quadro da ilustração: `label` vira o nome acessível (`role=\"img\"`).",
+          "definition": "{ label: string; paths: IllustrationPath[] }"
+        },
+        {
+          "name": "IllustrationPath",
+          "kind": "type",
+          "summary": "Traço de uma cena. Texto = caminho SVG em traço; objeto para dar um preenchimento suave (`soft`, gelo translúcido) ou destacar o traço na cor de destaque (`accent`).",
+          "definition": "string | { d: string; tone?: \"soft\" | \"accent\" }"
+        },
+        {
+          "name": "IntroCard",
+          "kind": "component",
+          "summary": "Cartão compacto de primeira execução: ilustração em traço no topo (gelo), \"Etapa 1 de 4\", título, texto, pontos de etapa, Voltar/Avançar (o último vira \"Começar\") e \"Pular\".",
+          "props": [
+            {
+              "name": "steps",
+              "type": "IntroStep[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "autoFocus",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Foca o cartão ao montar (←/→ funcionam de imediato)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "defaultIndex",
+              "type": "number | undefined",
+              "required": false,
+              "default": "0",
+              "description": null
+            },
+            {
+              "name": "finishLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Começar\"",
+              "description": null
+            },
+            {
+              "name": "illustration",
+              "type": "((index: number) => ReactNode) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Troca a ilustração padrão (`MorphIllustration` com o `frame` de cada etapa, ou `onboardingScenes`)."
+            },
+            {
+              "name": "index",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onFinish",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Último passo: \"Começar\"."
+            },
+            {
+              "name": "onIndexChange",
+              "type": "((index: number) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onSkip",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"Pular\" no canto da ilustração; sem ele, o botão some."
+            },
+            {
+              "name": "skipLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Pular\"",
+              "description": null
+            }
+          ],
+          "examplePage": "onboarding-ilustrado"
+        },
+        {
+          "name": "IntroStep",
+          "kind": "type",
+          "summary": "Etapa do `IntroCard`: título, texto e, opcionalmente, o quadro da ilustração.",
+          "definition": "{ title: string; description: ReactNode; frame?: IllustrationFrame }"
+        },
+        {
+          "name": "MorphIllustration",
+          "kind": "component",
+          "summary": "Ilustração em traço que transiciona entre quadros quando `index` muda: troca cruzada com leve deslocamento e escala, elemento a elemento; quando todos os quadros têm caminhos de mesma estrutura, os traços se transformam",
+          "props": [
+            {
+              "name": "frames",
+              "type": "IllustrationFrame[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "index",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Quadro visível (0…frames.length-1)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "strokeWidth",
+              "type": "number | undefined",
+              "required": false,
+              "default": "2",
+              "description": "Espessura do traço em unidades do viewBox (200 × 140)."
+            },
+            {
+              "name": "style",
+              "type": "CSSProperties | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "onboarding-ilustrado"
+        },
+        {
+          "name": "onboardingScenes",
+          "kind": "const",
+          "summary": "Quatro cenas de primeira execução, em traço: pasta (criar espaço), arquivos, equipe e selo de conquista."
+        }
+      ],
+      "doc": "components/illustration.md"
     }
   ],
   "blocks": [
@@ -28446,20 +31123,22 @@
       "slug": "ai-agent-builder",
       "file": "src/blocks/ai-agent-builder.tsx",
       "title": "Construtor de agentes",
-      "description": "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, propriedades (ferramentas, entrada, saída, verificações), instruções em editor rico com “Melhorar”, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).",
+      "description": "Conversa com o agente à esquerda e a ficha dele à direita: gatilhos, modelo e propriedades, ferramentas ligadas por app, arquivos de conhecimento com envio, instruções em editor rico com “Melhorar” e limite, testar e publicar. Abre qualquer agente da frota (?id=), uma cópia (?de=), um modelo (?modelo=) ou um pedido (?pedido=).",
       "category": "IA",
       "concept": {
         "goal": "Definir o que um agente faz sem sair da conversa com ele: quem configura automações monta gatilhos, ferramentas e instruções e testa na hora.",
         "patterns": [
           "Anatomia G · App de altura total: conversa à esquerda, ficha à direita (ResizableSplit)",
-          "Ficha em seções: Gatilhos → Propriedades → Instruções, cada uma com '+ Adicionar'",
+          "Ficha em seções: Gatilhos → Propriedades → Ferramentas → Conhecimento → Instruções",
+          "Ferramentas em grade com Switch por app (ToolToggleList, '5 de 6 ligadas'); conhecimento com envio, cancelar e tentar de novo (KnowledgeFiles)",
+          "Modelo do agente no ModelPicker; instruções com limite e contador (maxLength)",
           "Uma ação primária no topo: Publicar (estado rascunho/publicado/alterado)",
           "Testar roda dentro da conversa com RunSummary, sem trocar de tela",
           "Instruções em editor rico com 'Melhorar com IA'"
         ],
         "adapt": [
           "Construtor de automações, regras de CRM, playbooks de atendimento: troque os tipos de gatilho e propriedade",
-          "No celular, alterne Ficha/Conversa em vez de dividir a tela"
+          "No celular, o alternador Configurar / Testar troca a ficha pela conversa em vez de dividir a tela"
         ],
         "avoid": [
           "Publicar sem estado visível (rascunho × publicado)",
@@ -28477,15 +31156,23 @@
         "BuilderSection",
         "Button",
         "ChipPicker",
+        "KnowledgeFile",
+        "KnowledgeFiles",
+        "KnowledgeUpload",
         "MenuEntry",
         "Modal",
+        "ModelEffort",
+        "ModelOption",
+        "ModelPicker",
         "PropertyRow",
         "PublishBar",
         "ResizableSplit",
         "RunStatus",
         "RunSummary",
+        "SegmentedControl",
         "TextField",
         "ToolGlyph",
+        "ToolToggleList",
         "TriggerList",
         "notify"
       ]
@@ -28531,12 +31218,14 @@
       "slug": "ai-agent-evals",
       "file": "src/blocks/ai-agent-evals.tsx",
       "title": "Avaliações de agentes",
-      "description": "Suítes de teste de cada agente: casos, score contra o mínimo para publicar, score por versão em gráfico, regressões, rodar avaliação (uma suíte ou todas) e casos que falharam com link para a execução. Cinco estados (?estado=).",
+      "description": "Suítes de teste de cada agente: última execução caso a caso (grade de pontos por categoria com regressões e melhorias, filtros e comparação base × candidata com a rubrica do juiz), score contra o mínimo para publicar, score por versão em gráfico, rodar avaliação (uma suíte ou todas) e casos que falharam com link para a execução. Cinco estados (?estado=).",
       "category": "IA",
       "concept": {
         "goal": "Saber se uma versão nova do agente ficou melhor ou pior antes de ela atender clientes, e achar o caso que quebrou.",
         "patterns": [
           "Anatomia A · Lista: cabeçalho fixo + PageToolbar com filtros; gráfico do agente escolhido acima da tabela",
+          "Última execução: EvalRunHeader (candidata × base, juiz, score contra a base, últimas 8 execuções, custo e tempo) + EvalDotGrid (um ponto por caso, forma além da cor, setas percorrem) + EvalCaseCompare (entrada, base × candidata, rubrica com ✓/×)",
+          "Rodar a suíte transmite caso a caso (só com a aba visível); movimento reduzido mostra o resultado de uma vez",
           "Score por versão em LineChart com linha de referência no mínimo para publicar",
           "Suíte abaixo do mínimo = palavra + cor na linha (regressão)",
           "Rodar avaliação com useOperation: o botão diz o que está fazendo",
@@ -28548,7 +31237,8 @@
         ],
         "avoid": [
           "Score sem o mínimo ao lado (ninguém sabe se 87 % é bom)",
-          "Falha sem link para o caso e a execução"
+          "Falha sem link para o caso e a execução",
+          "Resultado só por cor (regressão e falha precisam de forma e palavra)"
         ]
       },
       "uses": [
@@ -28559,6 +31249,13 @@
         "DataTable",
         "Empty",
         "EmptyFilterResult",
+        "EvalCase",
+        "EvalCaseCompare",
+        "EvalCaseDetail",
+        "EvalCaseStatus",
+        "EvalCategory",
+        "EvalDotGrid",
+        "EvalRunHeader",
         "FilterBar",
         "FilterField",
         "HealthDot",
@@ -28578,7 +31275,9 @@
         "formatPercent",
         "notify",
         "useFilters",
-        "useOperation"
+        "useOperation",
+        "useReducedMotion",
+        "useVisibleInterval"
       ]
     },
     {
@@ -28639,7 +31338,7 @@
       "slug": "ai-agent-run",
       "file": "src/blocks/ai-agent-run.tsx",
       "title": "Execução de agente",
-      "description": "Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado.",
+      "description": "Detalhe de uma execução (?id=): trace em cascata com o passo selecionado, entrada e saída, ferramentas usadas, custo e tokens, saída para aprovar, executar de novo e 'O que você quer fazer agora?' navegável por teclado. Ao vivo (?estado=ao-vivo): AgentRunCard com passos chegando, portão de aprovação com diff e resultado.",
       "category": "IA",
       "concept": {
         "goal": "Explicar uma execução do agente passo a passo para quem precisa auditar, aprovar o resultado ou corrigir o agente.",
@@ -28648,7 +31347,8 @@
           "Passo selecionado mostra entrada e saída lado a lado; falha com mensagem em linguagem de gente",
           "Custo, tokens e tempo sempre visíveis",
           "Executar de novo com useOperation (o botão informa enquanto roda)",
-          "Fim da execução: 'O que você quer fazer agora?' com 3 opções numeradas (↑ ↓ Enter, 1–3, Esc) e campo livre"
+          "Fim da execução: 'O que você quer fazer agora?' com 3 opções numeradas (↑ ↓ Enter, 1–3, Esc) e campo livre",
+          "Ao vivo (?estado=ao-vivo): AgentRunCard — passos chegam um a um (o atual brilha), o agente para num portão com o diff (Aprovar e aplicar / Devolver com comentário) e, ao concluir, os passos recolhem numa linha e aparece o resultado com as verificações"
         ],
         "adapt": [
           "Logs de automação, jobs de integração, pipelines de dados",
@@ -28656,10 +31356,13 @@
         ],
         "avoid": [
           "Mostrar só o resultado final sem como chegou nele",
-          "Terminar a execução sem próximo passo (o usuário volta para a lista sem saber o que fazer)"
+          "Terminar a execução sem próximo passo (o usuário volta para a lista sem saber o que fazer)",
+          "Agente que escreve (lançamentos, arquivos, e-mails) sem parar para aprovação com o diff à vista"
         ]
       },
       "uses": [
+        "AgentRunCard",
+        "AgentRunScript",
         "AgentTrace",
         "AiBadge",
         "Badge",
@@ -28685,8 +31388,10 @@
         "ToolCallsSection",
         "TraceStep",
         "formatCurrency",
+        "formatDate",
         "formatDuration",
         "formatNumber",
+        "notify",
         "useOperation"
       ]
     },
@@ -28694,37 +31399,51 @@
       "slug": "ai-agent-templates",
       "file": "src/blocks/ai-agent-templates.tsx",
       "title": "Descobrir agentes",
-      "description": "Galeria de modelos de agente por categoria (Vendas, Financeiro, Suporte, Pessoas, Operações): ferramentas que cada um usa, quantas equipes usam, quem criou e tempo para configurar. 'Usar modelo' abre o construtor; campo de pedido para começar do zero.",
+      "description": "Galeria de modelos de agente por categoria: apps que cada um usa, modelo, nota, instalações e quem criou. 'Ver exemplo' mostra uma execução de 3 passos; 'Instalar' abre um fluxo curto (espaço de trabalho → acesso app a app → confirmação); 'Usar modelo' abre o construtor; campo de pedido para começar do zero.",
       "category": "IA",
       "concept": {
-        "goal": "Quem ainda não sabe o que automatizar encontra um ponto de partida testado por outras equipes e sai com um agente em rascunho em minutos.",
+        "goal": "Quem ainda não sabe o que automatizar encontra um ponto de partida testado por outras equipes e sai com um agente instalado (ou um rascunho para personalizar) em minutos.",
         "patterns": [
-          "Anatomia A · Lista (galeria): cabeçalho fixo + PageToolbar com categorias e busca",
-          "Cartão = ferramentas (glifos), nome, uma frase, prova social (equipes) e autor",
-          "Um primário por cartão: 'Usar modelo' abre o construtor com ?modelo=",
-          "Pedido livre no topo para quem prefere descrever do zero"
+          "Anatomia A · Lista (galeria): cabeçalho fixo + PageToolbar com abas de categoria e busca por agente ou app (só com 12 modelos ou mais)",
+          "Cartão = apps (glifos) e modelo, nome, uma frase, nota e instalações (formatCompact) e autor",
+          "Ver exemplo em Popover: uma execução real em 3 passos antes de decidir",
+          "Instalar em Drawer de 3 etapas (Stepper): espaço de trabalho (Select) → acesso app a app (AppAccessList) → confirmação com 'Abrir agente'",
+          "Instalação com useOperation/OperationButton: erro vira OperationFeedback com 'Tentar novamente'; Cancelar aborta a instalação em andamento",
+          "Instalado vira selo 'Instalado' + 'Abrir'; 'Usar modelo' segue abrindo o construtor (?modelo=) como rascunho"
         ],
         "adapt": [
-          "Galeria de automações, modelos de relatório, playbooks de atendimento"
+          "Galeria de automações, integrações, modelos de relatório, playbooks de atendimento"
         ],
         "avoid": [
-          "Cartões com ilustração genérica no lugar das ferramentas reais",
-          "Usar modelo publicando direto (sempre nasce rascunho)"
+          "Cartões com ilustração genérica no lugar dos apps reais",
+          "Instalar pedindo todas as permissões de uma vez sem dizer o que o agente faz com cada app",
+          "Abrir outro drawer de dentro do fluxo de instalação"
         ]
       },
       "uses": [
         "AgentComposer",
+        "AppAccessItem",
+        "AppAccessList",
         "Badge",
         "Button",
+        "Drawer",
         "Empty",
-        "FilterChip",
+        "OperationButton",
+        "OperationFeedback",
         "Page",
         "PageHeading",
         "PageToolbar",
+        "Popover",
+        "Select",
+        "Stepper",
         "TableSearch",
+        "Tabs",
         "ToolGlyph",
+        "collectionThresholds",
+        "formatCompact",
         "formatNumber",
-        "normalize"
+        "normalize",
+        "useOperation"
       ]
     },
     {
@@ -28898,6 +31617,49 @@
         "usePagination",
         "useSavedViews",
         "useSort"
+      ]
+    },
+    {
+      "slug": "ai-answer",
+      "file": "src/blocks/ai-answer.tsx",
+      "title": "Resposta com fontes",
+      "description": "Uma resposta da IA lida como artigo: pensa, mostra as fontes em cartões e escreve a resposta formatada em que cada citação acende a frase que sustenta. Copiar, refazer com opções, avaliar, compartilhar, alternar versões e perguntar algo relacionado ali mesmo. Cinco estados (?estado=).",
+      "category": "IA",
+      "concept": {
+        "goal": "Responder uma pergunta de trabalho com uma resposta que dá para conferir: toda afirmação aponta para a fonte e a pessoa vê de onde veio cada frase.",
+        "patterns": [
+          "reading",
+          "Pensou por N s recolhido (ReasoningBlock); fontes resumidas (SourceStack) que abrem os cartões (SourceCards)"
+        ],
+        "adapt": [
+          "Busca na base de conhecimento, pesquisa de mercado, resposta de suporte com artigos, parecer jurídico com cláusulas"
+        ],
+        "avoid": [
+          "Afirmação sem fonte quando há fonte; fonte listada que nenhuma frase cita",
+          "Responder de memória quando a busca não achou nada: diga que não achou e ofereça o próximo passo",
+          "Renderizar HTML vindo do modelo (use a marcação simples do CitedText)"
+        ]
+      },
+      "uses": [
+        "AiSource",
+        "Button",
+        "CitedText",
+        "Empty",
+        "ErrorState",
+        "MessageActions",
+        "Page",
+        "PageHeading",
+        "ReasoningBlock",
+        "RegenerateOption",
+        "RelatedQuestions",
+        "Skeleton",
+        "SourceCards",
+        "SourceStack",
+        "citedPlainText",
+        "notify",
+        "useLinkedHighlight",
+        "useReducedMotion",
+        "useVisibleInterval"
       ]
     },
     {
@@ -33638,6 +36400,38 @@
       ]
     },
     {
+      "slug": "onboarding-intro",
+      "file": "src/blocks/onboarding-intro.tsx",
+      "title": "Boas-vindas ilustradas",
+      "description": "Primeira execução em 4 etapas num cartão compacto: a ilustração em traço muda de cena (pasta → arquivos → equipe → selo) a cada etapa, com Voltar/Avançar, Pular e ←/→.",
+      "category": "Onboarding",
+      "concept": {
+        "goal": "Apresentar a ideia do produto em quatro frases antes do primeiro uso, sem pedir nenhum dado: quem acabou de entrar entende o que vem e pode pular.",
+        "patterns": [
+          "Anatomia H · Fluxo focado: só o cartão, centrado sobre bg-page, como diálogo (camada expressiva permitida no onboarding, regra 22a)",
+          "IntroCard: ilustração em traço (MorphIllustration + onboardingScenes) no topo em gelo, 'Etapa 1 de 4', título, texto",
+          "Pontos de etapa + Voltar/Avançar; a última vira 'Começar'; 'Pular' sempre à vista até a última",
+          "←/→ trocam de etapa; o texto da etapa é anunciado (aria-live); movimento reduzido troca a cena direto",
+          "Sem os cinco estados: o conteúdo é fixo e local (nada carrega, nada fica vazio, nada falha); o que pede dado vem depois, no assistente"
+        ],
+        "adapt": [
+          "Novidade grande de uma versão (3 etapas), boas-vindas de um módulo novo, primeira vez num portal do cliente",
+          "Troque as cenas por `frame` em cada etapa (caminhos SVG em traço, viewBox 200 × 140)"
+        ],
+        "avoid": [
+          "Mais de 4 etapas ou etapas que pedem dados (use o Assistente de configuração)",
+          "Abrir sozinho a cada visita: mostre uma vez e deixe 'Rever introdução' na ajuda",
+          "Ilustração atrás de lista, tabela ou formulário"
+        ]
+      },
+      "uses": [
+        "IntroCard",
+        "IntroStep",
+        "ProductMark",
+        "onboardingScenes"
+      ]
+    },
+    {
       "slug": "onboarding-wizard",
       "file": "src/blocks/onboarding-wizard.tsx",
       "title": "Assistente de configuração",
@@ -33940,6 +36734,42 @@
       ]
     },
     {
+      "slug": "saas-explore",
+      "file": "src/blocks/saas-explore.tsx",
+      "title": "Explorar dados",
+      "description": "Tabela dinâmica self-service: arraste região, canal, plano e trimestre para linhas e colunas, escolha o que somar e exporte o recorte.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Responder perguntas que o painel não previu (receita do Pro no Nordeste por canal, desconto médio por segmento) sem pedir relatório ao time de dados.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo + um card de trabalho que ocupa a página",
+          "PivotBuilder: campos como chips, quatro áreas (Filtros, Colunas, Linhas, Valores), arrastar ou menu do campo",
+          "Subtotais por grupo recolhível, total geral fixo no rodapé, sombreamento por intensidade",
+          "Visões salvas como ponto de partida; Exportar CSV do recorte"
+        ],
+        "adapt": [
+          "Financeiro: lançamentos por centro de custo × mês",
+          "ATS: candidaturas por vaga × etapa × origem",
+          "ERP: pedidos por produto × UF × trimestre"
+        ],
+        "avoid": [
+          "Usar o pivô para editar ou abrir registros: isso é DataGrid",
+          "Pivô como resposta de uma pergunta fixa e recorrente: vire um gráfico no painel",
+          "Mais de duas dimensões em Colunas: a tabela fica larga demais para ler"
+        ]
+      },
+      "uses": [
+        "Menu",
+        "Page",
+        "PageHeading",
+        "PivotBuilder",
+        "PivotBuilderField",
+        "PivotLayout",
+        "PivotRecord",
+        "Skeleton"
+      ]
+    },
+    {
       "slug": "saas-integrations",
       "file": "src/blocks/saas-integrations.tsx",
       "title": "Integrações",
@@ -33980,6 +36810,86 @@
         "TextField",
         "notify",
         "useFilters"
+      ]
+    },
+    {
+      "slug": "saas-journey",
+      "file": "src/blocks/saas-journey.tsx",
+      "title": "Jornada até o plano pago",
+      "description": "Sankey da visita ao plano pago com as perdas de cada etapa, troca de canal que transforma os fluxos, nó selecionável que traça o caminho e painel com conversão, maiores perdas e divisão do plano.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Ver onde as pessoas saem do caminho até o plano pago e comparar os canais de aquisição.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho com canal, gráfico principal e painel lateral (empilha no celular)",
+          "Sankey com rótulos acima do nó (valor · % das visitas) e etapas embaixo",
+          "Selecionar um nó traça o que chega e o que sai dele; o painel mostra a conversão",
+          "No celular o gráfico rola dentro do próprio contêiner"
+        ],
+        "adapt": [
+          "Funil de recrutamento com desistências, jornada de compra no e-commerce, triagem de chamados"
+        ],
+        "avoid": [
+          "Mais de 5 etapas ou 20 nós",
+          "Perda sem nome (\"Outros\")",
+          "Sankey quando só importa a conversão total (use FunnelChart)"
+        ]
+      },
+      "uses": [
+        "Button",
+        "ChartCard",
+        "Empty",
+        "ErrorState",
+        "Page",
+        "PageHeading",
+        "SankeyChart",
+        "SankeyLink",
+        "SankeyNode",
+        "SegmentedControl",
+        "Skeleton",
+        "formatNumber",
+        "formatPercent"
+      ]
+    },
+    {
+      "slug": "saas-mrr-bridge",
+      "file": "src/blocks/saas-mrr-bridge.tsx",
+      "title": "Movimento de MRR",
+      "description": "Ponte de MRR do início ao fim do período (novos, expansão, reativação, contração, cancelamento) com eixo truncado, troca de período que transforma as barras e a lista de contas por trás de cada movimento.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Explicar por que o MRR mudou no período e chegar às contas que causaram cada movimento.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho com período, KPIs, um gráfico principal",
+          "Cascata com eixo truncado (exceção documentada), conectores e valores nas barras",
+          "Barra selecionável abre a lista de contas daquele movimento (padrão: Novos)",
+          "Unidade alternável: R$ ou % do MRR de início"
+        ],
+        "adapt": [
+          "Ponte de caixa, variação de margem, carteira de contratos (início → fim)"
+        ],
+        "avoid": [
+          "Eixo truncado sem a marca de quebra",
+          "Cascata com mais de 8 barras",
+          "Movimento sem as contas que o explicam"
+        ]
+      },
+      "uses": [
+        "Button",
+        "ChartCard",
+        "Empty",
+        "ErrorState",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Skeleton",
+        "WaterfallChart",
+        "WaterfallStep",
+        "formatCurrency",
+        "formatNumber",
+        "formatPercent"
       ]
     },
     {
@@ -34032,6 +36942,61 @@
       ]
     },
     {
+      "slug": "saas-regions",
+      "file": "src/blocks/saas-regions.tsx",
+      "title": "Receita por estado",
+      "description": "Mapa por UF com receita, crescimento ou penetração em degraus, lista ordenada ligada ao mapa, filtro por região e zoom com detalhe das cidades ao escolher um estado.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Ver onde a receita está concentrada e onde cresce, para decidir em que estados investir em vendas, parceiros e suporte local.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo com filtro de região, um cartão principal",
+          "Métrica no SegmentedControl do cartão; crescimento usa escala divergente (abaixo × acima de zero), não verde × vermelho",
+          "Mapa nunca sozinho: lista ordenada ao lado, ligada pelo mesmo realce (hover numa acende na outra)",
+          "Escolher um estado aproxima o mapa e abre o detalhe (cidades, clientes); Voltar ao Brasil devolve a visão inteira",
+          "Sem dado em hachura com travessão, diferente de zero"
+        ],
+        "adapt": [
+          "Vendas por região de um ERP",
+          "Candidatos por estado num ATS",
+          "Inadimplência por UF no financeiro",
+          "Outro país: passe regions e viewBox próprios"
+        ],
+        "avoid": [
+          "Mapa sem a lista ordenada (estados grandes parecem mais importantes)",
+          "Escala contínua sem degraus",
+          "Pintar crescimento de verde e vermelho como se fosse bom × ruim"
+        ]
+      },
+      "uses": [
+        "Badge",
+        "BarList",
+        "BrRegion",
+        "BrUfId",
+        "Button",
+        "ChartCard",
+        "ChoroplethMap",
+        "ChoroplethScaleOptions",
+        "Empty",
+        "ErrorState",
+        "Page",
+        "PageHeading",
+        "RankedRegionList",
+        "SegmentedControl",
+        "Select",
+        "Skeleton",
+        "brRegions",
+        "brUfs",
+        "fitViewBox",
+        "formatCompact",
+        "formatCurrency",
+        "formatDelta",
+        "formatNumber",
+        "formatPercent",
+        "useLinkedHighlight"
+      ]
+    },
+    {
       "slug": "saas-reports",
       "file": "src/blocks/saas-reports.tsx",
       "title": "Relatórios",
@@ -34071,6 +37036,47 @@
         "TextField",
         "formatDate",
         "notify"
+      ]
+    },
+    {
+      "slug": "saas-retention",
+      "file": "src/blocks/saas-retention.tsx",
+      "title": "Retenção por coorte",
+      "description": "Triângulo de coortes com escala em degraus e legenda ligada, linha de média, curvas de retenção por coorte e recorte por segmento (self-service × vendas).",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Saber se as coortes novas retêm melhor que as antigas e em que mês a perda se estabiliza.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho com segmento, KPIs, um gráfico principal",
+          "Mapa de calor em triângulo (null = mês ainda não alcançado) com tamanho da coorte e linha de média",
+          "Escala em degraus com legenda que destaca as células da faixa",
+          "Mesma pergunta em curvas: coortes recentes mais escuras, média em destaque"
+        ],
+        "adapt": [
+          "Retenção de clientes no varejo, permanência de colaboradores (ATS), recompra no e-commerce"
+        ],
+        "avoid": [
+          "Coorte sem o tamanho ao lado",
+          "Escala contínua com dezenas de tons",
+          "Comparar coortes sem o mesmo mês desde o início"
+        ]
+      },
+      "uses": [
+        "Button",
+        "ChartCard",
+        "Delta",
+        "Empty",
+        "ErrorState",
+        "HeatmapMatrix",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "RetentionCurves",
+        "SegmentedControl",
+        "Skeleton",
+        "formatNumber",
+        "formatPercent"
       ]
     },
     {
@@ -34115,6 +37121,98 @@
         "TextareaField",
         "notify",
         "useFilters"
+      ]
+    },
+    {
+      "slug": "saas-unit-economics",
+      "file": "src/blocks/saas-unit-economics.tsx",
+      "title": "CAC e LTV por canal",
+      "description": "Dispersão conectada de CAC contra LTV mês a mês por canal de aquisição, com a linha de 3× e a zona saudável, cabeça que percorre o tempo e resumo por canal.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Ver se cada canal de aquisição continua pagando o próprio custo: onde o LTV/CAC caiu abaixo da meta de 3×, quando e por quê.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo; um cartão-pergunta com o seletor de canal no action",
+          "Células de número do mês em foco (mês, CAC, LTV, LTV/CAC com ponto + texto) acima do gráfico",
+          "Dispersão conectada: um ponto por mês, setas de direção, cabeça no mês em foco, outros canais esmaecidos",
+          "Linha y = 3·x tracejada e zona saudável em verde bem leve, com rótulo",
+          "Controle de tempo embaixo (tocar/pausar); setas do teclado no gráfico também movem a cabeça",
+          "Anotações nos meses em que algo mudou (campanha, plano anual)"
+        ],
+        "adapt": [
+          "Preço × volume por produto, custo por contratação × tempo até contratar, ticket × churn por plano",
+          "Qualquer par de medidas em que a direção no tempo importa mais que o ponto isolado"
+        ],
+        "avoid": [
+          "Mais de três séries visíveis ao mesmo tempo: o caminho vira novelo",
+          "Usar com poucos meses (menos de 6): uma linha simples mostra melhor",
+          "Pintar o caminho de verde ou vermelho: a zona e o status com palavra já dizem se está saudável"
+        ]
+      },
+      "uses": [
+        "Button",
+        "ChartCard",
+        "ConnectedScatter",
+        "ConnectedScatterSeries",
+        "DataTable",
+        "Dot",
+        "Empty",
+        "ErrorState",
+        "GridColumn",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Skeleton",
+        "StatCell",
+        "StatGrid",
+        "downloadCsv",
+        "formatCurrency",
+        "formatNumber",
+        "gridToCsv",
+        "notify"
+      ]
+    },
+    {
+      "slug": "saas-usage-horizon",
+      "file": "src/blocks/saas-usage-horizon.tsx",
+      "title": "Uso por cidade contra a base",
+      "description": "Horizon de 14 cidades: sessões diárias de junho a setembro contra a média de maio, com cruz sincronizada, ordenação por nome, pico ou último dia e número de faixas ajustável.",
+      "category": "SaaS",
+      "concept": {
+        "goal": "Achar, entre muitas cidades, onde o uso se afastou da base (para cima ou para baixo), quando começou e se ainda dura.",
+        "patterns": [
+          "Anatomia B · Painel: cabeçalho fixo, faixa de KPIs do último dia e um cartão-pergunta",
+          "Horizon: uma linha baixa por cidade dobrada em faixas; acima da base em chart-pos, abaixo em chart-neg",
+          "Cruz sincronizada em todas as linhas (ponteiro, toque ou setas) e valor do dia à direita de cada linha",
+          "Ordenar (Nome, Pico, Último) e Faixas (1–4) como SegmentedControl; região como filtro",
+          "Legenda que explica a leitura: tamanho da faixa e 'cor mais forte = mais longe da base'"
+        ],
+        "adapt": [
+          "Pedidos por loja, tickets por fila, latência por serviço, vendas por vendedor contra a própria meta",
+          "Qualquer conjunto de 8 a 20 séries diárias comparadas com a própria base"
+        ],
+        "avoid": [
+          "Usar com menos de 6 séries: um LineChart com as linhas sobrepostas lê melhor",
+          "Comparar valores absolutos entre cidades: o horizon mostra desvio relativo à base de cada uma",
+          "Ler cor como bom ou ruim: azul é acima, laranja é abaixo"
+        ]
+      },
+      "uses": [
+        "Button",
+        "ChartCard",
+        "Empty",
+        "ErrorState",
+        "HorizonChart",
+        "HorizonSeries",
+        "KpiCard",
+        "KpiGrid",
+        "Page",
+        "PageHeading",
+        "SegmentedControl",
+        "Select",
+        "Skeleton",
+        "formatDelta",
+        "formatNumber"
       ]
     },
     {
@@ -35569,6 +38667,20 @@
         "utility": "chart-grid",
         "light": "#eef0f2",
         "dark": "#242428",
+        "note": null
+      },
+      {
+        "token": "--ds-chart-pos",
+        "utility": "chart-pos",
+        "light": "#2f6ea8",
+        "dark": "#74aee6",
+        "note": null
+      },
+      {
+        "token": "--ds-chart-neg",
+        "utility": "chart-neg",
+        "light": "#c2621d",
+        "dark": "#f0a05a",
         "note": "Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes."
       },
       {

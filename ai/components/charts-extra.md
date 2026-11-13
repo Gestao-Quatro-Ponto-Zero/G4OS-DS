@@ -121,8 +121,6 @@ Exemplo (showcase `#/p/graficos-negocio`):
 
 ## ParetoChart
 
-Causas ordenadas (barras) + % acumulado (linha).
-
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `items` * | `{ label: string; value: number; }[]` |  |  |

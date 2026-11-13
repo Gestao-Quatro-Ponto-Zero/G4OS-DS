@@ -93,26 +93,26 @@ Ações de uma resposta: Copiar, Markdown, (refazer, avaliar) e ramificar.
 | `markdown` | `string \| undefined` |  |  |
 | `onBranch` | `(() => void) \| undefined` |  |  |
 | `onFeedback` | `((value: "up" \| "down") => void) \| undefined` |  |  |
+| `onRegenerate` | `((option: RegenerateOption) => void) \| undefined` |  | Refazer com opções; substitui o botão de `onRetry` ("Tentar de novo" chama com "retry"). |
 | `onRetry` | `(() => void) \| undefined` |  |  |
 | `onShare` | `(() => void) \| undefined` |  | Compartilhar a resposta (link ou exportar). |
 | `size` | `"xs" \| "md" \| undefined` | `"md"` | "xs": ícones mínimos (estilo Codex), implica `compact`. |
+| `versions` | `{ index: number; count: number; onChange: (index: number) => void; } \| undefined` |  | Versões da resposta (cada refazer gera uma): `index` começa em 0. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ia-layout-agente`):
+Exemplo (showcase `#/p/ia-resposta`):
 
 ```tsx
-<ThreadView resetKey={sessao.id} collapseBefore={mensagens.length > 8 ? mensagens.length - 5 : 0}>
-  {mensagens}
-</ThreadView>
-
-<AnswerCard
-  variant="flow"
-  run={<RunSummary variant="divider" status="done" durationMs={214000}>{/* StepGroup com os passos */}</RunSummary>}
-  actions={<MessageActions size="xs" text={texto} onShare={compartilhar} />}
->
-  …
-</AnswerCard>
+<MessageActions
+  text={citedPlainText(markdown)}
+  markdown={markdown}
+  onFeedback={avaliar}
+  onShare={compartilhar}
+  onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
+  versions={{ index, count, onChange: setIndex }}
+/>
+<AnswerVersions index={1} count={3} onChange={setIndex} />
 ```
 
 ## MinimapItem (type)
@@ -130,7 +130,7 @@ type ModelEffort = "leve" | "padrao" | "profundo"
 ## ModelOption (type)
 
 ```ts
-type ModelOption = { id: string; name: string; group?: string; description?: string; icon?: ReactNode }
+type ModelOption = { id: string; name: string; group?: string; description?: string; icon?: ReactNode; featured?: boolean; note?: string; context?: number; priceIn?: number; priceOut?: number; provider?: string; }
 ```
 
 ## ModelPicker
@@ -145,19 +145,23 @@ Chip de modelo + esforço ("⚡ Sol · Leve ⌄").
 | `agent` | `string \| undefined` |  |  |
 | `agents` | `AgentOption[] \| undefined` |  | Agentes disponíveis: o chip mostra o agente e o menu ganha a seção "Agente". |
 | `className` | `string \| undefined` |  |  |
+| `currency` | `string \| undefined` | `"BRL"` | Moeda dos preços (`priceIn`/`priceOut`), código ISO: "BRL", "USD". |
 | `effort` | `ModelEffort \| undefined` |  |  |
 | `onAgentChange` | `((id: string) => void) \| undefined` |  |  |
 | `onEffortChange` | `((e: ModelEffort) => void) \| undefined` |  |  |
+| `side` | `"top" \| "bottom" \| undefined` | `"top"` | Lado em que o menu abre. |
+| `summary` | `boolean \| undefined` | `false` | Resumo abaixo do chip: nota do modelo + Contexto, Entrada, Saída e Esforço. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
-Exemplo (showcase `#/p/ia-sessoes`):
+Exemplo (showcase `#/p/ia-resposta`):
 
 ```tsx
-<PermissionModeChip value={permissao} onChange={setPermissao} />   // "ler" | "aprovar" | "total"
-<ModelPicker models={modelos} value={modelo} onChange={setModelo} effort={esforco} onEffortChange={setEsforco} />
-// Chip único do campo: agente + modelo + esforço
-<ModelPicker agents={agentes} agent={agente} onAgentChange={setAgente} models={modelos} value={modelo} onChange={setModelo} effort={esforco} onEffortChange={setEsforco} />
+const modelos: ModelOption[] = [
+  { id: "sol", name: "Sol", featured: true, note: "Padrão para análises e código.", context: 1_000_000, priceIn: 20, priceOut: 100 },
+  { id: "aurora", name: "Aurora 3", provider: "Laboratório Aurora", context: 400_000, priceIn: 12, priceOut: 48 },
+];
+<ModelPicker summary side="bottom" models={modelos} value={modelo} onChange={setModelo} effort={esforco} onEffortChange={setEsforco} />
 ```
 
 ## PermissionMode (type)
@@ -203,6 +207,18 @@ Pasta de projeto na lista de sessões: ícone + nome + contagem, recolhível, se
 | `limit` | `number \| undefined` | `5` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+## RegenerateOption (type)
+
+Como refazer uma resposta: de novo, mais curta, mais detalhada ou mais simples.
+
+```ts
+type RegenerateOption = "retry" | "shorter" | "longer" | "simpler"
+```
+
+## regenerateOptionLabels (const)
+
+Rótulos (pt-BR) do menu de refazer, na ordem em que aparecem.
 
 ## SessionComposer
 

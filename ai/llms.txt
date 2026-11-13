@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 491 componentes, gráficos SVG e 143 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 520 componentes, gráficos SVG e 152 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -78,6 +78,16 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [stage](components/stage.md): Camada expressiva (palcos).
 - [agent-orb](components/agent-orb.md): Rosto gerado de agente: um personagem pequeno e chapado, desenhado em SVG inline e derivado de forma determinística de uma semente estável (id do agente, nome do subagente, id da sessão).
 - [code](components/code.md): ------------------------------------------------------------------
+- [lib-scale](components/lib-scale.md): Escalas de cor para dados de intensidade (mapa de calor, coorte, mapa por UF, pivô, horizon).
+- [charts-kit](components/charts-kit.md): Peças compartilhadas pelos gráficos analíticos (coorte, mapa por UF, horizon, dispersão conectada, sankey, cascata): · ScaleLegend: legenda de escala em degraus ou contínua, com hover que destaca a faixa no gráfico · Cha
+- [charts-analytics](components/charts-analytics.md): Gráficos analíticos de série temporal: · ConnectedScatter: duas medidas ao longo do tempo (CAC × LTV, preço × volume).
+- [lib-geo-br](components/lib-geo-br.md): Contornos das 27 unidades da federação, prontos para SVG.
+- [geo](components/geo.md): Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me
+- [lib-pivot](components/lib-pivot.md): Motor da tabela dinâmica (pivô).
+- [pivot](components/pivot.md): Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento opciona
+- [agent-run](components/agent-run.md): ------------------------------------------------------------------
+- [agent-evals](components/agent-evals.md): ------------------------------------------------------------------
+- [illustration](components/illustration.md): Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)
@@ -89,6 +99,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [ai-agent](blocks/ai-agent.md): Página do agente (IA)
 - [ai-agents-dashboard](blocks/ai-agents-dashboard.md): Painel da frota de agentes (IA)
 - [ai-agents](blocks/ai-agents.md): Frota de agentes (IA)
+- [ai-answer](blocks/ai-answer.md): Resposta com fontes (IA)
 - [ai-approvals](blocks/ai-approvals.md): Aprovações de agentes (IA)
 - [ai-assistant](blocks/ai-assistant.md): Assistente sobre a tela (IA)
 - [ai-catch-up](blocks/ai-catch-up.md): Resumo do período (IA)
@@ -190,16 +201,24 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [marketing-pricing](blocks/marketing-pricing.md): Página de preços (Marketing)
 - [marketing-stage](blocks/marketing-stage.md): Landing com palcos (Marketing)
 - [onboarding-checklist](blocks/onboarding-checklist.md): Primeiros passos (Onboarding)
+- [onboarding-intro](blocks/onboarding-intro.md): Boas-vindas ilustradas (Onboarding)
 - [onboarding-wizard](blocks/onboarding-wizard.md): Assistente de configuração (Onboarding)
 - [saas-analytics](blocks/saas-analytics.md): Análise de aquisição (SaaS)
 - [saas-billing](blocks/saas-billing.md): Cobrança e faturas (SaaS)
 - [saas-customer](blocks/saas-customer.md): Página da conta (SaaS)
 - [saas-customers](blocks/saas-customers.md): Lista de clientes (SaaS)
 - [saas-dashboard](blocks/saas-dashboard.md): Dashboard de produto SaaS (SaaS)
+- [saas-explore](blocks/saas-explore.md): Explorar dados (SaaS)
 - [saas-integrations](blocks/saas-integrations.md): Integrações (SaaS)
+- [saas-journey](blocks/saas-journey.md): Jornada até o plano pago (SaaS)
+- [saas-mrr-bridge](blocks/saas-mrr-bridge.md): Movimento de MRR (SaaS)
 - [saas-plans](blocks/saas-plans.md): Planos e preços (SaaS)
+- [saas-regions](blocks/saas-regions.md): Receita por estado (SaaS)
 - [saas-reports](blocks/saas-reports.md): Relatórios (SaaS)
+- [saas-retention](blocks/saas-retention.md): Retenção por coorte (SaaS)
 - [saas-support](blocks/saas-support.md): Central de suporte (SaaS)
+- [saas-unit-economics](blocks/saas-unit-economics.md): CAC e LTV por canal (SaaS)
+- [saas-usage-horizon](blocks/saas-usage-horizon.md): Uso por cidade contra a base (SaaS)
 - [saas-usage](blocks/saas-usage.md): Uso e limites (SaaS)
 - [settings-appearance](blocks/settings-appearance.md): Aparência e marca (Configurações)
 - [settings-audit-log](blocks/settings-audit-log.md): Log de auditoria (Configurações)
