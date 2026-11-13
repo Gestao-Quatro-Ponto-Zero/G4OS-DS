@@ -113,6 +113,66 @@ function smoothSegments(pts: Pt[], smooth: boolean) {
 
 const halo = { paintOrder: "stroke", stroke: "var(--color-surface)", strokeWidth: 3, strokeLinejoin: "round" } as const;
 
+type LabelSpot = { x: number; y: number; anchor: "start" | "middle" | "end" };
+type LabelBox = [x0: number, y0: number, x1: number, y1: number];
+
+/** Pontos ao longo de uma poligonal (amostra para testar colisão de rótulos). */
+function samplePolyline(pts: Pt[], per = 8): Pt[] {
+  const out: Pt[] = pts.length ? [pts[0]] : [];
+  for (let i = 1; i < pts.length; i++) {
+    const [ax, ay] = pts[i - 1];
+    const [bx, by] = pts[i];
+    for (let k = 1; k <= per; k++) out.push([ax + ((bx - ax) * k) / per, ay + ((by - ay) * k) / per]);
+  }
+  return out;
+}
+
+const labelBox = (spot: LabelSpot, w: number, size: number): LabelBox => {
+  const x0 = spot.anchor === "start" ? spot.x : spot.anchor === "end" ? spot.x - w : spot.x - w / 2;
+  return [x0, spot.y - size * 0.8, x0 + w, spot.y + size * 0.25];
+};
+
+/**
+ * Desvio simples de colisão: entre posições candidatas em volta do ponto
+ * (a primeira é a preferida), escolhe a que cruza menos o traço, os rótulos já
+ * postos e a borda da área. Empate fica com a preferida.
+ */
+function placeLabel(at: Pt, text: string, size: number, candidates: { dx: number; dy: number; anchor: LabelSpot["anchor"] }[], obstacles: Pt[], placed: LabelBox[], bounds: LabelBox): { spot: LabelSpot; box: LabelBox } {
+  const w = text.length * size * 0.56;
+  let best: { spot: LabelSpot; box: LabelBox } | null = null;
+  let bestScore = Infinity;
+  candidates.forEach((c, i) => {
+    const spot: LabelSpot = { x: at[0] + c.dx, y: at[1] + c.dy, anchor: c.anchor };
+    const box = labelBox(spot, w, size);
+    const pad = 3;
+    let score = i * 0.5;
+    for (const [px, py] of obstacles) if (px > box[0] - pad && px < box[2] + pad && py > box[1] - pad && py < box[3] + pad) score += 4;
+    for (const b of placed) if (box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]) score += 30;
+    if (box[0] < bounds[0] || box[2] > bounds[2] || box[1] < bounds[1] || box[3] > bounds[3]) score += 40;
+    if (score < bestScore) {
+      bestScore = score;
+      best = { spot, box };
+    }
+  });
+  return best ?? { spot: { x: at[0], y: at[1], anchor: "start" }, box: [at[0], at[1], at[0], at[1]] };
+}
+
+/** Posições em volta de um ponto, começando pela preferida (lado oposto à borda). */
+const aroundPoint = (side: "start" | "end", gap = 9) => {
+  const sx = side === "start" ? 1 : -1;
+  const other = side === "start" ? "end" : "start";
+  return [
+    { dx: sx * gap, dy: 14, anchor: side },
+    { dx: sx * gap, dy: -8, anchor: side },
+    { dx: -sx * gap, dy: 14, anchor: other },
+    { dx: -sx * gap, dy: -8, anchor: other },
+    { dx: 0, dy: 20, anchor: "middle" },
+    { dx: 0, dy: -13, anchor: "middle" },
+    { dx: sx * (gap + 1), dy: 4, anchor: side },
+    { dx: -sx * (gap + 1), dy: 4, anchor: other },
+  ] as { dx: number; dy: number; anchor: LabelSpot["anchor"] }[];
+};
+
 /* ------------------------------------------------------------------ */
 /* ConnectedScatter                                                    */
 /* ------------------------------------------------------------------ */
@@ -140,7 +200,7 @@ export type ConnectedScatterReference = {
   ratio: number;
   /** Rótulo da linha ("3× CAC"). */
   label: string;
-  /** Lado saudável da linha, sombreado em verde bem leve. */
+  /** Lado saudável da linha, sombreado em verde quase imperceptível (número bom não grita). */
   zone?: "above" | "below";
   /** Rótulo da zona ("Saudável, acima de 3×"). */
   zoneLabel?: string;
@@ -317,6 +377,30 @@ export function ConnectedScatter({
   const noteShown = (i: number) => (!narrow || i === index) && (i === index || !head || Math.hypot(shown[i][0] - head[0], shown[i][1] - head[1]) > 40);
   const sideOf = (x: number) => (x > left + innerW * 0.6 ? "end" : "start");
 
+  // Rótulos de texto (nota, início) com desvio de colisão contra o traço da
+  // série ativa, as séries de comparação, a cabeça e entre si.
+  const placed: LabelBox[] = [];
+  const obstacles: Pt[] = [...samplePolyline(shown), ...ghosts.flatMap((s) => samplePolyline(s.points.map((p): Pt => [sx(p.x), sy(p.y)]), 6))];
+  const bounds: LabelBox = [left + 2, m.top, left + innerW, m.top + innerH + 4];
+  if (head && headPt) {
+    const side = sideOf(head[0]);
+    placed.push(labelBox({ x: head[0] + (side === "end" ? -14 : 14), y: head[1] - 10, anchor: side }, headPt.label.length * 12 * 0.56, 12));
+    placed.push([head[0] - 10, head[1] - 10, head[0] + 10, head[1] + 10]);
+  }
+  const notePlace = new Map<number, LabelSpot>();
+  points.forEach((p, i) => {
+    if (!p.note || !shown[i] || !noteShown(i)) return;
+    const r = placeLabel(shown[i], p.note, 11.5, aroundPoint(sideOf(shown[i][0])), obstacles, placed, bounds);
+    placed.push(r.box);
+    notePlace.set(i, r.spot);
+  });
+  let startPlace: LabelSpot | null = null;
+  if (start && index > 0 && points[0]) {
+    const near = start[0] <= left + 64;
+    const pref = near ? [{ dx: 6, dy: 16, anchor: "start" as const }, ...aroundPoint("start")] : [{ dx: -9, dy: 4, anchor: "end" as const }, ...aroundPoint("end")];
+    startPlace = placeLabel(start, points[0].label, 11.5, pref, obstacles, placed, bounds).spot;
+  }
+
   return (
     <div className={cn("flex min-w-0 flex-col gap-3", className)}>
       {legend && (
@@ -349,7 +433,7 @@ export function ConnectedScatter({
             )}
             {reference?.zone && (
               <li className="flex items-center gap-1.5">
-                <span aria-hidden className="size-2.5 shrink-0 rounded-[3px] border border-ok/30" style={{ background: "color-mix(in oklab, var(--color-ok) 12%, transparent)" }} />
+                <span aria-hidden className="size-2.5 shrink-0 rounded-[3px] border border-ok/30" style={{ background: "color-mix(in oklab, var(--color-ok) 8%, transparent)" }} />
                 {reference.zoneLabel ?? "Zona saudável"}
               </li>
             )}
@@ -385,7 +469,7 @@ export function ConnectedScatter({
                 <rect x={left} y={m.top} width={innerW} height={innerH} />
               </clipPath>
             </defs>
-            {refLine?.zone && <path d={refLine.zone} clipPath={`url(#${clip}-plot)`} fill="color-mix(in oklab, var(--color-ok) 7%, transparent)" />}
+            {refLine?.zone && <path d={refLine.zone} clipPath={`url(#${clip}-plot)`} fill="color-mix(in oklab, var(--color-ok) 4%, transparent)" />}
             {gy.ticks.map((t) => (
               <g key={`y${t}`}>
                 <line x1={left} x2={left + innerW} y1={sy(t)} y2={sy(t)} stroke={t === gy.lo ? "var(--color-line)" : "var(--color-chart-grid)"} />
@@ -462,14 +546,12 @@ export function ConnectedScatter({
               ) : null,
             )}
             {points.map((p, i) =>
-              p.note && shown[i] && noteShown(i) ? (
+              p.note && shown[i] && notePlace.has(i) ? (
                 <text
                   key={`n${i}`}
-                  x={shown[i][0]}
-                  y={shown[i][1]}
-                  dx={sideOf(shown[i][0]) === "end" ? -9 : 9}
-                  dy={14}
-                  textAnchor={sideOf(shown[i][0])}
+                  x={notePlace.get(i)!.x}
+                  y={notePlace.get(i)!.y}
+                  textAnchor={notePlace.get(i)!.anchor}
                   className="fill-ink-soft text-[11.5px]"
                   style={halo}
                   opacity={i <= index ? 1 : 0.55}
@@ -480,8 +562,8 @@ export function ConnectedScatter({
             )}
 
             {/* Início e cabeça. */}
-            {start && index > 0 && (
-              <text x={start[0]} y={start[1]} dx={start[0] > left + 64 ? -9 : 6} dy={start[0] > left + 64 ? "0.32em" : 16} textAnchor={start[0] > left + 64 ? "end" : "start"} className="fill-muted text-[11.5px]" style={halo}>
+            {startPlace && (
+              <text x={startPlace.x} y={startPlace.y} textAnchor={startPlace.anchor} className="fill-muted text-[11.5px]" style={halo}>
                 {points[0].label}
               </text>
             )}
@@ -546,6 +628,16 @@ export function ConnectedScatter({
 /** Desvio sem casas; o que arredonda para zero aparece como "0 %", sem sinal. */
 const horizonDelta = (n: number) => (Math.abs(n) < 0.005 ? formatPercent(0, 0) : formatDelta(n, 0));
 
+/**
+ * Cor de uma faixa do horizon. No tema escuro as faixas baixas (30 % de
+ * chart-pos/neg sobre fundo escuro) viram marrom e azul acinzentados quase
+ * iguais: `--ds-horizon-lift` (0 no claro, ligado por `horizonLift`) mistura a
+ * cor cheia por cima e sobe o piso de opacidade sem mudar o tema claro.
+ */
+const horizonFill = (t: number, tone: "pos" | "neg") =>
+  `color-mix(in oklab, var(--color-chart-${tone}) var(--ds-horizon-lift, 0%), ${sequentialColor(t, tone)})`;
+const horizonLift = "dark:[--ds-horizon-lift:32%]";
+
 /* ------------------------------------------------------------------ */
 /* HorizonLegend                                                       */
 /* ------------------------------------------------------------------ */
@@ -567,14 +659,14 @@ export function HorizonLegend({ bands, extent, format = horizonDelta, className 
   const sizeText = formatPercent(size, Math.abs(size * 100 - Math.round(size * 100)) < 0.05 ? 0 : 1);
   const levels = Array.from({ length: b }, (_, k) => (k + 1) / b);
   return (
-    <div className={cn("flex w-full flex-col gap-1.5 text-[11.5px] text-muted sm:w-[300px]", className)}>
+    <div className={cn("flex w-full flex-col gap-1.5 text-[11.5px] text-muted sm:w-[300px]", horizonLift, className)}>
       <div className="flex items-center gap-0.5" aria-hidden>
         {[...levels].reverse().map((t) => (
-          <span key={`n${t}`} className="h-2.5 min-w-0 flex-1 rounded-[2px]" style={{ background: sequentialColor(t, "neg") }} />
+          <span key={`n${t}`} className="h-2.5 min-w-0 flex-1 rounded-[2px]" style={{ background: horizonFill(t, "neg") }} />
         ))}
         <span className="mx-1 h-4 w-px shrink-0 bg-line-strong" />
         {levels.map((t) => (
-          <span key={`p${t}`} className="h-2.5 min-w-0 flex-1 rounded-[2px]" style={{ background: sequentialColor(t, "pos") }} />
+          <span key={`p${t}`} className="h-2.5 min-w-0 flex-1 rounded-[2px]" style={{ background: horizonFill(t, "pos") }} />
         ))}
       </div>
       <div className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 tabular-nums">
@@ -721,7 +813,7 @@ export function HorizonChart({
             d += `L${Math.round(xAt(i) * 100) / 100},${Math.round((rowHeight - 2 - h * plotH) * 100) / 100}`;
           });
           d += `L${chartW},${rowHeight - 2}Z`;
-          if (any) out.push({ d, fill: sequentialColor(Math.min(1, (k + 1) / Math.max(1, b)), sign > 0 ? "pos" : "neg") });
+          if (any) out.push({ d, fill: horizonFill(Math.min(1, (k + 1) / Math.max(1, b)), sign > 0 ? "pos" : "neg") });
         }
       }
       return out;
@@ -769,7 +861,7 @@ export function HorizonChart({
     : "";
 
   return (
-    <div className={cn("flex min-w-0 flex-col gap-4", className)}>
+    <div className={cn("flex min-w-0 flex-col gap-4", horizonLift, className)}>
       {(header || legend) && (
         <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
           {header && (

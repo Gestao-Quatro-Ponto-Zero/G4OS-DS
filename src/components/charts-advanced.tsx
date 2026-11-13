@@ -187,7 +187,7 @@ export function WaterfallChart({
   connectors?: boolean;
   /** Valor escrito junto da barra (acima dos aumentos e totais, abaixo das quedas). Padrão: true. */
   showValues?: boolean;
-  /** Barra selecionada (índice). Com `onSelect`, as barras viram botões: setas percorrem, Enter seleciona, Esc solta; as outras esmaecem. */
+  /** Barra selecionada (índice). Com `onSelect`, as barras viram botões: setas percorrem, Enter seleciona, Esc solta; o preenchimento das outras esmaece (os valores seguem legíveis). */
   selected?: number | null;
   /** Clique ou Enter numa barra (índice), ou null ao soltar. */
   onSelect?: (index: number | null) => void;
@@ -307,11 +307,13 @@ export function WaterfallChart({
                   height={h}
                   rx={3}
                   fill={color}
-                  opacity={dim ? 0.4 : b.kind === "total" ? 1 : 0.85}
+                  // Com uma barra selecionada só o preenchimento esmaece: total segue em
+                  // ink (mais leve, nunca cinza claro), variação vira tom de fundo.
+                  opacity={b.kind === "total" ? (dim ? 0.7 : 1) : dim ? 0.35 : 0.85}
                   style={{ y: top, height: h, transition: grow } as CSSProperties}
                 />
                 {broken && b.kind === "total" && bottom >= base - 0.5 && h > 16 && (
-                  <g opacity={dim ? 0.4 : 1}>
+                  <g opacity={dim ? 0.7 : 1}>
                     <AxisBreak x={cx} y={base - 10} width={bw + 2} />
                   </g>
                 )}
@@ -320,9 +322,8 @@ export function WaterfallChart({
                     x={0}
                     y={0}
                     textAnchor={roomy ? "middle" : i === 0 ? "start" : i === bars.length - 1 ? "end" : "middle"}
-                    opacity={dim ? 0.45 : 1}
                     style={{ transform: `translate(${tx}px, ${ty}px)`, transition: slide }}
-                    className={cn("text-[10.5px] font-medium tabular-nums", b.kind === "total" ? "fill-ink" : b.value >= 0 ? "fill-ok" : "fill-rose")}
+                    className={cn("text-[10.5px] font-medium tabular-nums", dim ? "fill-ink-soft" : b.kind === "total" ? "fill-ink" : b.value >= 0 ? "fill-ok" : "fill-rose")}
                   >
                     {b.kind === "total" ? format(b.value) : signed(b.value)}
                   </text>

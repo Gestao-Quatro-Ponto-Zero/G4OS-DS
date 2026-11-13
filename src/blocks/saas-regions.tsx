@@ -108,7 +108,7 @@ const metrics: Record<
     label: "Receita",
     noun: "Receita mensal",
     format: (n) => formatCurrency(n, { compact: true }),
-    scale: { steps: 5, breaks: "quantile" },
+    scale: { steps: 7, breaks: "quantile" },
     value: (d) => d.mrr * 1000,
   },
   crescimento: {
@@ -353,7 +353,7 @@ export default function SaasRegions() {
                     format={m.format}
                     valueLabel={m.label}
                     formatLegend={metric === "receita" ? formatCompact : undefined}
-                    legendTitle={metric === "receita" ? "Receita (R$)" : undefined}
+                    legendTitle={metric === "receita" ? "Receita mensal (R$)" : undefined}
                     highlight={hl}
                     zoomTo={selected}
                     zoomOutLabel={region === "todas" ? "Voltar ao Brasil" : `Voltar ao ${region}`}

@@ -19,11 +19,12 @@ const clamp01 = (t: number) => (Number.isFinite(t) ? Math.min(1, Math.max(0, t))
 
 /**
  * Curva de opacidade: degraus baixos ficam distinguíveis do fundo e os altos
- * não "estouram" (mesmo critério do HeatmapMatrix).
+ * não "estouram" (mesmo critério do HeatmapMatrix). O topo para em 90 %: o
+ * degrau máximo não vira preto chapado no claro nem branco no escuro.
  */
 export function scaleShade(t: number) {
   const a = clamp01(t);
-  return a <= 0.5 ? 0.06 + a * 0.74 : 0.43 + (a - 0.5) * 1.14;
+  return a <= 0.5 ? 0.06 + a * 0.74 : 0.43 + (a - 0.5) * 0.94;
 }
 
 /** Cor de uma intensidade `t` (0–1) numa escala de uma cor só. */
