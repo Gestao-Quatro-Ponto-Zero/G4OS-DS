@@ -25,7 +25,7 @@ export const assistantRoutes = {
 
 const main: NavItem[] = [
   { href: assistantRoutes.chat, label: "Conversas", icon: MessagesSquare },
-  { href: assistantRoutes.answer, label: "Pesquisa com fontes", icon: BookOpenText },
+  { href: assistantRoutes.answer, label: "Pesquisa", icon: BookOpenText },
   { href: assistantRoutes.runs, label: "Execuções", icon: History, badge: runs.filter((r) => r.status === "aguardando").length },
   { href: assistantRoutes.inCrm, label: "No CRM", icon: KanbanSquare },
 ];

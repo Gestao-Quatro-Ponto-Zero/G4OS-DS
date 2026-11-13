@@ -134,12 +134,17 @@ export function AgentHeader({
         </h1>
       )}
       {onDescriptionChange ? (
-        <input
+        // Uma frase, mas sem cortar: cresce com o texto (field-sizing) e não aceita quebra de linha.
+        <textarea
           value={description ?? ""}
-          onChange={(e) => onDescriptionChange(e.target.value)}
+          onChange={(e) => onDescriptionChange(e.target.value.replace(/\n/g, " "))}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
+          rows={1}
           aria-label="Descrição do agente"
           placeholder="O que este agente faz, em uma frase"
-          className="ds-bare -mx-1.5 mt-1 w-[calc(100%+12px)] rounded-md bg-transparent px-1.5 text-[14px] text-muted outline-none placeholder:text-muted hover:bg-soft focus-visible:bg-soft focus-visible:ring-2 focus-visible:ring-muted/40"
+          className="ds-bare -mx-1.5 mt-1 block w-[calc(100%+12px)] resize-none rounded-md bg-transparent px-1.5 text-[14px] leading-[1.45] text-muted outline-none [field-sizing:content] placeholder:text-muted hover:bg-soft focus-visible:bg-soft focus-visible:ring-2 focus-visible:ring-muted/40"
         />
       ) : (
         description && <p className="m-0 mt-1 text-[14px] text-muted">{description}</p>
