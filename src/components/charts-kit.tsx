@@ -87,13 +87,16 @@ export function ScaleLegend({
   return (
     <div className={cn("flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted", className)}>
       {title ? <span className="shrink-0 text-ink-soft">{title}</span> : null}
-      <ul className="m-0 flex list-none items-start gap-0.5 p-0" aria-label={typeof title === "string" ? `Escala: ${title}` : "Escala"}>
+      <ul className="m-0 flex min-w-0 list-none items-start gap-0.5 p-0" aria-label={typeof title === "string" ? `Escala: ${title}` : "Escala"}>
         {thresholds.map((t, i) => {
           const end = thresholds[i + 1] ?? max;
           const range = end != null ? `${format(t)} a ${format(end)}` : `${format(t)} ou mais`;
           const active = activeBin === i;
+          // Rótulos longos ("−20 %", "80 mil") não cabem em todos os degraus: com
+          // muitos degraus, só os pares mostram o número (o intervalo segue no aria-label).
+          const showTick = thresholds.length <= 5 || i % 2 === 0 || i === thresholds.length - 1;
           return (
-            <li key={i} className="flex flex-col items-start gap-0.5">
+            <li key={i} className="flex min-w-0 flex-1 flex-col items-start gap-0.5 sm:flex-none">
               <button
                 type="button"
                 aria-label={range}
@@ -103,14 +106,16 @@ export function ScaleLegend({
                 onFocus={() => onHoverBin?.(i)}
                 onBlur={() => onHoverBin?.(null)}
                 className={cn(
-                  "block h-2.5 w-8 rounded-[3px] outline-none ring-offset-1 ring-offset-surface transition-shadow focus-visible:ring-2 focus-visible:ring-muted/50 sm:w-10",
+                  "block h-2.5 w-full min-w-6 rounded-[3px] sm:w-10 outline-none ring-offset-1 ring-offset-surface transition-shadow focus-visible:ring-2 focus-visible:ring-muted/50 sm:w-10",
                   active && "ring-2 ring-ink/60",
                   !onHoverBin && "pointer-events-none",
                 )}
                 tabIndex={onHoverBin ? 0 : -1}
                 style={{ background: colorAt(i) }}
               />
-              <span className="tabular-nums">{format(t)}</span>
+              <span className={cn("whitespace-nowrap tabular-nums", !showTick && "invisible")} aria-hidden={!showTick || undefined}>
+                {format(t)}
+              </span>
             </li>
           );
         })}
