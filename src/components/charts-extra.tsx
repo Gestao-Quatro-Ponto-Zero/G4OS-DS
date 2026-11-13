@@ -583,6 +583,22 @@ export function BumpChart({
  * Causas ordenadas (barras) + % acumulado (linha). A linha dos 80 % mostra
  * quais poucas causas explicam a maior parte (reclamações, devoluções, perdas).
  */
+/** Rótulo de categoria em até 2 linhas (quebra entre palavras; o resto vira "…"). */
+function paretoLabelLines(label: string, max: number): string[] {
+  if (label.length <= max) return [label];
+  const words = label.split(/\s+/);
+  const lines: string[] = [""];
+  for (const w of words) {
+    const cur = lines[lines.length - 1];
+    if (!cur) lines[lines.length - 1] = w;
+    else if (`${cur} ${w}`.length <= max) lines[lines.length - 1] = `${cur} ${w}`;
+    else lines.push(w);
+  }
+  const out = lines.slice(0, 2).map((l) => (l.length > max ? `${l.slice(0, Math.max(2, max - 1))}…` : l));
+  if (lines.length > 2 && !out[1].endsWith("…")) out[1] = `${out[1].slice(0, Math.max(2, max - 1))}…`;
+  return out;
+}
+
 export function ParetoChart({
   items,
   format = (n) => formatNumber(n),
@@ -615,7 +631,7 @@ export function ParetoChart({
   return (
     <div className={cn("min-w-0", className)}>
       <ChartLegend className="mb-3" items={[{ label: "Ocorrências", color: "var(--ds-chart-1)" }, { label: "% acumulado", color: "var(--ds-accent)" }]} />
-      <div ref={ref} className="relative" style={{ height }} role="img" aria-label={`Pareto: ${vital + 1} de ${rows.length} causas somam 80% (${rows.slice(0, vital + 1).map((r) => r.label).join(", ")})`}>
+      <div ref={ref} className="relative" style={{ height }} role="img" aria-label={`Pareto: ${vital + 1} de ${rows.length} causas somam 80 % (${rows.slice(0, vital + 1).map((r) => r.label).join(", ")})`}>
         {width > 0 && (
           <svg width={width} height={height} className="absolute inset-0" aria-hidden onPointerLeave={() => setActive(null)}>
             {ticks.map((t) => (
@@ -628,7 +644,7 @@ export function ParetoChart({
             ))}
             {[0, 0.5, 0.8, 1].map((f) => (
               <text key={f} x={width - m.right + 6} y={yR(f)} dy="0.32em" className={cn("text-[11px] tabular-nums", f === 0.8 ? "fill-accent-deep font-medium" : "fill-muted")}>
-                {Math.round(f * 100)}%
+                {formatPercent(f, 0)}
               </text>
             ))}
             <line x1={m.left} x2={width - m.right} y1={yR(0.8)} y2={yR(0.8)} stroke="var(--ds-accent)" strokeDasharray="3 3" />
@@ -637,7 +653,11 @@ export function ParetoChart({
                 <rect x={m.left + band * i} y={m.top} width={band} height={innerH} fill={active === i ? "var(--ds-soft)" : "transparent"} />
                 <rect x={x(i) - Math.min(band * 0.62, 44) / 2} y={yL(r.value)} width={Math.min(band * 0.62, 44)} height={Math.max(0, yL(0) - yL(r.value))} rx={3} fill="var(--ds-chart-1)" opacity={i <= vital ? 0.95 : 0.35} />
                 <text x={x(i)} y={height - m.bottom + 16} textAnchor="middle" className="fill-muted text-[11px]">
-                  {r.label.length > Math.max(4, Math.floor(band / 6.5)) ? `${r.label.slice(0, Math.max(3, Math.floor(band / 6.5) - 1))}…` : r.label}
+                  {paretoLabelLines(r.label, Math.max(4, Math.floor((band - 4) / 5.6))).map((line, k) => (
+                    <tspan key={k} x={x(i)} dy={k ? 13 : 0}>
+                      {line}
+                    </tspan>
+                  ))}
                 </text>
               </g>
             ))}
