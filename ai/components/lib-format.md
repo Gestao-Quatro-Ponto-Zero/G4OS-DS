@@ -78,7 +78,7 @@ Exemplo (showcase `#/p/graficos-mapa`):
 ```tsx
 // Só a região Sul; PR sem dado
 const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
-<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitViewBox(sul)}
+<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitGeoViewBox(sul)}
   values={{ PR: null, SC: 0.024, RS: 0.014 }} scale={{ tone: "info" }} format={(n) => formatPercent(n, 1)} />
 ```
 

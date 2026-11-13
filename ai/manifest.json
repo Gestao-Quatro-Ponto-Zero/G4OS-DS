@@ -8784,7 +8784,7 @@
               "type": "{ steps: number; domain?: [number, number]; } | undefined",
               "required": false,
               "default": null,
-              "description": "Escala em degraus (`quantize`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados."
+              "description": "Escala em degraus (`quantizeScale`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados."
             },
             {
               "name": "showValues",
@@ -8986,6 +8986,13 @@
               "description": "Rótulo de cada ponto do eixo X (\"1\", \"2\"… meses desde o cadastro)."
             },
             {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível (obrigatório): o que as curvas respondem."
+            },
+            {
               "name": "rows",
               "type": "{ label: string; values: (number | null)[]; }[]",
               "required": true,
@@ -9025,13 +9032,6 @@
               "type": "number | undefined",
               "required": false,
               "default": "280",
-              "description": null
-            },
-            {
-              "name": "label",
-              "type": "string | undefined",
-              "required": false,
-              "default": "\"Curvas de retenção por coorte\"",
               "description": null
             }
           ],
@@ -11844,7 +11844,7 @@
               "description": null
             },
             {
-              "name": "onChange",
+              "name": "onIndexChange",
               "type": "(index: number) => void",
               "required": true,
               "default": null,
@@ -18533,7 +18533,7 @@
             },
             {
               "name": "versions",
-              "type": "{ index: number; count: number; onChange: (index: number) => void; } | undefined",
+              "type": "{ index: number; count: number; onIndexChange: (index: number) => void; } | undefined",
               "required": false,
               "default": null,
               "description": "Versões da resposta (cada refazer gera uma): `index` começa em 0."
@@ -29153,28 +29153,28 @@
           "signature": "divergingColor(t): string"
         },
         {
-          "name": "extent",
-          "kind": "function",
-          "summary": "Mínimo e máximo de uma lista ignorando null/NaN.",
-          "signature": "extent(values): [number, number]"
-        },
-        {
           "name": "onScaleInk",
           "kind": "function",
           "summary": "Cor do texto sobre uma célula de intensidade `t`: tinta normal até o meio da escala, tinta invertida acima (legível nos dois temas).",
           "signature": "onScaleInk(t): \"var(--color-on-ink)\" | \"var(--color-ink)\""
         },
         {
-          "name": "quantize",
-          "kind": "function",
-          "summary": "Divide um domínio em `steps` degraus de limites \"redondos\" (escala em degraus: mais fácil de ler e comparar do que contínua).",
-          "signature": "quantize(domain, steps?, { nice = true }?): Quantized"
-        },
-        {
-          "name": "Quantized",
+          "name": "QuantizedScale",
           "kind": "type",
           "summary": null,
           "definition": "{ thresholds: number[]; bin: (v: number) => number; level: (v: number) => number; steps: number; domain: [number, number]; }"
+        },
+        {
+          "name": "quantizeScale",
+          "kind": "function",
+          "summary": "Divide um domínio em `steps` degraus de limites \"redondos\" (escala em degraus: mais fácil de ler e comparar do que contínua).",
+          "signature": "quantizeScale(domain, steps?, { nice = true }?): QuantizedScale"
+        },
+        {
+          "name": "scaleExtent",
+          "kind": "function",
+          "summary": "Mínimo e máximo de uma lista ignorando null/NaN.",
+          "signature": "scaleExtent(values): [number, number]"
         },
         {
           "name": "scaleShade",
@@ -29244,6 +29244,13 @@
               "description": "Quantidade de posições (meses, dias)."
             },
             {
+              "name": "index",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Posição atual (0…count-1)."
+            },
+            {
               "name": "label",
               "type": "string",
               "required": true,
@@ -29251,15 +29258,8 @@
               "description": "Nome acessível (\"Mês\")."
             },
             {
-              "name": "onChange",
+              "name": "onIndexChange",
               "type": "(index: number) => void",
-              "required": true,
-              "default": null,
-              "description": null
-            },
-            {
-              "name": "value",
-              "type": "number",
               "required": true,
               "default": null,
               "description": null
@@ -29299,7 +29299,7 @@
           "name": "ChartScrubberProps",
           "kind": "type",
           "summary": null,
-          "definition": "{ count: number; value: number; onChange: (index: number) => void; format?: (index: number) => string; label: string; playable?: boolean; interval?: number; className?: string; }"
+          "definition": "{ count: number; index: number; onIndexChange: (index: number) => void; format?: (index: number) => string; label: string; playable?: boolean; interval?: number; className?: string; }"
         },
         {
           "name": "LinkedHighlight",
@@ -29317,7 +29317,7 @@
               "type": "number[]",
               "required": true,
               "default": null,
-              "description": "Limites inferiores de cada degrau (de `quantize(...).thresholds`)."
+              "description": "Limites inferiores de cada degrau (de `quantizeScale(...).thresholds`)."
             },
             {
               "name": "activeBin",
@@ -29345,7 +29345,7 @@
               "type": "number | undefined",
               "required": false,
               "default": null,
-              "description": "Fim do último degrau (de `quantize(...).domain[1]`)."
+              "description": "Fim do último degrau (de `quantizeScale(...).domain[1]`)."
             },
             {
               "name": "mode",
@@ -29439,7 +29439,7 @@
               "description": "Nome da medida do eixo vertical (\"LTV em 12 meses\")."
             },
             {
-              "name": "active",
+              "name": "activeSeries",
               "type": "string | undefined",
               "required": false,
               "default": null,
@@ -29556,7 +29556,7 @@
           "name": "ConnectedScatterProps",
           "kind": "type",
           "summary": null,
-          "definition": "{ series: ConnectedScatterSeries[]; active?: string; compare?: boolean; index?: number; onIndexChange?: (index: number) => void; xLabel: string; yLabel: string; formatX?: (n: number) => string; formatY?: (n: number) => string; formatAxisX?: (n: number) => string; formatAxisY?: (n: number) => string; reference?: ConnectedScatterReference; curve?: \"smooth\" | \"linear\"; arrows?: boolean; scrubber?:…"
+          "definition": "{ series: ConnectedScatterSeries[]; activeSeries?: string; compare?: boolean; index?: number; onIndexChange?: (index: number) => void; xLabel: string; yLabel: string; formatX?: (n: number) => string; formatY?: (n: number) => string; formatAxisX?: (n: number) => string; formatAxisY?: (n: number) => string; reference?: ConnectedScatterReference; curve?: \"smooth\" | \"linear\"; arrows?: boolean; scru…"
         },
         {
           "name": "ConnectedScatterReference",
@@ -29793,7 +29793,7 @@
             },
             {
               "name": "values",
-              "type": "MapValues",
+              "type": "GeoValues",
               "required": true,
               "default": null,
               "description": "Valor por id de região."
@@ -29811,6 +29811,13 @@
               "required": false,
               "default": "(n) => formatNumber(n)",
               "description": null
+            },
+            {
+              "name": "formatLegend",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Formato curto dos limites da legenda (padrão: `format`)."
             },
             {
               "name": "height",
@@ -29831,14 +29838,7 @@
               "type": "boolean | undefined",
               "required": false,
               "default": "true",
-              "description": "Legenda em degraus abaixo do mapa (passar o mouse destaca a faixa)."
-            },
-            {
-              "name": "legendFormat",
-              "type": "((n: number) => string) | undefined",
-              "required": false,
-              "default": null,
-              "description": "Formato curto dos limites da legenda (padrão: `format`)."
+              "description": "Legenda em degraus acima do mapa, com o fim da escala (passar o mouse destaca a faixa)."
             },
             {
               "name": "legendTitle",
@@ -29877,7 +29877,7 @@
             },
             {
               "name": "regions",
-              "type": "readonly MapRegion[] | undefined",
+              "type": "readonly GeoRegion[] | undefined",
               "required": false,
               "default": "brUfs",
               "description": "Regiões desenháveis. Padrão: as 27 UFs (`brUfs`)."
@@ -29938,7 +29938,7 @@
           "name": "ChoroplethMapProps",
           "kind": "type",
           "summary": null,
-          "definition": "{ label: string; values: MapValues; regions?: readonly MapRegion[]; viewBox?: string; scale?: ChoroplethScaleOptions; format?: (n: number) => string; valueLabel?: string; regionLabel?: string; selected?: string | null; onSelect?: (id: string | null) => void; highlight?: LinkedHighlight<string>; zoomTo?: string | null; onZoomOut?: () => void; zoomOutLabel?: string; legend?: boolean; legendTitle?…"
+          "definition": "{ label: string; values: GeoValues; regions?: readonly GeoRegion[]; viewBox?: string; scale?: ChoroplethScaleOptions; format?: (n: number) => string; valueLabel?: string; regionLabel?: string; selected?: string | null; onSelect?: (id: string | null) => void; highlight?: LinkedHighlight<string>; zoomTo?: string | null; onZoomOut?: () => void; zoomOutLabel?: string; legend?: boolean; legendTitle?…"
         },
         {
           "name": "choroplethScale",
@@ -29959,19 +29959,19 @@
           "definition": "{ steps?: number; domain?: [number, number]; scheme?: \"sequential\" | \"diverging\"; tone?: ScaleTone; breaks?: \"equal\" | \"quantile\"; }"
         },
         {
-          "name": "fitViewBox",
+          "name": "fitGeoViewBox",
           "kind": "function",
           "summary": "viewBox que enquadra um conjunto de regiões (recorte por grande região, só os estados com dado).",
-          "signature": "fitViewBox(regions, pad?): string"
+          "signature": "fitGeoViewBox(regions, pad?): string"
         },
         {
-          "name": "MapRegion",
+          "name": "GeoRegion",
           "kind": "type",
           "summary": "Uma região desenhável: contorno SVG no sistema do `viewBox`.",
           "definition": "{ id: string; name: string; path: string; centroid?: readonly [number, number]; bbox?: readonly [number, number, number, number]; }"
         },
         {
-          "name": "MapValues",
+          "name": "GeoValues",
           "kind": "type",
           "summary": "Valores por id de região; `null` = sem dado (hachura).",
           "definition": "Record<string, number | null | undefined>"
@@ -29990,7 +29990,7 @@
             },
             {
               "name": "values",
-              "type": "MapValues",
+              "type": "GeoValues",
               "required": true,
               "default": null,
               "description": null
@@ -30032,7 +30032,7 @@
             },
             {
               "name": "regions",
-              "type": "readonly MapRegion[] | undefined",
+              "type": "readonly GeoRegion[] | undefined",
               "required": false,
               "default": "brUfs",
               "description": "Regiões (para os nomes)."
@@ -30051,7 +30051,7 @@
           "name": "RankedRegionListProps",
           "kind": "type",
           "summary": null,
-          "definition": "{ label: string; values: MapValues; regions?: readonly MapRegion[]; scale?: ChoroplethScaleOptions; format?: (n: number) => string; highlight?: LinkedHighlight<string>; limit?: number; hint?: (id: string) => ReactNode; className?: string; }"
+          "definition": "{ label: string; values: GeoValues; regions?: readonly GeoRegion[]; scale?: ChoroplethScaleOptions; format?: (n: number) => string; highlight?: LinkedHighlight<string>; limit?: number; hint?: (id: string) => ReactNode; className?: string; }"
         }
       ],
       "doc": "components/geo.md"
@@ -30062,6 +30062,12 @@
       "summary": "Motor da tabela dinâmica (pivô).",
       "exports": [
         {
+          "name": "buildPivot",
+          "kind": "function",
+          "summary": "Calcula o pivô. Campos desconhecidos no layout são ignorados; medidas em Linhas/Colunas também.",
+          "signature": "buildPivot(records, fields, layout): PivotResult"
+        },
+        {
           "name": "emptyPivotLayout",
           "kind": "const",
           "summary": "Layout vazio."
@@ -30071,12 +30077,6 @@
           "kind": "function",
           "summary": "Formata um valor do pivô conforme o campo e a agregação.",
           "signature": "formatPivotValue(n, spec, options?): string"
-        },
-        {
-          "name": "pivot",
-          "kind": "function",
-          "summary": "Calcula o pivô. Campos desconhecidos no layout são ignorados; medidas em Linhas/Colunas também.",
-          "signature": "pivot(records, fields, layout): PivotResult"
         },
         {
           "name": "PIVOT_BLANK",
@@ -30219,7 +30219,7 @@
     {
       "name": "pivot",
       "file": "src/components/pivot.tsx",
-      "summary": "Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento opciona",
+      "summary": "Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento op",
       "exports": [
         {
           "name": "PivotBuilder",
@@ -30356,7 +30356,7 @@
               "type": "PivotResult",
               "required": true,
               "default": null,
-              "description": "Resultado de `pivot(records, fields, layout)`."
+              "description": "Resultado de `buildPivot(records, fields, layout)`."
             },
             {
               "name": "className",
@@ -30459,7 +30459,7 @@
             },
             {
               "name": "onApprove",
-              "type": "((change: RunChange) => void) | undefined",
+              "type": "((change: AgentRunChange) => void) | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -30473,7 +30473,7 @@
             },
             {
               "name": "onReject",
-              "type": "((change: RunChange, reason: string) => void) | undefined",
+              "type": "((change: AgentRunChange, reason: string) => void) | undefined",
               "required": false,
               "default": null,
               "description": null
@@ -30503,105 +30503,37 @@
           "examplePage": "ia-execucao-e-avaliacao"
         },
         {
-          "name": "AgentRunScript",
-          "kind": "type",
-          "summary": "Roteiro do modo demonstração: passos, onde o portão de aprovação para a execução e o resultado.",
-          "definition": "{ steps: RunStep[]; approvalAt?: number; approval?: RunChange; result: RunOutcome; }"
-        },
-        {
-          "name": "AgentRunState",
-          "kind": "type",
-          "summary": "Estado controlado do AgentRunCard.",
-          "definition": "{ status: AgentRunStatus; elapsedMs: number; steps: RunStep[]; approval?: RunChange; result?: RunOutcome; error?: ReactNode; }"
-        },
-        {
-          "name": "AgentRunStatus",
-          "kind": "type",
-          "summary": "Situação da execução inteira.",
-          "definition": "\"running\" | \"waiting\" | \"done\" | \"failed\""
-        },
-        {
-          "name": "DiffApproval",
-          "kind": "component",
-          "summary": "Portão de aprovação de uma mudança proposta pelo agente: resumo, diff com uma aba por arquivo (com +/−), \"Aprovar e aplicar\" e \"Devolver com comentário\" (abre o campo do motivo).",
-          "props": [
-            {
-              "name": "change",
-              "type": "RunChange",
-              "required": true,
-              "default": null,
-              "description": null
-            },
-            {
-              "name": "autoFocus",
-              "type": "boolean | undefined",
-              "required": false,
-              "default": "false",
-              "description": "Leva o foco ao portão quando ele aparece."
-            },
-            {
-              "name": "busy",
-              "type": "boolean | undefined",
-              "required": false,
-              "default": "false",
-              "description": "Aplicando: os botões ficam ocupados."
-            },
-            {
-              "name": "className",
-              "type": "string | undefined",
-              "required": false,
-              "default": null,
-              "description": null
-            },
-            {
-              "name": "onApprove",
-              "type": "((change: RunChange) => void) | undefined",
-              "required": false,
-              "default": null,
-              "description": null
-            },
-            {
-              "name": "onReject",
-              "type": "((change: RunChange, reason: string) => void) | undefined",
-              "required": false,
-              "default": null,
-              "description": "Devolve ao agente com o comentário (obrigatório)."
-            }
-          ],
-          "examplePage": "ia-execucao-e-avaliacao"
-        },
-        {
-          "name": "RunChange",
+          "name": "AgentRunChange",
           "kind": "type",
           "summary": "A mudança que o agente quer aplicar e que espera aprovação.",
-          "definition": "{ id: string; title: string; summary?: ReactNode; files: RunChangeFile[] }"
+          "definition": "{ id: string; title: string; summary?: ReactNode; files: AgentRunChangeFile[] }"
         },
         {
-          "name": "RunChangeFile",
+          "name": "AgentRunChangeFile",
           "kind": "type",
           "summary": "Um arquivo da mudança proposta, como diff unificado.",
           "definition": "{ path: string; diff: string }"
         },
         {
-          "name": "RunCheck",
+          "name": "AgentRunCheck",
           "kind": "type",
           "summary": "Uma verificação ao fim da execução (testes, lint, conferência de saldo).",
           "definition": "{ label: string; status: \"passed\" | \"failed\"; detail?: string }"
         },
         {
-          "name": "RunOutcome",
+          "name": "AgentRunOutcome",
           "kind": "type",
           "summary": "O que a execução entregou.",
-          "definition": "{ summary?: ReactNode; files?: { path: string; added: number; removed: number }[]; checks?: RunCheck[]; openLabel?: string; openIcon?: ReactNode; }"
+          "definition": "{ summary?: ReactNode; files?: { path: string; added: number; removed: number }[]; checks?: AgentRunCheck[]; openLabel?: string; openIcon?: ReactNode; }"
         },
         {
-          "name": "RunResult",
+          "name": "AgentRunResult",
           "kind": "component",
           "summary": "Fim de uma execução: arquivos alterados com +/−, verificações que passaram, abrir o resultado e executar de novo.",
           "props": [
             {
               "name": "result",
-              "type": "RunOutcome",
+              "type": "AgentRunOutcome",
               "required": true,
               "default": null,
               "description": null
@@ -30631,25 +30563,43 @@
           "examplePage": "ia-execucao-e-avaliacao"
         },
         {
-          "name": "RunStep",
+          "name": "AgentRunScript",
           "kind": "type",
-          "summary": "Um passo da execução: texto curto no particípio (\"Leu src/api/rotas.ts\"), duração e, se for ferramenta, entrada e saída.",
-          "definition": "{ id: string; kind: RunStepKind; label: string; status?: RunStepStatus; durationMs?: number; tool?: { name: string; input?: unknown; output?: unknown; error?: string }; detail?: ReactNode; }"
+          "summary": "Roteiro do modo demonstração: passos, onde o portão de aprovação para a execução e o resultado.",
+          "definition": "{ steps: AgentRunStep[]; approvalAt?: number; approval?: AgentRunChange; result: AgentRunOutcome; }"
         },
         {
-          "name": "RunStepKind",
+          "name": "AgentRunState",
+          "kind": "type",
+          "summary": "Estado controlado do AgentRunCard.",
+          "definition": "{ status: AgentRunStatus; elapsedMs: number; steps: AgentRunStep[]; approval?: AgentRunChange; result?: AgentRunOutcome; error?: ReactNode; }"
+        },
+        {
+          "name": "AgentRunStatus",
+          "kind": "type",
+          "summary": "Situação da execução inteira.",
+          "definition": "\"running\" | \"waiting\" | \"done\" | \"failed\""
+        },
+        {
+          "name": "AgentRunStep",
+          "kind": "type",
+          "summary": "Um passo da execução: texto curto no particípio (\"Leu src/api/rotas.ts\"), duração e, se for ferramenta, entrada e saída.",
+          "definition": "{ id: string; kind: AgentRunStepKind; label: string; status?: AgentRunStepStatus; durationMs?: number; tool?: { name: string; input?: unknown; output?: unknown; error?: string }; detail?: ReactNode; }"
+        },
+        {
+          "name": "AgentRunStepKind",
           "kind": "type",
           "summary": "O que o agente fez naquele passo.",
           "definition": "\"plan\" | \"read\" | \"search\" | \"edit\" | \"test\" | \"tool\""
         },
         {
-          "name": "RunStepList",
+          "name": "AgentRunSteps",
           "kind": "component",
           "summary": "Passos de uma execução de agente, um por linha: ícone do tipo (planejar, ler, buscar, editar, testar, ferramenta), texto, duração e check.",
           "props": [
             {
               "name": "steps",
-              "type": "RunStep[]",
+              "type": "AgentRunStep[]",
               "required": true,
               "default": null,
               "description": null
@@ -30672,10 +30622,60 @@
           "examplePage": "ia-execucao-e-avaliacao"
         },
         {
-          "name": "RunStepStatus",
+          "name": "AgentRunStepStatus",
           "kind": "type",
           "summary": "Situação de um passo.",
           "definition": "\"pending\" | \"running\" | \"done\" | \"error\""
+        },
+        {
+          "name": "DiffApproval",
+          "kind": "component",
+          "summary": "Portão de aprovação de uma mudança proposta pelo agente: resumo, diff com uma aba por arquivo (com +/−), \"Aprovar e aplicar\" e \"Devolver com comentário\" (abre o campo do motivo).",
+          "props": [
+            {
+              "name": "change",
+              "type": "AgentRunChange",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "autoFocus",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Leva o foco ao portão quando ele aparece."
+            },
+            {
+              "name": "busy",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Aplicando: os botões ficam ocupados."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onApprove",
+              "type": "((change: AgentRunChange) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onReject",
+              "type": "((change: AgentRunChange, reason: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Devolve ao agente com o comentário (obrigatório)."
+            }
+          ],
+          "examplePage": "ia-execucao-e-avaliacao"
         }
       ],
       "doc": "components/agent-run.md"
@@ -30982,7 +30982,7 @@
           "props": [
             {
               "name": "steps",
-              "type": "IntroStep[]",
+              "type": "IntroCardStep[]",
               "required": true,
               "default": null,
               "description": null
@@ -31061,7 +31061,7 @@
           "examplePage": "onboarding-ilustrado"
         },
         {
-          "name": "IntroStep",
+          "name": "IntroCardStep",
           "kind": "type",
           "summary": "Etapa do `IntroCard`: título, texto e, opcionalmente, o quadro da ilustração.",
           "definition": "{ title: string; description: ReactNode; frame?: IllustrationFrame }"
@@ -36426,7 +36426,7 @@
       },
       "uses": [
         "IntroCard",
-        "IntroStep",
+        "IntroCardStep",
         "ProductMark",
         "onboardingScenes"
       ]
@@ -36987,7 +36987,7 @@
         "Skeleton",
         "brRegions",
         "brUfs",
-        "fitViewBox",
+        "fitGeoViewBox",
         "formatCompact",
         "formatCurrency",
         "formatDelta",

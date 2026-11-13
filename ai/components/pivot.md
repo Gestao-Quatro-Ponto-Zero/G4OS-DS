@@ -2,7 +2,7 @@
 
 Arquivo: `src/components/pivot.tsx` · importe de `@g4ai/ds`.
 
-Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento opciona
+Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento op
 
 ## PivotBuilder
 
@@ -63,7 +63,7 @@ Tabela dinâmica: grupos de linha recolhíveis (chevron, ←/→), subtotais em 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `label` * | `string` |  | Nome acessível da tabela ("Receita por região e trimestre"). |
-| `result` * | `PivotResult` |  | Resultado de `pivot(records, fields, layout)`. |
+| `result` * | `PivotResult` |  | Resultado de `buildPivot(records, fields, layout)`. |
 | `className` | `string \| undefined` |  |  |
 | `compact` | `boolean \| undefined` | `false` | Moeda e contagens abreviadas ("R$ 1,2 mi"). |
 | `defaultCollapsed` | `string[] \| undefined` |  | Grupos que começam recolhidos (chaves de `PivotRowNode.key`). |
@@ -76,7 +76,7 @@ Tabela dinâmica: grupos de linha recolhíveis (chevron, ←/→), subtotais em 
 Exemplo (showcase `#/p/colecoes-tabela-dinamica`):
 
 ```tsx
-const result = pivot(records, fields, {
+const result = buildPivot(records, fields, {
   rows: ["regiao", "uf"], columns: ["trimestre"],
   values: [{ field: "receita", agg: "sum" }], filters: [],
 });

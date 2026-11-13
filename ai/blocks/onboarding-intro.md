@@ -31,4 +31,4 @@ Primeira execução em 4 etapas num cartão compacto: a ilustração em traço m
 
 ## Componentes usados
 
-`IntroCard`, `IntroStep`, `ProductMark`, `onboardingScenes`
+`IntroCard`, `IntroCardStep`, `ProductMark`, `onboardingScenes`

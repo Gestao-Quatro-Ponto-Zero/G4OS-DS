@@ -26,7 +26,7 @@ Cartão compacto de primeira execução: ilustração em traço no topo (gelo), 
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `steps` * | `IntroStep[]` |  |  |
+| `steps` * | `IntroCardStep[]` |  |  |
 | `autoFocus` | `boolean \| undefined` | `false` | Foca o cartão ao montar (←/→ funcionam de imediato). |
 | `className` | `string \| undefined` |  |  |
 | `defaultIndex` | `number \| undefined` | `0` |  |
@@ -50,12 +50,12 @@ Exemplo (showcase `#/p/onboarding-ilustrado`):
 />
 ```
 
-## IntroStep (type)
+## IntroCardStep (type)
 
 Etapa do `IntroCard`: título, texto e, opcionalmente, o quadro da ilustração.
 
 ```ts
-type IntroStep = { title: string; description: ReactNode; frame?: IllustrationFrame }
+type IntroCardStep = { title: string; description: ReactNode; frame?: IllustrationFrame }
 ```
 
 ## MorphIllustration

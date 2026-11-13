@@ -4,6 +4,24 @@ Arquivo: `src/lib/pivot.ts` · importe de `@g4ai/ds`.
 
 Motor da tabela dinâmica (pivô).
 
+## buildPivot (function)
+
+Calcula o pivô. Campos desconhecidos no layout são ignorados; medidas em Linhas/Colunas também.
+
+```ts
+buildPivot(records, fields, layout): PivotResult
+```
+
+Exemplo (showcase `#/p/colecoes-tabela-dinamica`):
+
+```tsx
+const result = buildPivot(records, fields, {
+  rows: ["regiao", "uf"], columns: ["trimestre"],
+  values: [{ field: "receita", agg: "sum" }], filters: [],
+});
+<PivotTable result={result} label="Receita por região e trimestre" heat />
+```
+
 ## emptyPivotLayout (const)
 
 Layout vazio.
@@ -14,24 +32,6 @@ Formata um valor do pivô conforme o campo e a agregação.
 
 ```ts
 formatPivotValue(n, spec, options?): string
-```
-
-## pivot (function)
-
-Calcula o pivô. Campos desconhecidos no layout são ignorados; medidas em Linhas/Colunas também.
-
-```ts
-pivot(records, fields, layout): PivotResult
-```
-
-Exemplo (showcase `#/p/colecoes-tabela-dinamica`):
-
-```tsx
-const result = pivot(records, fields, {
-  rows: ["regiao", "uf"], columns: ["trimestre"],
-  values: [{ field: "receita", agg: "sum" }], filters: [],
-});
-<PivotTable result={result} label="Receita por região e trimestre" heat />
 ```
 
 ## PIVOT_BLANK (const)

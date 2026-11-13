@@ -11,19 +11,19 @@ Mapa coroplético (padrão: Brasil por UF).
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `label` * | `string` |  | Nome acessível do mapa ("Receita por estado em outubro de 2026"). |
-| `values` * | `MapValues` |  | Valor por id de região. |
+| `values` * | `GeoValues` |  | Valor por id de região. |
 | `className` | `string \| undefined` |  |  |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatNumber(n)` |  |
+| `formatLegend` | `((n: number) => string) \| undefined` |  | Formato curto dos limites da legenda (padrão: `format`). |
 | `height` | `number \| undefined` |  | Altura em px. Padrão: proporção do viewBox, até `maxHeight`. |
 | `highlight` | `LinkedHighlight<string> \| undefined` |  | Realce compartilhado com outra vista (`useLinkedHighlight`): substitui `selected`/`onSelect`. |
-| `legend` | `boolean \| undefined` | `true` | Legenda em degraus abaixo do mapa (passar o mouse destaca a faixa). |
-| `legendFormat` | `((n: number) => string) \| undefined` |  | Formato curto dos limites da legenda (padrão: `format`). |
+| `legend` | `boolean \| undefined` | `true` | Legenda em degraus acima do mapa, com o fim da escala (passar o mouse destaca a faixa). |
 | `legendTitle` | `ReactNode` |  |  |
 | `maxHeight` | `number \| undefined` | `640` | Teto da altura automática (recortes altos, como o Nordeste). |
 | `onSelect` | `((id: string \| null) => void) \| undefined` |  | Clique ou Enter numa região (de novo na mesma solta: `null`). |
 | `onZoomOut` | `(() => void) \| undefined` |  | Ação do botão de voltar que aparece com zoom. |
 | `regionLabel` | `string \| undefined` | `"UF"` | Cabeçalho da coluna de regiões na tabela de leitor de tela. |
-| `regions` | `readonly MapRegion[] \| undefined` | `brUfs` | Regiões desenháveis. Padrão: as 27 UFs (`brUfs`). |
+| `regions` | `readonly GeoRegion[] \| undefined` | `brUfs` | Regiões desenháveis. Padrão: as 27 UFs (`brUfs`). |
 | `scale` | `ChoroplethScaleOptions \| undefined` |  | Escala em degraus (sequencial ou divergente). |
 | `selected` | `string \| null \| undefined` |  | Região selecionada (controlado). |
 | `showLabels` | `boolean \| undefined` | `true` | Sigla sobre as regiões que cabem (padrão: sim). |
@@ -52,7 +52,7 @@ Exemplo (showcase `#/p/graficos-mapa`):
 ## ChoroplethMapProps (type)
 
 ```ts
-type ChoroplethMapProps = { label: string; values: MapValues; regions?: readonly MapRegion[]; viewBox?: string; scale?: ChoroplethScaleOptions; format?: (n: number) => string; valueLabel?: string; regionLabel?: string; selected?: string | null; onSelect?: (id: string | null) => void; highlight?: LinkedHighlight<string>; zoomTo?: string | null; onZoomOut?: () => void; zoomOutLabel?: string; legend?: boolean; legendTitle?…
+type ChoroplethMapProps = { label: string; values: GeoValues; regions?: readonly GeoRegion[]; viewBox?: string; scale?: ChoroplethScaleOptions; format?: (n: number) => string; valueLabel?: string; regionLabel?: string; selected?: string | null; onSelect?: (id: string | null) => void; highlight?: LinkedHighlight<string>; zoomTo?: string | null; onZoomOut?: () => void; zoomOutLabel?: string; legend?: boolean; legendTitle?…
 ```
 
 ## choroplethScale (function)
@@ -77,12 +77,12 @@ type ChoroplethScale = { scheme: "sequential" | "diverging"; tone: ScaleTone; th
 type ChoroplethScaleOptions = { steps?: number; domain?: [number, number]; scheme?: "sequential" | "diverging"; tone?: ScaleTone; breaks?: "equal" | "quantile"; }
 ```
 
-## fitViewBox (function)
+## fitGeoViewBox (function)
 
 viewBox que enquadra um conjunto de regiões (recorte por grande região, só os estados com dado).
 
 ```ts
-fitViewBox(regions, pad?): string
+fitGeoViewBox(regions, pad?): string
 ```
 
 Exemplo (showcase `#/p/graficos-mapa`):
@@ -90,24 +90,24 @@ Exemplo (showcase `#/p/graficos-mapa`):
 ```tsx
 // Só a região Sul; PR sem dado
 const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
-<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitViewBox(sul)}
+<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitGeoViewBox(sul)}
   values={{ PR: null, SC: 0.024, RS: 0.014 }} scale={{ tone: "info" }} format={(n) => formatPercent(n, 1)} />
 ```
 
-## MapRegion (type)
+## GeoRegion (type)
 
 Uma região desenhável: contorno SVG no sistema do `viewBox`.
 
 ```ts
-type MapRegion = { id: string; name: string; path: string; centroid?: readonly [number, number]; bbox?: readonly [number, number, number, number]; }
+type GeoRegion = { id: string; name: string; path: string; centroid?: readonly [number, number]; bbox?: readonly [number, number, number, number]; }
 ```
 
-## MapValues (type)
+## GeoValues (type)
 
 Valores por id de região; `null` = sem dado (hachura).
 
 ```ts
-type MapValues = Record<string, number | null | undefined>
+type GeoValues = Record<string, number | null | undefined>
 ```
 
 ## RankedRegionList
@@ -117,13 +117,13 @@ Lista ordenada (posição, nome, barra proporcional, valor) que acompanha um `Ch
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `label` * | `string` |  | Nome acessível da lista ("Receita por estado, do maior ao menor"). |
-| `values` * | `MapValues` |  |  |
+| `values` * | `GeoValues` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatNumber(n)` |  |
 | `highlight` | `LinkedHighlight<string> \| undefined` |  | Realce compartilhado com o mapa (`useLinkedHighlight`). |
 | `hint` | `((id: string) => ReactNode) \| undefined` |  | Detalhe curto à direita do nome ("128 clientes"). |
 | `limit` | `number \| undefined` |  | Mostra as primeiras N e um botão "Ver todas". |
-| `regions` | `readonly MapRegion[] \| undefined` | `brUfs` | Regiões (para os nomes). |
+| `regions` | `readonly GeoRegion[] \| undefined` | `brUfs` | Regiões (para os nomes). |
 | `scale` | `ChoroplethScaleOptions \| undefined` |  | Mesma escala do mapa (o quadradinho de cor bate com a região). |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
@@ -136,12 +136,12 @@ const hl = useLinkedHighlight<string>();
 // SP domina: degraus por quantil (mesma quantidade de UFs por faixa)
 const escala = { breaks: "quantile" } as const;
 <ChoroplethMap label="Receita mensal por estado" values={receitaPorUf} scale={escala} format={brl}
-  legendFormat={formatCompact} legendTitle="Receita (R$)" valueLabel="Receita" highlight={hl} />
+  formatLegend={formatCompact} legendTitle="Receita (R$)" valueLabel="Receita" highlight={hl} />
 <RankedRegionList label="Receita por estado, do maior ao menor" values={receitaPorUf} scale={escala} format={brl} highlight={hl} limit={8} />
 ```
 
 ## RankedRegionListProps (type)
 
 ```ts
-type RankedRegionListProps = { label: string; values: MapValues; regions?: readonly MapRegion[]; scale?: ChoroplethScaleOptions; format?: (n: number) => string; highlight?: LinkedHighlight<string>; limit?: number; hint?: (id: string) => ReactNode; className?: string; }
+type RankedRegionListProps = { label: string; values: GeoValues; regions?: readonly GeoRegion[]; scale?: ChoroplethScaleOptions; format?: (n: number) => string; highlight?: LinkedHighlight<string>; limit?: number; hint?: (id: string) => ReactNode; className?: string; }
 ```

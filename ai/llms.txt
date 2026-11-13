@@ -84,7 +84,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [lib-geo-br](components/lib-geo-br.md): Contornos das 27 unidades da federação, prontos para SVG.
 - [geo](components/geo.md): Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me
 - [lib-pivot](components/lib-pivot.md): Motor da tabela dinâmica (pivô).
-- [pivot](components/pivot.md): Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento opciona
+- [pivot](components/pivot.md): Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento op
 - [agent-run](components/agent-run.md): ------------------------------------------------------------------
 - [agent-evals](components/agent-evals.md): ------------------------------------------------------------------
 - [illustration](components/illustration.md): Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).

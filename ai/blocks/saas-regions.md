@@ -33,4 +33,4 @@ Mapa por UF com receita, crescimento ou penetração em degraus, lista ordenada 
 
 ## Componentes usados
 
-`Badge`, `BarList`, `BrRegion`, `BrUfId`, `Button`, `ChartCard`, `ChoroplethMap`, `ChoroplethScaleOptions`, `Empty`, `ErrorState`, `Page`, `PageHeading`, `RankedRegionList`, `SegmentedControl`, `Select`, `Skeleton`, `brRegions`, `brUfs`, `fitViewBox`, `formatCompact`, `formatCurrency`, `formatDelta`, `formatNumber`, `formatPercent`, `useLinkedHighlight`
+`Badge`, `BarList`, `BrRegion`, `BrUfId`, `Button`, `ChartCard`, `ChoroplethMap`, `ChoroplethScaleOptions`, `Empty`, `ErrorState`, `Page`, `PageHeading`, `RankedRegionList`, `SegmentedControl`, `Select`, `Skeleton`, `brRegions`, `brUfs`, `fitGeoViewBox`, `formatCompact`, `formatCurrency`, `formatDelta`, `formatNumber`, `formatPercent`, `useLinkedHighlight`

@@ -15,9 +15,9 @@ Um cartão que acompanha uma execução de agente do começo ao fim: tarefa, age
 | `autoPlay` | `boolean \| undefined` | `true` | No modo demonstração, anda sozinho. |
 | `className` | `string \| undefined` |  |  |
 | `model` | `string \| undefined` |  | Modelo usado (nome do catálogo do app). |
-| `onApprove` | `((change: RunChange) => void) \| undefined` |  |  |
+| `onApprove` | `((change: AgentRunChange) => void) \| undefined` |  |  |
 | `onOpenResult` | `(() => void) \| undefined` |  | Abre o resultado (pull request, lançamentos). |
-| `onReject` | `((change: RunChange, reason: string) => void) \| undefined` |  |  |
+| `onReject` | `((change: AgentRunChange, reason: string) => void) \| undefined` |  |  |
 | `onRestart` | `(() => void) \| undefined` |  | Executar de novo. No modo demonstração recomeça o roteiro mesmo sem este callback. |
 | `run` | `AgentRunState \| undefined` |  | Estado controlado: status, tempo, passos, aprovação pendente e resultado. |
 | `script` | `AgentRunScript \| undefined` |  | Modo demonstração: roteiro simulado quando `run` não vem. |
@@ -36,12 +36,63 @@ Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
   onApprove={(c) => aplicar(c)} onReject={(c, motivo) => devolver(c, motivo)} />
 ```
 
+## AgentRunChange (type)
+
+A mudança que o agente quer aplicar e que espera aprovação.
+
+```ts
+type AgentRunChange = { id: string; title: string; summary?: ReactNode; files: AgentRunChangeFile[] }
+```
+
+## AgentRunChangeFile (type)
+
+Um arquivo da mudança proposta, como diff unificado.
+
+```ts
+type AgentRunChangeFile = { path: string; diff: string }
+```
+
+## AgentRunCheck (type)
+
+Uma verificação ao fim da execução (testes, lint, conferência de saldo).
+
+```ts
+type AgentRunCheck = { label: string; status: "passed" | "failed"; detail?: string }
+```
+
+## AgentRunOutcome (type)
+
+O que a execução entregou.
+
+```ts
+type AgentRunOutcome = { summary?: ReactNode; files?: { path: string; added: number; removed: number }[]; checks?: AgentRunCheck[]; openLabel?: string; openIcon?: ReactNode; }
+```
+
+## AgentRunResult
+
+Fim de uma execução: arquivos alterados com +/−, verificações que passaram, abrir o resultado e executar de novo.
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `result` * | `AgentRunOutcome` |  |  |
+| `className` | `string \| undefined` |  |  |
+| `onOpen` | `(() => void) \| undefined` |  |  |
+| `onRestart` | `(() => void) \| undefined` |  |  |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
+
+```tsx
+<AgentRunResult result={{ files, checks, openLabel: "Abrir pull request", openIcon: <GitPullRequest /> }} onOpen={abrir} onRestart={deNovo} />
+```
+
 ## AgentRunScript (type)
 
 Roteiro do modo demonstração: passos, onde o portão de aprovação para a execução e o resultado.
 
 ```ts
-type AgentRunScript = { steps: RunStep[]; approvalAt?: number; approval?: RunChange; result: RunOutcome; }
+type AgentRunScript = { steps: AgentRunStep[]; approvalAt?: number; approval?: AgentRunChange; result: AgentRunOutcome; }
 ```
 
 ## AgentRunState (type)
@@ -49,7 +100,7 @@ type AgentRunScript = { steps: RunStep[]; approvalAt?: number; approval?: RunCha
 Estado controlado do AgentRunCard.
 
 ```ts
-type AgentRunState = { status: AgentRunStatus; elapsedMs: number; steps: RunStep[]; approval?: RunChange; result?: RunOutcome; error?: ReactNode; }
+type AgentRunState = { status: AgentRunStatus; elapsedMs: number; steps: AgentRunStep[]; approval?: AgentRunChange; result?: AgentRunOutcome; error?: ReactNode; }
 ```
 
 ## AgentRunStatus (type)
@@ -60,101 +111,29 @@ Situação da execução inteira.
 type AgentRunStatus = "running" | "waiting" | "done" | "failed"
 ```
 
-## DiffApproval
-
-Portão de aprovação de uma mudança proposta pelo agente: resumo, diff com uma aba por arquivo (com +/−), "Aprovar e aplicar" e "Devolver com comentário" (abre o campo do motivo).
-
-| Prop | Tipo | Padrão | Descrição |
-| --- | --- | --- | --- |
-| `change` * | `RunChange` |  |  |
-| `autoFocus` | `boolean \| undefined` | `false` | Leva o foco ao portão quando ele aparece. |
-| `busy` | `boolean \| undefined` | `false` | Aplicando: os botões ficam ocupados. |
-| `className` | `string \| undefined` |  |  |
-| `onApprove` | `((change: RunChange) => void) \| undefined` |  |  |
-| `onReject` | `((change: RunChange, reason: string) => void) \| undefined` |  | Devolve ao agente com o comentário (obrigatório). |
-
-`*` obrigatória. Atributos HTML nativos repassados não são listados.
-
-Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
-
-```tsx
-<DiffApproval change={{ id, title: "Revisar mudanças em 2 arquivos", summary, files: [{ path, diff }] }}\n  onApprove={aplicar} onReject={(c, motivo) => devolver(c, motivo)} />
-```
-
-## RunChange (type)
-
-A mudança que o agente quer aplicar e que espera aprovação.
-
-```ts
-type RunChange = { id: string; title: string; summary?: ReactNode; files: RunChangeFile[] }
-```
-
-## RunChangeFile (type)
-
-Um arquivo da mudança proposta, como diff unificado.
-
-```ts
-type RunChangeFile = { path: string; diff: string }
-```
-
-## RunCheck (type)
-
-Uma verificação ao fim da execução (testes, lint, conferência de saldo).
-
-```ts
-type RunCheck = { label: string; status: "passed" | "failed"; detail?: string }
-```
-
-## RunOutcome (type)
-
-O que a execução entregou.
-
-```ts
-type RunOutcome = { summary?: ReactNode; files?: { path: string; added: number; removed: number }[]; checks?: RunCheck[]; openLabel?: string; openIcon?: ReactNode; }
-```
-
-## RunResult
-
-Fim de uma execução: arquivos alterados com +/−, verificações que passaram, abrir o resultado e executar de novo.
-
-| Prop | Tipo | Padrão | Descrição |
-| --- | --- | --- | --- |
-| `result` * | `RunOutcome` |  |  |
-| `className` | `string \| undefined` |  |  |
-| `onOpen` | `(() => void) \| undefined` |  |  |
-| `onRestart` | `(() => void) \| undefined` |  |  |
-
-`*` obrigatória. Atributos HTML nativos repassados não são listados.
-
-Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
-
-```tsx
-<RunResult result={{ files, checks, openLabel: "Abrir pull request", openIcon: <GitPullRequest /> }} onOpen={abrir} onRestart={deNovo} />
-```
-
-## RunStep (type)
+## AgentRunStep (type)
 
 Um passo da execução: texto curto no particípio ("Leu src/api/rotas.ts"), duração e, se for ferramenta, entrada e saída.
 
 ```ts
-type RunStep = { id: string; kind: RunStepKind; label: string; status?: RunStepStatus; durationMs?: number; tool?: { name: string; input?: unknown; output?: unknown; error?: string }; detail?: ReactNode; }
+type AgentRunStep = { id: string; kind: AgentRunStepKind; label: string; status?: AgentRunStepStatus; durationMs?: number; tool?: { name: string; input?: unknown; output?: unknown; error?: string }; detail?: ReactNode; }
 ```
 
-## RunStepKind (type)
+## AgentRunStepKind (type)
 
 O que o agente fez naquele passo.
 
 ```ts
-type RunStepKind = "plan" | "read" | "search" | "edit" | "test" | "tool"
+type AgentRunStepKind = "plan" | "read" | "search" | "edit" | "test" | "tool"
 ```
 
-## RunStepList
+## AgentRunSteps
 
 Passos de uma execução de agente, um por linha: ícone do tipo (planejar, ler, buscar, editar, testar, ferramenta), texto, duração e check.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `steps` * | `RunStep[]` |  |  |
+| `steps` * | `AgentRunStep[]` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `label` | `string \| undefined` | `"Passos da execução"` |  |
 
@@ -163,13 +142,34 @@ Passos de uma execução de agente, um por linha: ícone do tipo (planejar, ler,
 Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
 
 ```tsx
-<RunStepList steps={[{ id: "1", kind: "read", label: "Leu src/api/rotas.ts", status: "done", durationMs: 900 }, …]} />
+<AgentRunSteps steps={[{ id: "1", kind: "read", label: "Leu src/api/rotas.ts", status: "done", durationMs: 900 }, …]} />
 ```
 
-## RunStepStatus (type)
+## AgentRunStepStatus (type)
 
 Situação de um passo.
 
 ```ts
-type RunStepStatus = "pending" | "running" | "done" | "error"
+type AgentRunStepStatus = "pending" | "running" | "done" | "error"
+```
+
+## DiffApproval
+
+Portão de aprovação de uma mudança proposta pelo agente: resumo, diff com uma aba por arquivo (com +/−), "Aprovar e aplicar" e "Devolver com comentário" (abre o campo do motivo).
+
+| Prop | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `change` * | `AgentRunChange` |  |  |
+| `autoFocus` | `boolean \| undefined` | `false` | Leva o foco ao portão quando ele aparece. |
+| `busy` | `boolean \| undefined` | `false` | Aplicando: os botões ficam ocupados. |
+| `className` | `string \| undefined` |  |  |
+| `onApprove` | `((change: AgentRunChange) => void) \| undefined` |  |  |
+| `onReject` | `((change: AgentRunChange, reason: string) => void) \| undefined` |  | Devolve ao agente com o comentário (obrigatório). |
+
+`*` obrigatória. Atributos HTML nativos repassados não são listados.
+
+Exemplo (showcase `#/p/ia-execucao-e-avaliacao`):
+
+```tsx
+<DiffApproval change={{ id, title: "Revisar mudanças em 2 arquivos", summary, files: [{ path, diff }] }}\n  onApprove={aplicar} onReject={(c, motivo) => devolver(c, motivo)} />
 ```

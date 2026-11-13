@@ -118,7 +118,7 @@ Intensidade em duas dimensões: coorte × mês (retenção), dia × hora (picos 
 | `rowMeta` | `ReactNode[] \| undefined` |  | Coluna extra depois do rótulo de cada linha (tamanho da coorte, total). |
 | `rowMetaLabel` | `string \| undefined` |  | Cabeçalho da coluna de `rowMeta` ("Espaços"). |
 | `rowsLabel` | `string \| undefined` |  | Cabeçalho da coluna de rótulos ("Coorte"). |
-| `scale` | `{ steps: number; domain?: [number, number]; } \| undefined` |  | Escala em degraus (`quantize`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados. |
+| `scale` | `{ steps: number; domain?: [number, number]; } \| undefined` |  | Escala em degraus (`quantizeScale`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados. |
 | `showValues` | `boolean \| undefined` | `true` |  |
 | `summaryRow` | `{ label: string; values: (number \| null)[]; meta?: ReactNode; } \| undefined` |  | Linha de resumo separada no fim ("Média"), pintada na mesma escala. |
 | `tone` | `"ok" \| "info" \| "accent" \| "ink" \| undefined` | `"ink"` |  |
@@ -189,13 +189,13 @@ Curvas de retenção por coorte: uma linha por coorte (as recentes mais escuras)
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `columns` * | `string[]` |  | Rótulo de cada ponto do eixo X ("1", "2"… meses desde o cadastro). |
+| `label` * | `string` |  | Nome acessível (obrigatório): o que as curvas respondem. |
 | `rows` * | `{ label: string; values: (number \| null)[]; }[]` |  | Uma linha por coorte, da mais antiga para a mais recente. |
 | `average` | `{ label?: string; values: (number \| null)[]; } \| undefined` |  | Curva média, desenhada em destaque. |
 | `className` | `string \| undefined` |  |  |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatPercent(n, 0)` |  |
 | `formatAxis` | `((n: number) => string) \| undefined` |  |  |
 | `height` | `number \| undefined` | `280` |  |
-| `label` | `string \| undefined` | `"Curvas de retenção por coorte"` |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 

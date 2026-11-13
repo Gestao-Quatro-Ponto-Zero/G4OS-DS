@@ -97,7 +97,7 @@ Ações de uma resposta: Copiar, Markdown, (refazer, avaliar) e ramificar.
 | `onRetry` | `(() => void) \| undefined` |  |  |
 | `onShare` | `(() => void) \| undefined` |  | Compartilhar a resposta (link ou exportar). |
 | `size` | `"xs" \| "md" \| undefined` | `"md"` | "xs": ícones mínimos (estilo Codex), implica `compact`. |
-| `versions` | `{ index: number; count: number; onChange: (index: number) => void; } \| undefined` |  | Versões da resposta (cada refazer gera uma): `index` começa em 0. |
+| `versions` | `{ index: number; count: number; onIndexChange: (index: number) => void; } \| undefined` |  | Versões da resposta (cada refazer gera uma): `index` começa em 0. |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
 
@@ -112,7 +112,7 @@ Exemplo (showcase `#/p/ia-resposta`):
   onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
   versions={{ index, count, onChange: setIndex }}
 />
-<AnswerVersions index={1} count={3} onChange={setIndex} />
+<AnswerVersions index={1} count={3} onIndexChange={setIndex} />
 ```
 
 ## MinimapItem (type)

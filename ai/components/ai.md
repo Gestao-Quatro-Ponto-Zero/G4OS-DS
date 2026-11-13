@@ -72,7 +72,7 @@ Pager das versões de uma resposta: "‹ 2 de 3 ›".
 | --- | --- | --- | --- |
 | `count` * | `number` |  |  |
 | `index` * | `number` |  |  |
-| `onChange` * | `(index: number) => void` |  |  |
+| `onIndexChange` * | `(index: number) => void` |  |  |
 | `className` | `string \| undefined` |  |  |
 
 `*` obrigatória. Atributos HTML nativos repassados não são listados.
@@ -88,7 +88,7 @@ Exemplo (showcase `#/p/ia-resposta`):
   onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
   versions={{ index, count, onChange: setIndex }}
 />
-<AnswerVersions index={1} count={3} onChange={setIndex} />
+<AnswerVersions index={1} count={3} onIndexChange={setIndex} />
 ```
 
 ## AskAILauncher
@@ -257,7 +257,7 @@ Exemplo (showcase `#/p/ia-resposta`):
   onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
   versions={{ index, count, onChange: setIndex }}
 />
-<AnswerVersions index={1} count={3} onChange={setIndex} />
+<AnswerVersions index={1} count={3} onIndexChange={setIndex} />
 ```
 
 ## CitedText

@@ -14,7 +14,7 @@ Dispersão conectada: como duas medidas andaram juntas no tempo (CAC × LTV, pre
 | `series` * | `ConnectedScatterSeries[]` |  |  |
 | `xLabel` * | `string` |  | Nome da medida do eixo horizontal ("CAC"). |
 | `yLabel` * | `string` |  | Nome da medida do eixo vertical ("LTV em 12 meses"). |
-| `active` | `string \| undefined` |  | Série em destaque (key). |
+| `activeSeries` | `string \| undefined` |  | Série em destaque (key). |
 | `arrows` | `boolean \| undefined` | `true` | Setas discretas de direção no meio de cada trecho. |
 | `className` | `string \| undefined` |  |  |
 | `compare` | `boolean \| undefined` | `true` | Mostra as outras séries bem esmaecidas, para comparar. |
@@ -54,7 +54,7 @@ type ConnectedScatterPoint = { x: number; y: number; label: string; note?: strin
 ## ConnectedScatterProps (type)
 
 ```ts
-type ConnectedScatterProps = { series: ConnectedScatterSeries[]; active?: string; compare?: boolean; index?: number; onIndexChange?: (index: number) => void; xLabel: string; yLabel: string; formatX?: (n: number) => string; formatY?: (n: number) => string; formatAxisX?: (n: number) => string; formatAxisY?: (n: number) => string; reference?: ConnectedScatterReference; curve?: "smooth" | "linear"; arrows?: boolean; scrubber?:…
+type ConnectedScatterProps = { series: ConnectedScatterSeries[]; activeSeries?: string; compare?: boolean; index?: number; onIndexChange?: (index: number) => void; xLabel: string; yLabel: string; formatX?: (n: number) => string; formatY?: (n: number) => string; formatAxisX?: (n: number) => string; formatAxisY?: (n: number) => string; reference?: ConnectedScatterReference; curve?: "smooth" | "linear"; arrows?: boolean; scru…
 ```
 
 ## ConnectedScatterReference (type)

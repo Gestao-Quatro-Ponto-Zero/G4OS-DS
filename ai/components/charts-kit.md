@@ -23,9 +23,9 @@ Controle de tempo para gráficos: arraste, clique ou use as setas (Home/End vão
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `count` * | `number` |  | Quantidade de posições (meses, dias). |
+| `index` * | `number` |  | Posição atual (0…count-1). |
 | `label` * | `string` |  | Nome acessível ("Mês"). |
-| `onChange` * | `(index: number) => void` |  |  |
-| `value` * | `number` |  |  |
+| `onIndexChange` * | `(index: number) => void` |  |  |
 | `className` | `string \| undefined` |  |  |
 | `format` | `((index: number) => string) \| undefined` | `(i) => String(i + 1)` | Texto de cada posição ("jun 2026"): vai para aria-valuetext e para o rótulo. |
 | `interval` | `number \| undefined` | `700` |  |
@@ -36,7 +36,7 @@ Controle de tempo para gráficos: arraste, clique ou use as setas (Home/End vão
 ## ChartScrubberProps (type)
 
 ```ts
-type ChartScrubberProps = { count: number; value: number; onChange: (index: number) => void; format?: (index: number) => string; label: string; playable?: boolean; interval?: number; className?: string; }
+type ChartScrubberProps = { count: number; index: number; onIndexChange: (index: number) => void; format?: (index: number) => string; label: string; playable?: boolean; interval?: number; className?: string; }
 ```
 
 ## LinkedHighlight (type)
@@ -51,11 +51,11 @@ Legenda de escala de intensidade.
 
 | Prop | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `thresholds` * | `number[]` |  | Limites inferiores de cada degrau (de `quantize(...).thresholds`). |
+| `thresholds` * | `number[]` |  | Limites inferiores de cada degrau (de `quantizeScale(...).thresholds`). |
 | `activeBin` | `number \| null \| undefined` | `null` | Degrau em destaque (vindo do gráfico). |
 | `className` | `string \| undefined` |  |  |
 | `format` | `((n: number) => string) \| undefined` | `(n) => formatNumber(n)` |  |
-| `max` | `number \| undefined` |  | Fim do último degrau (de `quantize(...).domain[1]`). |
+| `max` | `number \| undefined` |  | Fim do último degrau (de `quantizeScale(...).domain[1]`). |
 | `mode` | `"stepped" \| "continuous" \| undefined` | `"stepped"` |  |
 | `onHoverBin` | `((bin: number \| null) => void) \| undefined` |  | Hover/foco num degrau: o gráfico destaca as células daquela faixa. |
 | `scheme` | `"sequential" \| "diverging" \| undefined` | `"sequential"` | Escala de uma cor (`tone`) ou divergente (centrada em zero). |

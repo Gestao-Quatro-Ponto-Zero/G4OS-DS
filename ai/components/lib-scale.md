@@ -12,14 +12,6 @@ Cor de uma posição `t` (-1 a 1) numa escala divergente: negativo em `chart-neg
 divergingColor(t): string
 ```
 
-## extent (function)
-
-Mínimo e máximo de uma lista ignorando null/NaN.
-
-```ts
-extent(values): [number, number]
-```
-
 ## onScaleInk (function)
 
 Cor do texto sobre uma célula de intensidade `t`: tinta normal até o meio da escala, tinta invertida acima (legível nos dois temas).
@@ -28,18 +20,26 @@ Cor do texto sobre uma célula de intensidade `t`: tinta normal até o meio da e
 onScaleInk(t): "var(--color-on-ink)" | "var(--color-ink)"
 ```
 
-## quantize (function)
+## QuantizedScale (type)
+
+```ts
+type QuantizedScale = { thresholds: number[]; bin: (v: number) => number; level: (v: number) => number; steps: number; domain: [number, number]; }
+```
+
+## quantizeScale (function)
 
 Divide um domínio em `steps` degraus de limites "redondos" (escala em degraus: mais fácil de ler e comparar do que contínua).
 
 ```ts
-quantize(domain, steps?, { nice = true }?): Quantized
+quantizeScale(domain, steps?, { nice = true }?): QuantizedScale
 ```
 
-## Quantized (type)
+## scaleExtent (function)
+
+Mínimo e máximo de uma lista ignorando null/NaN.
 
 ```ts
-type Quantized = { thresholds: number[]; bin: (v: number) => number; level: (v: number) => number; steps: number; domain: [number, number]; }
+scaleExtent(values): [number, number]
 ```
 
 ## scaleShade (function)

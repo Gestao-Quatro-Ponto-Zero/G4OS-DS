@@ -177,7 +177,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **lib-geo-br**: Contornos das 27 unidades da federação, prontos para SVG.
 - **geo**: Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me
 - **lib-pivot**: Motor da tabela dinâmica (pivô).
-- **pivot**: Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento opciona
+- **pivot**: Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento op
 - **agent-run**: ------------------------------------------------------------------
 - **agent-evals**: ------------------------------------------------------------------
 - **illustration**: Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).
