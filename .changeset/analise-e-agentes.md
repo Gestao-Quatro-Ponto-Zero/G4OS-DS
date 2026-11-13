@@ -32,4 +32,6 @@ Gráficos analíticos, agentes de IA e revisão visual do DS inteiro.
 - `WaterfallChart`: valores de quedas ficam abaixo da barra; em faixa estreita só a barra em foco mostra o valor; o tooltip traz a variação com sinal.
 - `HeatmapMatrix`: células usam a mesma escala da legenda (`sequentialColor`); `tone="info"` passa a seguir o token `info`.
 
+**Servidor**: libs puras e tokens (`@g4ai/ds/lib/format`, `/lib/pivot`, `/lib/scale`, `/lib/geo-br`, `/lib/dates`, `/tokens`…) saem sem `"use client"` e rodam em Server Component, rota de API ou script. O ponto de entrada principal continua de cliente.
+
 **Auditoria**: regra `class-conflict` (duas utilidades da mesma propriedade no `cn`, que vence pela ordem do CSS e não do código).

@@ -87,7 +87,8 @@
     "!scripts/eval",
     "!scripts/test-react18.mjs",
     "!scripts/test-components.mjs",
-    "!scripts/test-pivot.mjs"
+    "!scripts/test-pivot.mjs",
+    "!scripts/test-server-libs.mjs"
   ],
   "bin": {
     "g4os-ds": "scripts/cli.mjs"
