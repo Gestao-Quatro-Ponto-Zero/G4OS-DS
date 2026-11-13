@@ -973,7 +973,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
                 aria-label={`${a.label}: ${rowLabel(row)}`}
                 disabled={a.disabled}
                 onClick={() => a.onSelect(row)}
-                className={cn("dg-quick inline-grid h-7 w-7 place-items-center rounded-md text-muted hover:bg-soft hover:text-ink disabled:opacity-40 [&_svg]:h-4 [&_svg]:w-4", a.tone === "danger" && "hover:text-rose")}
+                className={cn("dg-quick inline-grid h-7 w-7 place-items-center rounded-md text-muted hover:bg-soft disabled:opacity-40 [&_svg]:h-4 [&_svg]:w-4", a.tone === "danger" ? "hover:text-rose" : "hover:text-ink")}
               >
                 {a.icon}
               </button>

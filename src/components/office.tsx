@@ -838,7 +838,7 @@ function DocBlockView({ block, rows, last = true, headingId, toc }: { block: Doc
                 ) : (
                   <tr>
                     {block.columns.map((c, i) => (
-                      <th key={i} scope="col" className={cn("border-b border-line-strong px-2.5 py-2 text-left text-[12px] font-semibold text-ink", numeric(i) && "text-right")}>
+                      <th key={i} scope="col" className={cn("border-b border-line-strong px-2.5 py-2 text-[12px] font-semibold text-ink", numeric(i) ? "text-right" : "text-left")}>
                         {c.header}
                       </th>
                     ))}

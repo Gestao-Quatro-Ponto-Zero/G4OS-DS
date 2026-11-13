@@ -400,10 +400,10 @@ export function NativeSelect({
         aria-describedby={field.describedBy}
         aria-invalid={field.invalid || undefined}
         className={cn(
-          "focus-field w-full min-w-0 cursor-pointer appearance-none rounded-lg border bg-surface pl-3 pr-9 text-ink outline-none transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
+          "focus-field w-full min-w-0 cursor-pointer appearance-none rounded-lg border bg-surface pl-3 pr-9 outline-none transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:bg-soft/60 disabled:text-muted",
           size === "sm" ? "h-8 text-[13px]" : "h-10 text-[14px]",
           triggerBorder(field.invalid),
-          !value && placeholder && "text-muted",
+          !value && placeholder ? "text-muted" : "text-ink",
         )}
         {...rest}
       >

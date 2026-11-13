@@ -127,9 +127,9 @@ Os blocos estão em `src/blocks/` e no site em **Blocos**. Categorias: SaaS, CRM
 | **Financeiro** | `fin-dashboard`, `fin-cashflow` | `fin-receivables`, `fin-payables` | lançamento em `Drawer` | `fin-dre`, `fin-reconciliation`, `fin-bank-accounts` |
 | **Contratos** (CLM) | `clm-dashboard` | `clm-contracts`, `clm-obligations` | `clm-contract` | `clm-request` (assistente), `clm-approvals`, `clm-templates` |
 | **Comunicação interna** | `comms-home` | `comms-people`, `comms-events`, `comms-surveys` | `comms-announcement` | `comms-compose`, `comms-channels`, `comms-analytics` |
-| **Gestão de agentes de IA** | `ai-agents-dashboard` | `ai-agents`, `ai-runs`, `ai-approvals` | `ai-agent`, `ai-agent-run` | `ai-agent-builder`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-templates` |
-| **Assistente / chat de IA** | `ai-workspace` | `ai-sessions`, `ai-projects` | `ai-trace` | `ai-chat`, `ai-conversation`, `ai-assistant` |
-| **SaaS / produto** | `saas-dashboard` | `saas-customers`, `saas-plans`, `saas-usage` | `saas-customer` | `saas-analytics`, `settings-*`, `onboarding-*` |
+| **Gestão de agentes de IA** | `ai-agents-dashboard` | `ai-agents`, `ai-runs`, `ai-approvals` | `ai-agent`, `ai-agent-run` (`?estado=ao-vivo`: execução com aprovação de diff) | `ai-agent-builder`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-templates` |
+| **Assistente / chat de IA** | `ai-workspace` | `ai-sessions`, `ai-projects` | `ai-trace` | `ai-chat`, `ai-answer` (resposta com fontes citadas), `ai-conversation`, `ai-assistant` |
+| **SaaS / produto** | `saas-dashboard` | `saas-customers`, `saas-plans`, `saas-usage` | `saas-customer` | `saas-analytics`, `saas-mrr-bridge` (movimento de MRR), `saas-retention` (coortes), `saas-journey` (jornada), `saas-unit-economics` (CAC × LTV), `saas-regions` (mapa por UF), `saas-explore` (tabela dinâmica), `saas-usage-horizon`, `settings-*`, `onboarding-*` |
 | **Portal do cliente** | `onboarding-checklist` + `NextStep` | lista simples | — | `auth-login`, `auth-otp`, `app-file-manager` |
 | **Página pública** | — | — | — | `marketing-stage` (palcos, cena, cabeçalho que vira pílula), `marketing-landing`, `marketing-pricing`, `ats-careers` |
 | **Qualquer app** | — | — | — | `auth-*`, `settings-profile`/`-organization`/`-roles`/`-billing`/`-notifications`/`-team`/`-webhooks`/`-data`, `app-error-pages`, `app-legal`, `app-presentation` |

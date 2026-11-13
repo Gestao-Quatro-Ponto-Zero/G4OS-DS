@@ -210,8 +210,8 @@ export function ResizableSplit({
             <span
               aria-hidden
               className={cn(
-                "absolute top-1/2 h-8 w-1.5 -translate-y-1/2 rounded-full border border-line bg-surface transition-colors",
-                dragging ? "border-primary" : "group-hover:border-line-strong group-focus-visible:border-primary",
+                "absolute top-1/2 h-8 w-1.5 -translate-y-1/2 rounded-full border bg-surface transition-colors",
+                dragging ? "border-primary" : "border-line group-hover:border-line-strong group-focus-visible:border-primary",
               )}
             />
           </div>

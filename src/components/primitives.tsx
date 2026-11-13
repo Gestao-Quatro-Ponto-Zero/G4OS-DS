@@ -167,8 +167,8 @@ export function Avatar({
         <span
           aria-hidden
           className={cn(
-            "absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface [&_svg]:h-2.5 [&_svg]:w-2.5",
-            size === "xl" ? "h-5 w-5 [&_svg]:h-3 [&_svg]:w-3" : "h-4 w-4",
+            "absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface",
+            size === "xl" ? "h-5 w-5 [&_svg]:h-3 [&_svg]:w-3" : "h-4 w-4 [&_svg]:h-2.5 [&_svg]:w-2.5",
           )}
         >
           {badge}

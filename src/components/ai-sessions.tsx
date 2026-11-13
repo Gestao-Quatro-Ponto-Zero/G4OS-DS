@@ -1855,8 +1855,8 @@ export function PermissionModeChip({ value, onChange, className }: { value: Perm
         <BaseMenu.Trigger
           aria-label={`Permissão do agente: ${cur.label}`}
           className={cn(
-            "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium outline-none transition-colors hover:bg-ink/[0.05] focus-visible:ring-2 focus-visible:ring-muted/40 data-popup-open:bg-ink/[0.06] [&_svg]:h-3.5 [&_svg]:w-3.5",
-            value === "total" ? "bg-amber-soft text-amber hover:bg-amber-soft" : cur.cls,
+            "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-muted/40 data-popup-open:bg-ink/[0.06] [&_svg]:h-3.5 [&_svg]:w-3.5",
+            value === "total" ? "bg-amber-soft text-amber hover:bg-amber-soft" : cn("hover:bg-ink/[0.05]", cur.cls),
             className,
           )}
         >
@@ -2055,7 +2055,7 @@ export function ModelPicker({
               {cur?.icon ?? <Zap />}
             </span>
             <span className="whitespace-nowrap font-medium text-ink @max-[460px]:sr-only">{cur?.name}</span>
-            {effort && <span className={cn("hidden whitespace-nowrap text-muted sm:inline @max-[640px]:hidden", summary && "inline")}>{effortLabel[effort]}</span>}
+            {effort && <span className={cn("whitespace-nowrap text-muted @max-[640px]:hidden", summary ? "inline" : "hidden sm:inline")}>{effortLabel[effort]}</span>}
           </>
         )}
         <ChevronDown className="h-3 w-3 shrink-0 opacity-70" aria-hidden />

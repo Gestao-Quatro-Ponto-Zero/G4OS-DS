@@ -758,9 +758,9 @@ export function MessageScrollerButton({ direction = "end", children, className }
         aria-hidden={!show}
         onClick={() => (direction === "end" ? s.scrollToEnd() : s.scrollToStart())}
         className={cn(
-          "inline-flex h-8 items-center gap-1.5 rounded-full border border-line bg-popover px-3 text-[12.5px] font-medium text-ink shadow-raised transition-[opacity,transform] duration-150 hover:bg-soft focus-visible:ring-2 focus-visible:ring-accent/40",
+          "inline-flex h-8 items-center gap-1.5 rounded-full border bg-popover px-3 text-[12.5px] font-medium text-ink shadow-raised transition-[opacity,transform] duration-150 hover:bg-soft focus-visible:ring-2 focus-visible:ring-accent/40",
           show ? "pointer-events-auto translate-y-0 opacity-100" : "translate-y-1 opacity-0",
-          s.unread > 0 && direction === "end" && "border-primary/30",
+          s.unread > 0 && direction === "end" ? "border-primary/30" : "border-line",
           className,
         )}
       >

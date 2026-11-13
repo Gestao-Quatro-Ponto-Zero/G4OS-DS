@@ -527,8 +527,8 @@ export function ActionMenu({
           <BaseMenu.Popup className={cn(popupClass, "min-w-[180px] p-1.5")}>
             {actions.map((action, index) => {
               const cls = cn(
-                "flex w-full cursor-default items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] outline-none data-highlighted:bg-soft data-disabled:opacity-40",
-                action.tone === "danger" && "text-rose data-highlighted:bg-rose-soft/60",
+                "flex w-full cursor-default items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13.5px] outline-none data-disabled:opacity-40",
+                action.tone === "danger" ? "text-rose data-highlighted:bg-rose-soft/60" : "data-highlighted:bg-soft",
               );
               const body = (
                 <>

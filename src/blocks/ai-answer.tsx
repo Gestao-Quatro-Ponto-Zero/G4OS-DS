@@ -300,7 +300,7 @@ export default function AiAnswer() {
   })();
 
   return (
-    <AssistantShell current={assistantRoutes.chat} collapsed>
+    <AssistantShell current={assistantRoutes.answer} collapsed>
       <Page width="reading">
         <PageHeading
           title={question}
