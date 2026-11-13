@@ -63,7 +63,8 @@ export type Quantized = {
 const niceStep = (raw: number) => {
   if (raw <= 0 || !Number.isFinite(raw)) return 1;
   const mag = 10 ** Math.floor(Math.log10(raw));
-  const n = raw / mag;
+  // Tolerância: 0,6 / 6 = 0,10000000000000002 não pode virar passo 0,2.
+  const n = raw / mag - 1e-9;
   return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * mag;
 };
 
