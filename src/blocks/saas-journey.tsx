@@ -120,7 +120,6 @@ function JourneyPanel({ channel, selected, counts, links }: { channel: Channel; 
   const incoming = node ? links.filter((l) => l.target === node.id) : [];
   const outgoing = node ? links.filter((l) => l.source === node.id) : [];
   const losses = ["saiu", "abandonou", "parou"].map((id) => ({ id, value: value(id) })).sort((a, b) => b.value - a.value);
-  const totalLoss = losses.reduce((s, l) => s + l.value, 0);
   const free = counts.config - counts.pago;
   return (
     <aside aria-label="Detalhe da jornada" className="flex min-w-0 flex-col gap-5">
@@ -158,15 +157,16 @@ function JourneyPanel({ channel, selected, counts, links }: { channel: Channel; 
         </section>
       )}
       <section className="flex flex-col border-t border-line pt-4">
-        <h5 className="m-0 text-[12px] font-normal text-muted">Maiores perdas</h5>
+        {/* Mesma base do gráfico (% das visitas): "Saiu" lê 69 % aqui e no nó. */}
+        <h5 className="m-0 text-[12px] font-normal text-muted">Maiores perdas · % das visitas</h5>
         <ul className="m-0 flex list-none flex-col p-0">
           {losses.map((l) => (
-            <BarRow key={l.id} label={lossName[l.id]} value={l.value} share={l.value / (totalLoss || 1)} tone="muted" />
+            <BarRow key={l.id} label={lossName[l.id]} value={l.value} share={l.value / (counts.visitas || 1)} tone="muted" />
           ))}
         </ul>
       </section>
       <section className="flex flex-col border-t border-line pt-4">
-        <h5 className="m-0 text-[12px] font-normal text-muted">Plano depois da configuração</h5>
+        <h5 className="m-0 text-[12px] font-normal text-muted">Plano depois da configuração · % de quem configurou</h5>
         <ul className="m-0 flex list-none flex-col p-0">
           <BarRow label="Pago" value={counts.pago} share={counts.pago / (counts.config || 1)} tone="ok" />
           <BarRow label="Gratuito" value={free} share={free / (counts.config || 1)} tone="muted" />
@@ -186,7 +186,7 @@ function JourneySkeleton() {
       <div className="flex flex-col gap-4 lg:col-span-2">
         <Skeleton className="h-4 w-56 max-w-full" />
         <Skeleton className="h-3 w-72 max-w-full" />
-        <div className="flex h-[340px] items-start justify-between gap-4">
+        <div className="flex h-[420px] items-start justify-between gap-4">
           {[100, 34, 26, 18, 10].map((h, i) => (
             <div key={i} className="w-2" style={{ height: `${h}%` }}>
               <Skeleton className="h-full w-full rounded-sm" />
@@ -303,7 +303,7 @@ export default function SaasJourney() {
                     selected={selected}
                     onSelect={setSelected}
                     minWidth={620}
-                    height={380}
+                    height={460}
                     label={`Jornada até o plano pago. ${sentence}`}
                   />
                 </div>

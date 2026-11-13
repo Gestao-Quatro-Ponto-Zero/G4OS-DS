@@ -444,7 +444,8 @@ export function EvalRunHeader({
     <section aria-label={`Execução da suíte ${title}`} className={cn("flex min-w-0 flex-col gap-4", className)}>
       <div className="flex min-w-0 flex-wrap items-start gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          <h3 className="m-0 text-[15px] font-medium text-ink">{title}</h3>
+          {/* "Suíte · Agente": o separador fica preso à palavra anterior (nunca abre linha no celular). */}
+          <h3 className="m-0 text-[15px] font-medium text-ink">{title.replace(/ · /g, "\u00a0· ")}</h3>
           <p className="m-0 text-[12.5px] text-muted">
             {candidate.label} contra {baseline.label} · {formatNumber(caseCount)} casos
           </p>

@@ -817,6 +817,9 @@ function sankeyTrace(id: string, links: SankeyLink[]) {
   return { linkSet, nodeSet };
 }
 
+/** Halo em surface: rótulo legível mesmo quando uma faixa passa por trás. */
+const sankeyHalo = { paintOrder: "stroke", stroke: "var(--ds-surface)", strokeWidth: 3, strokeLinejoin: "round" } as const;
+
 /**
  * Fluxos entre etapas (origem do lead → etapa → ganho/perdido; visita →
  * conta → plano). Nós em colunas fixas, largura da faixa = volume.
@@ -898,8 +901,12 @@ export function SankeyChart({
       t.inY += w;
       const x0 = s.x + nodeW;
       const x1 = t.x;
-      const mx = (x0 + x1) / 2;
-      return { ...l, i, w, d: `M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1},${y1}` };
+      // Rótulos acima na última coluna crescem para a esquerda, sobre a chegada
+      // das faixas: a faixa termina com um trecho reto, por baixo do rótulo.
+      const tCol = nodes.find((n) => n.id === l.target)?.column ?? 0;
+      const run = above && tCol === cols - 1 ? Math.min(84, (x1 - x0) * 0.45) : 0;
+      const mx = (x0 + x1 - run) / 2;
+      return { ...l, i, w, d: `M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1 - run},${y1} L${x1},${y1}` };
     });
     const total = colTotals[0] || 1;
     return { pos, paths, nodeW, value, cols, total, plotBottom: topPad + plotH };
@@ -1001,10 +1008,10 @@ export function SankeyChart({
                 <rect x={p.x} y={p.y} width={layout.nodeW} height={p.h} rx={2} fill={fill} style={{ y: p.y, height: p.h, transition: grow } as CSSProperties} />
                 {above ? (
                   <g style={{ transform: `translate(${last ? p.x + layout.nodeW : p.x}px, ${p.y}px)`, transition: slide }}>
-                    <text x={0} y={-18} textAnchor={last ? "end" : "start"} className={cn("fill-ink text-[11.5px]", n.id === selected && "font-semibold")}>
+                    <text x={0} y={-18} textAnchor={last ? "end" : "start"} className={cn("fill-ink text-[11.5px]", n.id === selected && "font-semibold")} style={sankeyHalo}>
                       {n.label}
                     </text>
-                    <text x={0} y={-5} textAnchor={last ? "end" : "start"} className="fill-muted text-[11px] tabular-nums">
+                    <text x={0} y={-5} textAnchor={last ? "end" : "start"} className="fill-muted text-[11px] tabular-nums" style={sankeyHalo}>
                       {format(layout.value.get(n.id) ?? 0)} · {pctOf(n.id)}
                     </text>
                   </g>
