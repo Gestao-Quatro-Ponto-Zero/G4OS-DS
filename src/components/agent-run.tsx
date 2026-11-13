@@ -34,17 +34,17 @@ import { Button, IconButton } from "./primitives";
 /* ------------------------------------------------------------------ */
 
 /** O que o agente fez naquele passo. Define o ícone. */
-export type RunStepKind = "plan" | "read" | "search" | "edit" | "test" | "tool";
+export type AgentRunStepKind = "plan" | "read" | "search" | "edit" | "test" | "tool";
 /** Situação de um passo. `running` brilha (`.ds-shimmer`) enquanto acontece. */
-export type RunStepStatus = "pending" | "running" | "done" | "error";
+export type AgentRunStepStatus = "pending" | "running" | "done" | "error";
 
 /** Um passo da execução: texto curto no particípio ("Leu src/api/rotas.ts"), duração e, se for ferramenta, entrada e saída. */
-export type RunStep = {
+export type AgentRunStep = {
   id: string;
-  kind: RunStepKind;
+  kind: AgentRunStepKind;
   /** Texto do passo. No gerúndio enquanto roda fica natural ("Lendo…"), mas um texto só serve aos dois. */
   label: string;
-  status?: RunStepStatus;
+  status?: AgentRunStepStatus;
   durationMs?: number;
   /** Chamada de ferramenta: abre no lugar mostrando entrada e saída. */
   tool?: { name: string; input?: unknown; output?: unknown; error?: string };
@@ -53,16 +53,16 @@ export type RunStep = {
 };
 
 /** Um arquivo da mudança proposta, como diff unificado. */
-export type RunChangeFile = { path: string; diff: string };
+export type AgentRunChangeFile = { path: string; diff: string };
 /** A mudança que o agente quer aplicar e que espera aprovação. */
-export type RunChange = { id: string; title: string; summary?: ReactNode; files: RunChangeFile[] };
+export type AgentRunChange = { id: string; title: string; summary?: ReactNode; files: AgentRunChangeFile[] };
 /** Uma verificação ao fim da execução (testes, lint, conferência de saldo). */
-export type RunCheck = { label: string; status: "passed" | "failed"; detail?: string };
+export type AgentRunCheck = { label: string; status: "passed" | "failed"; detail?: string };
 /** O que a execução entregou. Os arquivos vêm da mudança aprovada quando `files` não vem. */
-export type RunOutcome = {
+export type AgentRunOutcome = {
   summary?: ReactNode;
   files?: { path: string; added: number; removed: number }[];
-  checks?: RunCheck[];
+  checks?: AgentRunCheck[];
   /** Rótulo do botão principal: "Abrir pull request", "Ver lançamentos". */
   openLabel?: string;
   /** Ícone do botão principal (ex.: `<GitPullRequest />`). Padrão: seta para fora. */
@@ -76,21 +76,21 @@ export type AgentRunStatus = "running" | "waiting" | "done" | "failed";
 export type AgentRunState = {
   status: AgentRunStatus;
   elapsedMs: number;
-  steps: RunStep[];
+  steps: AgentRunStep[];
   /** Mudança esperando decisão. Com ela, o status deve ser `waiting`. */
-  approval?: RunChange;
-  result?: RunOutcome;
+  approval?: AgentRunChange;
+  result?: AgentRunOutcome;
   /** Por que falhou, em linguagem de gente. */
   error?: ReactNode;
 };
 
 /** Roteiro do modo demonstração: passos, onde o portão de aprovação para a execução e o resultado. */
 export type AgentRunScript = {
-  steps: RunStep[];
+  steps: AgentRunStep[];
   /** A execução para para aprovação antes do passo com este índice (os passos seguintes aplicam e verificam). */
   approvalAt?: number;
-  approval?: RunChange;
-  result: RunOutcome;
+  approval?: AgentRunChange;
+  result: AgentRunOutcome;
 };
 
 const statusMeta: Record<AgentRunStatus, { label: string; dot: string; text: string }> = {
@@ -100,7 +100,7 @@ const statusMeta: Record<AgentRunStatus, { label: string; dot: string; text: str
   failed: { label: "Falhou", dot: "bg-rose", text: "text-rose" },
 };
 
-const kindIcon: Record<RunStepKind, ReactNode> = {
+const kindIcon: Record<AgentRunStepKind, ReactNode> = {
   plan: <ListChecks />,
   read: <FileText />,
   search: <Search />,
@@ -108,7 +108,7 @@ const kindIcon: Record<RunStepKind, ReactNode> = {
   test: <FlaskConical />,
   tool: <Wrench />,
 };
-const kindLabel: Record<RunStepKind, string> = { plan: "Planejar", read: "Ler", search: "Buscar", edit: "Editar", test: "Testar", tool: "Ferramenta" };
+const kindLabel: Record<AgentRunStepKind, string> = { plan: "Planejar", read: "Ler", search: "Buscar", edit: "Editar", test: "Testar", tool: "Ferramenta" };
 
 const clock = (ms: number) => {
   const s = Math.floor(ms / 1000);
@@ -124,16 +124,16 @@ function Counts({ added, removed }: { added: number; removed: number }) {
   );
 }
 
-function fileCounts(file: RunChangeFile) {
+function fileCounts(file: AgentRunChangeFile) {
   const parsed = parseDiff(file.diff);
   return { path: file.path, added: parsed?.reduce((n, f) => n + f.added, 0) ?? 0, removed: parsed?.reduce((n, f) => n + f.removed, 0) ?? 0 };
 }
 
 /* ------------------------------------------------------------------ */
-/* RunStepList                                                         */
+/* AgentRunSteps                                                         */
 /* ------------------------------------------------------------------ */
 
-function StepRow({ step, open, onToggle }: { step: RunStep; open: boolean; onToggle: () => void }) {
+function StepRow({ step, open, onToggle }: { step: AgentRunStep; open: boolean; onToggle: () => void }) {
   const reduce = useReducedMotion();
   const id = useId();
   const status = step.status ?? "done";
@@ -217,7 +217,7 @@ function StepRow({ step, open, onToggle }: { step: RunStep; open: boolean; onTog
  * com movimento reduzido) e é anunciado ao leitor de tela; passo de ferramenta ou com `detail` abre
  * no lugar com entrada e saída.
  */
-export function RunStepList({ steps, label = "Passos da execução", className }: { steps: RunStep[]; /** Nome acessível da lista. */ label?: string; className?: string }) {
+export function AgentRunSteps({ steps, label = "Passos da execução", className }: { steps: AgentRunStep[]; /** Nome acessível da lista. */ label?: string; className?: string }) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const current = steps.findIndex((s) => s.status === "running");
   const live = current >= 0 ? `Passo ${current + 1} de ${steps.length}: ${steps[current].label}` : "";
@@ -253,10 +253,10 @@ export function DiffApproval({
   autoFocus = false,
   className,
 }: {
-  change: RunChange;
-  onApprove?: (change: RunChange) => void;
+  change: AgentRunChange;
+  onApprove?: (change: AgentRunChange) => void;
   /** Devolve ao agente com o comentário (obrigatório). */
-  onReject?: (change: RunChange, reason: string) => void;
+  onReject?: (change: AgentRunChange, reason: string) => void;
   /** Aplicando: os botões ficam ocupados. */
   busy?: boolean;
   /** Leva o foco ao portão quando ele aparece. */
@@ -365,11 +365,11 @@ export function DiffApproval({
 }
 
 /* ------------------------------------------------------------------ */
-/* RunResult                                                           */
+/* AgentRunResult                                                           */
 /* ------------------------------------------------------------------ */
 
 /** Fim de uma execução: arquivos alterados com +/−, verificações que passaram, abrir o resultado e executar de novo. */
-export function RunResult({ result, onOpen, onRestart, className }: { result: RunOutcome; onOpen?: () => void; onRestart?: () => void; className?: string }) {
+export function AgentRunResult({ result, onOpen, onRestart, className }: { result: AgentRunOutcome; onOpen?: () => void; onRestart?: () => void; className?: string }) {
   const files = result.files ?? [];
   const checks = result.checks ?? [];
   const failed = checks.filter((c) => c.status === "failed").length;
@@ -430,7 +430,7 @@ export function RunResult({ result, onOpen, onRestart, className }: { result: Ru
 /* Modo demonstração                                                   */
 /* ------------------------------------------------------------------ */
 
-type Play = { index: number; inStep: number; elapsed: number; phase: "running" | "waiting" | "done"; extra: RunStep[]; approved: boolean };
+type Play = { index: number; inStep: number; elapsed: number; phase: "running" | "waiting" | "done"; extra: AgentRunStep[]; approved: boolean };
 const TICK = 100;
 
 /** Executa o roteiro com o relógio da aba (só anda com ela visível). Movimento reduzido ou sem autoPlay: pula para cada parada. */
@@ -499,7 +499,7 @@ function useScriptedRun(script: AgentRunScript | undefined, animate: boolean) {
     approve: () => setPlay((p) => skipTo({ ...p, approved: true, phase: p.index >= order.length ? "done" : "running" })),
     reject: (reason: string) =>
       setPlay((p) => {
-        const extra: RunStep = { id: `rev-${p.extra.length + 1}`, kind: "edit", label: `Ajustou a mudança: “${reason}”`, durationMs: 2400 };
+        const extra: AgentRunStep = { id: `rev-${p.extra.length + 1}`, kind: "edit", label: `Ajustou a mudança: “${reason}”`, durationMs: 2400 };
         // O passo de revisão entra antes do portão; o agente volta a pedir aprovação depois dele.
         return animate
           ? { ...p, extra: [...p.extra, extra], phase: "running" }
@@ -545,8 +545,8 @@ export function AgentRunCard({
   script?: AgentRunScript;
   /** No modo demonstração, anda sozinho. `false` mostra cada parada pronta (como movimento reduzido). */
   autoPlay?: boolean;
-  onApprove?: (change: RunChange) => void;
-  onReject?: (change: RunChange, reason: string) => void;
+  onApprove?: (change: AgentRunChange) => void;
+  onReject?: (change: AgentRunChange, reason: string) => void;
   /** Abre o resultado (pull request, lançamentos). Mostra o botão principal do resultado. */
   onOpenResult?: () => void;
   /** Executar de novo. No modo demonstração recomeça o roteiro mesmo sem este callback. */
@@ -575,12 +575,12 @@ export function AgentRunCard({
         }
       : undefined;
 
-  const approve = (c: RunChange) => {
+  const approve = (c: AgentRunChange) => {
     setInteracted(true);
     onApprove?.(c);
     if (!controlled) demo.approve();
   };
-  const reject = (c: RunChange, reason: string) => {
+  const reject = (c: AgentRunChange, reason: string) => {
     setInteracted(true);
     onReject?.(c, reason);
     if (!controlled) demo.reject(reason);
@@ -629,10 +629,10 @@ export function AgentRunCard({
               </span>
               <ChevronDown aria-hidden className={cn("h-4 w-4 shrink-0 transition-transform duration-150", showSteps && "rotate-180")} />
             </button>
-            {showSteps && <RunStepList steps={run.steps} />}
+            {showSteps && <AgentRunSteps steps={run.steps} />}
           </div>
         ) : (
-          run.steps.length > 0 && <RunStepList steps={run.steps} />
+          run.steps.length > 0 && <AgentRunSteps steps={run.steps} />
         )}
 
         {run.status === "waiting" && run.approval && <DiffApproval change={run.approval} onApprove={approve} onReject={reject} autoFocus={interacted || !gateAtMount.current} />}
@@ -647,7 +647,7 @@ export function AgentRunCard({
 
         {run.status === "done" && run.result && (
           <div className="border-t border-line px-2 pt-3">
-            <RunResult result={run.result} onOpen={onOpenResult} onRestart={restart} />
+            <AgentRunResult result={run.result} onOpen={onOpenResult} onRestart={restart} />
           </div>
         )}
       </div>

@@ -801,7 +801,7 @@ export function MessageActions({
   /** Refazer com opções; substitui o botão de `onRetry` ("Tentar de novo" chama com "retry"). */
   onRegenerate?: (option: RegenerateOption) => void;
   /** Versões da resposta (cada refazer gera uma): `index` começa em 0. Com `count` < 2, nada aparece. */
-  versions?: { index: number; count: number; onChange: (index: number) => void };
+  versions?: { index: number; count: number; onIndexChange: (index: number) => void };
   /** Só ícones, alinhados à esquerda (respostas em fluxo). */
   compact?: boolean;
   /** "xs": ícones mínimos (estilo Codex), implica `compact`. */

@@ -168,7 +168,7 @@ function finish(acc: Acc | undefined, agg: PivotAgg): number | null {
  * Linhas/Colunas também. Sem Valores, o resultado ainda traz linhas e
  * colunas (o componente mostra o estado vazio).
  */
-export function pivot(records: PivotRecord[], fields: PivotField[], layout: PivotLayout): PivotResult {
+export function buildPivot(records: PivotRecord[], fields: PivotField[], layout: PivotLayout): PivotResult {
   const byId = new Map(fields.map((f) => [f.id, f]));
   const isDim = (id: string) => byId.get(id)?.kind === "dimension";
   const rowIds = layout.rows.filter(isDim);

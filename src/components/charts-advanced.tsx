@@ -5,7 +5,7 @@ import { cn } from "../lib/cn";
 import { formatNumber, formatPercent } from "../lib/format";
 import { useReducedMotion } from "../lib/motion";
 import { useReadableFills } from "../lib/readable";
-import { quantize, sequentialColor } from "../lib/scale";
+import { quantizeScale, sequentialColor } from "../lib/scale";
 import { ChartLegend, ChartTooltip, chartColor, niceDomain, niceRange, SrTable, useElementWidth, type ChartDatum, type ChartSeries } from "./charts";
 import { AxisBreak, ScaleLegend } from "./charts-kit";
 
@@ -1082,9 +1082,6 @@ export function SankeyChart({
  * Intensidade → opacidade da cor. Monotônica, mas salta a faixa do meio
  * (40–72 %), onde nenhuma cor de texto atinge 4,5:1 sobre o preenchimento.
  */
-function heatShade(a: number) {
-  return a <= 0.5 ? a * 0.8 : 0.72 + (a - 0.5) * 0.56;
-}
 
 /**
  * Intensidade em duas dimensões: coorte × mês (retenção), dia × hora
@@ -1131,7 +1128,7 @@ export function HeatmapMatrix({
   rowsLabel?: string;
   /** Linha de resumo separada no fim ("Média"), pintada na mesma escala. */
   summaryRow?: { label: string; values: (number | null)[]; meta?: ReactNode };
-  /** Escala em degraus (`quantize`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados. */
+  /** Escala em degraus (`quantizeScale`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados. */
   scale?: { steps: number; domain?: [number, number] };
   /** Legenda da escala acima da matriz. `true` desenha o `ScaleLegend` ligado (passar o mouse num degrau destaca as células daquela faixa); um nó substitui a legenda. */
   legend?: boolean | ReactNode;
@@ -1145,13 +1142,12 @@ export function HeatmapMatrix({
   const rowNames = summaryRow ? [...rows, summaryRow.label] : rows;
   const nums = grid.flat().filter((v): v is number => v != null && Number.isFinite(v));
   const top = max ?? Math.max(1, ...nums);
-  const base = { ink: "var(--ds-ink)", accent: "var(--ds-accent)", ok: "var(--ds-ok)", info: "var(--ds-blue)" }[tone];
   const q = useMemo(() => {
     if (!scale) return null;
     const lo = nums.length ? Math.min(...nums) : 0;
     const hi = nums.length ? Math.max(...nums) : 1;
     // Domínio explícito vale como está; sem domínio, limites "redondos" a partir dos dados.
-    return scale.domain ? quantize(scale.domain, scale.steps, { nice: false }) : quantize([lo, hi], scale.steps);
+    return scale.domain ? quantizeScale(scale.domain, scale.steps, { nice: false }) : quantizeScale([lo, hi], scale.steps);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scale?.steps, scale?.domain?.[0], scale?.domain?.[1], grid]);
   const [hoverBin, setHoverBin] = useState<number | null>(null);
@@ -1168,8 +1164,8 @@ export function HeatmapMatrix({
   useReadableFills(box, [values, summaryRow, tone, top, q?.steps]);
   const fillOf = (v: number) => {
     if (q) return sequentialColor(q.level(v), tone);
-    const a = Math.max(0.06, Math.min(1, v / top));
-    return `color-mix(in oklab, ${base} ${Math.round(heatShade(a) * 100)}%, transparent)`;
+    // Mesma escala da legenda (ScaleLegend contínua): uma fonte de cor só.
+    return sequentialColor(Math.max(0, Math.min(1, v / top)), tone);
   };
   const has = (r: number, c: number) => grid[r]?.[c] != null;
   const nextCell = (r: number, c: number, key: string) => {
@@ -1312,7 +1308,7 @@ export function RetentionCurves({
   format = (n) => formatPercent(n, 0),
   formatAxis,
   height = 280,
-  label = "Curvas de retenção por coorte",
+  label,
   className,
 }: {
   /** Uma linha por coorte, da mais antiga para a mais recente. `null` = mês ainda não alcançado. */
@@ -1324,7 +1320,8 @@ export function RetentionCurves({
   format?: (n: number) => string;
   formatAxis?: (n: number) => string;
   height?: number;
-  label?: string;
+  /** Nome acessível (obrigatório): o que as curvas respondem. */
+  label: string;
   className?: string;
 }) {
   const [ref, width] = useElementWidth<HTMLDivElement>();

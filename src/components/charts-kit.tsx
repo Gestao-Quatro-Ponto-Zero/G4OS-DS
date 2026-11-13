@@ -24,9 +24,9 @@ import { divergingColor, sequentialColor, type ScaleTone } from "../lib/scale";
 /* ------------------------------------------------------------------ */
 
 export type ScaleLegendProps = {
-  /** Limites inferiores de cada degrau (de `quantize(...).thresholds`). Em `continuous`, só [mín, máx]. */
+  /** Limites inferiores de cada degrau (de `quantizeScale(...).thresholds`). Em `continuous`, só [mín, máx]. */
   thresholds: number[];
-  /** Fim do último degrau (de `quantize(...).domain[1]`). */
+  /** Fim do último degrau (de `quantizeScale(...).domain[1]`). */
   max?: number;
   mode?: "stepped" | "continuous";
   /** Escala de uma cor (`tone`) ou divergente (centrada em zero). */
@@ -131,8 +131,9 @@ export function ScaleLegend({
 export type ChartScrubberProps = {
   /** Quantidade de posições (meses, dias). */
   count: number;
-  value: number;
-  onChange: (index: number) => void;
+  /** Posição atual (0…count-1). */
+  index: number;
+  onIndexChange: (index: number) => void;
   /** Texto de cada posição ("jun 2026"): vai para aria-valuetext e para o rótulo. */
   format?: (index: number) => string;
   /** Nome acessível ("Mês"). */
@@ -148,7 +149,7 @@ export type ChartScrubberProps = {
  * (Home/End vão ao início e ao fim). Com `playable`, percorre sozinho;
  * com movimento reduzido, o botão de tocar não aparece.
  */
-export function ChartScrubber({ count, value, onChange, format = (i) => String(i + 1), label, playable = false, interval = 700, className }: ChartScrubberProps) {
+export function ChartScrubber({ count, index: value, onIndexChange: onChange, format = (i) => String(i + 1), label, playable = false, interval = 700, className }: ChartScrubberProps) {
   const reduced = useReducedMotion();
   const [playing, setPlaying] = useState(false);
   const last = Math.max(0, count - 1);

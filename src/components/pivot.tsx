@@ -2,7 +2,7 @@
 
 /*
  * Tabela dinâmica (pivô) para análise self-service:
- *   · PivotTable: desenha o resultado de `pivot()` (src/lib/pivot.ts) com
+ *   · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com
  *     cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais,
  *     total geral e sombreamento opcional por intensidade.
  *   · PivotBuilder: campos (Dimensões / Medidas) e quatro áreas (Filtros,
@@ -20,7 +20,7 @@ import {
   PIVOT_TOTAL,
   emptyPivotLayout,
   formatPivotValue,
-  pivot,
+  buildPivot,
   pivotAggLabel,
   pivotAggsFor,
   pivotCanDrop,
@@ -37,7 +37,7 @@ import {
   type PivotResult,
   type PivotRowNode,
 } from "../lib/pivot";
-import { extent, onScaleInk, sequentialColor } from "../lib/scale";
+import { scaleExtent, onScaleInk, sequentialColor } from "../lib/scale";
 import { ScaleLegend } from "./charts-kit";
 import { downloadCsv, gridToCsv, type GridColumn, type GridValue } from "./data-grid";
 import { notify } from "./feedback";
@@ -51,7 +51,7 @@ import { Button, Empty } from "./primitives";
 /* ------------------------------------------------------------------ */
 
 export type PivotTableProps = {
-  /** Resultado de `pivot(records, fields, layout)`. */
+  /** Resultado de `buildPivot(records, fields, layout)`. */
   result: PivotResult;
   /** Nome acessível da tabela ("Receita por região e trimestre"). */
   label: string;
@@ -89,7 +89,7 @@ export function PivotTable({ result, label, heat = false, maxHeight = 520, compa
     const walk = (ns: PivotRowNode[]) => ns.forEach((n) => (n.children.length ? walk(n.children) : leaves.push(n.key)));
     walk(result.rows);
     const cols = columns.length ? columns.map((c) => c.key) : [PIVOT_TOTAL];
-    return values.map((_, vi) => extent(leaves.flatMap((rk) => cols.map((ck) => result.value[rk]?.[ck]?.[vi]))));
+    return values.map((_, vi) => scaleExtent(leaves.flatMap((rk) => cols.map((ck) => result.value[rk]?.[ck]?.[vi]))));
   }, [heat, result, columns, values]);
   const leafCol = (ck: string) => (columns.length ? ck !== PIVOT_TOTAL : true);
 
@@ -457,7 +457,7 @@ export function PivotBuilder({
     return pivotMove(layout, fields, drag.item, toMoveTarget(drag.item, drag.over));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layout, fields, drag?.item, overKey]);
-  const result = useMemo(() => pivot(records, fields, shown), [records, fields, shown]);
+  const result = useMemo(() => buildPivot(records, fields, shown), [records, fields, shown]);
 
   /* Ações -------------------------------------------------------------- */
   const hasAny = layout.rows.length + layout.columns.length + layout.values.length + layout.filters.length > 0;
@@ -468,7 +468,7 @@ export function PivotBuilder({
     notify("Tabela limpa", () => setLayout(before, "Tabela restaurada."));
   };
   const exportCsv = () => {
-    const { header, rows } = pivotToRows(pivot(records, fields, layout));
+    const { header, rows } = pivotToRows(buildPivot(records, fields, layout));
     const cols: GridColumn<(GridValue)[]>[] = header.map((h, i) => ({ key: String(i), header: h, value: (r) => r[i] }));
     downloadCsv(fileName, gridToCsv(rows, cols));
   };

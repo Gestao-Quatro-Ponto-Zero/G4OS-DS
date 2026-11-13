@@ -89,7 +89,8 @@ type Pt = [number, number];
 /** Segmentos de Bézier por Catmull-Rom (passa por todos os pontos, sem cantos). */
 function smoothSegments(pts: Pt[], smooth: boolean) {
   const segs: { d: string; mid: Pt; angle: number; len: number }[] = [];
-  const k = smooth ? 0.9 : 0;
+  // Tensão moderada: o caminho é paramétrico (x não é monótono) e tensão alta faz laços.
+  const k = smooth ? 0.55 : 0;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] ?? pts[i];
     const p1 = pts[i];
@@ -148,7 +149,7 @@ export type ConnectedScatterReference = {
 export type ConnectedScatterProps = {
   series: ConnectedScatterSeries[];
   /** Série em destaque (key). Padrão: a primeira. Trocar transiciona o caminho. */
-  active?: string;
+  activeSeries?: string;
   /** Mostra as outras séries bem esmaecidas, para comparar. Padrão: true. */
   compare?: boolean;
   /** Posição da cabeça (índice do ponto). Controlado; sem ele, começa no último. */
@@ -187,7 +188,7 @@ export type ConnectedScatterProps = {
  */
 export function ConnectedScatter({
   series,
-  active: activeProp,
+  activeSeries: activeProp,
   compare = true,
   index: indexProp,
   onIndexChange,
@@ -537,7 +538,7 @@ export function ConnectedScatter({
           </table>
         </div>
       </div>
-      {scrubber && n > 1 && <ChartScrubber count={n} value={index} onChange={setIndex} format={(i) => points[i]?.label ?? ""} label="Mês" playable />}
+      {scrubber && n > 1 && <ChartScrubber count={n} index={index} onIndexChange={setIndex} format={(i) => points[i]?.label ?? ""} label="Mês" playable />}
     </div>
   );
 }

@@ -21,7 +21,7 @@ import {
   formatDelta,
   formatNumber,
   formatPercent,
-  fitViewBox,
+  fitGeoViewBox,
   useLinkedHighlight,
   type BrRegion,
   type BrUfId,
@@ -254,7 +254,7 @@ export default function SaasRegions() {
   // ?estado=filtro simula um recorte sem clientes (no seu app: a consulta voltou vazia).
   const filteredEmpty = estado === "filtro" && region === "Norte";
   const regions = useMemo(() => brUfs.filter((u) => ids.includes(u.id)), [ids]);
-  const viewBox = useMemo(() => (region === "todas" ? undefined : fitViewBox(regions)), [region, regions]);
+  const viewBox = useMemo(() => (region === "todas" ? undefined : fitGeoViewBox(regions)), [region, regions]);
   const values = useMemo(() => Object.fromEntries(ids.map((id) => [id, m.value(ufData[id])])), [ids, m]);
   const total = totals(ids);
   const place = region === "todas" ? "Brasil" : region;
@@ -352,7 +352,7 @@ export default function SaasRegions() {
                     scale={m.scale}
                     format={m.format}
                     valueLabel={m.label}
-                    legendFormat={metric === "receita" ? formatCompact : undefined}
+                    formatLegend={metric === "receita" ? formatCompact : undefined}
                     legendTitle={metric === "receita" ? "Receita (R$)" : undefined}
                     highlight={hl}
                     zoomTo={selected}

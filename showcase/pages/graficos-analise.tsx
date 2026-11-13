@@ -64,7 +64,7 @@ export default function Page() {
             <ConnectedScatter
               label="CAC contra LTV de 12 meses, julho de 2025 a junho de 2026"
               series={cacLtv}
-              active={channel}
+              activeSeries={channel}
               xLabel="CAC"
               yLabel="LTV em 12 meses"
               formatX={brl}

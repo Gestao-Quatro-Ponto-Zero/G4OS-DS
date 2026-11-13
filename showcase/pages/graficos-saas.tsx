@@ -178,7 +178,7 @@ export default function Page() {
             ["rowMeta", "ReactNode[]", "—", "Coluna depois do rótulo da linha (tamanho da coorte). Cabeçalho em `rowMetaLabel`."],
             ["rowsLabel", "string", "—", "Cabeçalho da coluna de rótulos (\"Coorte\")."],
             ["summaryRow", "{ label, values, meta? }", "—", "Linha separada no fim (\"Média\"), na mesma escala."],
-            ["scale", "{ steps; domain? }", "—", "Degraus de limites redondos (`quantize`); cor por `sequentialColor`."],
+            ["scale", "{ steps; domain? }", "—", "Degraus de limites redondos (`quantizeScale`); cor por `sequentialColor`."],
             ["legend", "boolean | ReactNode", "false", "`true` desenha o `ScaleLegend` ligado acima da matriz."],
             ["legendTitle / valueLabel", "string", "— / \"Valor\"", "Título da legenda e rótulo do valor no tooltip."],
           ]}
@@ -197,7 +197,7 @@ export default function Page() {
 />`}
         >
           <ChartCard title="Onde a retenção estabiliza?" description="% de espaços ativos por mês desde o cadastro">
-            <RetentionCurves rows={cohorts.map((c, i) => ({ label: c, values: triangle[i] }))} columns={months} average={{ label: "Média", values: average }} height={260} />
+            <RetentionCurves rows={cohorts.map((c, i) => ({ label: c, values: triangle[i] }))} columns={months} average={{ label: "Média", values: average }} height={260} label="Curvas de retenção por coorte" />
           </ChartCard>
         </Demo>
         <PropsTable

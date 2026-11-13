@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IntroCard, ProductMark, onboardingScenes, type IntroStep } from "@g4ai/ds";
+import { IntroCard, ProductMark, onboardingScenes, type IntroCardStep } from "@g4ai/ds";
 import { org } from "./data/workspace";
 import { frameHref, go, useFrameParam } from "./shells/frame-route";
 
@@ -35,7 +35,7 @@ export const meta = {
 /* Dados de exemplo                                                    */
 /* ------------------------------------------------------------------ */
 
-const steps: IntroStep[] = [
+const steps: IntroCardStep[] = [
   {
     title: "Crie seu primeiro espaço",
     description: `Cada área do trabalho ganha um lugar próprio no ${org.product}. Comece pelo Comercial e crie outros espaços quando precisar.`,

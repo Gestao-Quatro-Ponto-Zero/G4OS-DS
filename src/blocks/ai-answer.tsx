@@ -276,7 +276,7 @@ export default function AiAnswer() {
               onFeedback={() => notify("Avaliação enviada")}
               onShare={share}
               onRegenerate={regenerate}
-              versions={{ index, count: versions.length, onChange: setIndex }}
+              versions={{ index, count: versions.length, onIndexChange: setIndex }}
               className="-ml-2"
             />
           </div>

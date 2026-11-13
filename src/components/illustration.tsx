@@ -165,7 +165,7 @@ export const onboardingScenes: IllustrationFrame[] = [
 /* ------------------------------------------------------------------ */
 
 /** Etapa do `IntroCard`: título, texto e, opcionalmente, o quadro da ilustração. */
-export type IntroStep = { title: string; description: ReactNode; frame?: IllustrationFrame };
+export type IntroCardStep = { title: string; description: ReactNode; frame?: IllustrationFrame };
 
 /**
  * Cartão compacto de primeira execução: ilustração em traço no topo (gelo),
@@ -186,7 +186,7 @@ export function IntroCard({
   autoFocus = false,
   className,
 }: {
-  steps: IntroStep[];
+  steps: IntroCardStep[];
   index?: number;
   onIndexChange?: (index: number) => void;
   defaultIndex?: number;

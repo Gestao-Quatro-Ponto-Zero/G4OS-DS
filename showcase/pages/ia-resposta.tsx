@@ -95,9 +95,9 @@ function ActionsDemo() {
           setVersions((v) => v + 1);
           setIndex(versions);
         }}
-        versions={{ index, count: versions, onChange: setIndex }}
+        versions={{ index, count: versions, onIndexChange: setIndex }}
       />
-      <MessageActions compact text="Resposta" onRegenerate={() => undefined} versions={{ index: 0, count: 3, onChange: () => undefined }} />
+      <MessageActions compact text="Resposta" onRegenerate={() => undefined} versions={{ index: 0, count: 3, onIndexChange: () => undefined }} />
     </div>
   );
 }
@@ -153,11 +153,11 @@ export default function Page() {
   onRegenerate={(opcao) => refazer(opcao)}   // "retry" | "shorter" | "longer" | "simpler"
   versions={{ index, count, onChange: setIndex }}
 />
-<AnswerVersions index={1} count={3} onChange={setIndex} />`}
+<AnswerVersions index={1} count={3} onIndexChange={setIndex} />`}
         >
           <div className="flex flex-col gap-4">
             <ActionsDemo />
-            <AnswerVersions index={v} count={3} onChange={setV} />
+            <AnswerVersions index={v} count={3} onIndexChange={setV} />
           </div>
         </Demo>
       </DocSection>

@@ -49,7 +49,7 @@ export function onScaleInk(t: number) {
   return clamp01(t) > 0.55 ? "var(--color-on-ink)" : "var(--color-ink)";
 }
 
-export type Quantized = {
+export type QuantizedScale = {
   /** Limites inferiores de cada degrau (comprimento = steps). */
   thresholds: number[];
   /** Índice do degrau (0…steps-1) de um valor. */
@@ -72,7 +72,7 @@ const niceStep = (raw: number) => {
  * Divide um domínio em `steps` degraus de limites "redondos" (escala em
  * degraus: mais fácil de ler e comparar do que contínua).
  */
-export function quantize(domain: [number, number], steps = 5, { nice = true }: { nice?: boolean } = {}): Quantized {
+export function quantizeScale(domain: [number, number], steps = 5, { nice = true }: { nice?: boolean } = {}): QuantizedScale {
   const n = Math.max(2, Math.round(steps));
   let [lo, hi] = domain;
   if (!(hi > lo)) hi = lo + 1;
@@ -92,7 +92,7 @@ export function quantize(domain: [number, number], steps = 5, { nice = true }: {
 }
 
 /** Mínimo e máximo de uma lista ignorando null/NaN. */
-export function extent(values: Iterable<number | null | undefined>): [number, number] {
+export function scaleExtent(values: Iterable<number | null | undefined>): [number, number] {
   let lo = Infinity;
   let hi = -Infinity;
   for (const v of values) {

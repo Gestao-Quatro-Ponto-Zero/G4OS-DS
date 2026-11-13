@@ -159,6 +159,17 @@ export type AiSource = {
 const sourceIcon: Record<NonNullable<AiSource["kind"]>, LucideIcon> = { web: Globe, doc: FileText, record: Search, data: Brain };
 
 /**
+ * Link de fonte vindo de modelo ou da web: só http(s), mailto e caminhos
+ * relativos viram <a>. `javascript:`, `data:` e afins são descartados.
+ */
+function safeSourceHref(href: string | undefined) {
+  if (!href) return undefined;
+  const h = href.trim();
+  if (/^(https?:|mailto:)/i.test(h) || /^[/#?.]/.test(h)) return h;
+  return /^[a-z][a-z0-9+.-]*:/i.test(h) ? undefined : h;
+}
+
+/**
  * Número de citação dentro do texto: “… 18 % [2]”. Hover mostra a fonte.
  * Com `onHighlight`, avisa quando o ponteiro ou o foco entra e sai (CitedText usa
  * para acender a frase sustentada); `active` pinta o número aceso.
@@ -191,9 +202,10 @@ export function CitationChip({
         onBlur: () => onHighlight(false),
       }
     : {};
-  if (source?.href)
+  const href = safeSourceHref(source?.href);
+  if (href)
     return (
-      <a href={source.href} target="_blank" rel="noreferrer" className={cls} title={label} aria-label={label} onClick={onClick} {...hl}>
+      <a href={href} target="_blank" rel="noreferrer" className={cls} title={label} aria-label={label} onClick={onClick} {...hl}>
         {index}
       </a>
     );
@@ -235,8 +247,8 @@ export function SourceList({ sources, title = "Fontes", compact = false, classNa
             : "block rounded-lg border border-line bg-surface px-3 py-2 hover:border-line-strong";
           return (
             <li key={s.id} className="min-w-0">
-              {s.href ? (
-                <a href={s.href} target="_blank" rel="noreferrer" className={cls}>
+              {safeSourceHref(s.href) ? (
+                <a href={safeSourceHref(s.href)} target="_blank" rel="noreferrer" className={cls}>
                   {body}
                 </a>
               ) : (
@@ -396,8 +408,8 @@ export function SourceCards({
         const name = `Fonte ${n}: ${s.title} (${sourceOrigin(s)})`;
         return (
           <li key={s.id} className="w-[176px] shrink-0 snap-start sm:w-auto">
-            {s.href ? (
-              <a href={s.href} target="_blank" rel="noreferrer" aria-label={name} className={card} data-active={active || undefined} {...hover}>
+            {safeSourceHref(s.href) ? (
+              <a href={safeSourceHref(s.href)} target="_blank" rel="noreferrer" aria-label={name} className={card} data-active={active || undefined} {...hover}>
                 {body}
               </a>
             ) : highlight ? (
@@ -639,7 +651,7 @@ export function CitedText({
                     setSeg(on ? id : null);
                     hl.setHover(on ? n : null);
                   }}
-                  onClick={sources[n - 1]?.href ? undefined : () => hl.setPinned(hl.pinned === n ? null : n)}
+                  onClick={safeSourceHref(sources[n - 1]?.href) ? undefined : () => hl.setPinned(hl.pinned === n ? null : n)}
                 />
               ))}
             </span>
@@ -782,7 +794,7 @@ export function CitedText({
 }
 
 /** Pager das versões de uma resposta: "‹ 2 de 3 ›". Some com uma versão só. `index` começa em 0. */
-export function AnswerVersions({ index, count, onChange, className }: { index: number; count: number; onChange: (index: number) => void; className?: string }) {
+export function AnswerVersions({ index, count, onIndexChange: onChange, className }: { index: number; count: number; onIndexChange: (index: number) => void; className?: string }) {
   if (count < 2) return null;
   const btn =
     "grid h-7 w-7 place-items-center rounded-md text-muted outline-none transition-colors hover:bg-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40 disabled:pointer-events-none disabled:opacity-40 [&_svg]:h-3.5 [&_svg]:w-3.5";

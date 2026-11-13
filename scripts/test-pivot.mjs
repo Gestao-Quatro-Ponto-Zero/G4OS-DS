@@ -38,7 +38,7 @@ try {
   });
   writeFileSync(join(dir, "package.json"), JSON.stringify({ type: "module" }));
   const P = await import(pathToFileURL(out).href);
-  const { pivot, pivotToRows, formatPivotValue, pivotMove, pivotSwap, pivotValues, PIVOT_TOTAL: T, emptyPivotLayout } = P;
+  const { buildPivot, pivotToRows, formatPivotValue, pivotMove, pivotSwap, pivotValues, PIVOT_TOTAL: T, emptyPivotLayout } = P;
 
   const fields = [
     { id: "regiao", label: "Região", kind: "dimension", values: ["Sul", "Sudeste"] },
@@ -60,7 +60,7 @@ try {
   const SEP = "\u001f";
 
   console.log("pivot · agregações");
-  const r = pivot(records, fields, L({ rows: ["regiao", "uf"], columns: ["tri"], values: [{ field: "receita", agg: "sum" }] }));
+  const r = buildPivot(records, fields, L({ rows: ["regiao", "uf"], columns: ["tri"], values: [{ field: "receita", agg: "sum" }] }));
 
   test("soma por folha e coluna", () => {
     assert.deepEqual(r.value[`Sudeste${SEP}SP`]["1º tri"], [100]);
@@ -93,7 +93,7 @@ try {
     assert.deepEqual(r.columnHeaders, [[{ label: "1º tri", span: 1, key: "1º tri" }, { label: "2º tri", span: 1, key: "2º tri" }]]);
   });
 
-  const avg = pivot(records, fields, L({ rows: ["regiao", "uf"], values: [{ field: "desconto", agg: "avg" }, { field: "receita", agg: "count" }, { field: "canal", agg: "distinct" }, { field: "receita", agg: "min" }, { field: "receita", agg: "max" }] }));
+  const avg = buildPivot(records, fields, L({ rows: ["regiao", "uf"], values: [{ field: "desconto", agg: "avg" }, { field: "receita", agg: "count" }, { field: "canal", agg: "distinct" }, { field: "receita", agg: "min" }, { field: "receita", agg: "max" }] }));
   test("média do subtotal recalcula a partir dos registros (não é média de médias)", () => {
     // Sudeste: SP média 0,15; RJ 0 → média de médias seria 0,075; dos registros é 0,1.
     assert.ok(Math.abs(avg.value.Sudeste[T][0] - 0.1) < 1e-12);
@@ -107,55 +107,55 @@ try {
 
   console.log("pivot · filtros e bordas");
   test("filtro mantém só os valores incluídos", () => {
-    const f = pivot(records, fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }], filters: [{ field: "canal", include: ["Inside"] }] }));
+    const f = buildPivot(records, fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }], filters: [{ field: "canal", include: ["Inside"] }] }));
     assert.equal(f.recordCount, 4);
     assert.equal(f.totalRecords, 6);
     assert.deepEqual(f.grandTotal, [280]);
     assert.deepEqual(f.rows.map((n) => n.label), ["Sul", "Sudeste"]);
   });
   test("filtro sem `include` não recorta; `include: []` recorta tudo", () => {
-    assert.equal(pivot(records, fields, L({ values: [{ field: "receita", agg: "sum" }], filters: [{ field: "canal" }] })).recordCount, 6);
-    const none = pivot(records, fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }], filters: [{ field: "canal", include: [] }] }));
+    assert.equal(buildPivot(records, fields, L({ values: [{ field: "receita", agg: "sum" }], filters: [{ field: "canal" }] })).recordCount, 6);
+    const none = buildPivot(records, fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }], filters: [{ field: "canal", include: [] }] }));
     assert.equal(none.recordCount, 0);
     assert.deepEqual(none.rows, []);
     assert.deepEqual(none.grandTotal, [null]);
   });
   test("sem colunas: só o total por linha", () => {
-    const s = pivot(records, fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }] }));
+    const s = buildPivot(records, fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }] }));
     assert.deepEqual(s.columns, []);
     assert.deepEqual(s.columnHeaders, []);
     assert.deepEqual(Object.keys(s.value.Sul), [T]);
   });
   test("sem linhas: só a linha de total por coluna", () => {
-    const s = pivot(records, fields, L({ columns: ["tri"], values: [{ field: "receita", agg: "sum" }] }));
+    const s = buildPivot(records, fields, L({ columns: ["tri"], values: [{ field: "receita", agg: "sum" }] }));
     assert.deepEqual(s.rows, []);
     assert.deepEqual(s.value[T]["2º tri"], [230]);
     assert.deepEqual(s.grandTotal, [410]);
   });
   test("dois níveis de coluna agrupam o cabeçalho com span", () => {
-    const s = pivot(records, fields, L({ columns: ["tri", "canal"], values: [{ field: "receita", agg: "sum" }] }));
+    const s = buildPivot(records, fields, L({ columns: ["tri", "canal"], values: [{ field: "receita", agg: "sum" }] }));
     assert.deepEqual(s.columnHeaders[0].map((h) => [h.label, h.span]), [["1º tri", 2], ["2º tri", 2]]);
     assert.deepEqual(s.columnHeaders[1].map((h) => h.label), ["Inside", "Parceiros", "Inside", "Parceiros"]);
   });
   test("vários valores por célula", () => {
-    const s = pivot(records, fields, L({ rows: ["regiao"], columns: ["tri"], values: [{ field: "receita", agg: "sum" }, { field: "receita", agg: "avg" }] }));
+    const s = buildPivot(records, fields, L({ rows: ["regiao"], columns: ["tri"], values: [{ field: "receita", agg: "sum" }, { field: "receita", agg: "avg" }] }));
     assert.deepEqual(s.value.Sudeste["1º tri"], [150, 75]);
     assert.deepEqual(s.values.map((v) => v.label), ["Receita (Soma)", "Receita (Média)"]);
   });
   test("dados vazios não quebram", () => {
-    const s = pivot([], fields, L({ rows: ["regiao"], columns: ["tri"], values: [{ field: "receita", agg: "sum" }, { field: "receita", agg: "count" }] }));
+    const s = buildPivot([], fields, L({ rows: ["regiao"], columns: ["tri"], values: [{ field: "receita", agg: "sum" }, { field: "receita", agg: "count" }] }));
     assert.deepEqual(s.rows, []);
     assert.deepEqual(s.columns, []);
     assert.deepEqual(s.grandTotal, [null, 0]);
     assert.equal(pivotToRows(s).rows.length, 1);
   });
   test("medida em Linhas e campo desconhecido são ignorados", () => {
-    const s = pivot(records, fields, L({ rows: ["receita", "xpto", "regiao"], values: [{ field: "receita", agg: "sum" }, { field: "xpto", agg: "sum" }] }));
+    const s = buildPivot(records, fields, L({ rows: ["receita", "xpto", "regiao"], values: [{ field: "receita", agg: "sum" }, { field: "xpto", agg: "sum" }] }));
     assert.deepEqual(s.rowFields.map((f) => f.id), ["regiao"]);
     assert.equal(s.values.length, 1);
   });
   test("valor ausente na dimensão vira 'Sem valor', no fim", () => {
-    const s = pivot([...records, { uf: "AM", receita: 5 }], fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }] }));
+    const s = buildPivot([...records, { uf: "AM", receita: 5 }], fields, L({ rows: ["regiao"], values: [{ field: "receita", agg: "sum" }] }));
     assert.deepEqual(s.rows.map((n) => n.label), ["Sul", "Sudeste", "Sem valor"]);
     assert.deepEqual(pivotValues(records, fields[3]), ["Inside", "Parceiros"]);
   });

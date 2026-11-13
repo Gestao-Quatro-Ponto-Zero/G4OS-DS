@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChartCard, ChoroplethMap, RankedRegionList, brRegions, brUfs, fitViewBox, formatCompact, formatCurrency, formatDelta, formatPercent, useLinkedHighlight } from "@g4ai/ds";
+import { ChartCard, ChoroplethMap, RankedRegionList, brRegions, brUfs, fitGeoViewBox, formatCompact, formatCurrency, formatDelta, formatPercent, useLinkedHighlight } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -23,7 +23,7 @@ const growth: Record<string, number> = {
 const brl = (n: number) => formatCurrency(n, { compact: true });
 const quantile = { breaks: "quantile" } as const;
 const south = brUfs.filter((u) => brRegions.Sul.includes(u.id));
-const southBox = fitViewBox(south);
+const southBox = fitGeoViewBox(south);
 
 export default function Page() {
   const hl = useLinkedHighlight<string>();
@@ -38,12 +38,12 @@ export default function Page() {
 // SP domina: degraus por quantil (mesma quantidade de UFs por faixa)
 const escala = { breaks: "quantile" } as const;
 <ChoroplethMap label="Receita mensal por estado" values={receitaPorUf} scale={escala} format={brl}
-  legendFormat={formatCompact} legendTitle="Receita (R$)" valueLabel="Receita" highlight={hl} />
+  formatLegend={formatCompact} legendTitle="Receita (R$)" valueLabel="Receita" highlight={hl} />
 <RankedRegionList label="Receita por estado, do maior ao menor" values={receitaPorUf} scale={escala} format={brl} highlight={hl} limit={8} />`}
         >
           <ChartCard title="Onde está a receita?" description="Receita mensal por UF · outubro de 2026" value={brl(Object.values(revenue).reduce((s, v) => s + v, 0))}>
             <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-              <ChoroplethMap label="Receita mensal por estado, outubro de 2026" values={revenue} scale={quantile} format={brl} legendFormat={formatCompact} legendTitle="Receita (R$)" valueLabel="Receita" highlight={hl} />
+              <ChoroplethMap label="Receita mensal por estado, outubro de 2026" values={revenue} scale={quantile} format={brl} formatLegend={formatCompact} legendTitle="Receita (R$)" valueLabel="Receita" highlight={hl} />
               <RankedRegionList label="Receita por estado, do maior ao menor" values={revenue} scale={quantile} format={brl} highlight={hl} limit={8} />
             </div>
           </ChartCard>
@@ -86,7 +86,7 @@ const escala = { breaks: "quantile" } as const;
           bare
           code={`// Só a região Sul; PR sem dado
 const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
-<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitViewBox(sul)}
+<ChoroplethMap label="Penetração no Sul" regions={sul} viewBox={fitGeoViewBox(sul)}
   values={{ PR: null, SC: 0.024, RS: 0.014 }} scale={{ tone: "info" }} format={(n) => formatPercent(n, 1)} />`}
         >
           <ChartCard title="Quanto do Sul já é cliente?" description="Empresas-alvo que são clientes · Paraná sem base de empresas">
@@ -107,9 +107,9 @@ const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
           rows={[
             ["label", "string", "—", "Obrigatório. Nome do mapa e legenda da tabela para leitor de tela."],
             ["values", "Record<id, number | null>", "—", "Valor por UF (ou região). Ausente ou null = sem dado (hachura)."],
-            ["regions / viewBox", "MapRegion[] / string", "brUfs / brViewBox", "Contornos { id, name, path, centroid?, bbox? }. Outro país ou recorte: passe os seus."],
-            ["scale", "{ steps?, domain?, scheme?, tone?, breaks? }", "5 degraus, sequencial, ink, equal", "equal = faixas iguais (quantize); quantile = mesma quantidade de UFs por faixa (um valor domina). diverging centra em zero."],
-            ["legendFormat / legendTitle", "(n) => string / ReactNode", "format / valueLabel", "Limites curtos na legenda (formatCompact + “Receita (R$)”)."],
+            ["regions / viewBox", "GeoRegion[] / string", "brUfs / brViewBox", "Contornos { id, name, path, centroid?, bbox? }. Outro país ou recorte: passe os seus."],
+            ["scale", "{ steps?, domain?, scheme?, tone?, breaks? }", "5 degraus, sequencial, ink, equal", "equal = faixas iguais (quantizeScale); quantile = mesma quantidade de UFs por faixa (um valor domina). diverging centra em zero."],
+            ["formatLegend / legendTitle", "(n) => string / ReactNode", "format / valueLabel", "Limites curtos na legenda (formatCompact + “Receita (R$)”)."],
             ["format / valueLabel", "(n) => string / string", "formatNumber / “Valor”", "Valor no tooltip, na legenda, na lista e na tabela."],
             ["selected / onSelect", "string | null", "—", "UF escolhida (clique, Enter); as outras esmaecem. Esc solta."],
             ["highlight", "LinkedHighlight<string>", "—", "useLinkedHighlight compartilhado com RankedRegionList ou uma tabela."],

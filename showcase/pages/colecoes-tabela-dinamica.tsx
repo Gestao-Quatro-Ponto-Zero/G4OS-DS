@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { CalendarRange, CircleDollarSign, Layers, Map as MapIcon, Megaphone, Repeat } from "lucide-react";
-import { PivotBuilder, PivotTable, pivot, type PivotBuilderField, type PivotLayout, type PivotRecord } from "@g4ai/ds";
+import { PivotBuilder, PivotTable, buildPivot, type PivotBuilderField, type PivotLayout, type PivotRecord } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -8,7 +8,7 @@ export const meta: PageMeta = {
   group: "Coleções",
   order: 45,
   description:
-    "PivotBuilder e PivotTable para análise self-service: a pessoa escolhe o que agrupar (Linhas, Colunas), o que calcular (Valores) e o recorte (Filtros), com subtotais, total geral e exportação em CSV. O motor pivot() é puro e testado.",
+    "PivotBuilder e PivotTable para análise self-service: a pessoa escolhe o que agrupar (Linhas, Colunas), o que calcular (Valores) e o recorte (Filtros), com subtotais, total geral e exportação em CSV. O motor buildPivot() é puro e testado.",
 };
 
 // Dados determinísticos (sem Math.random) para prints estáveis.
@@ -46,7 +46,7 @@ const fields: PivotBuilderField[] = [
 
 export default function Page() {
   const result = useMemo(
-    () => pivot(records, fields, { rows: ["regiao", "uf"], columns: ["trimestre"], values: [{ field: "receita", agg: "sum" }], filters: [] }),
+    () => buildPivot(records, fields, { rows: ["regiao", "uf"], columns: ["trimestre"], values: [{ field: "receita", agg: "sum" }], filters: [] }),
     [],
   );
   const [layout, setLayout] = useState<PivotLayout>({
@@ -91,11 +91,11 @@ const [layout, setLayout] = useState<PivotLayout>({
 
       <DocSection
         title="Só a tabela"
-        rule="Quando o recorte é fixo mas a pessoa precisa de subtotais e do detalhe, calcule com `pivot()` e desenhe com `PivotTable`. Grupos recolhem pelo chevron (← e → também); subtotais ficam na faixa `soft` e o total geral, em negrito, no rodapé fixo."
+        rule="Quando o recorte é fixo mas a pessoa precisa de subtotais e do detalhe, calcule com `buildPivot()` e desenhe com `PivotTable`. Grupos recolhem pelo chevron (← e → também); subtotais ficam na faixa `soft` e o total geral, em negrito, no rodapé fixo."
       >
         <Demo
           bare
-          code={`const result = pivot(records, fields, {
+          code={`const result = buildPivot(records, fields, {
   rows: ["regiao", "uf"], columns: ["trimestre"],
   values: [{ field: "receita", agg: "sum" }], filters: [],
 });
@@ -107,11 +107,11 @@ const [layout, setLayout] = useState<PivotLayout>({
 
       <DocSection
         title="Motor"
-        rule="`pivot(records, fields, layout)` é puro (sem React) e recalcula cada agregação a partir dos registros do grupo: a média do subtotal é a dos registros, nunca a média das médias. `distinct` conta valores únicos."
+        rule="`buildPivot(records, fields, layout)` é puro (sem React) e recalcula cada agregação a partir dos registros do grupo: a média do subtotal é a dos registros, nunca a média das médias. `distinct` conta valores únicos."
       >
         <PropsTable
           rows={[
-            ["pivot(records, fields, layout)", "PivotResult", "—", "Árvore de linhas com subtotais, colunas, value[rowKey][colKey][i], totais (chave PIVOT_TOTAL) e grandTotal."],
+            ["buildPivot(records, fields, layout)", "PivotResult", "—", "Árvore de linhas com subtotais, colunas, value[rowKey][colKey][i], totais (chave PIVOT_TOTAL) e grandTotal."],
             ["pivotToRows(result)", "{ header, rows }", "—", "Tabela achatada (subtotais e total geral) para CSV ou cópia."],
             ["formatPivotValue(n, spec)", "string", "—", "Formata pelo campo e pela agregação com lib/format; null vira “—”."],
             ["pivotMove(layout, fields, from, to)", "PivotLayout", "—", "Move um campo entre áreas respeitando as regras (o que o construtor usa)."],
@@ -133,7 +133,7 @@ const [layout, setLayout] = useState<PivotLayout>({
             ["toolbar", "ReactNode", "—", "Controles extras no topo (visões salvas)."],
             ["maxHeight", "number | string", "520", "Altura da tabela: rola dentro do card, nunca a página."],
             ["compact", "boolean", "false", "Moeda abreviada (R$ 1,2 mi) para tabelas largas."],
-            ["PivotTable.result", "PivotResult", "—", "Saída de pivot()."],
+            ["PivotTable.result", "PivotResult", "—", "Saída de buildPivot()."],
             ["PivotTable.label", "string", "—", "Nome acessível da tabela (obrigatório)."],
             ["PivotTable.defaultCollapsed", "string[]", "—", "Grupos que começam recolhidos."],
           ]}

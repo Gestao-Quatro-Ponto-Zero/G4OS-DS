@@ -6,15 +6,15 @@ import {
   EvalDotGrid,
   EvalRunHeader,
   OperationButton,
-  RunResult,
-  RunStepList,
+  AgentRunResult,
+  AgentRunSteps,
   notify,
   useOperation,
   type AgentRunScript,
   type EvalCaseDetail,
   type EvalCaseStatus,
   type EvalCategory,
-  type RunChange,
+  type AgentRunChange,
 } from "@g4ai/ds";
 import { GitPullRequest, Play } from "lucide-react";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
@@ -57,7 +57,7 @@ const routesDiff = `--- a/src/api/rotas.ts
  api.use("/pedidos", pedidos);
 `;
 
-const change: RunChange = {
+const change: AgentRunChange = {
   id: "chg-1",
   title: "Revisar mudanças em 2 arquivos",
   summary: "Limitar a 60 requisições por minuto por chave de API e aplicar o limite antes de todas as rotas públicas.",
@@ -185,10 +185,10 @@ export default function Page() {
         />
       </DocSection>
 
-      <DocSection title="Partes avulsas" rule="RunStepList, DiffApproval e RunResult servem fora do cartão: num painel lateral, num chat, numa página de execução.">
+      <DocSection title="Partes avulsas" rule="AgentRunSteps, DiffApproval e AgentRunResult servem fora do cartão: num painel lateral, num chat, numa página de execução.">
         <div className="grid gap-5 lg:grid-cols-2">
-          <Demo title="RunStepList" code={`<RunStepList steps={[{ id: "1", kind: "read", label: "Leu src/api/rotas.ts", status: "done", durationMs: 900 }, …]} />`}>
-            <RunStepList
+          <Demo title="AgentRunSteps" code={`<AgentRunSteps steps={[{ id: "1", kind: "read", label: "Leu src/api/rotas.ts", status: "done", durationMs: 900 }, …]} />`}>
+            <AgentRunSteps
               steps={[
                 { id: "1", kind: "plan", label: "Planejou a mudança", status: "done", durationMs: 1200 },
                 { id: "2", kind: "search", label: "Buscou middlewares de limite", status: "done", durationMs: 1000, tool: { name: "codigo.buscar", input: { termo: "limite" }, output: { resultados: 0 } } },
@@ -196,8 +196,8 @@ export default function Page() {
               ]}
             />
           </Demo>
-          <Demo title="RunResult" code={`<RunResult result={{ files, checks, openLabel: "Abrir pull request", openIcon: <GitPullRequest /> }} onOpen={abrir} onRestart={deNovo} />`}>
-            <RunResult
+          <Demo title="AgentRunResult" code={`<AgentRunResult result={{ files, checks, openLabel: "Abrir pull request", openIcon: <GitPullRequest /> }} onOpen={abrir} onRestart={deNovo} />`}>
+            <AgentRunResult
               result={{ files: [{ path: "src/api/limite.ts", added: 12, removed: 0 }, { path: "src/api/rotas.ts", added: 2, removed: 1 }], checks: script.result.checks, openLabel: "Abrir pull request", openIcon: <GitPullRequest /> }}
               onOpen={() => notify("Pull request #412 aberto")}
               onRestart={() => notify("Execução enviada de novo")}

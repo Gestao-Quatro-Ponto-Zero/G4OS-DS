@@ -17,7 +17,7 @@ import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
 import { brUfs, brViewBox } from "../lib/geo-br";
 import { useReducedMotion } from "../lib/motion";
-import { divergingColor, extent, onScaleInk, quantize, sequentialColor, type ScaleTone } from "../lib/scale";
+import { divergingColor, scaleExtent, onScaleInk, quantizeScale, sequentialColor, type ScaleTone } from "../lib/scale";
 import { ChartTooltipContent, SrTable } from "./charts";
 import { ScaleLegend, useLinkedHighlight, type LinkedHighlight } from "./charts-kit";
 import { Button } from "./primitives";
@@ -27,7 +27,7 @@ import { Button } from "./primitives";
 /* ------------------------------------------------------------------ */
 
 /** Uma região desenhável: contorno SVG no sistema do `viewBox`. */
-export type MapRegion = {
+export type GeoRegion = {
   id: string;
   name: string;
   /** Caminho SVG; várias partes (ilhas) são desenhadas com fill-rule="evenodd". */
@@ -39,7 +39,7 @@ export type MapRegion = {
 };
 
 /** Valores por id de região; `null` = sem dado (hachura). */
-export type MapValues = Record<string, number | null | undefined>;
+export type GeoValues = Record<string, number | null | undefined>;
 
 export type ChoroplethScaleOptions = {
   /** Quantidade de degraus (padrão 5; divergente arredonda para par, padrão 6). */
@@ -88,13 +88,13 @@ function roundNice(v: number, mode: "down" | "up" | "near") {
  * Escala em degraus de um mapa coroplético. A mesma instância pinta o mapa,
  * a legenda e a lista ordenada, então as três cores batem.
  */
-export function choroplethScale(values: MapValues, { steps, domain, scheme = "sequential", tone = "ink", breaks = "equal" }: ChoroplethScaleOptions = {}): ChoroplethScale {
+export function choroplethScale(values: GeoValues, { steps, domain, scheme = "sequential", tone = "ink", breaks = "equal" }: ChoroplethScaleOptions = {}): ChoroplethScale {
   const nums = Object.values(values).filter(isNum);
   if (scheme === "diverging") {
-    const [lo, hi] = domain ?? extent(nums);
+    const [lo, hi] = domain ?? scaleExtent(nums);
     const m = Math.max(Math.abs(lo), Math.abs(hi)) || 1;
     const half = Math.max(1, Math.ceil((steps ?? 6) / 2));
-    const q = quantize([0, m], half);
+    const q = quantizeScale([0, m], half);
     const step = q.thresholds[1] - q.thresholds[0] || m / half;
     const top = step * half;
     const n = half * 2;
@@ -135,7 +135,7 @@ export function choroplethScale(values: MapValues, { steps, domain, scheme = "se
       level,
     };
   }
-  const q = quantize(domain ?? extent(nums), steps ?? 5);
+  const q = quantizeScale(domain ?? scaleExtent(nums), steps ?? 5);
   return {
     scheme,
     tone,
@@ -151,7 +151,7 @@ export function choroplethScale(values: MapValues, { steps, domain, scheme = "se
  * viewBox que enquadra um conjunto de regiões (recorte por grande região,
  * só os estados com dado). `pad` é a folga em fração do lado maior.
  */
-export function fitViewBox(regions: readonly MapRegion[], pad = 0.04) {
+export function fitGeoViewBox(regions: readonly GeoRegion[], pad = 0.04) {
   const boxes = regions.flatMap((r) => (r.bbox ? [r.bbox] : []));
   if (!boxes.length) return brViewBox;
   const x0 = Math.min(...boxes.map((b) => b[0]));
@@ -173,11 +173,11 @@ const parseViewBox = (vb: string): Box => {
   return [x || 0, y || 0, w || 1000, h || 1000];
 };
 
-const centerOf = (r: MapRegion, fallback: Box): [number, number] =>
+const centerOf = (r: GeoRegion, fallback: Box): [number, number] =>
   r.centroid ? [r.centroid[0], r.centroid[1]] : r.bbox ? [(r.bbox[0] + r.bbox[2]) / 2, (r.bbox[1] + r.bbox[3]) / 2] : [fallback[0] + fallback[2] / 2, fallback[1] + fallback[3] / 2];
 
 /** Próxima região na direção da seta (a mais perto num cone à frente). */
-function neighborIn(regions: readonly MapRegion[], fromId: string, dir: "left" | "right" | "up" | "down", base: Box) {
+function neighborIn(regions: readonly GeoRegion[], fromId: string, dir: "left" | "right" | "up" | "down", base: Box) {
   const from = regions.find((r) => r.id === fromId);
   if (!from) return null;
   const [fx, fy] = centerOf(from, base);
@@ -253,9 +253,9 @@ export type ChoroplethMapProps = {
   /** Nome acessível do mapa ("Receita por estado em outubro de 2026"). Obrigatório. */
   label: string;
   /** Valor por id de região. Ausente ou `null` = sem dado (hachura e "—"). */
-  values: MapValues;
+  values: GeoValues;
   /** Regiões desenháveis. Padrão: as 27 UFs (`brUfs`). */
-  regions?: readonly MapRegion[];
+  regions?: readonly GeoRegion[];
   /** viewBox das regiões. Padrão: `brViewBox`. */
   viewBox?: string;
   /** Escala em degraus (sequencial ou divergente). */
@@ -280,7 +280,7 @@ export type ChoroplethMapProps = {
   legend?: boolean;
   legendTitle?: ReactNode;
   /** Formato curto dos limites da legenda (padrão: `format`). Ex.: `formatCompact` para dinheiro. */
-  legendFormat?: (n: number) => string;
+  formatLegend?: (n: number) => string;
   /** Sigla sobre as regiões que cabem (padrão: sim). */
   showLabels?: boolean;
   /** Altura em px. Padrão: proporção do viewBox, até `maxHeight`. */
@@ -314,7 +314,7 @@ export function ChoroplethMap({
   zoomOutLabel = "Voltar ao Brasil",
   legend = true,
   legendTitle,
-  legendFormat,
+  formatLegend,
   showLabels = true,
   height,
   maxHeight = 640,
@@ -513,7 +513,7 @@ export function ChoroplethMap({
           max={scale.max}
           scheme={scale.scheme}
           tone={scale.tone}
-          format={legendFormat ?? format}
+          format={formatLegend ?? format}
           title={legendTitle ?? valueLabel}
           activeBin={legendBin ?? (isNum(activeValue) ? scale.bin(activeValue) : null)}
           onHoverBin={setLegendBin}
@@ -531,9 +531,9 @@ export function ChoroplethMap({
 export type RankedRegionListProps = {
   /** Nome acessível da lista ("Receita por estado, do maior ao menor"). */
   label: string;
-  values: MapValues;
+  values: GeoValues;
   /** Regiões (para os nomes). Padrão: as 27 UFs. */
-  regions?: readonly MapRegion[];
+  regions?: readonly GeoRegion[];
   /** Mesma escala do mapa (o quadradinho de cor bate com a região). */
   scale?: ChoroplethScaleOptions;
   format?: (n: number) => string;

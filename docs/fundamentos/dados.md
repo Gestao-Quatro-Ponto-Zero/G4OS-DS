@@ -17,7 +17,7 @@ Gráficos do DS são SVG puro (`src/components/charts.tsx` e, para os complexos,
 
 Em código: `chartColor(i)` devolve `var(--color-chart-N)`; em TS fora do CSS, `tokens.chart[i]`.
 
-**Escalas de intensidade** (mapa de calor, coorte, mapa por UF, pivô) saem de `src/lib/scale.ts`: `sequentialColor(t, tone)` (uma cor, de claro a forte), `divergingColor(t)` (de `chart-neg` a `chart-pos` passando por neutro), `quantize(domain, steps)` (degraus com limites legíveis) e `onScaleInk(t)` (cor do texto sobre a célula, legível nos dois temas). A legenda é o `ScaleLegend` (degraus ou contínua).
+**Escalas de intensidade** (mapa de calor, coorte, mapa por UF, pivô) saem de `src/lib/scale.ts`: `sequentialColor(t, tone)` (uma cor, de claro a forte), `divergingColor(t)` (de `chart-neg` a `chart-pos` passando por neutro), `quantizeScale(domain, steps)` (degraus com limites legíveis) e `onScaleInk(t)` (cor do texto sobre a célula, legível nos dois temas). A legenda é o `ScaleLegend` (degraus ou contínua).
 
 **Ordem fixa.** A mesma categoria tem a mesma cor em todos os gráficos da tela (se "Orgânico" é chart-3 no donut, é chart-3 na barra ao lado). Passe `color` explícito quando a ordem dos dados variar.
 

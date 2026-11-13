@@ -438,7 +438,8 @@ export function NumberField({
   const clamp = (n: number) => Math.min(max ?? Infinity, Math.max(min ?? -Infinity, n));
   const bump = (dir: 1 | -1, mult = 1) => onChange(clamp(Number(((value ?? 0) + dir * step * mult).toFixed(digits))));
   const commit = () => {
-    const n = parseFloat(draft.replace(/\./g, "").replace(",", "."));
+    // Aceita o "−" tipográfico do formatNumber e o hífen digitado.
+    const n = parseFloat(draft.replace(/\u2212/g, "-").replace(/\./g, "").replace(",", "."));
     if (draft.trim() === "") onChange(null);
     else if (Number.isFinite(n)) onChange(clamp(n));
     else setDraft(value == null ? "" : formatNumber(value, digits));

@@ -327,7 +327,7 @@ function CellEditor({
     const t = text.trim();
     if (editor.type === "number" || editor.type === "currency") {
       if (!t) return null;
-      const n = Number(t.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+      const n = Number(t.replace(/\u2212/g, "-").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
       return Number.isFinite(n) ? n : undefined;
     }
     if (editor.type === "date") return t ? parseDateInput(t) : null;
@@ -855,7 +855,7 @@ export function DataGrid<T>(props: DataGridProps<T>) {
     if (entries.length) entries.push({ type: "separator" });
     if (ctx.col?.value) {
       const v = ctx.col.value(ctx.row);
-      entries.push({ label: `Copiar ${ctx.col.header.toLowerCase()}`, onSelect: () => navigator.clipboard?.writeText(formatValue(v)) });
+      entries.push({ label: `Copiar ${ctx.col.header.toLowerCase()}`, onSelect: () => navigator.clipboard?.writeText(formatValue(v).replace(/\u2212/g, "-")) });
     }
     if (selectable) {
       const key = rowKey(ctx.row);

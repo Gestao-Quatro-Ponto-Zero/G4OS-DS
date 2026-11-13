@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IntroCard, MorphIllustration, SegmentedControl, notify, onboardingScenes, type IntroStep } from "@g4ai/ds";
+import { IntroCard, MorphIllustration, SegmentedControl, notify, onboardingScenes, type IntroCardStep } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -9,7 +9,7 @@ export const meta: PageMeta = {
   description: "Ilustração em traço que muda de cena a cada etapa (MorphIllustration) e o cartão compacto de primeira execução (IntroCard). Camada expressiva: só em onboarding, boas-vindas e estado vazio de destaque.",
 };
 
-const steps: IntroStep[] = [
+const steps: IntroCardStep[] = [
   { title: "Crie seu primeiro espaço", description: "Cada área do trabalho ganha um lugar próprio. Comece pelo Comercial e crie outros quando precisar." },
   { title: "Traga seus arquivos", description: "Importe as planilhas e os contratos que você já usa; cada arquivo vai para o espaço certo." },
   { title: "Convide a equipe", description: "Quem trabalha junto vê o mesmo quadro. Você decide quem edita e quem só acompanha." },

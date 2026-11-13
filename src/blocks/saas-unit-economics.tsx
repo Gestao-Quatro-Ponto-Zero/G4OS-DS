@@ -307,7 +307,7 @@ export default function SaasUnitEconomics() {
                       <ConnectedScatter
                         label={`CAC contra LTV de 12 meses do canal ${channelLabel[channel]}, de ${months[0]} a ${months[months.length - 1]}`}
                         series={series}
-                        active={channel}
+                        activeSeries={channel}
                         index={index}
                         onIndexChange={setIndex}
                         xLabel="CAC"
