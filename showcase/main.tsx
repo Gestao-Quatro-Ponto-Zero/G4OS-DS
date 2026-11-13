@@ -44,7 +44,22 @@ const isDoc = (p: PageModule) => (docGroups as readonly string[]).includes(p.met
 const byCategory = (cat: string) => blocks.filter((b) => b.meta.category === cat).sort((a, b) => (a.meta.order ?? 50) - (b.meta.order ?? 50));
 const categories = blockCategories.filter((c) => byCategory(c).length);
 const slugCat = (c: string) => normalize(c).replace(/\s+/g, "-");
-const featuredSlugs = ["saas-dashboard", "crm-pipeline", "ats-pipeline", "erp-orders", "srv-work-orders", "fin-cashflow", "clm-contract", "comms-home", "ai-agents-dashboard", "ai-agent", "auth-login", "app-presentation"];
+/** Abas da home: um bloco por tipo de app, com o nome do produto (duas abas "IA" não dizem nada). */
+const featuredTabs: Record<string, string> = {
+  "saas-dashboard": "SaaS",
+  "crm-pipeline": "CRM",
+  "ats-pipeline": "ATS",
+  "erp-orders": "ERP",
+  "srv-work-orders": "Serviços",
+  "fin-cashflow": "Financeiro",
+  "clm-contract": "Contratos",
+  "comms-home": "Comunicação",
+  "ai-agents-dashboard": "Agentes de IA",
+  "ai-workspace": "Assistente de IA",
+  "auth-login": "Autenticação",
+  "app-presentation": "Aplicação",
+};
+const featuredSlugs = Object.keys(featuredTabs);
 const featured = featuredSlugs.map((s) => blocks.find((b) => b.slug === s)).filter(Boolean) as BlockModule[];
 
 /* ------------------------------------------------------------------ */
@@ -69,7 +84,7 @@ function Appearance() {
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div>
           <p className="m-0 mb-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Modo</p>
           <ThemeToggle mode={t.mode} onChange={t.setMode} />
@@ -383,19 +398,21 @@ function Home() {
       </section>
       {current && (
         <section>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line">
+          <div className="flex items-end gap-4 border-b border-line">
+            <div className="-mb-px flex min-w-0 flex-1 gap-x-5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {featured.map((b) => (
               <button
                 key={b.slug}
                 type="button"
                 onClick={() => setTab(b.slug)}
                 aria-pressed={b.slug === current.slug}
-                className={cn("-mb-px border-b-2 pb-2.5 text-[13.5px]", b.slug === current.slug ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
+                className={cn("shrink-0 whitespace-nowrap border-b-2 pb-2.5 pt-1 text-[13.5px] transition-colors", b.slug === current.slug ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
               >
-                {b.meta.category === "SaaS" ? "Dashboard" : b.meta.category}
+                {featuredTabs[b.slug] ?? b.meta.category}
               </button>
             ))}
-            <a href="#/blocos" className="mb-2 ml-auto inline-flex h-8 items-center gap-1 rounded-lg bg-soft px-3 text-[12.5px] font-medium hover:bg-line">
+            </div>
+            <a href="#/blocos" className="mb-2 hidden h-8 shrink-0 items-center gap-1 rounded-lg bg-soft px-3 text-[12.5px] font-medium hover:bg-line sm:inline-flex">
               Todos os blocos <ArrowRight className="h-3.5 w-3.5" />
             </a>
           </div>
@@ -430,7 +447,7 @@ function BlocksPage({ category }: { category?: string }) {
             key={label}
             href={href}
             aria-current={on ? "page" : undefined}
-            className={cn("shrink-0 rounded-lg px-3 py-1.5 text-[13px]", on ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-soft hover:text-ink")}
+            className={cn("shrink-0 rounded-lg px-2.5 py-1.5 text-[13px]", on ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-soft hover:text-ink")}
           >
             {label}
             {label !== "Destaque" && <span className={cn("ml-1.5 text-[11px] tabular-nums", on ? "text-on-primary/60" : "text-muted")}>{byCategory(label).length}</span>}

@@ -107,7 +107,7 @@ export function DocSection({ id, title, rule, children }: { id?: string; title: 
     <section id={id} className="scroll-mt-20 py-9">
       <h2 data-toc="" className="m-0 scroll-mt-20 text-[18px] font-semibold tracking-tight">{title}</h2>
       {rule && <div className="m-0 mt-1.5 max-w-[720px] text-[13px] leading-relaxed text-muted">{typeof rule === "string" ? inlineCode(rule) : rule}</div>}
-      <div className="mt-5 space-y-6">{children}</div>
+      <div className="mt-5 flex flex-col gap-6">{children}</div>
     </section>
   );
 }
@@ -121,8 +121,9 @@ function inlineCode(text: string): ReactNode {
 
 export function Demo({ title, description, code, children, className, bare }: { title?: string; description?: ReactNode; code?: string; children: ReactNode; className?: string; bare?: boolean }) {
   const [tab, setTab] = useState<"preview" | "code">("preview");
+  // Coluna flexível: lado a lado numa grade, as molduras ficam da mesma altura.
   return (
-    <div className="min-w-0">
+    <div className="flex min-w-0 flex-col">
       {(title || code) && (
         <div className="mb-2 flex items-end justify-between gap-3">
           <div className="min-w-0">
@@ -146,7 +147,7 @@ export function Demo({ title, description, code, children, className, bare }: { 
       ) : bare ? (
         children
       ) : (
-        <div className={cn("rounded-xl border border-line bg-surface p-5", className ?? "flex flex-wrap items-center gap-3")}>{children}</div>
+        <div className={cn("flex-1 rounded-xl border border-line bg-surface p-5", className ?? "flex flex-wrap items-center gap-3")}>{children}</div>
       )}
     </div>
   );
@@ -155,9 +156,9 @@ export function Demo({ title, description, code, children, className, bare }: { 
 /** Especificação rápida: rótulo + moldura. */
 export function Specimen({ label, children, className }: { label?: string; children: ReactNode; className?: string }) {
   return (
-    <div className="min-w-0">
+    <div className="flex min-w-0 flex-col">
       {label && <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{label}</p>}
-      <div className={className ?? "flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-5"}>{children}</div>
+      <div className={cn("flex-1", className ?? "flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-5")}>{children}</div>
     </div>
   );
 }
@@ -203,7 +204,7 @@ export function Rules({ items }: { items: { do: ReactNode; dont?: ReactNode }[] 
 export function PropsTable({ rows }: { rows: [string, string, string, string][] }) {
   return (
     <div tabIndex={0} role="region" aria-label="Props" className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-muted/50">
-      <table className="w-full text-left text-[12.5px]">
+      <table className="w-full text-left text-[12.5px] [&_td]:align-top">
         <thead className="border-b border-line bg-soft/60 text-[11.5px] text-muted">
           <tr>
             <th className="px-3 py-2">Prop</th>
@@ -215,10 +216,10 @@ export function PropsTable({ rows }: { rows: [string, string, string, string][] 
         <tbody className="divide-y divide-line">
           {rows.map(([n, t, d, desc]) => (
             <tr key={n}>
-              <td className="px-3 py-2 font-mono text-[12px] font-medium">{n}</td>
-              <td className="px-3 py-2 font-mono text-[11.5px] text-blue">{t}</td>
-              <td className="px-3 py-2 font-mono text-[11.5px] text-muted">{d}</td>
-              <td className="px-3 py-2 text-ink-soft">{desc}</td>
+              <td className="px-3 py-2 font-mono text-[12px] font-medium leading-5">{n}</td>
+              <td className="px-3 py-2 font-mono text-[11.5px] leading-5 text-blue">{t}</td>
+              <td className="px-3 py-2 font-mono text-[11.5px] leading-5 text-muted">{d}</td>
+              <td className="px-3 py-2 leading-5 text-ink-soft">{desc}</td>
             </tr>
           ))}
         </tbody>
@@ -434,7 +435,7 @@ function BlockConceptView({ block }: { block: BlockModule }) {
     ) : null;
   return (
     <div className="grid gap-6 rounded-2xl border border-line bg-surface p-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <div>
           <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Objetivo</p>
           <p className="m-0 text-[15px] leading-relaxed text-ink">{c?.goal ?? block.meta.description}</p>
@@ -444,7 +445,7 @@ function BlockConceptView({ block }: { block: BlockModule }) {
         {list("Evite ao copiar", c?.avoid)}
         {!c && <p className="m-0 text-[12.5px] text-muted">Este bloco ainda não tem o conceito descrito (meta.concept).</p>}
       </div>
-      <div className="space-y-5 lg:border-l lg:border-line lg:pl-6">
+      <div className="flex flex-col gap-5 lg:border-l lg:border-line lg:pl-6">
         <div>
           <p className="m-0 mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Componentes do DS ({imports.length})</p>
           <div className="flex flex-wrap gap-1.5">
