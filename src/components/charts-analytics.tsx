@@ -163,9 +163,9 @@ const aroundPoint = (side: "start" | "end", gap = 9) => {
   const other = side === "start" ? "end" : "start";
   return [
     { dx: sx * gap, dy: 14, anchor: side },
-    { dx: sx * gap, dy: -8, anchor: side },
+    { dx: sx * gap, dy: -10, anchor: side },
     { dx: -sx * gap, dy: 14, anchor: other },
-    { dx: -sx * gap, dy: -8, anchor: other },
+    { dx: -sx * gap, dy: -10, anchor: other },
     { dx: 0, dy: 20, anchor: "middle" },
     { dx: 0, dy: -13, anchor: "middle" },
     { dx: sx * (gap + 1), dy: 4, anchor: side },

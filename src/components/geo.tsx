@@ -406,7 +406,7 @@ export function ChoroplethMap({
     <div className={cn("flex min-w-0 flex-col gap-3", className)}>
       {/* Legenda colada ao topo do mapa, com o fim do último degrau (a escala fecha). */}
       {legend ? (
-        <div className="flex min-w-0 flex-wrap items-end gap-x-1.5 gap-y-1">
+        <div className="flex min-w-0 items-end gap-3">
           <ScaleLegend
             thresholds={scale.thresholds}
             max={scale.max}
@@ -416,7 +416,7 @@ export function ChoroplethMap({
             title={legendTitle ?? valueLabel}
             activeBin={legendBin ?? (isNum(activeValue) ? scale.bin(activeValue) : null)}
             onHoverBin={setLegendBin}
-            className="min-w-0"
+            className="min-w-0 max-sm:flex-col max-sm:items-start"
           />
           <span className="whitespace-nowrap text-[11px] tabular-nums text-muted">{legendFormat(scale.max)}</span>
         </div>
@@ -484,8 +484,10 @@ export function ChoroplethMap({
               const [cx, cy] = centerOf(r, base);
               const b = hl.bind(r.id);
               const on = hl.active === r.id;
+              // Sigla do lado com espaço: perto da borda direita, vai para a esquerda.
+              const toLeft = (cx - vb[0]) / vb[2] > 0.88;
               // Marcador com a cor da própria UF (sobre surface, igual à legenda),
-              // contorno em line-strong e a sigla ao lado: lê como "aqui é o DF".
+              // contorno em ink-soft e a sigla ao lado: lê como "aqui é o DF".
               return (
                 <g
                   key={`t-${r.id}`}
@@ -502,20 +504,21 @@ export function ChoroplethMap({
                     cy={cy}
                     r={6 / s}
                     fill={scale.color(values[r.id]) ?? `url(#${hatchId})`}
-                    stroke={on ? "var(--color-ink)" : "var(--color-line-strong)"}
+                    stroke={on ? "var(--color-ink)" : "var(--color-ink-soft)"}
                     strokeWidth={on ? 1.75 : 1}
                     vectorEffect="non-scaling-stroke"
                   />
                   {showLabels ? (
                     <text
-                      x={cx + 9 / s}
+                      x={toLeft ? cx - 9 / s : cx + 9 / s}
                       y={cy}
                       dy="0.35em"
+                      textAnchor={toLeft ? "end" : "start"}
                       fontSize={10 / s}
-                      fontWeight={600}
+                      fontWeight={500}
                       fill="var(--color-ink)"
                       stroke="var(--color-surface)"
-                      strokeWidth={3 / s}
+                      strokeWidth={2.5 / s}
                       strokeLinejoin="round"
                       paintOrder="stroke"
                       className="pointer-events-none select-none"
