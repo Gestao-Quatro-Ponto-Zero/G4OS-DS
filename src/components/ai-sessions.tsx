@@ -46,6 +46,8 @@ import {
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { cn } from "../lib/cn";
 import { tintFill } from "../lib/color";
+import { formatCompact, formatCurrency } from "../lib/format";
+import { AnswerVersions } from "./ai";
 import { AgentComposer, Waveform, type SlashCommand } from "./ai-workspace";
 import { notify } from "./feedback";
 import { FileCard } from "./media";
@@ -745,9 +747,36 @@ const copyText = async (text: string, label: string) => {
   notify(label, undefined, "info");
 };
 
+/** Como refazer uma resposta: de novo, mais curta, mais detalhada ou mais simples. */
+export type RegenerateOption = "retry" | "shorter" | "longer" | "simpler";
+
+/** Rótulos (pt-BR) do menu de refazer, na ordem em que aparecem. */
+export const regenerateOptionLabels: Record<RegenerateOption, string> = {
+  retry: "Tentar de novo",
+  shorter: "Mais curta",
+  longer: "Mais detalhada",
+  simpler: "Mais simples",
+};
+
+function RegenerateMenu({ onRegenerate, triggerClassName }: { onRegenerate: (o: RegenerateOption) => void; triggerClassName: string }) {
+  const opt = (o: RegenerateOption) => ({ label: regenerateOptionLabels[o], onSelect: () => onRegenerate(o) });
+  return (
+    <Menu
+      label="Refazer resposta"
+      triggerVariant="bare"
+      side="top"
+      triggerClassName={triggerClassName}
+      trigger={<RotateCw aria-hidden />}
+      items={[opt("retry"), { type: "separator" }, { type: "label", label: "Refazer" }, opt("shorter"), opt("longer"), opt("simpler")]}
+    />
+  );
+}
+
 /**
  * Ações de uma resposta: Copiar, Markdown, (refazer, avaliar) e ramificar.
  * `text` = versão sem formatação; `markdown` = fonte com formatação.
+ * Com `onRegenerate`, refazer vira menu (Tentar de novo · Mais curta · Mais
+ * detalhada · Mais simples); com `versions`, aparece o pager "‹ 2 de 3 ›".
  */
 export function MessageActions({
   text,
@@ -756,6 +785,8 @@ export function MessageActions({
   onRetry,
   onFeedback,
   onShare,
+  onRegenerate,
+  versions,
   compact = false,
   size = "md",
   className,
@@ -767,6 +798,10 @@ export function MessageActions({
   onFeedback?: (value: "up" | "down") => void;
   /** Compartilhar a resposta (link ou exportar). */
   onShare?: () => void;
+  /** Refazer com opções; substitui o botão de `onRetry` ("Tentar de novo" chama com "retry"). */
+  onRegenerate?: (option: RegenerateOption) => void;
+  /** Versões da resposta (cada refazer gera uma): `index` começa em 0. Com `count` < 2, nada aparece. */
+  versions?: { index: number; count: number; onChange: (index: number) => void };
   /** Só ícones, alinhados à esquerda (respostas em fluxo). */
   compact?: boolean;
   /** "xs": ícones mínimos (estilo Codex), implica `compact`. */
@@ -781,6 +816,7 @@ export function MessageActions({
     );
     return (
       <div className={cn("flex items-center gap-0.5", className)}>
+        {versions && <AnswerVersions {...versions} />}
         <Tooltip content="Copiar">
           <button type="button" className={ic} aria-label="Copiar resposta" onClick={() => copyText(text, "Resposta copiada")}>
             <Copy />
@@ -793,12 +829,16 @@ export function MessageActions({
             </button>
           </Tooltip>
         )}
-        {onRetry && (
-          <Tooltip content="Refazer">
-            <button type="button" className={ic} aria-label="Refazer resposta" onClick={onRetry}>
-              <RotateCw />
-            </button>
-          </Tooltip>
+        {onRegenerate ? (
+          <RegenerateMenu onRegenerate={onRegenerate} triggerClassName={cn(ic, "data-popup-open:bg-ink/[0.06] data-popup-open:text-ink")} />
+        ) : (
+          onRetry && (
+            <Tooltip content="Refazer">
+              <button type="button" className={ic} aria-label="Refazer resposta" onClick={onRetry}>
+                <RotateCw />
+              </button>
+            </Tooltip>
+          )
         )}
         {onFeedback &&
           (["up", "down"] as const).map((v) => (
@@ -837,7 +877,7 @@ export function MessageActions({
   const btn = "inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-[12.5px] text-muted transition-colors hover:bg-ink/[0.05] hover:text-ink [&_svg]:h-3.5 [&_svg]:w-3.5";
   const icon = "grid h-7 w-7 place-items-center rounded-md text-muted transition-colors hover:bg-ink/[0.05] hover:text-ink [&_svg]:h-3.5 [&_svg]:w-3.5";
   return (
-    <div className={cn("flex items-center gap-0.5", className)}>
+    <div className={cn("flex flex-wrap items-center gap-0.5", className)}>
       <button type="button" className={btn} onClick={() => copyText(text, "Resposta copiada")}>
         <Copy /> Copiar
       </button>
@@ -847,37 +887,51 @@ export function MessageActions({
         </button>
       )}
       <span className="flex-1" />
-      {onRetry && (
-        <Tooltip content="Refazer resposta">
-          <button type="button" className={icon} onClick={onRetry} aria-label="Refazer resposta">
-            <RotateCw />
-          </button>
-        </Tooltip>
-      )}
-      {onFeedback &&
-        (["up", "down"] as const).map((v) => (
-          <Tooltip key={v} content={v === "up" ? "Boa resposta" : "Resposta ruim"}>
-            <button
-              type="button"
-              aria-pressed={fb === v}
-              aria-label={v === "up" ? "Boa resposta" : "Resposta ruim"}
-              className={cn(icon, fb === v && "bg-ink/[0.06] text-ink")}
-              onClick={() => {
-                setFb(v);
-                onFeedback(v);
-              }}
-            >
-              {v === "up" ? <ThumbsUp /> : <ThumbsDown />}
+      <div className="flex shrink-0 items-center gap-0.5">
+        {versions && <AnswerVersions {...versions} className="mr-1" />}
+        {onRegenerate ? (
+          <RegenerateMenu onRegenerate={onRegenerate} triggerClassName={cn(icon, "data-popup-open:bg-ink/[0.06] data-popup-open:text-ink")} />
+        ) : (
+          onRetry && (
+            <Tooltip content="Refazer resposta">
+              <button type="button" className={icon} onClick={onRetry} aria-label="Refazer resposta">
+                <RotateCw />
+              </button>
+            </Tooltip>
+          )
+        )}
+        {onFeedback &&
+          (["up", "down"] as const).map((v) => (
+            <Tooltip key={v} content={v === "up" ? "Boa resposta" : "Resposta ruim"}>
+              <button
+                type="button"
+                aria-pressed={fb === v}
+                aria-label={v === "up" ? "Boa resposta" : "Resposta ruim"}
+                className={cn(icon, fb === v && "bg-ink/[0.06] text-ink")}
+                onClick={() => {
+                  setFb(v);
+                  onFeedback(v);
+                }}
+              >
+                {v === "up" ? <ThumbsUp /> : <ThumbsDown />}
+              </button>
+            </Tooltip>
+          ))}
+        {onBranch && (
+          <Tooltip content="Ramificar daqui (nova sessão com este contexto)">
+            <button type="button" className={icon} onClick={onBranch} aria-label="Ramificar conversa">
+              <GitBranch />
             </button>
           </Tooltip>
-        ))}
-      {onBranch && (
-        <Tooltip content="Ramificar daqui (nova sessão com este contexto)">
-          <button type="button" className={icon} onClick={onBranch} aria-label="Ramificar conversa">
-            <GitBranch />
-          </button>
-        </Tooltip>
-      )}
+        )}
+        {onShare && (
+          <Tooltip content="Compartilhar">
+            <button type="button" className={icon} onClick={onShare} aria-label="Compartilhar resposta">
+              <Share />
+            </button>
+          </Tooltip>
+        )}
+      </div>
     </div>
   );
 }
@@ -1849,15 +1903,59 @@ export function PermissionModeChip({ value, onChange, className }: { value: Perm
   );
 }
 
-export type ModelOption = { id: string; name: string; group?: string; description?: string; icon?: ReactNode };
+export type ModelOption = {
+  id: string;
+  name: string;
+  group?: string;
+  description?: string;
+  icon?: ReactNode;
+  /** Em destaque: fica no topo do menu, com a `note`. Os demais vão para "Outros modelos". */
+  featured?: boolean;
+  /** Uma linha sobre quando usar ("Para análises longas e código"). Aparece no destaque e no resumo. */
+  note?: string;
+  /** Janela de contexto, em tokens. */
+  context?: number;
+  /** Preço de entrada por milhão de tokens (na moeda de `currency`). */
+  priceIn?: number;
+  /** Preço de saída por milhão de tokens. */
+  priceOut?: number;
+  /** Fornecedor: agrupa "Outros modelos" (cai para `group`). */
+  provider?: string;
+};
 export type ModelEffort = "leve" | "padrao" | "profundo";
 const effortLabel: Record<ModelEffort, string> = { leve: "Leve", padrao: "Padrão", profundo: "Profundo" };
+
+const modelItemClass = "flex w-full cursor-default items-start gap-2.5 rounded-lg px-2.5 py-2 text-left outline-none data-highlighted:bg-soft";
+const menuOverline = "px-2.5 pb-1 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted";
+
+function ModelRadioItem({ m, line, icon = false }: { m: ModelOption; line?: string; icon?: boolean }) {
+  return (
+    <BaseMenu.RadioItem value={m.id} closeOnClick className={modelItemClass}>
+      {icon && m.icon && (
+        <span className="mt-0.5 shrink-0 text-accent-deep [&_svg]:h-3.5 [&_svg]:w-3.5" aria-hidden>
+          {m.icon}
+        </span>
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-medium text-ink">{m.name}</span>
+        {line && <span className="block text-[12px] leading-snug text-muted">{line}</span>}
+      </span>
+      <BaseMenu.RadioItemIndicator className="mt-0.5 shrink-0">
+        <Check className="h-4 w-4" aria-hidden />
+      </BaseMenu.RadioItemIndicator>
+    </BaseMenu.RadioItem>
+  );
+}
 
 /**
  * Chip de modelo + esforço ("⚡ Sol · Leve ⌄"). Menu agrupado por família e
  * seletor de esforço (mais esforço = mais lento e caro, mais cuidadoso).
  * Com `agents`, vira o chip único do campo: avatar + "G4 OS · Padrão" e o
  * menu escolhe agente, modelo e esforço. Estreito (< 440px): só o avatar.
+ * Com modelos `featured`, o menu mostra os destaques no topo (com a nota de
+ * uma linha), o esforço e "Outros modelos" num submenu agrupado por
+ * `provider`. `summary` mostra abaixo do chip a nota e as células Contexto,
+ * Entrada, Saída e Esforço.
  */
 export function ModelPicker({
   models,
@@ -1868,6 +1966,9 @@ export function ModelPicker({
   agents,
   agent,
   onAgentChange,
+  summary = false,
+  currency = "BRL",
+  side = "top",
   className,
 }: {
   models: ModelOption[];
@@ -1879,10 +1980,19 @@ export function ModelPicker({
   agents?: AgentOption[];
   agent?: string;
   onAgentChange?: (id: string) => void;
+  /** Resumo abaixo do chip: nota do modelo + Contexto, Entrada, Saída e Esforço. Para páginas de configuração, não para o campo. */
+  summary?: boolean;
+  /** Moeda dos preços (`priceIn`/`priceOut`), código ISO: "BRL", "USD". */
+  currency?: string;
+  /** Lado em que o menu abre. "top" no campo da conversa; "bottom" numa página. */
+  side?: "top" | "bottom";
   className?: string;
 }) {
   const cur = models.find((m) => m.id === value) ?? models[0];
-  const groups = Array.from(new Set(models.map((m) => m.group ?? "Modelos")));
+  const featured = models.filter((m) => m.featured);
+  const others = featured.length ? models.filter((m) => !m.featured) : models;
+  const groupOf = (m: ModelOption) => (featured.length ? (m.provider ?? m.group ?? "Modelos") : (m.group ?? "Modelos"));
+  const groups = Array.from(new Set(others.map(groupOf)));
   const curAgent = agents?.find((a) => a.id === agent) ?? agents?.[0];
   const avatar = (a: AgentOption, size = "h-5 w-5 text-[10px] tracking-tight") => (
     // ds-audit-ignore white-black: iniciais brancas sobre o tint do agente (identidade), escurecido até AA por tintFill
@@ -1890,13 +2000,45 @@ export function ModelPicker({
       {a.initials}
     </span>
   );
-  return (
+  const groupedOthers = groups.map((g) => (
+    <div key={g}>
+      <div className={menuOverline}>{g}</div>
+      {others
+        .filter((m) => groupOf(m) === g)
+        .map((m) => (
+          <ModelRadioItem key={m.id} m={m} line={m.description ?? m.note} icon={featured.length > 0} />
+        ))}
+    </div>
+  ));
+  const effortControl = effort && onEffortChange && (
+    <>
+      <BaseMenu.Separator className="my-1 h-px bg-line" />
+      <div className="px-2.5 pb-1 pt-1.5 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted">Esforço</div>
+      <div role="radiogroup" aria-label="Esforço" className="grid grid-cols-3 gap-0.5 rounded-lg bg-ink/[0.04] p-0.5 mx-1 mb-1">
+        {(Object.keys(effortLabel) as ModelEffort[]).map((e) => (
+          <button
+            key={e}
+            type="button"
+            role="radio"
+            aria-checked={effort === e}
+            onClick={() => onEffortChange(e)}
+            className={cn("h-7 rounded-md text-[12px]", effort === e ? "bg-surface font-medium text-ink shadow-surface ring-1 ring-line-strong" : "text-muted hover:text-ink")}
+          >
+            {effortLabel[e]}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+  const curIsOther = featured.length > 0 && !cur?.featured;
+  const menu = (
     <BaseMenu.Root>
       <BaseMenu.Trigger
         aria-label={`${curAgent ? `Agente: ${curAgent.name}, ` : ""}Modelo: ${cur?.name}${effort ? `, esforço ${effortLabel[effort]}` : ""}`}
         className={cn(
           "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full text-[12px] text-ink-soft outline-none transition-colors hover:bg-ink/[0.05] hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40 data-popup-open:bg-ink/[0.06]",
           curAgent ? "pl-1.5 pr-2.5" : "px-2.5",
+          summary && "h-9 bg-surface px-3.5 text-[13px] ring-1 ring-line hover:bg-soft",
           className,
         )}
       >
@@ -1914,17 +2056,17 @@ export function ModelPicker({
               {cur?.icon ?? <Zap />}
             </span>
             <span className="whitespace-nowrap font-medium text-ink @max-[460px]:sr-only">{cur?.name}</span>
-            {effort && <span className="hidden whitespace-nowrap text-muted sm:inline @max-[640px]:hidden">{effortLabel[effort]}</span>}
+            {effort && <span className={cn("hidden whitespace-nowrap text-muted sm:inline @max-[640px]:hidden", summary && "inline")}>{effortLabel[effort]}</span>}
           </>
         )}
         <ChevronDown className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
       </BaseMenu.Trigger>
       <BaseMenu.Portal>
-        <BaseMenu.Positioner side="top" align="end" sideOffset={6} collisionPadding={12} className="z-[100]">
-          <BaseMenu.Popup className={cn(popupClass, "max-h-[var(--available-height)] w-[290px] overflow-y-auto bg-popover p-1.5")}>
+        <BaseMenu.Positioner side={side} align={summary ? "center" : "end"} sideOffset={6} collisionPadding={12} className="z-[100]">
+          <BaseMenu.Popup className={cn(popupClass, "max-h-[var(--available-height)] w-[290px] max-w-[calc(100vw-24px)] overflow-y-auto bg-popover p-1.5")}>
             {agents && curAgent && (
               <>
-                <div className="px-2.5 pb-1 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted">Agente</div>
+                <div className={menuOverline}>Agente</div>
                 <BaseMenu.RadioGroup value={curAgent.id} onValueChange={(v) => onAgentChange?.(v as string)}>
                   {agents.map((a) => (
                     <BaseMenu.RadioItem key={a.id} value={a.id} closeOnClick className="flex w-full cursor-default items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left outline-none data-highlighted:bg-soft">
@@ -1942,49 +2084,72 @@ export function ModelPicker({
                 <BaseMenu.Separator className="my-1 h-px bg-line" />
               </>
             )}
-            <BaseMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as string)}>
-              {groups.map((g) => (
-                <div key={g}>
-                  <div className="px-2.5 pb-1 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted">{g}</div>
-                  {models
-                    .filter((m) => (m.group ?? "Modelos") === g)
-                    .map((m) => (
-                      <BaseMenu.RadioItem key={m.id} value={m.id} closeOnClick className="flex w-full cursor-default items-start gap-2.5 rounded-lg px-2.5 py-2 text-left outline-none data-highlighted:bg-soft">
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-medium text-ink">{m.name}</span>
-                          {m.description && <span className="block text-[12px] leading-snug text-muted">{m.description}</span>}
-                        </span>
-                        <BaseMenu.RadioItemIndicator className="mt-0.5 shrink-0">
-                          <Check className="h-4 w-4" aria-hidden />
-                        </BaseMenu.RadioItemIndicator>
-                      </BaseMenu.RadioItem>
-                    ))}
-                </div>
-              ))}
-            </BaseMenu.RadioGroup>
-            {effort && onEffortChange && (
+            {featured.length ? (
               <>
-                <BaseMenu.Separator className="my-1 h-px bg-line" />
-                <div className="px-2.5 pb-1 pt-1.5 text-[10.5px] font-medium uppercase tracking-[0.08em] text-muted">Esforço</div>
-                <div role="radiogroup" aria-label="Esforço" className="grid grid-cols-3 gap-0.5 rounded-lg bg-ink/[0.04] p-0.5 mx-1 mb-1">
-                  {(Object.keys(effortLabel) as ModelEffort[]).map((e) => (
-                    <button
-                      key={e}
-                      type="button"
-                      role="radio"
-                      aria-checked={effort === e}
-                      onClick={() => onEffortChange(e)}
-                      className={cn("h-7 rounded-md text-[12px]", effort === e ? "bg-surface font-medium text-ink shadow-surface ring-1 ring-line-strong" : "text-muted hover:text-ink")}
-                    >
-                      {effortLabel[e]}
-                    </button>
+                <BaseMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as string)}>
+                  <div className={menuOverline}>Em destaque</div>
+                  {featured.map((m) => (
+                    <ModelRadioItem key={m.id} m={m} line={m.note ?? m.description} icon />
                   ))}
-                </div>
+                </BaseMenu.RadioGroup>
+                {effortControl}
+                {others.length > 0 && (
+                  <>
+                    <BaseMenu.Separator className="my-1 h-px bg-line" />
+                    <BaseMenu.SubmenuRoot>
+                      <BaseMenu.SubmenuTrigger className="flex w-full cursor-default items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] text-ink outline-none data-highlighted:bg-soft data-popup-open:bg-soft">
+                        <span className="min-w-0 flex-1">Outros modelos</span>
+                        {curIsOther && <span className="max-w-[110px] truncate text-[12px] text-muted">{cur?.name}</span>}
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
+                      </BaseMenu.SubmenuTrigger>
+                      <BaseMenu.Portal>
+                        <BaseMenu.Positioner sideOffset={4} alignOffset={-6} collisionPadding={12} className="z-[100]">
+                          <BaseMenu.Popup className={cn(popupClass, "max-h-[var(--available-height)] w-[270px] max-w-[calc(100vw-24px)] overflow-y-auto bg-popover p-1.5")}>
+                            <BaseMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as string)}>
+                              {groupedOthers}
+                            </BaseMenu.RadioGroup>
+                          </BaseMenu.Popup>
+                        </BaseMenu.Positioner>
+                      </BaseMenu.Portal>
+                    </BaseMenu.SubmenuRoot>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <BaseMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as string)}>
+                  {groupedOthers}
+                </BaseMenu.RadioGroup>
+                {effortControl}
               </>
             )}
           </BaseMenu.Popup>
         </BaseMenu.Positioner>
       </BaseMenu.Portal>
     </BaseMenu.Root>
+  );
+  if (!summary || !cur) return menu;
+  const note = cur.note ?? cur.description;
+  const price = (n?: number) => (n == null ? "—" : formatCurrency(n, { currency }));
+  const cells: [string, string][] = [
+    ["Contexto", cur.context == null ? "—" : `${formatCompact(cur.context)} tokens`],
+    ["Entrada", price(cur.priceIn)],
+    ["Saída", price(cur.priceOut)],
+    ["Esforço", effort ? effortLabel[effort] : "—"],
+  ];
+  return (
+    <div className="flex min-w-0 flex-col items-start gap-3">
+      {menu}
+      {note && <p className="m-0 max-w-[60ch] text-[13px] leading-relaxed text-muted">{note}</p>}
+      <dl aria-label={`Resumo de ${cur.name}`} className="m-0 grid w-full max-w-[480px] grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-4">
+        {cells.map(([k, v]) => (
+          <div key={k} className="flex min-w-0 flex-col gap-0.5 bg-surface px-3 py-2.5">
+            <dt className="text-[11.5px] text-muted">{k}</dt>
+            <dd className="m-0 truncate text-[13.5px] font-medium tabular-nums text-ink">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {(cur.priceIn != null || cur.priceOut != null) && <p className="m-0 text-[11.5px] text-muted">Preços por milhão de tokens.</p>}
+    </div>
   );
 }

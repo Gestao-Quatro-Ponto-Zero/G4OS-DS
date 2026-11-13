@@ -321,6 +321,8 @@ export default function Page() {
             ["ModelPicker.value · onChange", "string · (id) => void", "—", "Modelo escolhido."],
             ["ModelPicker.effort · onEffortChange", '"leve" | "padrao" | "profundo"', "—", "Esforço (Leve · Padrão · Profundo) no fim do menu."],
             ["ModelPicker.agents · agent · onAgentChange", "AgentOption[] · string · (id) => void", "—", "Vira o chip único “G4 OS · Padrão” com avatar; o menu ganha a seção Agente."],
+            ["ModelOption.featured · note · provider", "boolean · string · string", "—", "Destaques no topo com nota de uma linha; o resto vai para “Outros modelos”, agrupado por provider. Exemplo em Resposta com fontes."],
+            ["ModelPicker.summary · currency · side", 'boolean · string · "top" | "bottom"', 'false · "BRL" · "top"', "Resumo (Contexto, Entrada, Saída, Esforço) abaixo do chip, para páginas de configuração."],
           ]}
         />
         <p className="m-0 mt-2 text-[12.5px] text-muted">
