@@ -99,27 +99,43 @@ export function KpiCard({
   const sparkTone = delta == null || goodWhen === "neutral" ? "neutral" : (delta >= 0) === (goodWhen === "up") ? "neutral" : "bad";
   const body = (
     <>
-      <div className="flex items-start justify-between gap-3">
+      {/* Altura fixa da linha do rótulo (a do selo de variação): com ou sem delta, os números de uma grade alinham. */}
+      <div className="flex min-h-5 items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2 text-[12.5px] text-muted">
           {icon && <span className="inline-flex shrink-0 text-muted [&_svg]:h-4 [&_svg]:w-4">{icon}</span>}
-          <span className="truncate">{label}</span>
+          <span className="truncate" title={label}>
+            {label}
+          </span>
         </div>
         {delta != null && <Delta value={delta} goodWhen={goodWhen} />}
       </div>
-      {/* Valor e sparkline quebram linha em cards estreitos em vez de se sobrepor. */}
-      <div className="mt-2 flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
+      {/*
+        Linha do valor com a altura da sparkline (30 px) mesmo sem ela: cards com e sem tendência
+        alinham número e período. Card estreito demais para os dois esconde a sparkline (container query);
+        se ainda faltar espaço, ela quebra linha em vez de se sobrepor.
+      */}
+      <div className="mt-2 flex min-h-[30px] flex-wrap items-end justify-between gap-x-3 gap-y-2">
         <div className={cn("whitespace-nowrap font-semibold leading-none tracking-[-0.02em] tabular-nums", size === "lg" ? "text-[30px]" : "text-[24px]")}>{value}</div>
-        {spark && <Sparkline values={spark} tone={sparkTone} width={84} height={30} className="ml-auto" />}
+        {spark && (
+          <span className="ml-auto hidden @min-[13.5rem]:block">
+            <Sparkline values={spark} tone={sparkTone} width={84} height={30} />
+          </span>
+        )}
       </div>
       {(hint || (delta != null && period)) && (
         <div className="mt-2.5 text-[12px] leading-snug text-muted">
           {hint ?? period}
         </div>
       )}
-      {footer && <div className="mt-3 border-t border-line pt-3">{footer}</div>}
+      {/* Rodapé encostado embaixo: numa grade, os rodapés da mesma linha alinham. */}
+      {footer && (
+        <div className="mt-auto pt-3">
+          <div className="border-t border-line pt-3">{footer}</div>
+        </div>
+      )}
     </>
   );
-  const cls = cn("surface-card block min-w-0 rounded-xl border border-line bg-surface px-4 py-3.5", href && "surface-interactive hover:border-line-strong", className);
+  const cls = cn("surface-card @container flex min-w-0 flex-col rounded-xl border border-line bg-surface px-4 py-3.5", href && "surface-interactive hover:border-line-strong", className);
   return href ? (
     <DsLink href={href} className={cls}>
       {body}
@@ -184,17 +200,19 @@ export function ChartCard({
   const TrendIcon = insightTrend === "down" ? ArrowDownRight : insightTrend === "flat" ? ArrowRight : ArrowUpRight;
   return (
     <section className={cn("surface-card flex min-w-0 flex-col rounded-xl border border-line bg-surface", className)}>
-      <header className={cn("flex items-stretch justify-between gap-3", headerAside ? "flex-wrap border-b border-line" : "items-start px-6 pt-5")}>
-        <div className={cn("min-w-0", headerAside ? "w-full px-6 py-5 sm:w-auto sm:flex-1" : undefined)}>
+      {/* Sem headerAside: a ação (período, menu) desce para a linha de baixo quando o título não tem 12rem ao lado dela. */}
+      <header className={cn("flex flex-wrap justify-between", headerAside ? "items-stretch gap-3 border-b border-line" : "items-start gap-3 px-4 pt-4 sm:px-6 sm:pt-5")}>
+        <div className={headerAside ? "w-full min-w-0 px-4 py-4 sm:w-auto sm:flex-1 sm:px-6 sm:py-5" : "min-w-[min(100%,12rem)] flex-1"}>
           <h3 className="m-0 text-[15px] font-semibold leading-snug tracking-[-0.01em]">{title}</h3>
           {description && <p className="m-0 mt-1 text-[13px] text-muted">{description}</p>}
           {value != null && <div className="mt-2 text-[24px] font-semibold tabular-nums tracking-tight">{value}</div>}
         </div>
         {headerAside ? <div className="flex w-full min-w-0 flex-wrap items-stretch sm:w-auto">{headerAside}</div> : action && <div className="shrink-0">{action}</div>}
       </header>
-      <div className={cn("min-w-0 flex-1 pb-5 pt-5", flush ? "px-2 sm:px-3" : "px-6")}>{children}</div>
+      {/* Celular: 16 px de respiro lateral (como os outros cards); 24 px a partir de 640 px. */}
+      <div className={cn("min-w-0 flex-1 pb-4 pt-4 sm:pb-5 sm:pt-5", flush ? "px-2 sm:px-3" : "px-4 sm:px-6")}>{children}</div>
       {insight && (
-        <div className="px-6 pb-5 text-[13px]">
+        <div className="px-4 pb-4 text-[13px] sm:px-6 sm:pb-5">
           <div className="flex items-center gap-1.5 font-medium text-ink">
             {insight}
             {insightTrend && <TrendIcon className="h-4 w-4 text-ink-soft" aria-hidden />}
@@ -202,7 +220,7 @@ export function ChartCard({
           {insightDetail && <div className="mt-1 text-muted">{insightDetail}</div>}
         </div>
       )}
-      {footer && <footer className="border-t border-line px-6 py-3 text-[12px] text-muted">{footer}</footer>}
+      {footer && <footer className="border-t border-line px-4 py-3 text-[12px] text-muted sm:px-6">{footer}</footer>}
     </section>
   );
 }

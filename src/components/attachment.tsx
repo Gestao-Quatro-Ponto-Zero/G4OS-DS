@@ -61,10 +61,11 @@ export function Attachment({
         data-orientation={orientation}
         aria-busy={state === "uploading" || state === "processing" ? true : undefined}
         className={cn(
-          "linked-card group/attachment relative flex min-w-0 overflow-hidden rounded-xl border bg-surface text-ink",
+          "linked-card group/attachment relative flex min-w-0 overflow-hidden border bg-surface text-ink",
           orientation === "vertical" ? "w-40 flex-col" : "items-center",
           orientation === "horizontal" && sizeCls[size],
-          size === "xs" && "rounded-lg",
+          // cn não resolve conflito: um raio só por tamanho (antes o rounded-xl vencia o rounded-lg do xs).
+          size === "xs" ? "rounded-lg" : "rounded-xl",
           state === "error" ? "border-rose/35" : "border-line",
           state === "idle" && "border-dashed",
           className,
