@@ -254,7 +254,25 @@ function DiffFileRows({ file, many }: { file: DiffFile; many: boolean }) {
  * as palavras que mudaram marcadas dentro de uma linha reescrita. Recebe um diff unificado
  * (`git diff`); texto que não é diff aparece como bloco de código comum.
  */
-export function DiffView({ diff, title, maxHeight = 420, className }: { /** Diff unificado, como sai do `git diff`. */ diff: string; /** Título no lugar do nome do arquivo. */ title?: string; maxHeight?: number | false; className?: string }) {
+export function DiffView({
+  diff,
+  title,
+  maxHeight = 420,
+  actions,
+  collapsed = false,
+  className,
+}: {
+  /** Diff unificado, como sai do `git diff`. */
+  diff: string;
+  /** Título no lugar do nome do arquivo. */
+  title?: string;
+  maxHeight?: number | false;
+  /** Ações extras no cabeçalho, antes de Copiar ("Abrir arquivo", "Ver no editor"). */
+  actions?: ReactNode;
+  /** Só o cabeçalho (arquivo e saldo de linhas), sem o corpo: para um registro já revisado ou uma lista de arquivos. */
+  collapsed?: boolean;
+  className?: string;
+}) {
   const files = useMemo(() => parseDiff(diff), [diff]);
   const { ref, open, setOpen, tall } = useCollapse<HTMLDivElement>();
   if (!files) return <CodeBlock language="diff" code={diff} title={title} maxHeight={maxHeight} className={className} />;
@@ -264,12 +282,14 @@ export function DiffView({ diff, title, maxHeight = 420, className }: { /** Diff
   const name = title ?? (many ? `${files.length} arquivos` : (files[0].name ?? "Alterações"));
   return (
     <figure className={cn("diff-view min-w-0 max-w-full overflow-hidden rounded-xl border border-line bg-surface", className)} aria-label={`Diff: ${name}`}>
-      <figcaption className="flex min-h-10 items-center gap-2 border-b border-line py-1 pl-4 pr-1">
+      <figcaption className={cn("flex min-h-10 items-center gap-2 py-1 pl-4 pr-1", !collapsed && "border-b border-line")}>
         <FileDiff className="h-4 w-4 shrink-0 text-muted" aria-hidden />
         <span className="min-w-0 flex-1 truncate font-mono text-[12.5px] font-medium text-ink-soft">{name}</span>
         <Counts added={added} removed={removed} />
+        {actions}
         <CopyButton value={diff} className="border-0 bg-transparent" />
       </figcaption>
+      {!collapsed && (
       <div ref={ref} tabIndex={0} role="region" aria-label={`Diff de ${name}`} className="overflow-auto bg-surface outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted/50" style={{ maxHeight: open || maxHeight === false ? undefined : maxHeight }}>
         <table className="w-full border-collapse font-mono text-[12.5px] leading-[1.55] [font-variant-ligatures:none]">
           {files.map((file, i) => (
@@ -277,7 +297,8 @@ export function DiffView({ diff, title, maxHeight = 420, className }: { /** Diff
           ))}
         </table>
       </div>
-      {(tall || open) && maxHeight !== false && <Expand open={open} onToggle={() => setOpen(!open)} />}
+      )}
+      {!collapsed && (tall || open) && maxHeight !== false && <Expand open={open} onToggle={() => setOpen(!open)} />}
     </figure>
   );
 }
