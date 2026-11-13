@@ -382,7 +382,7 @@ export function NavTreeItem({
               aria-controls={panel}
               onClick={() => setOpen(id, !isOpen)}
               onKeyDown={(e) => arrowToggle(e, isOpen, (v) => setOpen(id, v))}
-              className="flex h-full min-w-0 flex-1 items-center gap-2.5 rounded-[inherit] pl-2.5 pr-1.5 focus-visible:outline-offset-[-2px]"
+              className="flex h-full min-w-0 flex-1 items-center gap-2.5 rounded-[inherit] pl-2.5 pr-[11px] focus-visible:outline-offset-[-2px]"
             >
               {content}
               <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200 motion-reduce:transition-none", isOpen && "rotate-90")} aria-hidden />

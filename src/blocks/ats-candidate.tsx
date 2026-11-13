@@ -372,7 +372,7 @@ function Profile({ candidate: c }: { candidate: Candidate }) {
           </>
         }
       >
-        <div className="space-y-4">
+        <div>
           <FieldBlock label="Data">
             <DatePicker label="Data da entrevista" value={when} onValueChange={setWhen} min={iso(0)} />
           </FieldBlock>

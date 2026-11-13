@@ -398,7 +398,7 @@ export default function CrmContacts() {
           </>
         }
       >
-        <div className="space-y-4">
+        <div>
           <TextField label="Razão social ou nome fantasia" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} error={tried && !draft.name.trim() ? "Informe o nome da empresa." : undefined} autoFocus />
           <FieldGrid>
             <TextField label="Site" optional placeholder="empresa.com.br" value={draft.domain} onChange={(v) => setDraft((d) => ({ ...d, domain: v }))} />

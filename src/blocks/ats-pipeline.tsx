@@ -231,7 +231,7 @@ function Board({ jobId }: { jobId: string }) {
           </>
         }
       >
-        <div className="space-y-4">
+        <div>
           <TextField label="Nome completo" value={name} onChange={setName} />
           <TextField label="E-mail" value={email} onChange={setEmail} placeholder="nome@email.com" optional />
           <Select label="Origem" value={source} onValueChange={(v) => setSource(v as Candidate["source"])} options={["Indicação", "LinkedIn", "Hunting", "Site de carreiras"].map((s) => ({ value: s, label: s }))} />

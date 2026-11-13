@@ -259,7 +259,7 @@ export default function CrmContact() {
           </>
         }
       >
-        <div className="space-y-4">
+        <div>
           <TextField label="Assunto" value={subject} onChange={setSubject} />
           <TextareaField label="Mensagem" value={body} onChange={setBody} rows={8} />
         </div>

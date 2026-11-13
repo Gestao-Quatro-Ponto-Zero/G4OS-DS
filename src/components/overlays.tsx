@@ -74,7 +74,7 @@ export function Modal({
               <X className="h-4 w-4" />
             </BaseDialog.Close>
           </header>
-          {children && <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>}
+          {children && <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 [&>:last-child]:mb-0 [&>:last-child>:last-child]:mb-0">{children}</div>}
           {footer && (
             <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-soft/35 px-6 py-4">{footer}</footer>
           )}
@@ -198,12 +198,12 @@ export function Drawer({
       className="app-dialog fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-ink backdrop:bg-black/15 backdrop:backdrop-blur-[2px]"
     >
       <aside
-        className="drawer-surface absolute right-0 top-0 flex h-full w-full flex-col border-l border-line bg-surface shadow-2xl shadow-black/10"
+        className="drawer-surface absolute right-0 top-0 flex h-full w-full flex-col border-l border-line bg-surface shadow-overlay"
         style={{ maxWidth: width }}
       >
         <header className="shrink-0 border-b border-line px-5 py-6 sm:px-7">
           {kicker && <div className="text-[12.5px] text-muted">{kicker}</div>}
-          <div className="mt-2 flex items-start justify-between gap-4">
+          <div className={cn("flex items-start justify-between gap-4", kicker && "mt-2")}>
             <h2 id={titleId} className="m-0 min-w-0 break-words text-[20px] font-semibold leading-snug tracking-tight">
               {title}
             </h2>
@@ -217,9 +217,9 @@ export function Drawer({
             </button>
           </div>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-7 sm:px-7">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-7 sm:px-7 [&>:last-child]:mb-0 [&>:last-child>:last-child]:mb-0">{children}</div>
         {footer && (
-          <footer className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-line bg-soft/35 px-5 py-5 sm:px-7">{footer}</footer>
+          <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-soft/35 px-5 py-5 sm:px-7">{footer}</footer>
         )}
       </aside>
     </dialog>,
