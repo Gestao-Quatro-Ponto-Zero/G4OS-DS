@@ -90,8 +90,8 @@ export function TableSearch({
   const ph = placeholder ?? (total != null ? `Buscar em ${formatNumber(total)} ${total === 1 ? noun : plural}` : `Buscar ${plural}`);
   return (
     <div className={cn("relative min-w-0", className)}>
-      <label className="focus-field flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-2.5">
-        <Search className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden />
+      <label className="focus-field flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 focus-within:border-muted">
+        <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden />
         <input
           ref={ref}
           type="search"
