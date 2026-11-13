@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ComponentType, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
-import { formatNumber, formatPercent } from "../lib/format";
+import { formatDelta, formatNumber, formatPercent } from "../lib/format";
 import { formatDuration } from "./ai";
 import { Menu, Tooltip, type MenuEntry } from "./overlays-extra";
 import { NavFlyout, navActiveDeep, navMatches, type NavSubItem } from "./nav-tree";
@@ -520,7 +520,7 @@ export function ArtifactCard({
     <div
       className={cn(
         "flex min-w-0 items-center gap-3 rounded-xl border bg-surface p-2.5 pr-2 transition-colors",
-        selected ? "border-primary/50 ring-2 ring-primary/10" : "border-line hover:border-line-strong",
+        selected ? "border-primary/40 bg-soft/40" : "border-line hover:border-line-strong",
         className,
       )}
     >
@@ -882,8 +882,7 @@ export function MetricBar({
       <span className="text-right font-medium tabular-nums">{formatPercent(v, 0)}</span>
       {delta != null ? (
         <span className={cn("text-right text-[12px] tabular-nums", good == null ? "text-muted" : good ? "text-ok" : "text-rose")}>
-          {delta > 0 ? "+" : delta < 0 ? "−" : ""}
-          {formatNumber(Math.abs(delta * 100), 1)}%
+          {formatDelta(delta)}
         </span>
       ) : (
         <span />
@@ -1281,14 +1280,15 @@ export function ApprovalRequest({
       data-state={state}
       className={cn("min-w-0 overflow-hidden rounded-xl border bg-surface", pending ? t.border : "border-line", className)}
     >
-      <header className="flex items-start gap-3 px-4 pt-3.5">
+      {/* Celular: o impacto desce para baixo do texto, alinhado a ele (no lado, espremia título e descrição). */}
+      <header className="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 pt-3.5">
         <span aria-hidden className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg [&_svg]:h-4 [&_svg]:w-4", tileClass)}>{glyph}</span>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 max-sm:basis-[calc(100%-2.75rem)]">
           <p className="m-0 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">{pending ? (eyebrow ?? l.eyebrow) : stateLabel}</p>
           <h3 className="m-0 mt-0.5 text-[14px] font-medium leading-snug">{title}</h3>
           {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
         </div>
-        {impact && <span className="shrink-0 rounded-md bg-soft px-2 py-1 text-[11.5px] font-medium tabular-nums text-ink-soft ring-1 ring-line">{impact}</span>}
+        {impact && <span className="shrink-0 rounded-md bg-soft px-2 py-1 text-[11.5px] font-medium tabular-nums text-ink-soft ring-1 ring-line max-sm:ml-11">{impact}</span>}
       </header>
       {preview && <div className={cn("mx-4 mt-3 rounded-lg border border-line bg-soft/60 p-3 text-[12.5px] leading-relaxed text-ink-soft", !pending && "opacity-70")}>{preview}</div>}
       {children != null && children !== false && <div className={cn("mx-4 mt-3 min-w-0 text-[12.5px] leading-relaxed text-ink-soft", !pending && "opacity-70")}>{children}</div>}
@@ -1530,8 +1530,8 @@ export function AgentMessage({
       {status && <div className="mb-2">{status}</div>}
       {children && <div className={cn("flex flex-col gap-3 text-[14px] leading-[1.7] text-ink [&_p]:m-0", streaming && "after:ml-0.5 after:inline-block after:h-4 after:w-1.5 after:translate-y-0.5 after:animate-pulse after:rounded-sm after:bg-ink/60 after:content-['']")}>{children}</div>}
       {artifacts && <div className="mt-4 grid gap-2 sm:grid-cols-2">{artifacts}</div>}
-      {!streaming && (suggestions?.length || onRetry || onFeedback || copyText) && (
-        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      {!streaming && (onRetry || onFeedback || copyText) && (
+        <div className="mt-3 flex flex-wrap items-center gap-1 -ml-1.5">
           {copyText && (
             <button
               type="button"
@@ -1561,7 +1561,12 @@ export function AgentMessage({
               </button>
             </>
           )}
-          {suggestions?.map((s) => (
+        </div>
+      )}
+      {/* Sugestões numa linha própria: misturadas aos ícones, quebravam desalinhadas. */}
+      {!streaming && !!suggestions?.length && (
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          {suggestions.map((s) => (
             <button key={s} type="button" onClick={() => onSuggestion?.(s)} className="inline-flex h-7 items-center rounded-full px-3 text-[12px] text-ink-soft ring-1 ring-line hover:bg-soft hover:text-ink">
               {s}
             </button>
