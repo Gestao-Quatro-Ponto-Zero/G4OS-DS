@@ -53,7 +53,9 @@ export type ChoroplethScaleOptions = {
   /**
    * Como cortar os degraus (sequencial): `equal` = faixas do mesmo tamanho;
    * `quantile` = mesma quantidade de regiões por faixa, com limites
-   * arredondados. Use `quantile` quando um valor domina (SP na receita).
+   * arredondados. Use `quantile` quando um valor domina (SP na receita):
+   * se o topo ainda juntar valores muito distantes (o maior ≥ 3× o início do
+   * último degrau), o último degrau começa na média do topo.
    */
   breaks?: "equal" | "quantile";
 };
@@ -114,10 +116,24 @@ export function choroplethScale(values: GeoValues, { steps, domain, scheme = "se
   if (breaks === "quantile" && nums.length > 1) {
     const sorted = [...nums].sort((a, b) => a - b);
     const n = Math.max(2, Math.round(steps ?? 5));
-    const cuts: number[] = [roundNice(sorted[0], "down")];
-    for (let i = 1; i < n; i++) {
-      const c = roundNice(sorted[Math.min(sorted.length - 1, Math.floor((i / n) * sorted.length))], "near");
-      if (c > cuts[cuts.length - 1]) cuts.push(c);
+    const quantileCuts = (k: number) => {
+      const out: number[] = [roundNice(sorted[0], "down")];
+      for (let i = 1; i < k; i++) {
+        const c = roundNice(sorted[Math.min(sorted.length - 1, Math.floor((i / k) * sorted.length))], "near");
+        if (c > out[out.length - 1]) out.push(c);
+      }
+      return out;
+    };
+    let cuts = quantileCuts(n);
+    // Cauda alta: quando o último degrau junta valores muito diferentes (SP com
+    // 6× a receita de SC), ele vira cabeça × cauda: n − 1 degraus por quantil e
+    // o último começa na média do topo, para o maior não ter o tom do sexto.
+    const top = sorted.filter((v) => v >= cuts[cuts.length - 1]);
+    if (n >= 3 && top.length > 1 && top[top.length - 1] >= 3 * cuts[cuts.length - 1]) {
+      const head = quantileCuts(n - 1);
+      const rest = sorted.filter((v) => v >= head[head.length - 1]);
+      const mean = roundNice(rest.reduce((a, v) => a + v, 0) / rest.length, "near");
+      if (mean > head[head.length - 1] && mean <= rest[rest.length - 1]) cuts = [...head, mean];
     }
     const bin = (v: number) => {
       let b = 0;
@@ -276,7 +292,7 @@ export type ChoroplethMapProps = {
   /** Ação do botão de voltar que aparece com zoom. Padrão: solta a seleção. */
   onZoomOut?: () => void;
   zoomOutLabel?: string;
-  /** Legenda em degraus abaixo do mapa (passar o mouse destaca a faixa). */
+  /** Legenda em degraus acima do mapa, com o fim da escala (passar o mouse destaca a faixa). */
   legend?: boolean;
   legendTitle?: ReactNode;
   /** Formato curto dos limites da legenda (padrão: `format`). Ex.: `formatCompact` para dinheiro. */
@@ -385,8 +401,26 @@ export function ChoroplethMap({
   const srRows = useMemo(() => [...regions].sort((a, b) => a.name.localeCompare(b.name, "pt-BR")).map((r) => ({ [regionLabel]: r.name, v: values[r.id] ?? null })), [regions, values, regionLabel]);
   const minTarget = 14; // px: abaixo disso a região ganha um círculo de toque
 
+  const legendFormat = formatLegend ?? format;
   return (
     <div className={cn("flex min-w-0 flex-col gap-3", className)}>
+      {/* Legenda colada ao topo do mapa, com o fim do último degrau (a escala fecha). */}
+      {legend ? (
+        <div className="flex min-w-0 flex-wrap items-end gap-x-1.5 gap-y-1">
+          <ScaleLegend
+            thresholds={scale.thresholds}
+            max={scale.max}
+            scheme={scale.scheme}
+            tone={scale.tone}
+            format={legendFormat}
+            title={legendTitle ?? valueLabel}
+            activeBin={legendBin ?? (isNum(activeValue) ? scale.bin(activeValue) : null)}
+            onHoverBin={setLegendBin}
+            className="min-w-0"
+          />
+          <span className="whitespace-nowrap text-[11px] tabular-nums text-muted">{legendFormat(scale.max)}</span>
+        </div>
+      ) : null}
       <div ref={boxRef} className="relative w-full" style={height ? { height } : { aspectRatio: `${base[2]} / ${base[3]}`, maxHeight: maxHeight }}>
         <svg viewBox={vb.join(" ")} preserveAspectRatio="xMidYMid meet" role="group" aria-label={label} className="block h-full w-full overflow-hidden">
           <defs>
@@ -395,6 +429,16 @@ export function ChoroplethMap({
               <line x1={0} y1={0} x2={0} y2={6 / zoomFactor} stroke="var(--color-line-strong)" strokeWidth={1.5 / zoomFactor} />
             </pattern>
           </defs>
+          {/* Contorno do país em line (UFs claras não somem no fundo): o traço largo
+              fica por baixo e o preenchimento em surface cobre a metade de dentro. */}
+          <g aria-hidden pointerEvents="none">
+            {regions.map((r) => (
+              <path key={`o-${r.id}`} d={r.path} fill="none" stroke="var(--color-line)" strokeWidth={2.5} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+            ))}
+            {regions.map((r) => (
+              <path key={`b-${r.id}`} d={r.path} fill="var(--color-surface)" fillRule="evenodd" />
+            ))}
+          </g>
           {regions.map((r) => {
             const v = values[r.id];
             const fill = scale.color(v) ?? `url(#${hatchId})`;
@@ -439,23 +483,47 @@ export function ChoroplethMap({
               if (Math.min(w, h) >= minTarget) return null;
               const [cx, cy] = centerOf(r, base);
               const b = hl.bind(r.id);
+              const on = hl.active === r.id;
+              // Marcador com a cor da própria UF (sobre surface, igual à legenda),
+              // contorno em line-strong e a sigla ao lado: lê como "aqui é o DF".
               return (
-                <circle
+                <g
                   key={`t-${r.id}`}
                   aria-hidden
-                  cx={cx}
-                  cy={cy}
-                  r={7 / s}
-                  fill={scale.color(values[r.id]) ?? `url(#${hatchId})`}
-                  stroke={hl.active === r.id ? "var(--color-ink)" : "var(--color-surface)"}
-                  strokeWidth={hl.active === r.id ? 1.75 : 1.25}
-                  vectorEffect="non-scaling-stroke"
                   onMouseEnter={b.onMouseEnter}
                   onMouseLeave={b.onMouseLeave}
                   onClick={b.onClick}
                   className="cursor-pointer transition-opacity duration-150 motion-reduce:transition-none"
                   style={{ opacity: dimmed(r.id) ? 0.4 : 1 }}
-                />
+                >
+                  <circle cx={cx} cy={cy} r={6 / s} fill="var(--color-surface)" />
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={6 / s}
+                    fill={scale.color(values[r.id]) ?? `url(#${hatchId})`}
+                    stroke={on ? "var(--color-ink)" : "var(--color-line-strong)"}
+                    strokeWidth={on ? 1.75 : 1}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  {showLabels ? (
+                    <text
+                      x={cx + 9 / s}
+                      y={cy}
+                      dy="0.35em"
+                      fontSize={10 / s}
+                      fontWeight={600}
+                      fill="var(--color-ink)"
+                      stroke="var(--color-surface)"
+                      strokeWidth={3 / s}
+                      strokeLinejoin="round"
+                      paintOrder="stroke"
+                      className="pointer-events-none select-none"
+                    >
+                      {r.id}
+                    </text>
+                  ) : null}
+                </g>
               );
             })}
           {showLabels && s > 0 && (
@@ -507,18 +575,6 @@ export function ChoroplethMap({
           </div>
         ) : null}
       </div>
-      {legend ? (
-        <ScaleLegend
-          thresholds={scale.thresholds}
-          max={scale.max}
-          scheme={scale.scheme}
-          tone={scale.tone}
-          format={formatLegend ?? format}
-          title={legendTitle ?? valueLabel}
-          activeBin={legendBin ?? (isNum(activeValue) ? scale.bin(activeValue) : null)}
-          onHoverBin={setLegendBin}
-        />
-      ) : null}
       <SrTable label={label} data={srRows} index={regionLabel} series={[{ key: "v", label: valueLabel }]} format={format} />
     </div>
   );
