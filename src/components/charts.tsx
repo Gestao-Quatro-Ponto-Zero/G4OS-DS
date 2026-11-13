@@ -249,7 +249,7 @@ export function ChartTooltipContent({
         {items.map((r) => {
           const Icon = r.icon;
           return (
-            <div key={r.key ?? r.label} className={cn("flex items-stretch gap-2", indicator === "dot" && "items-center")}>
+            <div key={r.key ?? r.label} className={cn("flex gap-2", indicator === "dot" ? "items-center" : "items-stretch")}>
               {Icon ? (
                 <Icon className="h-3 w-3 shrink-0 self-center text-muted" />
               ) : (
@@ -353,11 +353,12 @@ export function ChartLegend({
           <>
             {swatch}
             {it.label}
-            {it.value != null && <span className="font-medium tabular-nums text-ink">{it.value}</span>}
+            {it.value != null && <span className="ml-auto pl-1 font-medium tabular-nums text-ink">{it.value}</span>}
           </>
         );
         return (
-          <li key={it.key ?? it.label}>
+          // li em flex: o item vira bloco e não alinha pela linha de base do marcador (o tracejado, com 0 de altura, descia o texto).
+          <li key={it.key ?? it.label} className="flex">
             {onToggle && it.key ? (
               <button
                 type="button"
@@ -369,7 +370,7 @@ export function ChartLegend({
                 {body}
               </button>
             ) : (
-              <span className="inline-flex items-center gap-1.5">{body}</span>
+              <span className="inline-flex flex-1 items-center gap-1.5">{body}</span>
             )}
           </li>
         );
@@ -649,7 +650,8 @@ function Cartesian({
   }, [data, vis.map((s) => s.key).join(), stacked, expand, n]);
 
   /* ---------- geometria ---------- */
-  const catW = horizontal && !categoryInside ? Math.min(150, Math.max(40, Math.max(...data.map((d) => formatIndex(String(d[index] ?? "")).length)) * 6.6 + 12)) : 0;
+  // Mesma conta de largura do wrapCategory (7 px por caractere) + 10 de vão + 14 de folga: nome que cabe não quebra no meio.
+  const catW = horizontal && !categoryInside ? Math.min(150, Math.max(40, Math.max(...data.map((d) => formatIndex(String(d[index] ?? "")).length)) * 7 + 24)) : 0;
   const axisW = !horizontal && yAxis ? (axisWidth ?? Math.min(68, Math.max(28, Math.max(...ticks.map((t) => axisFormat(t).length)) * 6.8 + 12))) : 0;
   const labelTop = (labels || endLabels) && !horizontal ? 16 : 0;
   const m = horizontal
@@ -667,6 +669,12 @@ function Cartesian({
   const tickLabelW = Math.max(...ticks.map((t) => axisFormat(t).length)) * 7 + 10;
   const hTickEvery = horizontal ? Math.max(1, Math.ceil(tickLabelW / Math.max(1, innerW / Math.max(1, ticks.length - 1)))) : 1;
   const labelEvery = horizontal ? 1 : Math.max(1, Math.ceil(n / Math.max(1, Math.floor(innerW / (longest * 7 + 18)))));
+
+  // Centro de um rótulo centrado que não sai do SVG (largura estimada: caracteres × 2·half px).
+  const clampLabel = (x: number, text: string, half: number) => {
+    const w = text.length * half;
+    return Math.min(Math.max(x, w), Math.max(w, width - w));
+  };
 
   const pick = (clientX: number, clientY: number, rect: DOMRect) => {
     if (!n) return null;
@@ -881,10 +889,18 @@ function Cartesian({
                     // Empilhado: só o total, no topo da pilha.
                     if (stacked && si !== vis.length - 1) return null;
                     const { groupW, barW } = barSize(vis.length);
+                    const valueOf = (d: ChartDatum) => (stacked ? vis.reduce((t, o) => t + num(d[o.key]), 0) : num(d[s.key]));
+                    // Espaço do rótulo: uma série (ou o total da pilha) usa a faixa da categoria; séries lado a lado, a barra.
+                    // A decisão vale para a série inteira: mesmo corpo em todos os rótulos, alternados só se nem o menor couber.
+                    const room = labels === "inside" ? barW - 4 : stacked || vis.length === 1 ? band - 6 : barW + 3;
+                    const longest = Math.max(0, ...data.map((d) => (expand ? formatPercent(1, 0) : format(valueOf(d))).length));
+                    // Largura média medida da Figtree tabular: ~5,3 px por caractere a 11,5 px; ~4,9 px a 10,5 px.
+                    const small = longest * 5.4 > room;
+                    const alternate = small && longest * 4.9 > room;
                     return (
                       <g key={`l-${s.key}`}>
                         {data.map((d, i) => {
-                          const v = stacked ? vis.reduce((t, o) => t + num(d[o.key]), 0) : num(d[s.key]);
+                          const v = valueOf(d);
                           const end = vScale(stacked ? stacks.highs[s.key][i] : val(d, i, s.key));
                           const center = stacked ? cat(i) : cat(i) - groupW / 2 + si * (barW + 3) + barW / 2;
                           const text = expand ? formatPercent(1, 0) : format(v);
@@ -906,10 +922,7 @@ function Cartesian({
                             );
                           }
                           const inside = labels === "inside";
-                          // Barras estreitas: fonte menor e, se ainda não couber, um rótulo sim e outro não.
-                          const room = stacked ? band : barW + 6;
-                          const small = text.length * 6.4 > room;
-                          if (small && text.length * 5.6 > room && i % 2 === 1) return null;
+                          if (alternate && i % 2 === 1) return null;
                           return (
                             <text
                               key={i}
@@ -929,7 +942,7 @@ function Cartesian({
                 : vis.map((s) => (
                     <g key={`l-${s.key}`}>
                       {data.map((d, i) => gaps && d[s.key] == null ? null : (
-                        <text key={i} x={cat(i)} y={vScale(stacks.highs[s.key][i]) - 9} textAnchor="middle" className="fill-ink-soft text-[11.5px] font-medium tabular-nums">
+                        <text key={i} x={clampLabel(cat(i), format(num(d[s.key])), 3.3)} y={vScale(stacks.highs[s.key][i]) - 9} textAnchor="middle" className="fill-ink-soft text-[11.5px] font-medium tabular-nums">
                           {format(num(d[s.key]))}
                         </text>
                       ))}
@@ -1020,11 +1033,13 @@ function Cartesian({
                       );
                     })()
                   ) : (
+                    // Centrado sob o ponto; nas pontas, encosta na borda do SVG em vez de vazar
+                    // (âncora "start" no primeiro rótulo encavalava no segundo).
                     <text
                       key={i}
-                      x={cat(i)}
+                      x={clampLabel(cat(i), formatIndex(String(d[index] ?? "")), 3.4)}
                       y={height - 8}
-                      textAnchor={kind !== "bar" && i === 0 ? "start" : kind !== "bar" && i === n - 1 ? "end" : "middle"}
+                      textAnchor="middle"
                       className="fill-muted text-[12px]"
                     >
                       {formatIndex(String(d[index] ?? ""))}
@@ -1200,19 +1215,23 @@ export function MiniBarChart({
         onPointerLeave={() => setActive(null)}
       >
         {data.map((d, i) => {
-          const on = active === i;
+          // Em repouso, a barra do valor mostrado no cabeçalho (a última) já fica em tinta: número e barra se ligam.
+          const on = shown === i;
           const near = active != null && Math.abs(active - i) === 1;
+          const last = data.length - 1;
+          // Rótulo a cada N; o penúltimo some se encostar no último (que sempre aparece).
+          const hideLabel = !on && i !== last && (i % every !== 0 || last - i < Math.ceil(every / 2));
           return (
             <div key={`${d.label}-${i}`} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end" onPointerEnter={() => setActive(i)}>
               <div
                 aria-hidden
                 className={cn(
                   "w-full max-w-[28px] rounded-[4px] transition-[background-color,transform] duration-150 motion-reduce:transition-none",
-                  on ? "bg-ink" : near ? "bg-ink/35" : active != null ? "bg-ink/12" : "bg-ink/25",
+                  on ? "bg-ink" : near ? "bg-ink/35" : active != null ? "bg-ink/12" : "bg-ink/60",
                 )}
                 style={{ height: Math.max(2, (d.value / max) * height) }}
               />
-              <span aria-hidden className={cn("mt-1.5 max-w-full whitespace-nowrap text-[10px] leading-none", on ? "font-medium text-ink" : "text-muted", !on && i % every !== 0 && i !== data.length - 1 && "invisible")}>
+              <span aria-hidden className={cn("mt-1.5 max-w-full whitespace-nowrap text-[10px] leading-none", on ? "font-medium text-ink" : "text-muted", hideLabel && "invisible")}>
                 {d.label}
               </span>
             </div>

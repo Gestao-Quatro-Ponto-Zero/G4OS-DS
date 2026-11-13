@@ -318,7 +318,7 @@ export function ProjectProgressCard({
                     <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                   </span>
                 ) : (
-                  <span className="h-3.5 w-3.5 rounded-full border border-line-strong" />
+                  <span className="h-4 w-4 rounded-full border-[1.5px] border-line-strong" />
                 )}
               </span>
               <div className={cn("min-w-0 flex-1", !last && "pb-3.5")}>

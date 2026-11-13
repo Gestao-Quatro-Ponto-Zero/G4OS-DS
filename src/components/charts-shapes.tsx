@@ -181,7 +181,7 @@ export function PieChart({
       </div>
       {legend && (
         <ChartLegend
-          className={legend === "right" ? "flex-col !items-start gap-y-2" : ""}
+          className={legend === "right" ? "flex-col !items-stretch gap-y-2" : ""}
           align="center"
           items={base.map((it, i) => ({ label: it.label, color: colorOf(it, i), value: legend === "right" ? formatPercent(it.value / (total0 || 1), 0) : undefined }))}
         />
