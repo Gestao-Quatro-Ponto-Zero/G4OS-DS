@@ -160,7 +160,7 @@ function findTrail(path: string, groups: NavGroup[]): string[] {
 }
 
 export default function SidebarSubmenusBlock() {
-  const p = useFrameParam("p", "");
+  const p = useFrameParam("p") ?? "";
   const path = `/${p}`;
   const [collapsed, setCollapsed] = useState(false);
   const [ws, setWs] = useState("acme");

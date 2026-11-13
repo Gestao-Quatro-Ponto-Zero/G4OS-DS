@@ -520,7 +520,7 @@ export default function CrmDeal() {
           </>
         }
       >
-        <div className="space-y-4">
+        <div>
           <TextField label="Título" value={draft.title} onChange={(v) => setDraft((d) => ({ ...d, title: v }))} />
           <CurrencyField label="Valor" value={draft.value} onChange={(v) => setDraft((d) => ({ ...d, value: v ?? 0 }))} />
           <FieldBlock label="Fechamento previsto">

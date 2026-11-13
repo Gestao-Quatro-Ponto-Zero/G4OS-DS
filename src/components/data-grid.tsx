@@ -1244,16 +1244,17 @@ export function DataGrid<T>(props: DataGridProps<T>) {
         <div className="flex flex-wrap items-start gap-2 border-b border-line px-3 py-2">
           {/* Bloco: FilterBar/TableSearch ocupam a largura; controles da grade ficam no fim da linha. */}
           <div className="min-w-0 flex-1 basis-[280px]">{toolbar}</div>
-          <div className="ml-auto flex min-h-10 items-center gap-1.5">
+          {/* Mesma altura e corpo dos filtros ao lado (40 px, 12.5 px): densidade, exportar e colunas. */}
+          <div className="ml-auto flex min-h-10 items-center gap-1.5 [&>button]:h-10 [&>button]:text-[12.5px]">
             {props.showDensity && <DensityControl density={density} onChange={setDensity} />}
             {exportFileName && (
-              <button type="button" onClick={exportRows} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-ink-soft ring-1 ring-line hover:bg-soft" title={selected.size ? "Exportar selecionados" : "Exportar o que está na tela"}>
+              <button type="button" onClick={exportRows} className="inline-flex h-10 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-ink-soft ring-1 ring-line hover:bg-soft" title={selected.size ? "Exportar selecionados" : "Exportar o que está na tela"}>
                 <Download className="h-3.5 w-3.5" aria-hidden />
                 <span className="hidden sm:inline">{selected.size ? `Exportar ${selected.size}` : "Exportar"}</span>
               </button>
             )}
             {columnMenu && !cards && (
-              <Menu label="Colunas" align="end" triggerClassName="h-8 px-2.5 text-[12.5px] font-normal text-ink-soft" trigger={<><Columns3 aria-hidden /> <span className="hidden sm:inline">Colunas</span></>} items={colEntries} />
+              <Menu label="Colunas" align="end" triggerClassName="!h-10 !gap-1.5 !px-2.5 !text-[12.5px] !font-normal !text-ink-soft [&_svg]:!h-3.5 [&_svg]:!w-3.5" trigger={<><Columns3 aria-hidden /><span className="hidden sm:inline">Colunas</span></>} items={colEntries} />
             )}
           </div>
         </div>

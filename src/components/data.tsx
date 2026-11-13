@@ -232,8 +232,10 @@ export function Pagination({
   const sizes = pageSizeOptions && onPageSizeChange && pageSize ? pageSizeOptions : null;
   const unit = noun ? ` ${total === 1 ? noun : nounPlural ?? `${noun}s`}` : "";
   const pages: (number | "…")[] = [];
+  // "…" só quando esconde 2+ páginas: no lugar de uma página só, mostra o número.
+  const shown = (p: number) => p === 1 || p === pageCount || Math.abs(p - page) <= 1;
   for (let p = 1; p <= pageCount; p++) {
-    if (p === 1 || p === pageCount || Math.abs(p - page) <= 1) pages.push(p);
+    if (shown(p) || (shown(p - 1) && shown(p + 1))) pages.push(p);
     else if (pages[pages.length - 1] !== "…") pages.push("…");
   }
   const box = "h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[12.5px] tabular-nums disabled:cursor-not-allowed disabled:text-muted/50 disabled:hover:bg-transparent";
