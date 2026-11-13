@@ -128,11 +128,11 @@ Os blocos estão em `src/blocks/` e no site em **Blocos**. Categorias: SaaS, CRM
 | **Contratos** (CLM) | `clm-dashboard` | `clm-contracts`, `clm-obligations` | `clm-contract` | `clm-request` (assistente), `clm-approvals`, `clm-templates` |
 | **Comunicação interna** | `comms-home` | `comms-people`, `comms-events`, `comms-surveys` | `comms-announcement` | `comms-compose`, `comms-channels`, `comms-analytics` |
 | **Gestão de agentes de IA** | `ai-agents-dashboard` | `ai-agents`, `ai-runs`, `ai-approvals` | `ai-agent`, `ai-agent-run` (`?estado=ao-vivo`: execução com aprovação de diff) | `ai-agent-builder`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-templates` |
-| **Assistente / chat de IA** | `ai-workspace` | `ai-sessions`, `ai-projects` | `ai-trace` | `ai-chat`, `ai-answer` (resposta com fontes citadas), `ai-conversation`, `ai-assistant` |
+| **Assistente / chat de IA** | `ai-workspace` | `ai-sessions`, `ai-projects` | `ai-trace` | `ai-chat`, `ai-answer` (resposta com fontes citadas), `ai-delegate` (tarefas delegadas a agentes), `ai-conversation`, `ai-assistant` |
 | **SaaS / produto** | `saas-dashboard` | `saas-customers`, `saas-plans`, `saas-usage` | `saas-customer` | `saas-analytics`, `saas-mrr-bridge` (movimento de MRR), `saas-retention` (coortes), `saas-journey` (jornada), `saas-unit-economics` (CAC × LTV), `saas-regions` (mapa por UF), `saas-explore` (tabela dinâmica), `saas-usage-horizon`, `settings-*`, `onboarding-*` |
 | **Portal do cliente** | `onboarding-checklist` + `NextStep` | lista simples | — | `auth-login`, `auth-otp`, `app-file-manager` |
 | **Página pública** | — | — | — | `marketing-stage` (palcos, cena, cabeçalho que vira pílula), `marketing-landing`, `marketing-pricing`, `ats-careers` |
-| **Qualquer app** | — | — | — | `auth-*`, `settings-profile`/`-organization`/`-roles`/`-billing`/`-notifications`/`-team`/`-webhooks`/`-data`, `app-error-pages`, `app-legal`, `app-presentation` |
+| **Qualquer app** | — | — | — | `auth-*`, `settings-profile`/`-organization`/`-roles`/`-billing`/`-notifications`/`-team`/`-webhooks`/`-data`/`-storage` (armazenamento com limpeza), `app-error-pages`, `app-legal`, `app-presentation` |
 
 Receitas por tipo de app (entidades, mapa de navegação, telas): `docs/receitas/` (CRM, ATS, ERP, ERP de serviços, financeiro, contratos, comunicação interna, agentes de IA, portal).
 

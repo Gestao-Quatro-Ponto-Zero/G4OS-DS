@@ -4,7 +4,7 @@
 - Categoria: IA
 - Preview: showcase `#/frame/ai-codex` (`?theme=dark` para o escuro)
 
-Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.
+Estilo Codex: tarefa em execução com fase, plano, contexto e custo ao vivo (AgentActivityCard), sessões agrupadas por repositório, lista recolhível (⌘\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.
 
 ## Conceito
 
@@ -14,7 +14,8 @@ Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\), co
 
 - Anatomia Conversa (AgentAppLayout): trilho + lista por projeto recolhível (⌘\) + conversa; troca rápida de sessão quando a lista está fechada
 - Lista “Por projeto”: pastas = repositórios, sessões aninhadas, “Mostrar mais”, ⋯ por projeto
-- Execução como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos
+- Tarefa em execução como card de atividade (AgentActivityCard): fase com palavra, plano com o passo atual, o que o agente está lendo/buscando/escrevendo, ferramentas, modelo, tokens, custo e tempo, com Pausar e Parar
+- Execução terminada como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos
 - Histórico longo recolhido no topo (ThreadView collapseBefore): só o final importa
 - Resultados verificáveis em lista (commit, deploy, testes) com links, não só texto
 - Permissão sempre visível no campo; “Acesso total” em âmbar e com confirmação
@@ -28,9 +29,10 @@ Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\), co
 **Evite**
 
 - Esconder que o agente tem acesso total
+- Execução longa sem Pausar e sem custo visível
 - Mostrar o histórico inteiro sempre aberto
 - Resultado sem evidência (hash, link, contagem de testes)
 
 ## Componentes usados
 
-`AgentAppLayout`, `AgentComposer`, `AnswerCard`, `Badge`, `BottomNav`, `Button`, `CommandPalette`, `ComposerChip`, `Disclaimer`, `InputModal`, `ListToggle`, `MenuEntry`, `MessageActions`, `Modal`, `ModelEffort`, `ModelPicker`, `PermissionMode`, `PermissionModeChip`, `PropertyList`, `RunSummary`, `SessionQuickSwitcher`, `SessionSidebar`, `StepGroup`, `StepItem`, `ThreadHeader`, `ThreadView`, `UserBubble`, `VoiceModeButton`, `VoiceOverlay`, `WorkspaceSwitcher`, `notify`
+`AgentActivityCard`, `AgentAppLayout`, `AgentComposer`, `AnswerCard`, `Badge`, `BottomNav`, `Button`, `CommandPalette`, `ComposerChip`, `Disclaimer`, `InputModal`, `ListToggle`, `MenuEntry`, `MessageActions`, `Modal`, `ModelEffort`, `ModelPicker`, `PermissionMode`, `PermissionModeChip`, `PropertyList`, `RunSummary`, `SessionQuickSwitcher`, `SessionSidebar`, `StepGroup`, `StepItem`, `ThreadHeader`, `ThreadView`, `UserBubble`, `VoiceModeButton`, `VoiceOverlay`, `WorkspaceSwitcher`, `notify`, `useAgentActivityDemo`

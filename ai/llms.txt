@@ -1,6 +1,6 @@
 # @g4ai/ds
 
-> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 520 componentes, gráficos SVG e 152 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
+> Design system G4 OS (React 18.2+/19 + Base UI + Tailwind v4): tokens semânticos com tema escuro e marcas, 530 componentes, gráficos SVG e 154 blocos de tela para CRM, ATS, ERP, financeiro e SaaS. Tudo em pt-BR.
 
 Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 
@@ -88,6 +88,9 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [agent-run](components/agent-run.md): ------------------------------------------------------------------
 - [agent-evals](components/agent-evals.md): ------------------------------------------------------------------
 - [illustration](components/illustration.md): Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).
+- [capacity](components/capacity.md): Capacidade: quanto de uma cota está ocupado e por quê.
+- [agent-tasks](components/agent-tasks.md): Tarefas delegadas a agentes: a pessoa escolhe o que sai da mão dela, entrega a um ou mais agentes e acompanha o trabalho ao vivo até o resultado.
+- [agent-activity](components/agent-activity.md): Atividade do agente, por fases: um card compacto que mostra O QUE o agente está fazendo agora (lendo, buscando, pensando, escrevendo, revisando), o plano com o passo atual, o contexto da fase e quanto já custou.
 
 ## Blocos
 - [ai-agent-builder](blocks/ai-agent-builder.md): Construtor de agentes (IA)
@@ -107,6 +110,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [ai-codex](blocks/ai-codex.md): Agente de código (tarefas longas) (IA)
 - [ai-compose-email](blocks/ai-compose-email.md): E-mail com IA (IA)
 - [ai-conversation](blocks/ai-conversation.md): Conversa com aprovação (IA)
+- [ai-delegate](blocks/ai-delegate.md): Tarefas da semana (IA)
 - [ai-projects](blocks/ai-projects.md): Projetos do agente (IA)
 - [ai-runs](blocks/ai-runs.md): Execuções de agentes (IA)
 - [ai-sessions-artifacts](blocks/ai-sessions-artifacts.md): Sessões com artefatos (IA)
@@ -230,6 +234,7 @@ Comece por [core.md](core.md). Regras completas em ../AGENTS.md.
 - [settings-profile](blocks/settings-profile.md): Perfil (Configurações)
 - [settings-roles](blocks/settings-roles.md): Papéis e permissões (Configurações)
 - [settings-security](blocks/settings-security.md): Segurança (Configurações)
+- [settings-storage](blocks/settings-storage.md): Armazenamento (Configurações)
 - [settings-team](blocks/settings-team.md): Equipe e permissões (Configurações)
 - [settings-webhooks](blocks/settings-webhooks.md): Webhooks (Configurações)
 - [srv-billing](blocks/srv-billing.md): Cobranças (boleto e Pix) (Serviços)

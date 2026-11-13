@@ -31116,6 +31116,875 @@
         }
       ],
       "doc": "components/illustration.md"
+    },
+    {
+      "name": "capacity",
+      "file": "src/components/capacity.tsx",
+      "summary": "Capacidade: quanto de uma cota está ocupado e por quê.",
+      "exports": [
+        {
+          "name": "CapacityBar",
+          "kind": "component",
+          "summary": "Barra de capacidade segmentada: cada categoria ocupa a fração da cota (`total`), o resto é espaço livre em gelo.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Nome acessível da barra (\"Uso do armazenamento\")."
+            },
+            {
+              "name": "segments",
+              "type": "CapacitySegment[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Tamanho da cota (100 % da barra)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "clearing",
+              "type": "string | null | undefined",
+              "required": false,
+              "default": null,
+              "description": "Id da categoria sendo limpa agora: o segmento esmaece até encolher."
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "formatStorage",
+              "description": null
+            },
+            {
+              "name": "height",
+              "type": "number | undefined",
+              "required": false,
+              "default": "48",
+              "description": "Altura em px."
+            },
+            {
+              "name": "highlight",
+              "type": "LinkedHighlight<string> | undefined",
+              "required": false,
+              "default": null,
+              "description": "Realce compartilhado com a legenda (`useLinkedHighlight<string>()`)."
+            },
+            {
+              "name": "othersLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Outros\"",
+              "description": "Nome do grupo que junta as categorias além da 6ª."
+            },
+            {
+              "name": "scanned",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "0–1: fração já varrida."
+            },
+            {
+              "name": "texture",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Textura de pontos sutil sobre cada segmento."
+            },
+            {
+              "name": "tooltip",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "Etiqueta com nome, tamanho e % sobre o segmento em foco."
+            }
+          ],
+          "examplePage": "dash-capacidade"
+        },
+        {
+          "name": "CapacityBreakdown",
+          "kind": "component",
+          "summary": "Cartão de capacidade completo: total usado (desce animado quando algo é limpo), linha de status (caminho em varredura, categoria em foco ou o resultado da limpeza), barra, legenda e uma recomendação por vez com a ação.",
+          "props": [
+            {
+              "name": "segments",
+              "type": "CapacitySegment[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "barHeight",
+              "type": "number | undefined",
+              "required": false,
+              "default": "64",
+              "description": "Altura da barra em px."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "doneLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Nada mais vale a pena limpar agora.\"",
+              "description": "Quando não sobra recomendação."
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "formatStorage",
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Uso do armazenamento\"",
+              "description": "Nome acessível da barra."
+            },
+            {
+              "name": "onRescan",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Mostra \"Varrer de novo\"."
+            },
+            {
+              "name": "scanning",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Varredura em andamento (controlado)."
+            },
+            {
+              "name": "scanPath",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Onde a varredura está agora (\"Drive › Comercial › Propostas 2026\")."
+            },
+            {
+              "name": "scanProgress",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "0–1 durante a varredura (controlado)."
+            },
+            {
+              "name": "simulateScan",
+              "type": "boolean | { duration?: number; paths?: string[]; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Demonstração: anima uma varredura ao montar e ao varrer de novo."
+            },
+            {
+              "name": "suggestions",
+              "type": "CapacitySuggestion[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": "Recomendações em ordem; uma aparece por vez e some depois de feita."
+            },
+            {
+              "name": "usedLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Texto depois do total."
+            }
+          ],
+          "examplePage": "dash-capacidade"
+        },
+        {
+          "name": "CapacityLegend",
+          "kind": "component",
+          "summary": "Legenda da barra em grade (3 → 2 → 1 colunas pela largura do contêiner): ícone ou amostra de cor + categoria + tamanho.",
+          "props": [
+            {
+              "name": "segments",
+              "type": "CapacitySegment[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "format",
+              "type": "((n: number) => string) | undefined",
+              "required": false,
+              "default": "formatStorage",
+              "description": null
+            },
+            {
+              "name": "highlight",
+              "type": "LinkedHighlight<string> | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "othersLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Outros\"",
+              "description": null
+            }
+          ],
+          "examplePage": "dash-capacidade"
+        },
+        {
+          "name": "CapacitySegment",
+          "kind": "type",
+          "summary": "Uma categoria da cota (Documentos, Gravações, Lixeira…).",
+          "definition": "{ id: string; label: string; value: number; color?: string; icon?: ReactNode; description?: ReactNode; }"
+        },
+        {
+          "name": "CapacitySuggestion",
+          "kind": "type",
+          "summary": "Recomendação de limpeza: frase com o tamanho, verbo + objeto no botão.",
+          "definition": "{ id: string; tone?: \"info\" | \"warn\"; text: ReactNode; actionLabel: string; busyLabel?: string; category?: string; onAction: () => Promise<{ freed: number }>; destructive?: boolean; confirm?: { title?: string; description?: ReactNode; confirmLabel?: string }; undo?: () => void; doneMessage?: string; }"
+        },
+        {
+          "name": "formatStorage",
+          "kind": "function",
+          "summary": "Bytes em unidade legível, base 1000 como o sistema operacional mostra: 357_800_000_000 → \"357,8 GB\".",
+          "signature": "formatStorage(bytes, digits?): string"
+        }
+      ],
+      "doc": "components/capacity.md"
+    },
+    {
+      "name": "agent-tasks",
+      "file": "src/components/agent-tasks.tsx",
+      "summary": "Tarefas delegadas a agentes: a pessoa escolhe o que sai da mão dela, entrega a um ou mais agentes e acompanha o trabalho ao vivo até o resultado.",
+      "exports": [
+        {
+          "name": "AgentQueue",
+          "kind": "component",
+          "summary": "Painel \"Agentes\": uma linha por tarefa delegada ainda em curso, com o rosto do agente, o título e o que ele está fazendo agora (anunciado ao leitor de tela, troca com um fade curto).",
+          "props": [
+            {
+              "name": "tasks",
+              "type": "DelegableTask[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "id",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Para a pílula apontar (`aria-controls`)."
+            },
+            {
+              "name": "onOpen",
+              "type": "((taskId: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRetry",
+              "type": "((taskId: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onReview",
+              "type": "((taskId: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Abrir o que o agente pede (aprovação, dado que falta)."
+            },
+            {
+              "name": "onStop",
+              "type": "((taskId: string) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Interromper o agente: a tarefa volta para você."
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Agentes\"",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-tarefas-delegadas"
+        },
+        {
+          "name": "AgentRef",
+          "kind": "type",
+          "summary": "Um agente que recebe tarefas.",
+          "definition": "{ id: string; name: string; seed?: string; palette?: number; shape?: AgentOrbShape; }"
+        },
+        {
+          "name": "DelegableTask",
+          "kind": "type",
+          "summary": "Uma tarefa que pode ser delegada.",
+          "definition": "{ id: string; title: string; due?: Date | string; priority?: \"alta\" | \"normal\"; agent?: AgentRef; status?: DelegableTaskStatus; activity?: string; suggestedAgentId?: string; }"
+        },
+        {
+          "name": "DelegableTaskList",
+          "kind": "component",
+          "summary": "Lista de tarefas com seleção múltipla para delegar a agentes.",
+          "props": [
+            {
+              "name": "tasks",
+              "type": "DelegableTask[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "agents",
+              "type": "AgentRef[] | undefined",
+              "required": false,
+              "default": "[]",
+              "description": "Agentes do seletor da barra."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "now",
+              "type": "Date | undefined",
+              "required": false,
+              "default": null,
+              "description": "Referência de \"hoje\" para os prazos."
+            },
+            {
+              "name": "onComplete",
+              "type": "((ids: string[]) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Marcar as tarefas como concluídas pela própria pessoa."
+            },
+            {
+              "name": "onCreate",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Botão \"+\" do cabeçalho."
+            },
+            {
+              "name": "onDelegate",
+              "type": "((ids: string[], agentId: string | null) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "Delegar as tarefas marcadas."
+            },
+            {
+              "name": "onSelectedChange",
+              "type": "((ids: string[]) => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "selected",
+              "type": "string[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Seleção controlada (ids)."
+            },
+            {
+              "name": "showCompleted",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Mantém as concluídas na lista (riscadas) em vez de tirá-las."
+            },
+            {
+              "name": "title",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Esta semana\"",
+              "description": "Título do cartão."
+            }
+          ],
+          "examplePage": "ia-tarefas-delegadas"
+        },
+        {
+          "name": "DelegableTaskStatus",
+          "kind": "type",
+          "summary": "Situação da tarefa. `aberta` é da pessoa; `delegada` está na fila do agente; `trabalhando` está em execução; `aguardando` travou e pede você (aprovação, dado que falta); `falhou` parou com erro; `concluida` terminou.",
+          "definition": "\"aberta\" | \"delegada\" | \"trabalhando\" | \"aguardando\" | \"falhou\" | \"concluida\""
+        },
+        {
+          "name": "DelegationDemoStep",
+          "kind": "type",
+          "summary": "Um passo do roteiro de demonstração: texto, ou texto que trava pedindo você ou que falha.",
+          "definition": "string | { text: string; waitForYou?: boolean; fail?: boolean }"
+        },
+        {
+          "name": "DelegationPill",
+          "kind": "component",
+          "summary": "Pílula flutuante do trabalho delegado: rostos dos agentes e uma frase (\"2 agentes trabalhando\", \"1 aguardando você\", \"Financeiro respondeu ✓\").",
+          "props": [
+            {
+              "name": "tasks",
+              "type": "DelegableTask[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "answered",
+              "type": "AgentRef | null | undefined",
+              "required": false,
+              "default": null,
+              "description": "Agente que acabou de entregar: mostra \"<nome> respondeu\" quando ninguém mais trabalha."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "controls",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Id do painel que a pílula abre."
+            },
+            {
+              "name": "expanded",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": "Painel aberto (folha no celular)."
+            },
+            {
+              "name": "onClick",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-tarefas-delegadas"
+        },
+        {
+          "name": "describeTaskDue",
+          "kind": "function",
+          "summary": "Prazo de tarefa em palavras: \"Hoje\", \"Amanhã\", \"Sexta\" (até 6 dias), \"21 nov\" depois disso e \"Atrasada\" antes de hoje.",
+          "signature": "describeTaskDue(due, now?): { label: string; full: string; tone: \"atrasada\"; } | { label: string; full: string; tone: \"hoje\"; } | { lab…"
+        },
+        {
+          "name": "TaskResultCard",
+          "kind": "component",
+          "summary": "Resultado de uma tarefa delegada: título, quem fez, \"Trabalhou por 2 min 14 s ›\" (abre os passos), a frase de resultado, uma tabela-resumo opcional, os arquivos entregues (com \"Abrir em\") e, se a entrega pede revisão, \"A",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Ações extras no rodapé (ou no lugar das de revisão)."
+            },
+            {
+              "name": "agent",
+              "type": "AgentRef | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "A frase de resultado."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "durationMs",
+              "type": "number | undefined",
+              "required": false,
+              "default": null,
+              "description": "Tempo de trabalho do agente."
+            },
+            {
+              "name": "files",
+              "type": "TaskResultFile[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "needsReview",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "A entrega espera sua decisão: mostra Aprovar e Pedir ajuste."
+            },
+            {
+              "name": "onApprove",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRequestChanges",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "steps",
+              "type": "(string | AgentRunStep)[] | undefined",
+              "required": false,
+              "default": null,
+              "description": "Passos (texto simples ou `AgentRunStep`) que abrem sob \"Trabalhou por\"."
+            },
+            {
+              "name": "table",
+              "type": "TaskResultTable | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-tarefas-delegadas"
+        },
+        {
+          "name": "TaskResultFile",
+          "kind": "type",
+          "summary": "Arquivo entregue pelo agente, com destinos de \"Abrir em\".",
+          "definition": "{ name: string; size?: number; meta?: ReactNode; openWith?: { label: string; icon?: ReactNode; onSelect?: () => void }[]; }"
+        },
+        {
+          "name": "TaskResultTable",
+          "kind": "type",
+          "summary": "Tabela-resumo do resultado.",
+          "definition": "{ columns: { label: string; align?: \"start\" | \"end\" }[]; rows: (ReactNode | number)[][]; caption?: string; }"
+        },
+        {
+          "name": "useDelegationDemo",
+          "kind": "hook",
+          "summary": "Simula o ciclo de delegação para showcase, protótipo e testes de usabilidade: delegada → passos do roteiro (um por compasso, só com a aba visível) → concluída.",
+          "signature": "useDelegationDemo(initial, props): { tasks: DelegableTask[]; answered: { taskId: string; agent: AgentRef; } | null; running: boolean; delegate…"
+        }
+      ],
+      "doc": "components/agent-tasks.md"
+    },
+    {
+      "name": "agent-activity",
+      "file": "src/components/agent-activity.tsx",
+      "summary": "Atividade do agente, por fases: um card compacto que mostra O QUE o agente está fazendo agora (lendo, buscando, pensando, escrevendo, revisando), o plano com o passo atual, o contexto da fase e quanto já custou.",
+      "exports": [
+        {
+          "name": "AgentActivityCard",
+          "kind": "component",
+          "summary": "Card de atividade do agente, por fases: marca + fase no topo, barra de progresso na cor da fase, plano com o passo atual, o contexto da fase (arquivo, busca, ideias, escrita, revisão, resultado), ferramentas, modelo e co",
+          "props": [
+            {
+              "name": "phase",
+              "type": "AgentPhase",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "plan",
+              "type": "AgentPlanStep[]",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "progress",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Progresso da tarefa, de 0 a 1."
+            },
+            {
+              "name": "task",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Título da tarefa (\"Adicionar alternador de tema escuro\")."
+            },
+            {
+              "name": "usage",
+              "type": "AgentUsage",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "agentName",
+              "type": "string | undefined",
+              "required": false,
+              "default": "\"Agente de código\"",
+              "description": null
+            },
+            {
+              "name": "animate",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "true",
+              "description": "`false` mostra cada painel já no estado final (documentação, listas, impressão)."
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "context",
+              "type": "AgentPhaseContext | undefined",
+              "required": false,
+              "default": null,
+              "description": "Painel da fase atual."
+            },
+            {
+              "name": "label",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome acessível do card."
+            },
+            {
+              "name": "model",
+              "type": "string | { models: ModelOption[]; value: string; onChange: (id: string) => void; } | undefined",
+              "required": false,
+              "default": null,
+              "description": "Nome do modelo (chip estático) ou o `ModelPicker` controlado."
+            },
+            {
+              "name": "onPause",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onRestart",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": "\"Executar de novo\" depois de concluído, parado ou falhou."
+            },
+            {
+              "name": "onResume",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "onStop",
+              "type": "(() => void) | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "phaseLabel",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": "Troca a palavra da fase no cabeçalho (\"Lendo tokens.css\")."
+            },
+            {
+              "name": "tools",
+              "type": "AgentTool[] | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "unsavedChanges",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": "false",
+              "description": "Há alterações não salvas: Parar pede confirmação antes."
+            }
+          ],
+          "examplePage": "ia-atividade-do-agente"
+        },
+        {
+          "name": "agentActivitySample",
+          "kind": "function",
+          "summary": "Um quadro estático de cada fase da demonstração (para documentação e estados).",
+          "signature": "agentActivitySample(phase): Omit<{ phase: AgentPhase; progress: number; task: string; plan: AgentPlanStep[]; context?: AgentPhaseContex…"
+        },
+        {
+          "name": "AgentMark",
+          "kind": "component",
+          "summary": "Marca do agente: quatro barras de equalizador na cor da fase.",
+          "props": [
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "live",
+              "type": "boolean | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "phase",
+              "type": "AgentPhase | undefined",
+              "required": false,
+              "default": "\"concluido\"",
+              "description": null
+            },
+            {
+              "name": "size",
+              "type": "number | undefined",
+              "required": false,
+              "default": "20",
+              "description": null
+            }
+          ],
+          "examplePage": "ia-atividade-do-agente"
+        },
+        {
+          "name": "AgentPhase",
+          "kind": "type",
+          "summary": "Fase do agente. As cinco de trabalho + concluído, pausado, parado e falhou.",
+          "definition": "\"lendo\" | \"buscando\" | \"pensando\" | \"escrevendo\" | \"revisando\" | \"concluido\" | \"pausado\" | \"parado\" | \"falhou\""
+        },
+        {
+          "name": "AgentPhaseBadge",
+          "kind": "component",
+          "summary": "A fase como ponto + palavra, na cor da fase.",
+          "props": [
+            {
+              "name": "phase",
+              "type": "AgentPhase",
+              "required": true,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "className",
+              "type": "string | undefined",
+              "required": false,
+              "default": null,
+              "description": null
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ],
+          "examplePage": "ia-atividade-do-agente"
+        },
+        {
+          "name": "AgentPhaseContext",
+          "kind": "type",
+          "summary": "O que a fase está mostrando: o arquivo lido, a busca, as ideias, o texto escrito, a revisão ou o resultado.",
+          "definition": "| { kind: \"arquivo\"; path: string } | { kind: \"busca\"; query: string; results: { title: string; source: string }[] } | { kind: \"ideias\"; items: string[] } | { kind: \"escrita\"; path: string; text: string } | { kind: \"revisao\"; path: string; before: string; after: string } | { kind: \"resultado\"; title: string; summary: string; changes?: string[] } | { kind: \"erro\"; title: string; detail?: string }"
+        },
+        {
+          "name": "agentPhaseLabel",
+          "kind": "function",
+          "summary": "Rótulo de cada fase (\"Buscando na web\").",
+          "signature": "agentPhaseLabel(phase): string"
+        },
+        {
+          "name": "AgentPlanStep",
+          "kind": "type",
+          "summary": "Um passo do plano do agente.",
+          "definition": "{ id: string; label: string; status: \"pendente\" | \"atual\" | \"feito\" }"
+        },
+        {
+          "name": "AgentTool",
+          "kind": "type",
+          "summary": "Ferramenta conectada ao agente; `active` realça a que está em uso.",
+          "definition": "{ id: string; label: string; active?: boolean }"
+        },
+        {
+          "name": "AgentUsage",
+          "kind": "type",
+          "summary": "Consumo da execução: tokens, custo (em reais) e tempo decorrido.",
+          "definition": "{ tokens: number; cost: number; elapsedMs: number }"
+        },
+        {
+          "name": "useAgentActivityDemo",
+          "kind": "hook",
+          "summary": "Percorre as fases do `AgentActivityCard` em ~15 s (só com a aba visível), com Pausar, Retomar, Parar e Executar de novo funcionando.",
+          "signature": "useAgentActivityDemo(props?): { phase: AgentPhase; task: string; progress: number; plan: AgentPlanStep[]; context: AgentPhaseContext; too…"
+        }
+      ],
+      "doc": "components/agent-activity.md"
     }
   ],
   "blocks": [
@@ -31846,14 +32715,15 @@
       "slug": "ai-codex",
       "file": "src/blocks/ai-codex.tsx",
       "title": "Agente de código (tarefas longas)",
-      "description": "Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.",
+      "description": "Estilo Codex: tarefa em execução com fase, plano, contexto e custo ao vivo (AgentActivityCard), sessões agrupadas por repositório, lista recolhível (⌘\\\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.",
       "category": "IA",
       "concept": {
         "goal": "Acompanhar um agente que trabalha por minutos em um repositório (corrige, testa, publica): ver o que ele fez, o resultado verificável e decidir o próximo passo sem se perder em conversas longas.",
         "patterns": [
           "Anatomia Conversa (AgentAppLayout): trilho + lista por projeto recolhível (⌘\\) + conversa; troca rápida de sessão quando a lista está fechada",
           "Lista “Por projeto”: pastas = repositórios, sessões aninhadas, “Mostrar mais”, ⋯ por projeto",
-          "Execução como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos",
+          "Tarefa em execução como card de atividade (AgentActivityCard): fase com palavra, plano com o passo atual, o que o agente está lendo/buscando/escrevendo, ferramentas, modelo, tokens, custo e tempo, com Pausar e Parar",
+          "Execução terminada como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos",
           "Histórico longo recolhido no topo (ThreadView collapseBefore): só o final importa",
           "Resultados verificáveis em lista (commit, deploy, testes) com links, não só texto",
           "Permissão sempre visível no campo; “Acesso total” em âmbar e com confirmação"
@@ -31865,11 +32735,13 @@
         ],
         "avoid": [
           "Esconder que o agente tem acesso total",
+          "Execução longa sem Pausar e sem custo visível",
           "Mostrar o histórico inteiro sempre aberto",
           "Resultado sem evidência (hash, link, contagem de testes)"
         ]
       },
       "uses": [
+        "AgentActivityCard",
         "AgentAppLayout",
         "AgentComposer",
         "AnswerCard",
@@ -31900,7 +32772,8 @@
         "VoiceModeButton",
         "VoiceOverlay",
         "WorkspaceSwitcher",
-        "notify"
+        "notify",
+        "useAgentActivityDemo"
       ]
     },
     {
@@ -31982,6 +32855,57 @@
         "ToolCallsSection",
         "formatCurrency",
         "notify"
+      ]
+    },
+    {
+      "slug": "ai-delegate",
+      "file": "src/blocks/ai-delegate.tsx",
+      "title": "Tarefas da semana",
+      "description": "A lista da semana de uma gestora: marque várias tarefas (clique, arraste ou Shift), delegue aos agentes e acompanhe ao vivo. Pílula com quem está trabalhando, painel de agentes com o passo atual, pedido de aprovação antes de pagar, conclusões uma a uma e o resultado em cartão com tabela e planilha. Cinco estados (?estado=).",
+      "category": "IA",
+      "concept": {
+        "goal": "Tirar da mão o que um agente resolve sozinho sem perder o controle: ver quem está fazendo o quê, decidir o que mexe em dinheiro e receber a entrega pronta para conferir.",
+        "patterns": [
+          "reading",
+          "Esta semana",
+          "DelegableTaskList: seleção múltipla (clique, arrasto, Shift, teclado) e barra flutuante com Delegar (n) e o agente (Automático ou um nome)",
+          "DelegationPill no topo: rostos empilhados + frase (2 agentes trabalhando · 1 aguardando você · Financeiro respondeu ✓); no celular abre o painel em folha",
+          "AgentQueue: uma linha por tarefa em curso com o passo ao vivo (aria-live); Parar e Ver detalhes no ⋯; falha com Tentar de novo",
+          "O que mexe em dinheiro trava em Aguardando você e vira ApprovalRequest com o valor (R$ 842,30) antes de pagar",
+          "Concluída: check, riscado e sai da lista; a entrega abre como TaskResultCard (Trabalhou por ›, tabela-resumo, planilha com Abrir em, Aprovar/Pedir ajuste)",
+          "Estados: carregando (forma da lista), vazio (Criar tarefa), erro de um agente (linha com falha e Tentar de novo). Sem estado de filtro: a tela não filtra"
+        ],
+        "adapt": [
+          "Gestão pessoal, backoffice financeiro, operação de compras, assistente de agenda: troque tarefas, agentes e roteiros",
+          "Ligue useDelegationDemo ao seu orquestrador: status e activity vêm do servidor; o resto da tela não muda"
+        ],
+        "avoid": [
+          "Delegar tarefa sem dono ou sem prazo (o agente não sabe quando é tarde)",
+          "Agente pagar, enviar ou cancelar sem aprovação explícita",
+          "Status só por cor ou só pelo ícone: sempre com palavra",
+          "Contador de total na pílula: ela diz o que está acontecendo, não quantas tarefas existem"
+        ]
+      },
+      "uses": [
+        "AgentQueue",
+        "AgentRef",
+        "ApprovalRequest",
+        "Button",
+        "DelegableTask",
+        "DelegableTaskList",
+        "DelegationDemoStep",
+        "DelegationPill",
+        "Empty",
+        "Page",
+        "PageHeading",
+        "Sheet",
+        "Skeleton",
+        "TaskResultCard",
+        "formatCurrency",
+        "formatNumber",
+        "notify",
+        "useDelegationDemo",
+        "useReducedMotion"
       ]
     },
     {
@@ -37657,6 +38581,48 @@
         "PasswordField",
         "SettingsSection",
         "TextField",
+        "notify"
+      ]
+    },
+    {
+      "slug": "settings-storage",
+      "file": "src/blocks/settings-storage.tsx",
+      "title": "Armazenamento",
+      "description": "Uso da cota de 1 TB do workspace por categoria, com varredura ao abrir, barra segmentada ligada à legenda, recomendações de limpeza uma por vez (com confirmação quando é irreversível), maiores arquivos e uso por equipe.",
+      "category": "Configurações",
+      "concept": {
+        "goal": "Mostrar o que ocupa a cota e liberar espaço com segurança, sem o administrador ter de caçar arquivo por arquivo.",
+        "patterns": [
+          "Anatomia D · Configurações: título 'Configurações' fixo e subnavegação colada abaixo (SettingsLayout)",
+          "CapacityBreakdown: total, linha de status, barra segmentada e legenda ligadas pelo mesmo realce",
+          "Uma recomendação por vez, com o tamanho na frase e verbo + objeto no botão; a próxima aparece quando a anterior termina",
+          "Irreversível (versões antigas, lixeira) passa por ConfirmDialog; reversível (arquivo frio) vai direto e o toast oferece Desfazer",
+          "Maiores arquivos com filtro por equipe e uso por equipe em BarList, para achar quem cuidar"
+        ],
+        "adapt": [
+          "Cota de e-mails ou de envio (SaaS)",
+          "Assentos por plano (Configurações › Plano)",
+          "Espaço do portal do cliente"
+        ],
+        "avoid": [
+          "Mais de 6 categorias com cor (agrupe em Outros)",
+          "Usar a barra para série temporal",
+          "Apagar sem dizer quanto e o quê"
+        ]
+      },
+      "uses": [
+        "ActionMenu",
+        "BarList",
+        "Button",
+        "CapacityBreakdown",
+        "CapacitySegment",
+        "CapacitySuggestion",
+        "Empty",
+        "ErrorState",
+        "FileCard",
+        "Select",
+        "Skeleton",
+        "formatStorage",
         "notify"
       ]
     },

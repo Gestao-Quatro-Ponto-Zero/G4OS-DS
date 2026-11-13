@@ -251,6 +251,10 @@ function NoTasks() {
 }
 
 /** Com `failed`, a revisão do carro já está com a Agenda e falhou (estado de erro de um agente). */
+const happyScripts: Record<string, DelegationDemoStep[]> = Object.fromEntries(
+  Object.entries(scripts).map(([id, steps]) => [id, steps.filter((step) => !(typeof step === "object" && "fail" in step && step.fail))]),
+);
+
 function initialTasks(failed: boolean): DelegableTask[] {
   const list = week();
   if (!failed) return list;
@@ -269,9 +273,10 @@ function initialTasks(failed: boolean): DelegableTask[] {
 }
 
 function Delegation({ failed }: { failed: boolean }) {
+  // Fluxo normal sem falha; a falha da Agenda só aparece em ?estado=erro.
   const demo = useDelegationDemo(initialTasks(failed), {
     agents,
-    scripts,
+    scripts: failed ? scripts : happyScripts,
     tickMs: 2000,
   });
   const [finished, setFinished] = useState<string[]>([]);

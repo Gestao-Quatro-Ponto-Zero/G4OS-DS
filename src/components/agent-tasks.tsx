@@ -915,11 +915,23 @@ export function TaskResultCard({
       )}
       {children != null && <div className="text-[14px] leading-relaxed text-ink">{children}</div>}
       {table && (
+        <div className="@container">
+          {/* Estreito (celular, painel): cada linha vira pares rótulo → valor, sem cortar coluna. */}
+          <dl className="m-0 flex flex-col divide-y divide-line rounded-xl border border-line @md:hidden">
+            {table.rows.map((row, r) =>
+              row.map((cell, i) => (
+                <div key={`${r}-${i}`} className="flex items-baseline justify-between gap-3 px-3 py-2">
+                  <dt className="text-[12.5px] text-ink-soft">{table.columns[i]?.label}</dt>
+                  <dd className={cn("m-0 text-[15px] font-medium text-ink", (typeof cell === "number" || table.columns[i]?.align === "end") && "tabular-nums")}>{typeof cell === "number" ? formatNumber(cell) : cell}</dd>
+                </div>
+              )),
+            )}
+          </dl>
         <div
           tabIndex={0}
           role="region"
           aria-label={table.caption ?? `Resumo: ${title}`}
-          className="overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          className="hidden overflow-x-auto rounded-xl border border-line outline-none focus-visible:ring-2 focus-visible:ring-accent/40 @md:block"
         >
           <table className="w-full border-collapse text-left">
             {table.caption && <caption className="sr-only">{table.caption}</caption>}
@@ -947,6 +959,7 @@ export function TaskResultCard({
               ))}
             </tbody>
           </table>
+        </div>
         </div>
       )}
       {files?.map((f) => (
