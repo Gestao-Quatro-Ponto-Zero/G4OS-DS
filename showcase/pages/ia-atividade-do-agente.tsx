@@ -1,4 +1,4 @@
-import { AgentActivityCard, AgentMark, AgentPhaseBadge, agentActivitySample, notify, useAgentActivityDemo, type AgentPhase } from "@g4ai/ds";
+import { AgentActivityCard, AgentMark, AgentPhaseBadge, agentActivitySample, agentPhaseLabel, notify, useAgentActivityDemo, type AgentPhase } from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
@@ -56,7 +56,7 @@ export default function Page() {
       <DocSection title="Cada fase" rule="Fases de trabalho usam a paleta categórica (não são bom ou ruim); concluído é ok, falhou é rose, pausado e parado ficam neutros. Com animate={false} cada painel aparece no estado final.">
         <div className="grid gap-4 lg:grid-cols-2">
           {phases.map((p) => (
-            <Demo key={p} title={p} className="p-3" code={`<AgentActivityCard {...props} phase="${p}" animate={false} />`}>
+            <Demo key={p} title={agentPhaseLabel(p)} className="p-3" code={`<AgentActivityCard {...props} phase="${p}" animate={false} />`}>
               <AgentActivityCard {...agentActivitySample(p)} animate={false} onPause={() => undefined} onResume={() => undefined} onStop={() => undefined} onRestart={() => undefined} className="w-full" />
             </Demo>
           ))}
