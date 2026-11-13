@@ -165,7 +165,7 @@ export function AttachmentDescription({ children, className }: { children?: Reac
     ) : (
       children
     );
-  return <div className={cn("mt-0.5 truncate text-[12px] text-muted", state === "error" && "text-rose", className)}>{text}</div>;
+  return <div className={cn("mt-0.5 truncate text-[12px]", state === "error" ? "text-rose" : "text-muted", className)}>{text}</div>;
 }
 
 /** Grupo de ações à direita (ou embaixo, na vertical). */

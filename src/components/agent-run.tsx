@@ -141,7 +141,7 @@ function StepRow({ step, open, onToggle }: { step: RunStep; open: boolean; onTog
   const running = status === "running";
   const body = (
     <>
-      <span aria-hidden className={cn("grid h-5 w-5 shrink-0 place-items-center text-muted [&_svg]:h-4 [&_svg]:w-4", running && "text-ink")}>
+      <span aria-hidden className={cn("grid h-5 w-5 shrink-0 place-items-center [&_svg]:h-4 [&_svg]:w-4", running ? "text-ink" : "text-muted")}>
         {kindIcon[step.kind]}
       </span>
       <span className="sr-only">{kindLabel[step.kind]}: </span>

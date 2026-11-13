@@ -362,10 +362,10 @@ export function buttonClass({
   const sizes = size === "sm" ? "min-h-9 px-3 py-2 text-[13px]" : "min-h-10 px-4 py-2.5 text-[13.5px]";
   const variants: Record<ButtonVariant, string> = {
     primary: "ui-button-primary ui-button-solid bg-primary text-on-primary hover:bg-primary/90",
-    ghost: "ui-button-outline bg-surface text-ink ring-1 ring-line hover:bg-soft",
+    ghost: "ui-button-outline bg-surface text-ink ring-1 ring-inset ring-line hover:bg-soft",
     danger: "ui-button-solid bg-rose text-on-ink hover:bg-rose/90",
     quiet: "ui-button-text bg-transparent text-muted hover:bg-soft hover:text-ink",
-    "split-left": "ui-button-outline rounded-r-none bg-surface text-ink ring-1 ring-line hover:bg-soft",
+    "split-left": "ui-button-outline rounded-r-none bg-surface text-ink ring-1 ring-inset ring-line hover:bg-soft",
     "split-right": "ui-button-solid rounded-l-none bg-primary text-on-primary hover:bg-primary/90",
   };
   return cn(

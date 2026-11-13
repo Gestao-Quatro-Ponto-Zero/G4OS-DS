@@ -159,7 +159,7 @@ export default function TaskProposals() {
         </div>
         <div className="grid min-h-0 flex-1 gap-5 overflow-hidden p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_440px]">
           <div className={cn("min-h-0 min-w-0 overflow-y-auto", view !== "doc" && "hidden lg:block")}>{doc}</div>
-          <div className={cn("flex min-h-0 min-w-0 flex-col", view !== "tasks" && "hidden lg:flex")}>{panel}</div>
+          <div className={cn("min-h-0 min-w-0 flex-col", view !== "tasks" ? "hidden lg:flex" : "flex")}>{panel}</div>
         </div>
       </div>
     </AgentShell>

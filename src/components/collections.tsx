@@ -737,8 +737,8 @@ export function KanbanColumn({
         onDrop?.(e);
       }}
       className={cn(
-        "flex min-h-0 min-w-0 shrink-0 flex-col rounded-2xl border bg-soft/60 p-2 transition-colors",
-        over || dropActive ? "border-line-strong bg-soft" : "border-line",
+        "flex min-h-0 min-w-0 shrink-0 flex-col rounded-2xl border p-2 transition-colors",
+        over || dropActive ? "border-line-strong bg-soft" : "border-line bg-soft/60",
       )}
       // Mínimo `width`, cresce para ocupar telas largas (até 400px por coluna).
       style={{ flex: `1 0 ${width}px`, maxWidth: Math.max(width, 400) }}

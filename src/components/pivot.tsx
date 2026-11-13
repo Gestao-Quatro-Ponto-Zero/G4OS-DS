@@ -755,8 +755,8 @@ export function PivotBuilder({
               role="group"
               aria-label={areaLabel[area]}
               className={cn(
-                "flex min-h-12 min-w-0 items-start gap-2 rounded-xl border bg-soft/60 p-2 transition-colors motion-reduce:transition-none",
-                over ? "border-primary/50 bg-soft" : drag && accepts ? "border-dashed border-line-strong" : "border-transparent",
+                "flex min-h-12 min-w-0 items-start gap-2 rounded-xl border p-2 transition-colors motion-reduce:transition-none",
+                over ? "border-primary/50 bg-soft" : drag && accepts ? "border-dashed border-line-strong bg-soft/60" : "border-transparent bg-soft/60",
                 drag && !accepts && "opacity-50",
               )}
             >

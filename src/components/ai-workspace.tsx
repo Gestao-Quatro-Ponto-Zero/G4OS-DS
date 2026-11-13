@@ -519,8 +519,8 @@ export function ArtifactCard({
   return (
     <div
       className={cn(
-        "flex min-w-0 items-center gap-3 rounded-xl border bg-surface p-2.5 pr-2 transition-colors",
-        selected ? "border-primary/40 bg-soft/40" : "border-line hover:border-line-strong",
+        "flex min-w-0 items-center gap-3 rounded-xl border p-2.5 pr-2 transition-colors",
+        selected ? "border-primary/40 bg-soft/40" : "border-line bg-surface hover:border-line-strong",
         className,
       )}
     >

@@ -782,7 +782,7 @@ export function ActiveFilterChip<T>({ filters, condition }: { filters: FiltersAp
   if (!field) return null;
   const d = filters.describe(condition);
   return (
-    <span className="inline-flex h-8 items-stretch overflow-hidden rounded-lg bg-surface text-[12.5px] ring-1 ring-line-strong">
+    <span className="inline-flex h-8 items-stretch overflow-hidden rounded-lg bg-surface text-[12.5px] ring-1 ring-inset ring-line-strong">
       <Pop
         open={open}
         onOpenChange={(o) => {

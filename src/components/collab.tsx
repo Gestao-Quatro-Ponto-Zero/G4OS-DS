@@ -18,7 +18,7 @@ type Author = { name: string; initials: string; tint?: string };
 export function TeamMessage({ author, time, mine = false, children, className }: { author: Author; time: string; mine?: boolean; children: ReactNode; className?: string }) {
   return (
     <article className={cn("flex", mine ? "justify-end" : "justify-start", className)} aria-label={`${author.name}, ${time}`}>
-      <div className={cn("w-fit max-w-[min(85%,520px)] rounded-2xl border border-line bg-surface px-4 py-3 shadow-surface", mine ? "rounded-br-md" : "rounded-bl-md")}>
+      <div className={cn("w-fit max-w-[min(85%,520px)] border border-line bg-surface px-4 py-3 shadow-surface", mine ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-bl-md")}>
         <header className="mb-1.5 flex items-center gap-2">
           <Avatar initials={author.initials} tint={author.tint} name={author.name} size="sm" />
           <span className="min-w-0 truncate text-[13px] font-medium">{author.name}</span>

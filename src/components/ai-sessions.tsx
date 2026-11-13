@@ -1479,7 +1479,7 @@ export function SessionDetails({
   return (
     <div className={cn("min-w-0", className)}>
       {title != null && <h3 className="m-0 pt-4 text-[15px] font-semibold tracking-tight">{title}</h3>}
-      <div role="tablist" aria-label="Seções" className={cn("flex gap-4 border-b border-line", title != null && "mt-2", show !== "both" && "hidden")}>
+      <div role="tablist" aria-label="Seções" className={cn("gap-4 border-b border-line", title != null && "mt-2", show !== "both" ? "hidden" : "flex")}>
         {(
           [
             ["detalhes", "Detalhes"],
@@ -2036,9 +2036,8 @@ export function ModelPicker({
       <BaseMenu.Trigger
         aria-label={`${curAgent ? `Agente: ${curAgent.name}, ` : ""}Modelo: ${cur?.name}${effort ? `, esforço ${effortLabel[effort]}` : ""}`}
         className={cn(
-          "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full text-[12px] text-ink-soft outline-none transition-colors hover:bg-ink/[0.05] hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40 data-popup-open:bg-ink/[0.06]",
-          curAgent ? "pl-1.5 pr-2.5" : "px-2.5",
-          summary && "h-9 bg-surface px-3.5 text-[13px] ring-1 ring-line hover:bg-soft",
+          "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full text-ink-soft outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-muted/40 data-popup-open:bg-ink/[0.06]",
+          summary ? "h-9 bg-surface px-3.5 text-[13px] ring-1 ring-inset ring-line hover:bg-soft" : cn("h-8 text-[12px] hover:bg-ink/[0.05]", curAgent ? "pl-1.5 pr-2.5" : "px-2.5"),
           className,
         )}
       >

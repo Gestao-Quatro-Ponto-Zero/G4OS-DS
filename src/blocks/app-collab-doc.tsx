@@ -175,8 +175,8 @@ export default function CollabDoc() {
           />
         </div>
         <div className="grid min-h-0 flex-1 gap-4 p-3 sm:p-5 lg:grid-cols-[minmax(340px,440px)_minmax(0,1fr)]">
-          <div className={cn("flex min-h-0", view !== "conversa" && "hidden lg:flex")}>{chat}</div>
-          <div className={cn("flex min-h-0", view !== "documento" && "hidden lg:flex")}>{docPane}</div>
+          <div className={cn("min-h-0", view !== "conversa" ? "hidden lg:flex" : "flex")}>{chat}</div>
+          <div className={cn("min-h-0", view !== "documento" ? "hidden lg:flex" : "flex")}>{docPane}</div>
         </div>
       </div>
     </AtlasShell>

@@ -366,7 +366,7 @@ export function SettingsSection({
         {description && <p className="m-0 mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
         {action && <div className="mt-3">{action}</div>}
       </div>
-      <div className="min-w-0 max-w-[560px]">{children}</div>
+      <div className="min-w-0 max-w-[560px] [&>:last-child]:mb-0">{children}</div>
     </section>
   );
 }
