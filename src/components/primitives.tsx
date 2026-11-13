@@ -137,8 +137,9 @@ export function Avatar({
   const face = (
     <span
       className={cn(
+        // inset-ring de 10 % da tinta: invisível sobre o preenchimento escuro no tema claro, contorna o avatar no escuro (a tinta da pessoa não muda de tema)
         // ds-audit-ignore white-black: iniciais brancas sobre `tint` escuro (identidade da pessoa)
-        "inline-grid shrink-0 place-items-center overflow-hidden align-middle text-center font-medium leading-none whitespace-nowrap text-white",
+        "inline-grid shrink-0 place-items-center overflow-hidden align-middle text-center font-medium leading-none whitespace-nowrap text-white inset-ring inset-ring-ink/10",
         avatarDim[size],
         round,
         !(status || badge) && className,
@@ -709,7 +710,7 @@ export function Metric({
     </>
   );
   const cls = cn(
-    "metric-panel flex min-w-0 items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3",
+    "metric-panel flex min-w-0 items-start gap-3 rounded-xl border border-line bg-surface px-4 py-3",
     href && "surface-interactive hover:border-line-strong",
   );
   return href ? (

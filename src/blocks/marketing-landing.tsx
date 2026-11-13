@@ -144,7 +144,7 @@ export default function MarketingLanding() {
               ))}
             </ul>
           </div>
-          <ImageSphere images={sphere} size={440} itemSize={60} label="Empresas clientes" />
+          <ImageSphere images={sphere} size={440} itemSize={60} label="Empresas clientes" className="min-w-0" />
         </section>
 
         <div className="py-12">
