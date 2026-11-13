@@ -239,7 +239,8 @@ export default function AiWorkspace() {
             onStop={stop}
             busy={running}
             commands={slashCommands}
-            placeholder="Pergunte ou dê uma tarefa ao agente… ( / para comandos)"
+            placeholder="Pergunte ou dê uma tarefa ao agente…"
+            hint="/ para comandos"
             attachOptions={[
               { label: "Arquivo do computador", icon: <Paperclip className="h-4 w-4" />, onSelect: () => fileInput.current?.click() },
               { label: "Dados do CRM", icon: <Database className="h-4 w-4" />, onSelect: () => setSourcesOpen(true) },
