@@ -40,6 +40,7 @@ Por que `@theme inline`: os utilitários saem como `background-color: var(--ds-s
 | `clay` / `clay-soft` | ênfase editorial | `#842e20` / `#f6e7e3` | `#e59a8a` / `#3a211c` |
 | `ok`, `amber`, `rose`, `info` (+`-soft`) | estados | tons fortes / fundos claros | tons claros / fundos escuros |
 | `chart-1…6`, `chart-grid` | séries e grade | ink, azul, dourado, clay, sálvia, cinza | versões claras |
+| `chart-pos`, `chart-neg` | escala divergente (acima × abaixo de uma base) | azul, laranja | versões claras |
 
 Também são semânticos (sem utilitário de cor): `--ds-focus` (anel de foco), `--ds-backdrop`, `--ds-shadow-*` (sombras ficam mais densas no escuro), `--ds-radius-scale`, `--ds-font-sans`, `--ds-font-mono`.
 

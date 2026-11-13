@@ -165,6 +165,10 @@
   --ds-chart-5: var(--g4-sage-500);
   --ds-chart-6: var(--g4-gray-400);
   --ds-chart-grid: #eef0f2;
+  /* Escala divergente (acima × abaixo de uma base): horizon, mapa de crescimento.
+     Não é bom × ruim: para isso use ok / rose. */
+  --ds-chart-pos: #2f6ea8;
+  --ds-chart-neg: #c2621d;
 
   /* Etiquetas (categoria, status, tipo): fundo suave + texto AA. 9 matizes. */
   --ds-tag-gray-bg: #f0f0ef;
@@ -276,6 +280,8 @@
   --ds-chart-5: #8fbfa6;
   --ds-chart-6: #6b6e76;
   --ds-chart-grid: #242428;
+  --ds-chart-pos: #74aee6;
+  --ds-chart-neg: #f0a05a;
   --ds-tag-gray-bg: #2f2f31;
   --ds-tag-gray-fg: #c9c8c4;
   --ds-tag-brown-bg: #3a2e26;
@@ -357,6 +363,8 @@
     --ds-chart-5: #8fbfa6;
     --ds-chart-6: #6b6e76;
     --ds-chart-grid: #242428;
+    --ds-chart-pos: #74aee6;
+    --ds-chart-neg: #f0a05a;
     --ds-tag-gray-bg: #2f2f31;
     --ds-tag-gray-fg: #c9c8c4;
     --ds-tag-brown-bg: #3a2e26;
@@ -440,6 +448,8 @@
   --color-chart-5: var(--ds-chart-5);
   --color-chart-6: var(--ds-chart-6);
   --color-chart-grid: var(--ds-chart-grid);
+  --color-chart-pos: var(--ds-chart-pos);
+  --color-chart-neg: var(--ds-chart-neg);
   --color-tag-gray-bg: var(--ds-tag-gray-bg);
   --color-tag-gray-fg: var(--ds-tag-gray-fg);
   --color-tag-brown-bg: var(--ds-tag-brown-bg);
