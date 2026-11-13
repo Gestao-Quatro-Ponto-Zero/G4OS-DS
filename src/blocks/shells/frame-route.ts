@@ -46,7 +46,7 @@ export function useFrameParams() {
 export function useFrameParam(name: string): string | null;
 export function useFrameParam(name: string, fallback: string): string;
 export function useFrameParam(name: string, fallback?: string) {
-  return useFrameParams().get(name) || fallback || null;
+  return useFrameParams().get(name) || (fallback ?? null);
 }
 
 /** Navega para um href já montado ("#/frame/app-notifications"). */

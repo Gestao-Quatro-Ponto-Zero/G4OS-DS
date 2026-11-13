@@ -592,6 +592,10 @@
   .responsive-table td:is([data-primary], [data-wide], [data-action], [colspan]) { grid-column: 1 / -1; }
   .responsive-table td[data-primary] { grid-row: 1; font-size: var(--text-input); }
   .responsive-table td[data-action] { padding-top: 8px; border-top: 1px solid var(--ds-line); }
+  /* Ação que é só o menu ⋯: vai para o canto do cartão, na altura do título (não gasta uma linha). */
+  .responsive-table tbody tr:has(> td[data-action] > button[aria-haspopup]:only-child) { position: relative; }
+  .responsive-table tbody tr:has(> td[data-action] > button[aria-haspopup]:only-child) > td[data-primary] { padding-right: 36px; }
+  .responsive-table td[data-action]:has(> button[aria-haspopup]:only-child) { position: absolute; top: 10px; right: 10px; padding: 0; border-top: 0; }
   .responsive-table td[data-mobile-hidden] { display: none; }
   .responsive-table .truncate { overflow: visible; white-space: normal; text-overflow: clip; }
   /* Tabela com seleção: checkbox em coluna própria de 28px. */
@@ -759,6 +763,8 @@
   overflow: hidden;
 }
 .data-grid .dg-cell[data-pin] { z-index: 2; }
+/* A sombra da coluna fixa é um ::after fora da célula: o overflow precisa deixá-la passar. */
+.data-grid .dg-cell[data-pin-edge] { overflow: visible; }
 /* Célula em edição: a mensagem de erro/prévia de data sai da célula por cima da linha de baixo. */
 .data-grid .dg-cell.dg-editing { overflow: visible; z-index: 5; }
 .data-grid .dg-cell.dg-editing:not([data-pin]) { position: relative; }

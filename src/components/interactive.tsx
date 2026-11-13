@@ -446,7 +446,7 @@ export function ImageSphere({
     e.preventDefault();
   };
   return (
-    <div ref={wrap} className={cn("mx-auto w-full", className)} style={{ maxWidth: size }}>
+    <div ref={wrap} className={cn("mx-auto w-full min-w-0", className)} style={{ maxWidth: size }}>
       <div
         role="group"
         aria-label={`${label}. Arraste ou use as setas para girar.`}
