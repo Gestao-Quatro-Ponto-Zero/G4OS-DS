@@ -12,6 +12,7 @@ import {
   Skeleton,
   formatNumber,
   formatPercent,
+  useMediaQuery,
   type SankeyLink,
   type SankeyNode,
 } from "@g4ai/ds";
@@ -216,6 +217,8 @@ export default function SaasJourney() {
   const [selected, setSelected] = useState<string | null>(null);
   const clear = () => setFrameQuery({ estado: undefined });
   const filtered = estado === "filtro";
+  // Ao lado do painel (lg), o gráfico acompanha a altura dele; empilhado, fica mais baixo.
+  const sideBySide = useMediaQuery("(min-width: 1024px)", true);
   const counts = useMemo(() => countsOf(channel), [channel]);
   const links = useMemo(() => linksOf(counts), [counts]);
   const sentence = `${channelName[channel]}: ${formatNumber(counts.visitas)} visitas e ${formatNumber(counts.pago)} planos pagos em setembro`;
@@ -303,7 +306,7 @@ export default function SaasJourney() {
                     selected={selected}
                     onSelect={setSelected}
                     minWidth={620}
-                    height={460}
+                    height={sideBySide ? 460 : 380}
                     label={`Jornada até o plano pago. ${sentence}`}
                   />
                 </div>
