@@ -103,3 +103,7 @@ export * from "./components/pivot";
 export * from "./components/agent-run";
 export * from "./components/agent-evals";
 export * from "./components/illustration";
+// Capacidade (armazenamento com varredura e limpeza), tarefas delegadas a agentes, atividade de agente por fases
+export * from "./components/capacity";
+export * from "./components/agent-tasks";
+export * from "./components/agent-activity";

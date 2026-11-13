@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpenText, Coins, History, KanbanSquare, MessagesSquare, Plug, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpenText, Coins, History, KanbanSquare, ListChecks, MessagesSquare, Plug, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { AppShell, Sidebar, type NavGroup, type NavItem } from "@g4ai/ds";
 import { runs } from "../data/agents";
@@ -17,6 +17,7 @@ import { frameHref } from "./frame-route";
 export const assistantRoutes = {
   chat: frameHref("ai-chat"),
   answer: frameHref("ai-answer"),
+  tasks: frameHref("ai-delegate"),
   runs: frameHref("ai-runs"),
   inCrm: frameHref("ai-assistant"),
   models: frameHref("settings-integrations", { id: "claude" }),
@@ -26,6 +27,7 @@ export const assistantRoutes = {
 const main: NavItem[] = [
   { href: assistantRoutes.chat, label: "Conversas", icon: MessagesSquare },
   { href: assistantRoutes.answer, label: "Pesquisa", icon: BookOpenText },
+  { href: assistantRoutes.tasks, label: "Tarefas", icon: ListChecks },
   { href: assistantRoutes.runs, label: "Execuções", icon: History, badge: runs.filter((r) => r.status === "aguardando").length },
   { href: assistantRoutes.inCrm, label: "No CRM", icon: KanbanSquare },
 ];

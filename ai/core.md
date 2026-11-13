@@ -103,7 +103,7 @@ Requisitos: React 18.2+ ou 19, Tailwind v4, `@base-ui/react`, `lucide-react` (`n
 ## Tokens em uma linha
 Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft · muted` · linhas `line · line-strong` · ação `primary / on-primary` · sobre forte `on-ink` · marca `navy · blue · clay · accent (só preenchimento) · accent-deep (texto) · accent-soft` · estados `ok · amber · rose · info` (+`-soft`) · dados `chart-1…6 · chart-grid`. Raios `rounded-lg` controle, `rounded-xl` card/popup, `rounded-2xl` modal. Tabela completa: `tokens.md`.
 
-## Módulos (520 componentes) → `components/<nome>.md`
+## Módulos (530 componentes) → `components/<nome>.md`
 - **primitives**: Base visual: Button, IconButton, Badge, Dot, Avatar, EntityMark, Card, Metric, StatGrid, Meter, Empty, Page, Section, Kbd, DsLink/setLinkComponent, tons.
 - **overlays**: Modal, ConfirmDialog, Drawer, Popover (Base UI).
 - **forms**: Formulário padrão: FieldBlock, FieldGrid, Select, Combobox, Checkbox, Switch, SearchInput, fieldClass.
@@ -181,18 +181,21 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **agent-run**: ------------------------------------------------------------------
 - **agent-evals**: ------------------------------------------------------------------
 - **illustration**: Ilustração em traço e cartão de primeira execução (camada expressiva: onboarding, boas-vindas, estado vazio de destaque — regra 22a).
+- **capacity**: Capacidade: quanto de uma cota está ocupado e por quê.
+- **agent-tasks**: Tarefas delegadas a agentes: a pessoa escolhe o que sai da mão dela, entrega a um ou mais agentes e acompanha o trabalho ao vivo até o resultado.
+- **agent-activity**: Atividade do agente, por fases: um card compacto que mostra O QUE o agente está fazendo agora (lendo, buscando, pensando, escrevendo, revisando), o plano com o passo atual, o contexto da fase e quanto já custou.
 
-## Blocos (152) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
+## Blocos (154) → `blocks/<slug>.md` (código em `src/blocks/<slug>.tsx`)
 - **ATS**: `ats-admission`, `ats-candidate`, `ats-candidates`, `ats-careers`, `ats-dashboard`, `ats-interviews`, `ats-job`, `ats-jobs`, `ats-offers`, `ats-pipeline`, `ats-reports`, `ats-requisitions`
 - **Aplicação**: `app-collab-doc`, `app-command-palette`, `app-connection`, `app-error-pages`, `app-file-manager`, `app-filtered-list`, `app-global-search`, `app-help-center`, `app-legal`, `app-marketplace`, `app-meeting-notes`, `app-notifications`, `app-presentation`, `app-record-tracker`, `app-sidebar-submenus`
 - **Autenticação**: `auth-forgot-password`, `auth-login`, `auth-otp`, `auth-signup`
 - **CRM**: `crm-activities`, `crm-company`, `crm-contact`, `crm-contacts`, `crm-deal`, `crm-leads`, `crm-pipeline`, `crm-quotes`, `crm-sales-dashboard`, `crm-settings`, `crm-team`
 - **Comunicação**: `comms-analytics`, `comms-announcement`, `comms-channels`, `comms-compose`, `comms-events`, `comms-home`, `comms-people`, `comms-surveys`
-- **Configurações**: `settings-appearance`, `settings-audit-log`, `settings-billing`, `settings-data`, `settings-integrations`, `settings-notifications`, `settings-organization`, `settings-profile`, `settings-roles`, `settings-security`, `settings-team`, `settings-webhooks`
+- **Configurações**: `settings-appearance`, `settings-audit-log`, `settings-billing`, `settings-data`, `settings-integrations`, `settings-notifications`, `settings-organization`, `settings-profile`, `settings-roles`, `settings-security`, `settings-storage`, `settings-team`, `settings-webhooks`
 - **Contratos**: `clm-approvals`, `clm-contract`, `clm-contracts`, `clm-counterparties`, `clm-dashboard`, `clm-obligations`, `clm-request`, `clm-templates`
 - **ERP**: `erp-customers`, `erp-dashboard`, `erp-inventory`, `erp-invoice`, `erp-invoices`, `erp-order`, `erp-orders`, `erp-product`, `erp-products`, `erp-purchase-order`, `erp-purchase-orders`, `erp-purchase-requests`, `erp-receiving`, `erp-shipping`, `erp-stock-movements`, `erp-suppliers`
 - **Financeiro**: `fin-bank-accounts`, `fin-budget`, `fin-cashflow`, `fin-dashboard`, `fin-dre`, `fin-payables`, `fin-receivables`, `fin-reconciliation`
-- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-answer`, `ai-approvals`, `ai-assistant`, `ai-catch-up`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
+- **IA**: `ai-agent-builder`, `ai-agent-connections`, `ai-agent-evals`, `ai-agent-governance`, `ai-agent-run`, `ai-agent-templates`, `ai-agent`, `ai-agents-dashboard`, `ai-agents`, `ai-answer`, `ai-approvals`, `ai-assistant`, `ai-catch-up`, `ai-chat`, `ai-codex`, `ai-compose-email`, `ai-conversation`, `ai-delegate`, `ai-projects`, `ai-runs`, `ai-sessions-artifacts`, `ai-sessions-empty`, `ai-sessions`, `ai-task-proposals`, `ai-trace`, `ai-workspace`
 - **Marketing**: `marketing-landing`, `marketing-pricing`, `marketing-stage`
 - **Onboarding**: `onboarding-checklist`, `onboarding-intro`, `onboarding-wizard`
 - **SaaS**: `saas-analytics`, `saas-billing`, `saas-customer`, `saas-customers`, `saas-dashboard`, `saas-explore`, `saas-integrations`, `saas-journey`, `saas-mrr-bridge`, `saas-plans`, `saas-regions`, `saas-reports`, `saas-retention`, `saas-support`, `saas-unit-economics`, `saas-usage-horizon`, `saas-usage`

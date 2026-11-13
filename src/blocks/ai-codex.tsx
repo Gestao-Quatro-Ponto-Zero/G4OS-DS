@@ -1,6 +1,7 @@
 import { Archive, CheckCircle2, Download, FileCode2, FolderClosed, GitCommitHorizontal, GitPullRequest, Globe, Link2, Pencil, Rocket, SquarePen, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
+  AgentActivityCard,
   AgentAppLayout,
   AgentComposer,
   AnswerCard,
@@ -33,6 +34,7 @@ import {
   type ModelEffort,
   type PermissionMode,
   type StepItem,
+  useAgentActivityDemo,
 } from "@g4ai/ds";
 import { codexModels, codexProjects, codexRun, codexSessions, type CodexEntry, type CodexResult, type CodexSession } from "./data/codex";
 import { saveText } from "./shells/download";
@@ -41,7 +43,7 @@ import { OsRail, osTabs } from "./shells/os-shell";
 
 export const meta = {
   title: "Agente de código (tarefas longas)",
-  description: "Estilo Codex: sessões agrupadas por repositório, lista recolhível (⌘\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.",
+  description: "Estilo Codex: tarefa em execução com fase, plano, contexto e custo ao vivo (AgentActivityCard), sessões agrupadas por repositório, lista recolhível (⌘\\), conversa em fluxo com “Trabalhou por …”, histórico longo recolhido, resultados (commit, deploy, testes), permissão e modelo no campo.",
   category: "IA",
   height: 880,
   order: 3,
@@ -50,7 +52,8 @@ export const meta = {
     patterns: [
       "Anatomia Conversa (AgentAppLayout): trilho + lista por projeto recolhível (⌘\\) + conversa; troca rápida de sessão quando a lista está fechada",
       "Lista “Por projeto”: pastas = repositórios, sessões aninhadas, “Mostrar mais”, ⋯ por projeto",
-      "Execução como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos",
+      "Tarefa em execução como card de atividade (AgentActivityCard): fase com palavra, plano com o passo atual, o que o agente está lendo/buscando/escrevendo, ferramentas, modelo, tokens, custo e tempo, com Pausar e Parar",
+      "Execução terminada como linha discreta (RunSummary divider): “Trabalhou por 1 min 1 s ›” abre os passos",
       "Histórico longo recolhido no topo (ThreadView collapseBefore): só o final importa",
       "Resultados verificáveis em lista (commit, deploy, testes) com links, não só texto",
       "Permissão sempre visível no campo; “Acesso total” em âmbar e com confirmação",
@@ -60,11 +63,24 @@ export const meta = {
       "Operações (deploys, incidentes): resultados com status ok/falhou e link do painel",
       "Use “Sessões com artefatos” quando a entrega principal for um documento e não uma ação",
     ],
-    avoid: ["Esconder que o agente tem acesso total", "Mostrar o histórico inteiro sempre aberto", "Resultado sem evidência (hash, link, contagem de testes)"],
+    avoid: ["Esconder que o agente tem acesso total", "Execução longa sem Pausar e sem custo visível", "Mostrar o histórico inteiro sempre aberto", "Resultado sem evidência (hash, link, contagem de testes)"],
   },
 } as const;
 
 const here = frameHref("ai-codex");
+
+/* Tarefa em execução: o card de atividade percorre as fases (no app: eventos do agente). */
+const LIVE_ID = "tema-escuro";
+const LIVE_TASK = "Adicionar alternador de tema escuro";
+const liveSession: CodexSession = {
+  id: LIVE_ID,
+  title: LIVE_TASK,
+  time: "agora",
+  status: "working",
+  projectId: "g4-cos-os",
+  day: "Hoje",
+  thread: [{ kind: "user", id: "live-u1", text: "Adiciona um alternador de tema escuro no cabeçalho. Usa os tokens que já existem e respeita a preferência do sistema." }],
+};
 let seq = 0;
 const uid = (p: string) => `${p}-${Date.now().toString(36)}-${++seq}`;
 const isMobile = () => typeof window !== "undefined" && window.matchMedia("(max-width: 767.98px)").matches;
@@ -132,8 +148,8 @@ function Results({ items, onOpen }: { items: CodexResult[]; onOpen: (r: CodexRes
 }
 
 export default function AiCodex() {
-  const initialId = useFrameParam("id", "permissoes");
-  const [list, setList] = useState<CodexSession[]>(codexSessions);
+  const initialId = useFrameParam("id", LIVE_ID);
+  const [list, setList] = useState<CodexSession[]>(() => [liveSession, ...codexSessions]);
   const [activeId, setActiveId] = useState(initialId);
   const [mobileView, setMobileView] = useState<"list" | "main">(useFrameParam("id") ? "main" : "list");
   const [projects, setProjects] = useState(codexProjects);
@@ -151,6 +167,7 @@ export default function AiCodex() {
   const [running, setRunning] = useState<{ sessionId: string; entryId: string; startedAt: number; steps: StepItem[]; shown: number; full: string[] } | null>(null);
   const timers = useRef<number[]>([]);
   const active = list.find((s) => s.id === activeId) ?? list[0];
+  const live = useAgentActivityDemo({ task: LIVE_TASK });
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   useEffect(() => {
@@ -214,6 +231,13 @@ export default function AiCodex() {
   };
   const activeIdRef = useRef(activeId);
   activeIdRef.current = activeId;
+
+  // A tarefa ao vivo muda o estado da sessão na lista: trabalhando → pronta/parada.
+  const livePhase = live.phase;
+  useEffect(() => {
+    const status = livePhase === "concluido" ? (activeIdRef.current === LIVE_ID ? "idle" : "ready") : livePhase === "parado" ? "idle" : "working";
+    patch(LIVE_ID, { status });
+  }, [livePhase, patch]);
 
   const stop = () => {
     if (!running) return;
@@ -281,6 +305,24 @@ export default function AiCodex() {
       </AnswerCard>
     ),
   );
+  if (active?.id === LIVE_ID) {
+    nodes.push(
+      <div key="live" className="w-full max-w-[560px]">
+        <AgentActivityCard
+          {...live}
+          model={{ models: codexModels, value: model, onChange: setModel }}
+          onStop={() => {
+            live.onStop();
+            notify("Execução parada. Nada foi salvo", undefined, "info");
+          }}
+          onRestart={() => {
+            live.onRestart();
+            patch(LIVE_ID, { status: "working" });
+          }}
+        />
+      </div>,
+    );
+  }
   if (running && running.sessionId === active?.id) {
     const text = running.full.join("\n").slice(0, running.shown);
     nodes.push(
@@ -354,7 +396,7 @@ export default function AiCodex() {
         }
       />
       <ThreadView
-        follow={`${entries.length}:${running?.shown ?? 0}:${running?.steps.length ?? 0}`}
+        follow={`${entries.length}:${running?.shown ?? 0}:${running?.steps.length ?? 0}:${active?.id === LIVE_ID ? live.phase : ""}`}
         resetKey={active.id}
         collapseBefore={nodes.length > 8 ? nodes.length - 5 : 0}
         minimap={entries.map((e) => ({ id: `msg-${e.id}`, role: e.kind === "user" ? "user" : "assistant", preview: e.kind === "user" ? e.text : e.paragraphs[0] }))}

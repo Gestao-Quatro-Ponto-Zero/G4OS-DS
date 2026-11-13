@@ -1,4 +1,4 @@
-import { Bell, Building2, CreditCard, Database, History, KeyRound, Palette, Plug, ShieldCheck, User, Users, Webhook } from "lucide-react";
+import { Bell, Building2, CreditCard, Database, HardDrive, History, KeyRound, Palette, Plug, ShieldCheck, User, Users, Webhook } from "lucide-react";
 import type { ReactNode } from "react";
 import { Page, SettingsLayout, type SettingsNavItem } from "@g4ai/ds";
 import { AtlasShell, atlasRoutes } from "./atlas-shell";
@@ -20,6 +20,7 @@ export const settingsNav: SettingsNavItem[] = [
   { href: frameHref("settings-billing"), label: "Plano e cobrança", icon: CreditCard },
   { href: frameHref("settings-integrations"), label: "Integrações", icon: Plug },
   { href: frameHref("settings-webhooks"), label: "Webhooks", icon: Webhook },
+  { href: frameHref("settings-storage"), label: "Armazenamento", icon: HardDrive },
   { href: frameHref("settings-data"), label: "Dados e privacidade", icon: Database },
   { href: frameHref("settings-audit-log"), label: "Auditoria", icon: History },
 ];

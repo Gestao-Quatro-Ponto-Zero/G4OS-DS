@@ -236,9 +236,9 @@ Arquivos em `src/blocks/` (também no pacote: `node_modules/@g4ai/ds/src/blocks/
 | Financeiro | `fin-dashboard`, `fin-cashflow`, `fin-receivables`, `fin-bank-accounts`, `fin-dre`, `fin-reconciliation` |
 | Contratos | `clm-dashboard`, `clm-contracts`, `clm-contract`, `clm-approvals`, `clm-obligations` |
 | Comunicação | `comms-home`, `comms-announcement`, `comms-channels`, `comms-people`, `comms-surveys` |
-| IA | `ai-agents-dashboard`, `ai-agents`, `ai-agent`, `ai-runs`, `ai-approvals`, `ai-agent-evals`, `ai-agent-run`, `ai-workspace`, `ai-chat`, `ai-answer` |
+| IA | `ai-agents-dashboard`, `ai-agents`, `ai-agent`, `ai-runs`, `ai-approvals`, `ai-agent-evals`, `ai-agent-run`, `ai-workspace`, `ai-chat`, `ai-answer`, `ai-delegate`, `ai-codex` |
 | Aplicação | `app-command-palette`, `app-notifications`, `app-file-manager`, `app-error-pages`, `app-presentation`, `app-help-center`, `app-legal` |
-| Autenticação, configurações, onboarding | `auth-login`, `auth-otp`, `settings-organization`, `settings-roles`, `settings-team`, `settings-billing`, `onboarding-wizard`, `onboarding-intro` |
+| Autenticação, configurações, onboarding | `auth-login`, `auth-otp`, `settings-organization`, `settings-roles`, `settings-team`, `settings-billing`, `settings-storage`, `onboarding-wizard`, `onboarding-intro` |
 
 Catálogo completo com objetivo de cada um: [ai/llms.txt](ai/llms.txt) ou `list_blocks` no MCP. Qual bloco usar por tipo de app: [AGENTS.md](AGENTS.md#qual-bloco-usar).
 
