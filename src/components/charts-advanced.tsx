@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber, formatPercent } from "../lib/format";
+import { useReducedMotion } from "../lib/motion";
 import { useReadableFills } from "../lib/readable";
-import { ChartLegend, ChartTooltip, chartColor, niceDomain, SrTable, useElementWidth, type ChartDatum, type ChartSeries } from "./charts";
+import { quantize, sequentialColor } from "../lib/scale";
+import { ChartLegend, ChartTooltip, chartColor, niceDomain, niceRange, SrTable, useElementWidth, type ChartDatum, type ChartSeries } from "./charts";
+import { AxisBreak, ScaleLegend } from "./charts-kit";
 
 /*
  * Gráficos avançados, mesmas regras de charts.tsx. Qual usar (docs/fundamentos/dados.md):
@@ -146,10 +149,14 @@ export function Treemap({
 
 export type WaterfallStep = { label: string; value: number; kind?: "delta" | "total" };
 
+const EASE = "cubic-bezier(0.2, 0, 0, 1)";
+
 /**
  * Ponte entre um valor inicial e um final (receita bruta → lucro líquido;
- * caixa inicial → final). `kind: "total"` desenha a barra cheia a partir do
- * zero (subtotais). Positivo = ok, negativo = rose, total = ink.
+ * caixa inicial → final; MRR de início → fim). `kind: "total"` desenha a barra
+ * cheia a partir da base (subtotais). Positivo = ok, negativo = rose,
+ * total = ink. Quando os dados mudam (troca de período), as barras mudam de
+ * altura e posição; nada anima na entrada.
  */
 export function WaterfallChart({
   steps,
@@ -157,6 +164,11 @@ export function WaterfallChart({
   format = (n) => formatNumber(n),
   formatAxis,
   label = "Ponte de valores",
+  axisBreak = false,
+  connectors = true,
+  showValues = true,
+  selected,
+  onSelect,
   className,
 }: {
   steps: WaterfallStep[];
@@ -164,10 +176,27 @@ export function WaterfallChart({
   format?: (n: number) => string;
   formatAxis?: (n: number) => string;
   label?: string;
+  /**
+   * Eixo truncado (exceção da regra do zero): começa perto do menor valor, com
+   * a marca de quebra no eixo e na base de cada barra de total. Use quando
+   * início e fim são grandes e os movimentos pequenos (ponte de MRR, de caixa).
+   * `{ min }` fixa onde o eixo começa. A tabela de leitor de tela mantém os valores reais.
+   */
+  axisBreak?: boolean | { min: number };
+  /** Linhas tracejadas ligando o topo de uma barra ao início da seguinte. Padrão: true. */
+  connectors?: boolean;
+  /** Valor escrito junto da barra (acima dos aumentos e totais, abaixo das quedas). Padrão: true. */
+  showValues?: boolean;
+  /** Barra selecionada (índice). Com `onSelect`, as barras viram botões: setas percorrem, Enter seleciona, Esc solta; as outras esmaecem. */
+  selected?: number | null;
+  /** Clique ou Enter numa barra (índice), ou null ao soltar. */
+  onSelect?: (index: number | null) => void;
   className?: string;
 }) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
+  const reduced = useReducedMotion();
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const bars = useMemo(() => {
     let run = 0;
     return steps.map((s) => {
@@ -180,44 +209,125 @@ export function WaterfallChart({
       return { ...s, from, to: run };
     });
   }, [steps]);
-  const all = bars.flatMap((b) => [b.from, b.to]);
-  const { lo, hi, ticks } = niceDomain(Math.min(...all, 0), Math.max(...all, 0), 4);
+  const broken = !!axisBreak;
+  const breakMin = typeof axisBreak === "object" ? axisBreak.min : null;
+  const { lo, hi, ticks } = useMemo(() => {
+    if (!broken) {
+      const all = bars.flatMap((b) => [b.from, b.to]);
+      return niceDomain(Math.min(...all, 0), Math.max(...all, 0), 4);
+    }
+    // Eixo truncado: ignora o zero das barras de total e começa perto do menor valor.
+    const vals = bars.flatMap((b) => (b.kind === "total" ? [b.to] : [b.from, b.to]));
+    const vMin = Math.min(...vals);
+    const vMax = Math.max(...vals);
+    // Folga embaixo: o menor total fica a ~1/3 da altura, legível como barra.
+    const floor = Math.max(vMin >= 0 ? 0 : -Infinity, vMin - (vMax - vMin) * 0.6);
+    const r = niceRange(floor, vMax, 4, 0.06);
+    if (breakMin != null && Number.isFinite(breakMin) && breakMin < vMin) {
+      const step = r.ticks.length > 1 ? r.ticks[1] - r.ticks[0] : 1;
+      const out: number[] = [];
+      for (let v = Math.ceil(breakMin / step) * step; v <= r.hi + step / 2; v += step) out.push(Number(v.toPrecision(12)));
+      return { lo: breakMin, hi: r.hi, ticks: out };
+    }
+    return r;
+  }, [bars, broken, breakMin]);
   const axis = formatAxis ?? format;
-  const left = Math.min(64, Math.max(28, Math.max(...ticks.map((t) => axis(t).length)) * 6.4 + 10));
+  const left = Math.min(64, Math.max(28, Math.max(...ticks.map((t) => axis(t).length)) * 6.4 + 10)) + (broken ? 4 : 0);
   const m = { top: 18, bottom: 24 };
   const innerW = Math.max(0, width - left - 8);
   const innerH = height - m.top - m.bottom;
-  const y = (v: number) => m.top + innerH - ((v - lo) / (hi - lo || 1)) * innerH;
+  const base = m.top + innerH;
+  const y = (v: number) => Math.min(base, m.top + innerH - ((v - lo) / (hi - lo || 1)) * innerH);
   const band = bars.length ? innerW / bars.length : 0;
   const bw = Math.min(band * 0.64, 56);
+  // Faixa estreita (celular): só a barra em foco ou selecionada leva o valor escrito.
+  const roomy = band >= 64;
+  const interactive = !!onSelect;
+  const sel = selected ?? null;
+  const signed = (v: number) => `${v >= 0 ? "+" : "−"}${format(Math.abs(v))}`;
+  const grow = reduced ? undefined : `y 320ms ${EASE}, height 320ms ${EASE}, opacity 160ms linear`;
+  const slide = reduced ? undefined : `transform 320ms ${EASE}, opacity 160ms linear`;
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const next: Record<string, number> = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i - 1, ArrowUp: i - 1, Home: 0, End: bars.length - 1 };
+    if (e.key in next) {
+      e.preventDefault();
+      buttons.current[Math.max(0, Math.min(bars.length - 1, next[e.key]))]?.focus();
+    } else if (e.key === "Escape" && sel != null) {
+      e.preventDefault();
+      onSelect?.(null);
+    }
+  };
+  const tabStop = sel != null && sel < bars.length ? sel : 0;
   return (
     <div ref={ref} className={cn("relative min-w-0", className)} style={{ height }}>
       {width > 0 && (
         <svg width={width} height={height} className="absolute inset-0" aria-hidden onPointerLeave={() => setActive(null)}>
           {ticks.map((t) => (
             <g key={t}>
-              <line x1={left} x2={width - 8} y1={y(t)} y2={y(t)} stroke={t === 0 ? "var(--ds-line)" : "var(--ds-chart-grid)"} />
+              <line x1={left} x2={width - 8} y1={y(t)} y2={y(t)} stroke={t === 0 && !broken ? "var(--ds-line)" : "var(--ds-chart-grid)"} />
               <text x={left - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-muted text-[11px] tabular-nums">
                 {axis(t)}
               </text>
             </g>
           ))}
+          {broken && (
+            <>
+              <line x1={left} x2={width - 8} y1={base} y2={base} stroke="var(--ds-line)" />
+              <AxisBreak x={left + 7} y={base - 4} width={10} />
+            </>
+          )}
           {bars.map((b, i) => {
             const cx = left + band * (i + 0.5);
             const color = b.kind === "total" ? "var(--ds-ink)" : b.value >= 0 ? "var(--ds-ok)" : "var(--ds-rose)";
             const top = Math.min(y(b.from), y(b.to));
-            const h = Math.max(1, Math.abs(y(b.from) - y(b.to)));
+            const bottom = Math.max(y(b.from), y(b.to));
+            const h = Math.max(1, bottom - top);
+            const dim = sel != null && sel !== i;
+            const below = b.kind !== "total" && b.value < 0;
+            const ty = below ? Math.min(bottom + 13, base - 3) : top - 5;
+            const tx = roomy || (i > 0 && i < bars.length - 1) ? cx : i === 0 ? cx - bw / 2 : cx + bw / 2;
             return (
-              <g key={b.label} onPointerEnter={() => setActive(i)}>
+              <g key={i} onPointerEnter={() => setActive(i)}>
                 <rect x={left + band * i} y={m.top} width={band} height={innerH} fill={active === i ? "var(--ds-soft)" : "transparent"} />
-                {i < bars.length - 1 && (
-                  <line x1={cx + bw / 2} x2={cx + band - bw / 2} y1={y(b.to)} y2={y(b.to)} stroke="var(--ds-line-strong)" strokeDasharray="2 2" />
+                {connectors && i < bars.length - 1 && (
+                  <line
+                    x1={cx + bw / 2}
+                    x2={cx + band - bw / 2}
+                    y1={0}
+                    y2={0}
+                    stroke="var(--ds-line-strong)"
+                    strokeDasharray="2 2"
+                    style={{ transform: `translateY(${y(b.to)}px)`, transition: slide }}
+                  />
                 )}
-                <rect x={cx - bw / 2} y={top} width={bw} height={h} rx={3} fill={color} opacity={b.kind === "total" ? 1 : 0.85} />
-                <text x={cx} y={top - 5} textAnchor="middle" className={cn("text-[10.5px] font-medium tabular-nums", b.kind === "total" ? "fill-ink" : b.value >= 0 ? "fill-ok" : "fill-rose")}>
-                  {b.kind === "total" ? format(b.value) : `${b.value >= 0 ? "+" : "−"}${format(Math.abs(b.value))}`}
-                </text>
-                <text x={cx} y={height - 6} textAnchor="middle" className="fill-muted text-[11px]">
+                <rect
+                  x={cx - bw / 2}
+                  y={top}
+                  width={bw}
+                  height={h}
+                  rx={3}
+                  fill={color}
+                  opacity={dim ? 0.4 : b.kind === "total" ? 1 : 0.85}
+                  style={{ y: top, height: h, transition: grow } as CSSProperties}
+                />
+                {broken && b.kind === "total" && bottom >= base - 0.5 && h > 16 && (
+                  <g opacity={dim ? 0.4 : 1}>
+                    <AxisBreak x={cx} y={base - 10} width={bw + 2} />
+                  </g>
+                )}
+                {showValues && (roomy || sel === i || active === i) && (
+                  <text
+                    x={0}
+                    y={0}
+                    textAnchor={roomy ? "middle" : i === 0 ? "start" : i === bars.length - 1 ? "end" : "middle"}
+                    opacity={dim ? 0.45 : 1}
+                    style={{ transform: `translate(${tx}px, ${ty}px)`, transition: slide }}
+                    className={cn("text-[10.5px] font-medium tabular-nums", b.kind === "total" ? "fill-ink" : b.value >= 0 ? "fill-ok" : "fill-rose")}
+                  >
+                    {b.kind === "total" ? format(b.value) : signed(b.value)}
+                  </text>
+                )}
+                <text x={cx} y={height - 6} textAnchor="middle" className={cn("text-[11px]", sel === i ? "fill-ink font-medium" : "fill-muted")}>
                   {b.label.length > Math.floor(band / 6.2) ? `${b.label.slice(0, Math.max(3, Math.floor(band / 6.2) - 1))}…` : b.label}
                 </text>
               </g>
@@ -225,15 +335,38 @@ export function WaterfallChart({
           })}
         </svg>
       )}
+      {interactive && width > 0 && (
+        <div role="group" aria-label={label} className="absolute inset-0" onPointerLeave={() => setActive(null)}>
+          {bars.map((b, i) => (
+            <button
+              key={i}
+              ref={(el) => {
+                buttons.current[i] = el;
+              }}
+              type="button"
+              tabIndex={i === tabStop ? 0 : -1}
+              aria-pressed={sel === i}
+              aria-label={`${b.label}: ${b.kind === "total" ? format(b.value) : `${signed(b.value)}, acumulado ${format(b.to)}`}`}
+              onPointerEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onBlur={() => setActive(null)}
+              onClick={() => onSelect?.(sel === i ? null : i)}
+              onKeyDown={(e) => onKey(e, i)}
+              className="absolute cursor-pointer rounded-md outline-none focus-visible:ring-2 focus-visible:ring-muted/40"
+              style={{ left: left + band * i, top: m.top - 4, width: band, height: innerH + m.bottom + 4 }}
+            />
+          ))}
+        </div>
+      )}
       <SrTable label={label} data={steps.map((s) => ({ etapa: s.label, valor: s.value }))} index="etapa" series={[{ key: "valor", label: "Valor" }]} format={format} />
       {active != null && bars[active] && (
         <ChartTooltip
           title={bars[active].label}
           rows={[
-            { label: bars[active].kind === "total" ? "Total" : "Variação", value: format(bars[active].value) },
+            { label: bars[active].kind === "total" ? "Total" : "Variação", value: bars[active].kind === "total" ? format(bars[active].value) : signed(bars[active].value) },
             ...(bars[active].kind === "total" ? [] : [{ label: "Acumulado", value: format(bars[active].to) }]),
           ]}
-          style={{ top: 0, left: Math.min(left + band * active + band / 2 + 10, width - 170) }}
+          style={{ top: 0, left: Math.max(0, Math.min(left + band * active + band / 2 + 10, width - 170)) }}
         />
       )}
     </div>
@@ -647,13 +780,47 @@ export function BulletChart({
 /* Sankey                                                              */
 /* ------------------------------------------------------------------ */
 
-export type SankeyNode = { id: string; label: string; column: number };
+export type SankeyNode = {
+  id: string;
+  label: string;
+  column: number;
+  /** Cor do nó e das faixas que chegam nele (ex.: perda em `var(--ds-chart-6)`, meta em `var(--ds-ok)`). Sem cor, a faixa herda a cor da origem. */
+  color?: string;
+};
 export type SankeyLink = { source: string; target: string; value: number };
 
+/** Todas as faixas que chegam (para trás, recursivamente) e saem (para frente) de um nó. */
+function sankeyTrace(id: string, links: SankeyLink[]) {
+  const linkSet = new Set<number>();
+  const nodeSet = new Set<string>([id]);
+  const walk = (start: string, dir: "up" | "down") => {
+    const stack = [start];
+    const seen = new Set<string>([start]);
+    while (stack.length) {
+      const cur = stack.pop()!;
+      links.forEach((l, i) => {
+        const hit = dir === "up" ? l.target === cur : l.source === cur;
+        if (!hit) return;
+        linkSet.add(i);
+        const next = dir === "up" ? l.source : l.target;
+        nodeSet.add(next);
+        if (!seen.has(next)) {
+          seen.add(next);
+          stack.push(next);
+        }
+      });
+    }
+  };
+  walk(id, "up");
+  walk(id, "down");
+  return { linkSet, nodeSet };
+}
+
 /**
- * Fluxos entre etapas (origem do lead → etapa → ganho/perdido; receita →
- * centros de custo). Nós em colunas fixas, largura da faixa = volume.
- * Até ~5 colunas e ~20 nós; mais que isso vira espaguete.
+ * Fluxos entre etapas (origem do lead → etapa → ganho/perdido; visita →
+ * conta → plano). Nós em colunas fixas, largura da faixa = volume.
+ * Até ~5 colunas e ~20 nós; mais que isso vira espaguete. Passar o mouse
+ * (ou selecionar, com `onSelect`) num nó traça tudo o que chega e sai dele.
  */
 export function SankeyChart({
   nodes,
@@ -661,6 +828,11 @@ export function SankeyChart({
   height = 300,
   format = (n) => formatNumber(n),
   label = "Fluxo",
+  columnLabels,
+  nodeLabels = "side",
+  selected,
+  onSelect,
+  minWidth,
   className,
 }: {
   nodes: SankeyNode[];
@@ -668,15 +840,31 @@ export function SankeyChart({
   height?: number;
   format?: (n: number) => string;
   label?: string;
+  /** Rótulo de cada coluna, embaixo ("Visita", "Conta", "Plano"). */
+  columnLabels?: string[];
+  /** "side": nome e valor à direita do nó. "above": nome e "valor · %" (sobre o total da 1ª coluna) acima do nó. */
+  nodeLabels?: "side" | "above";
+  /** Nó selecionado (id): traça os fluxos que chegam e saem dele; o resto esmaece. */
+  selected?: string | null;
+  /** Com `onSelect`, os nós viram botões: setas percorrem (↑↓ na coluna, ←→ entre colunas), Enter seleciona, Esc solta. */
+  onSelect?: (id: string | null) => void;
+  /** Largura mínima do desenho. Abaixo dela o gráfico rola dentro do próprio contêiner (nunca a página). */
+  minWidth?: number;
   className?: string;
 }) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
-  const [active, setActive] = useState<string | null>(null);
+  const [hover, setHover] = useState<string | null>(null);
+  const reduced = useReducedMotion();
+  const buttons = useRef(new Map<string, HTMLButtonElement | null>());
+  const above = nodeLabels === "above";
   const layout = useMemo(() => {
     const cols = Math.max(...nodes.map((n) => n.column)) + 1;
-    const nodeW = 10;
-    const pad = 10;
-    const labelSpace = 110;
+    const nodeW = above ? 8 : 10;
+    const topPad = above ? 30 : 0;
+    const bottomPad = columnLabels?.length ? 24 : 0;
+    const plotH = Math.max(40, height - topPad - bottomPad);
+    const pad = above ? 40 : 10;
+    const labelSpace = above ? 0 : 110;
     const usableW = Math.max(0, width - labelSpace);
     const value = new Map<string, number>();
     nodes.forEach((n) => {
@@ -686,13 +874,13 @@ export function SankeyChart({
     });
     const colTotals = Array.from({ length: cols }, (_, c) => nodes.filter((n) => n.column === c).reduce((s, n) => s + (value.get(n.id) ?? 0), 0));
     const colCounts = Array.from({ length: cols }, (_, c) => nodes.filter((n) => n.column === c).length);
-    const k = Math.min(...colTotals.map((t, c) => (height - pad * (colCounts[c] - 1)) / (t || 1)));
+    const k = Math.max(0, Math.min(...colTotals.map((t, c) => (plotH - pad * (colCounts[c] - 1)) / (t || 1))));
     const pos = new Map<string, { x: number; y: number; h: number; outY: number; inY: number }>();
     for (let c = 0; c < cols; c++) {
-      let y = 0;
       const colNodes = nodes.filter((n) => n.column === c);
       const used = colNodes.reduce((s, n) => s + (value.get(n.id) ?? 0) * k, 0) + pad * (colNodes.length - 1);
-      y = (height - used) / 2;
+      // Rótulos acima: colunas alinhadas no topo (lê-se a queda de volume). Ao lado: centradas.
+      let y = above ? topPad : (plotH - used) / 2;
       colNodes.forEach((n) => {
         const h = Math.max(2, (value.get(n.id) ?? 0) * k);
         pos.set(n.id, { x: cols === 1 ? 0 : (c * (usableW - nodeW)) / (cols - 1), y, h, outY: y, inY: y });
@@ -712,48 +900,176 @@ export function SankeyChart({
       const mx = (x0 + x1) / 2;
       return { ...l, i, w, d: `M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1},${y1}` };
     });
-    return { pos, paths, nodeW, value, cols };
-  }, [nodes, links, width, height]);
+    const total = colTotals[0] || 1;
+    return { pos, paths, nodeW, value, cols, total, plotBottom: topPad + plotH };
+  }, [nodes, links, width, height, above, columnLabels]);
+  const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
   const colorOf = (id: string) => {
+    const own = byId.get(id)?.color;
+    if (own) return own;
     const first = nodes.filter((n) => n.column === 0);
     const idx = first.findIndex((n) => n.id === id);
     return idx >= 0 ? chartColor(idx) : "var(--ds-line-strong)";
   };
-  // cada faixa herda a cor da origem na coluna 0
-  const rootOf = (id: string): string => {
+  // cada faixa herda a cor da origem na coluna 0 (ou a cor própria do destino)
+  const rootOf = (id: string, depth = 0): string => {
     const incoming = links.find((l) => l.target === id);
-    return incoming ? rootOf(incoming.source) : id;
+    return incoming && depth < 50 ? rootOf(incoming.source, depth + 1) : id;
   };
-  return (
-    <div ref={ref} className={cn("relative min-w-0", className)} style={{ height }} role="img" aria-label={`${label}: ${links.map((l) => `${nodes.find((n) => n.id === l.source)?.label} → ${nodes.find((n) => n.id === l.target)?.label}: ${format(l.value)}`).join("; ")}`}>
+  const linkColor = (l: SankeyLink) => byId.get(l.target)?.color ?? colorOf(rootOf(l.source));
+  const active = hover ?? selected ?? null;
+  const trace = useMemo(() => (active ? sankeyTrace(active, links) : null), [active, links]);
+  const interactive = !!onSelect;
+  const ease = "cubic-bezier(0.2, 0, 0, 1)";
+  const morph = reduced ? undefined : `d 360ms ${ease}, stroke-width 360ms ${ease}, stroke-opacity 150ms linear`;
+  const grow = reduced ? undefined : `y 360ms ${ease}, height 360ms ${ease}, opacity 150ms linear`;
+  const slide = reduced ? undefined : `transform 360ms ${ease}, opacity 150ms linear`;
+  const pctOf = (id: string) => formatPercent((layout.value.get(id) ?? 0) / layout.total, 0);
+  const nodeText = (n: SankeyNode) => `${n.label}: ${format(layout.value.get(n.id) ?? 0)}${above ? ` (${pctOf(n.id)})` : ""}`;
+
+  const move = (n: SankeyNode, key: string) => {
+    const col = nodes.filter((x) => x.column === n.column);
+    const i = col.indexOf(n);
+    let target: SankeyNode | undefined;
+    if (key === "ArrowDown") target = col[i + 1];
+    else if (key === "ArrowUp") target = col[i - 1];
+    else {
+      const c = n.column + (key === "ArrowRight" ? 1 : -1);
+      const p = layout.pos.get(n.id)!;
+      const mid = p.y + p.h / 2;
+      target = nodes
+        .filter((x) => x.column === c)
+        .sort((a, b) => {
+          const pa = layout.pos.get(a.id)!;
+          const pb = layout.pos.get(b.id)!;
+          return Math.abs(pa.y + pa.h / 2 - mid) - Math.abs(pb.y + pb.h / 2 - mid);
+        })[0];
+    }
+    if (target) buttons.current.get(target.id)?.focus();
+  };
+  const tabStop = selected && byId.has(selected) ? selected : nodes[0]?.id;
+
+  const chart = (
+    <div
+      ref={ref}
+      className={cn("relative min-w-0", !minWidth && className)}
+      style={{ height, minWidth }}
+      role={interactive ? "group" : "img"}
+      aria-label={
+        interactive
+          ? label
+          : `${label}: ${links.map((l) => `${byId.get(l.source)?.label} → ${byId.get(l.target)?.label}: ${format(l.value)}`).join("; ")}`
+      }
+    >
       {width > 0 && (
         <svg width={width} height={height} className="absolute inset-0" aria-hidden>
-          {layout.paths.map((p) => (
-            <path
-              key={p.i}
-              d={p.d}
-              fill="none"
-              stroke={colorOf(rootOf(p.source))}
-              strokeOpacity={active == null ? 0.22 : active === p.source || active === p.target ? 0.45 : 0.08}
-              strokeWidth={Math.max(1, p.w)}
-              className="transition-[stroke-opacity] duration-150"
-            />
-          ))}
+          {columnLabels?.map((c, i) => {
+            if (i >= layout.cols) return null;
+            const x = layout.cols === 1 ? 0 : (i * (width - (above ? 0 : 110) - layout.nodeW)) / (layout.cols - 1);
+            const last = i === layout.cols - 1 && above;
+            return (
+              <g key={i}>
+                <line x1={x + layout.nodeW / 2} x2={x + layout.nodeW / 2} y1={above ? 30 : 0} y2={layout.plotBottom + 4} stroke="var(--ds-chart-grid)" />
+                <text x={last ? x + layout.nodeW : x} y={height - 6} textAnchor={last ? "end" : "start"} className="fill-muted text-[11px]">
+                  {c}
+                </text>
+              </g>
+            );
+          })}
+          {layout.paths.map((p) => {
+            const on = trace ? trace.linkSet.has(p.i) : null;
+            return (
+              <path
+                key={p.i}
+                d={p.d}
+                fill="none"
+                stroke={linkColor(p)}
+                strokeOpacity={on == null ? 0.22 : on ? 0.5 : 0.06}
+                strokeWidth={Math.max(1, p.w)}
+                style={{ d: `path("${p.d}")`, strokeWidth: Math.max(1, p.w), transition: morph } as CSSProperties}
+              />
+            );
+          })}
           {nodes.map((n) => {
             const p = layout.pos.get(n.id)!;
             const last = n.column === layout.cols - 1;
+            const dim = trace ? !trace.nodeSet.has(n.id) : false;
+            const fill = n.color ?? (n.column === 0 ? colorOf(n.id) : "var(--ds-ink)");
             return (
-              <g key={n.id} onPointerEnter={() => setActive(n.id)} onPointerLeave={() => setActive(null)}>
-                <rect x={p.x} y={p.y} width={layout.nodeW} height={p.h} rx={2} fill={n.column === 0 ? colorOf(n.id) : "var(--ds-ink)"} />
-                <text x={last ? p.x + layout.nodeW + 6 : p.x + layout.nodeW + 6} y={p.y + p.h / 2} dy="0.32em" className="fill-ink text-[11.5px]">
-                  {n.label}
-                  <tspan className="fill-muted tabular-nums"> {format(layout.value.get(n.id) ?? 0)}</tspan>
-                </text>
+              <g key={n.id} onPointerEnter={() => setHover(n.id)} onPointerLeave={() => setHover(null)} opacity={dim ? 0.35 : 1} style={{ transition: reduced ? undefined : "opacity 150ms linear" }}>
+                <rect x={p.x} y={p.y} width={layout.nodeW} height={p.h} rx={2} fill={fill} style={{ y: p.y, height: p.h, transition: grow } as CSSProperties} />
+                {above ? (
+                  <g style={{ transform: `translate(${last ? p.x + layout.nodeW : p.x}px, ${p.y}px)`, transition: slide }}>
+                    <text x={0} y={-18} textAnchor={last ? "end" : "start"} className={cn("fill-ink text-[11.5px]", n.id === selected && "font-semibold")}>
+                      {n.label}
+                    </text>
+                    <text x={0} y={-5} textAnchor={last ? "end" : "start"} className="fill-muted text-[11px] tabular-nums">
+                      {format(layout.value.get(n.id) ?? 0)} · {pctOf(n.id)}
+                    </text>
+                  </g>
+                ) : (
+                  <text x={p.x + layout.nodeW + 6} y={p.y + p.h / 2} dy="0.32em" className="fill-ink text-[11.5px]">
+                    {n.label}
+                    <tspan className="fill-muted tabular-nums"> {format(layout.value.get(n.id) ?? 0)}</tspan>
+                  </text>
+                )}
               </g>
             );
           })}
         </svg>
       )}
+      {interactive && width > 0 && (
+        <>
+          {nodes.map((n) => {
+            const p = layout.pos.get(n.id)!;
+            const last = n.column === layout.cols - 1;
+            const w = above ? 96 : layout.nodeW + 8;
+            const left = above ? (last ? p.x + layout.nodeW - w + 4 : p.x - 4) : p.x - 4;
+            const top = above ? p.y - 32 : p.y - 2;
+            return (
+              <button
+                key={n.id}
+                ref={(el) => {
+                  buttons.current.set(n.id, el);
+                }}
+                type="button"
+                tabIndex={n.id === tabStop ? 0 : -1}
+                aria-pressed={selected === n.id}
+                aria-label={nodeText(n)}
+                onPointerEnter={() => setHover(n.id)}
+                onPointerLeave={() => setHover(null)}
+                onFocus={() => setHover(n.id)}
+                onBlur={() => setHover(null)}
+                onClick={() => onSelect?.(selected === n.id ? null : n.id)}
+                onKeyDown={(e) => {
+                  if (e.key.startsWith("Arrow")) {
+                    e.preventDefault();
+                    move(n, e.key);
+                  } else if (e.key === "Escape" && selected != null) {
+                    e.preventDefault();
+                    onSelect?.(null);
+                  }
+                }}
+                className="absolute cursor-pointer rounded-md outline-none focus-visible:ring-2 focus-visible:ring-muted/40"
+                style={{ left, top, width: w, height: Math.max(16, p.h + (top < p.y ? p.y - top : 0) + 4) }}
+              />
+            );
+          })}
+          <SrTable
+            label={label}
+            data={links.map((l) => ({ fluxo: `${byId.get(l.source)?.label} → ${byId.get(l.target)?.label}`, valor: l.value }))}
+            index="fluxo"
+            series={[{ key: "valor", label: "Volume" }]}
+            format={format}
+          />
+        </>
+      )}
+    </div>
+  );
+  if (!minWidth) return chart;
+  return (
+    <div className={cn("min-w-0 overflow-x-auto overscroll-x-contain", className)} tabIndex={interactive ? undefined : 0} role={interactive ? undefined : "region"} aria-label={interactive ? undefined : label}>
+      {chart}
     </div>
   );
 }
@@ -772,8 +1088,10 @@ function heatShade(a: number) {
 
 /**
  * Intensidade em duas dimensões: coorte × mês (retenção), dia × hora
- * (picos de atendimento), vendedor × etapa. Uma cor, 5+ níveis contínuos,
- * valor escrito na célula quando cabe.
+ * (picos de atendimento), vendedor × etapa. Uma cor, 5+ níveis contínuos
+ * (ou degraus com `scale`), valor escrito na célula quando cabe. Células com
+ * valor são focáveis: setas percorrem, o tooltip mostra o valor. `null` =
+ * célula vazia (triângulo de coorte).
  */
 export function HeatmapMatrix({
   rows,
@@ -785,11 +1103,19 @@ export function HeatmapMatrix({
   showValues = true,
   label = "Matriz",
   cell = 36,
+  rowMeta,
+  rowMetaLabel,
+  rowsLabel,
+  summaryRow,
+  scale,
+  legend = false,
+  legendTitle,
+  valueLabel = "Valor",
   className,
 }: {
   rows: string[];
   columns: string[];
-  /** values[linha][coluna]; null = sem dado. */
+  /** values[linha][coluna]; null = sem dado (célula vazia, sem fundo). */
   values: (number | null)[][];
   format?: (n: number) => string;
   max?: number;
@@ -797,50 +1123,392 @@ export function HeatmapMatrix({
   showValues?: boolean;
   label?: string;
   cell?: number;
+  /** Coluna extra depois do rótulo de cada linha (tamanho da coorte, total). */
+  rowMeta?: ReactNode[];
+  /** Cabeçalho da coluna de `rowMeta` ("Espaços"). */
+  rowMetaLabel?: string;
+  /** Cabeçalho da coluna de rótulos ("Coorte"). */
+  rowsLabel?: string;
+  /** Linha de resumo separada no fim ("Média"), pintada na mesma escala. */
+  summaryRow?: { label: string; values: (number | null)[]; meta?: ReactNode };
+  /** Escala em degraus (`quantize`): `steps` faixas sobre `domain` exatamente como dado ([0.2, 0.8] em 6 → 20, 30… 70 %) ou, sem `domain`, faixas de limites redondos sobre o mínimo e o máximo dos dados. */
+  scale?: { steps: number; domain?: [number, number] };
+  /** Legenda da escala acima da matriz. `true` desenha o `ScaleLegend` ligado (passar o mouse num degrau destaca as células daquela faixa); um nó substitui a legenda. */
+  legend?: boolean | ReactNode;
+  /** Título curto da legenda ("% retido"). */
+  legendTitle?: string;
+  /** Rótulo do valor no tooltip ("Retidos"). */
+  valueLabel?: string;
   className?: string;
 }) {
-  const top = max ?? Math.max(1, ...values.flat().map((v) => v ?? 0));
+  const grid = useMemo(() => (summaryRow ? [...values, summaryRow.values] : values), [values, summaryRow]);
+  const rowNames = summaryRow ? [...rows, summaryRow.label] : rows;
+  const nums = grid.flat().filter((v): v is number => v != null && Number.isFinite(v));
+  const top = max ?? Math.max(1, ...nums);
   const base = { ink: "var(--ds-ink)", accent: "var(--ds-accent)", ok: "var(--ds-ok)", info: "var(--ds-blue)" }[tone];
+  const q = useMemo(() => {
+    if (!scale) return null;
+    const lo = nums.length ? Math.min(...nums) : 0;
+    const hi = nums.length ? Math.max(...nums) : 1;
+    // Domínio explícito vale como está; sem domínio, limites "redondos" a partir dos dados.
+    return scale.domain ? quantize(scale.domain, scale.steps, { nice: false }) : quantize([lo, hi], scale.steps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scale?.steps, scale?.domain?.[0], scale?.domain?.[1], grid]);
+  const [hoverBin, setHoverBin] = useState<number | null>(null);
+  const [tip, setTip] = useState<{ r: number; c: number; x: number; y: number; below: boolean } | null>(null);
+  const firstCell = (() => {
+    for (let r = 0; r < grid.length; r++) for (let c = 0; c < columns.length; c++) if (grid[r]?.[c] != null) return { r, c };
+    return { r: 0, c: 0 };
+  })();
+  const [focus, setFocus] = useState<{ r: number; c: number } | null>(null);
+  const cur = focus && grid[focus.r]?.[focus.c] != null ? focus : firstCell;
+  const host = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
-  useReadableFills(box, [values, tone, top]);
+  const cells = useRef(new Map<string, HTMLTableCellElement | null>());
+  useReadableFills(box, [values, summaryRow, tone, top, q?.steps]);
+  const fillOf = (v: number) => {
+    if (q) return sequentialColor(q.level(v), tone);
+    const a = Math.max(0.06, Math.min(1, v / top));
+    return `color-mix(in oklab, ${base} ${Math.round(heatShade(a) * 100)}%, transparent)`;
+  };
+  const has = (r: number, c: number) => grid[r]?.[c] != null;
+  const nextCell = (r: number, c: number, key: string) => {
+    const lastCol = columns.length - 1;
+    if (key === "ArrowRight") for (let j = c + 1; j <= lastCol; j++) if (has(r, j)) return { r, c: j };
+    if (key === "ArrowLeft") for (let j = c - 1; j >= 0; j--) if (has(r, j)) return { r, c: j };
+    if (key === "ArrowDown") for (let i = r + 1; i < grid.length; i++) if (has(i, c)) return { r: i, c };
+    if (key === "ArrowUp") for (let i = r - 1; i >= 0; i--) if (has(i, c)) return { r: i, c };
+    if (key === "Home") for (let j = 0; j <= lastCol; j++) if (has(r, j)) return { r, c: j };
+    if (key === "End") for (let j = lastCol; j >= 0; j--) if (has(r, j)) return { r, c: j };
+    return null;
+  };
+  const showTip = (r: number, c: number, el: HTMLElement) => {
+    const h = host.current;
+    if (!h) return;
+    const hr = h.getBoundingClientRect();
+    const cr = el.getBoundingClientRect();
+    const x = Math.max(70, Math.min(hr.width - 70, cr.left - hr.left + cr.width / 2));
+    const below = cr.top - hr.top < 64;
+    setTip({ r, c, x, y: below ? cr.bottom - hr.top + 6 : cr.top - hr.top - 6, below });
+  };
+  const legendNode =
+    legend === true ? (
+      q ? (
+        <ScaleLegend thresholds={q.thresholds} max={q.domain[1]} tone={tone} format={format} title={legendTitle} activeBin={hoverBin} onHoverBin={setHoverBin} />
+      ) : (
+        <ScaleLegend thresholds={[0, top]} mode="continuous" tone={tone} format={format} title={legendTitle} />
+      )
+    ) : legend || null;
+  const renderCells = (r: number, rowName: string) =>
+    columns.map((c, ci) => {
+      const v = grid[r]?.[ci];
+      if (v == null) return <td key={c} style={{ height: cell * 0.8, minWidth: cell }} />;
+      const dim = hoverBin != null && q != null && q.bin(v) !== hoverBin;
+      const isStop = cur.r === r && cur.c === ci;
+      return (
+        <td
+          key={c}
+          ref={(el) => {
+            cells.current.set(`${r}:${ci}`, el);
+          }}
+          tabIndex={isStop ? 0 : -1}
+          data-fill=""
+          aria-label={`${rowName} · ${c}: ${format(v)}`}
+          onMouseEnter={(e) => showTip(r, ci, e.currentTarget)}
+          onMouseLeave={() => setTip(null)}
+          onFocus={(e) => {
+            setFocus({ r, c: ci });
+            showTip(r, ci, e.currentTarget);
+          }}
+          onBlur={() => setTip(null)}
+          onKeyDown={(e) => {
+            const n = nextCell(r, ci, e.key);
+            if (n || e.key.startsWith("Arrow") || e.key === "Home" || e.key === "End") e.preventDefault();
+            if (n) cells.current.get(`${n.r}:${n.c}`)?.focus();
+            if (e.key === "Escape") setTip(null);
+          }}
+          className="rounded-[4px] text-center tabular-nums outline-none transition-opacity duration-150 focus-visible:ring-2 focus-visible:ring-muted/40 motion-reduce:transition-none"
+          style={{ height: cell * 0.8, minWidth: cell, background: fillOf(v), opacity: dim ? 0.18 : 1 }}
+        >
+          {showValues ? format(v) : <span className="sr-only">{format(v)}</span>}
+        </td>
+      );
+    });
+  const tipValue = tip ? grid[tip.r]?.[tip.c] : null;
   return (
-    <div ref={box} className={cn("min-w-0 overflow-x-auto", className)} tabIndex={0} role="region" aria-label={label}>
-      <table className="border-separate text-[11.5px]" style={{ borderSpacing: 2 }} aria-label={label}>
-        <thead>
-          <tr>
-            <th />
-            {columns.map((c) => (
-              <th key={c} scope="col" className="px-1 pb-1 text-center font-normal text-muted" style={{ minWidth: cell }}>
-                {c}
+    <div ref={host} className={cn("relative flex min-w-0 flex-col gap-3", className)}>
+      {legendNode}
+      <div ref={box} className="min-w-0 overflow-x-auto" role="region" aria-label={label}>
+        <table className="border-separate text-[11.5px]" style={{ borderSpacing: 2 }} aria-label={label}>
+          <thead>
+            <tr>
+              <th scope="col" className="pb-1 pr-2 text-left text-[11px] font-normal text-muted">
+                {rowsLabel ?? <span className="sr-only">Linha</span>}
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r, ri) => (
-            <tr key={r}>
-              <th scope="row" className="whitespace-nowrap pr-2 text-left font-normal text-ink-soft">
-                {r}
-              </th>
-              {columns.map((c, ci) => {
-                const v = values[ri]?.[ci];
-                const a = v == null ? 0 : Math.max(0.06, Math.min(1, v / top));
-                return (
-                  <td
-                    key={c}
-                    title={v == null ? `${r} · ${c}: sem dado` : `${r} · ${c}: ${format(v)}`}
-                    data-fill=""
-                    className="rounded-[4px] text-center tabular-nums"
-                    style={{ height: cell * 0.8, minWidth: cell, background: v == null ? "transparent" : `color-mix(in oklab, ${base} ${Math.round(heatShade(a) * 100)}%, transparent)` }}
-                  >
-                    {showValues && v != null ? format(v) : ""}
-                  </td>
-                );
-              })}
+              {rowMeta && (
+                <th scope="col" className="pb-1 pr-3 text-right text-[11px] font-normal text-muted">
+                  {rowMetaLabel ?? <span className="sr-only">Detalhe</span>}
+                </th>
+              )}
+              {columns.map((c) => (
+                <th key={c} scope="col" className="px-1 pb-1 text-center font-normal text-muted" style={{ minWidth: cell }}>
+                  {c}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r, ri) => (
+              <tr key={r}>
+                <th scope="row" className="whitespace-nowrap pr-2 text-left font-normal text-ink-soft">
+                  {r}
+                </th>
+                {rowMeta && <td className="whitespace-nowrap pr-3 text-right tabular-nums text-muted">{rowMeta[ri]}</td>}
+                {renderCells(ri, r)}
+              </tr>
+            ))}
+            {summaryRow && (
+              <>
+                <tr aria-hidden>
+                  <td colSpan={columns.length + (rowMeta ? 2 : 1)} className="h-1.5 p-0" />
+                </tr>
+                <tr>
+                  <th scope="row" className="whitespace-nowrap pr-2 text-left font-medium text-ink">
+                    {summaryRow.label}
+                  </th>
+                  {rowMeta && <td className="whitespace-nowrap pr-3 text-right font-medium tabular-nums text-ink-soft">{summaryRow.meta}</td>}
+                  {renderCells(rows.length, summaryRow.label)}
+                </tr>
+              </>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {tip && tipValue != null && (
+        <ChartTooltip
+          title={`${rowNames[tip.r]} · ${columns[tip.c]}`}
+          rows={[{ label: valueLabel, value: format(tipValue) }]}
+          style={{ left: tip.x, top: tip.y, transform: `translate(-50%, ${tip.below ? "0" : "-100%"})` }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* RetentionCurves                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Curvas de retenção por coorte: uma linha por coorte (as recentes mais
+ * escuras), a média em destaque. Responde "as coortes novas retêm melhor que
+ * as antigas?". Mesmo dado do HeatmapMatrix em triângulo, outra leitura.
+ * Setas ←→ percorrem os meses, ↑↓ as coortes; o tooltip mostra o valor.
+ */
+export function RetentionCurves({
+  rows,
+  columns,
+  average,
+  format = (n) => formatPercent(n, 0),
+  formatAxis,
+  height = 280,
+  label = "Curvas de retenção por coorte",
+  className,
+}: {
+  /** Uma linha por coorte, da mais antiga para a mais recente. `null` = mês ainda não alcançado. */
+  rows: { label: string; values: (number | null)[] }[];
+  /** Rótulo de cada ponto do eixo X ("1", "2"… meses desde o cadastro). */
+  columns: string[];
+  /** Curva média, desenhada em destaque. */
+  average?: { label?: string; values: (number | null)[] };
+  format?: (n: number) => string;
+  formatAxis?: (n: number) => string;
+  height?: number;
+  label?: string;
+  className?: string;
+}) {
+  const [ref, width] = useElementWidth<HTMLDivElement>();
+  const reduced = useReducedMotion();
+  const [pt, setPt] = useState<{ r: number; c: number } | null>(null);
+  const series = average ? [...rows, { label: average.label ?? "Média", values: average.values }] : rows;
+  const avgIndex = average ? rows.length : -1;
+  const all = series.flatMap((s) => s.values).filter((v): v is number => v != null);
+  // Taxa: o eixo não precisa começar em zero (docs/fundamentos/dados.md, regra 2); a escala diz onde começa.
+  const { lo, hi, ticks } = all.length ? niceRange(Math.min(...all), Math.max(...all), 4, 0.06) : niceDomain(0, 1, 4);
+  const axis = formatAxis ?? format;
+  const left = Math.min(56, Math.max(28, Math.max(...ticks.map((t) => axis(t).length)) * 6.4 + 10));
+  const right = average ? 52 : 12;
+  const m = { top: 10, bottom: 24 };
+  const innerW = Math.max(0, width - left - right);
+  const innerH = height - m.top - m.bottom;
+  const x = (c: number) => left + (columns.length > 1 ? (c / (columns.length - 1)) * innerW : innerW / 2);
+  const y = (v: number) => m.top + innerH - ((v - lo) / (hi - lo || 1)) * innerH;
+  const pathOf = (vals: (number | null)[]) => {
+    let d = "";
+    let pen = false;
+    vals.forEach((v, c) => {
+      if (v == null) {
+        pen = false;
+        return;
+      }
+      d += `${pen ? "L" : "M"}${x(c).toFixed(1)},${y(v).toFixed(1)}`;
+      pen = true;
+    });
+    return d;
+  };
+  const opacityOf = (r: number) => (rows.length <= 1 ? 0.8 : 0.16 + (r / (rows.length - 1)) * 0.66);
+  const lastOf = (vals: (number | null)[]) => {
+    for (let c = vals.length - 1; c >= 0; c--) if (vals[c] != null) return c;
+    return -1;
+  };
+  const pick = (clientX: number, clientY: number, el: SVGSVGElement) => {
+    const b = el.getBoundingClientRect();
+    const px = clientX - b.left;
+    const py = clientY - b.top;
+    const c = Math.max(0, Math.min(columns.length - 1, Math.round(((px - left) / (innerW || 1)) * (columns.length - 1))));
+    let best = -1;
+    let dist = Infinity;
+    series.forEach((s, r) => {
+      const v = s.values[c];
+      if (v == null) return;
+      const d = Math.abs(y(v) - py);
+      if (d < dist) {
+        dist = d;
+        best = r;
+      }
+    });
+    setPt(best >= 0 ? { r: best, c } : null);
+  };
+  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const p = pt ?? { r: avgIndex >= 0 ? avgIndex : rows.length - 1, c: 0 };
+    const map: Record<string, [number, number]> = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
+    if (e.key === "Escape") return setPt(null);
+    if (!(e.key in map)) return;
+    e.preventDefault();
+    const [dr, dc] = map[e.key];
+    let r = Math.max(0, Math.min(series.length - 1, p.r + dr));
+    let c = Math.max(0, Math.min(columns.length - 1, p.c + dc));
+    // Pula para a coorte mais próxima que já tem esse mês.
+    if (series[r]?.values[c] == null) {
+      if (dc) c = Math.max(0, Math.min(c, lastOf(series[r].values)));
+      else {
+        let k = r;
+        while (k >= 0 && k < series.length && series[k].values[c] == null) k += dr || 1;
+        r = k >= 0 && k < series.length ? k : p.r;
+      }
+    }
+    setPt({ r, c });
+  };
+  const morph = reduced ? undefined : "d 360ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms linear";
+  const active = pt ? series[pt.r] : null;
+  const activeV = pt && active ? active.values[pt.c] : null;
+  const sr = rows.map((s) => Object.fromEntries([["coorte", s.label], ...s.values.map((v, i) => [`m${i}`, v])]) as ChartDatum);
+  if (average) sr.push(Object.fromEntries([["coorte", average.label ?? "Média"], ...average.values.map((v, i) => [`m${i}`, v])]) as ChartDatum);
+  return (
+    <div className={cn("flex min-w-0 flex-col gap-3", className)}>
+      <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0 text-[12px] text-muted" aria-hidden>
+        <li className="flex items-center gap-1.5">
+          <span className="flex items-center gap-0.5">
+            {[0.2, 0.45, 0.8].map((o) => (
+              <span key={o} className="h-0.5 w-2.5 rounded-full bg-ink" style={{ opacity: o }} />
+            ))}
+          </span>
+          Coortes (mais escura = mais recente)
+        </li>
+        {average && (
+          <li className="flex items-center gap-1.5">
+            <span className="h-[3px] w-4 rounded-full" style={{ background: "var(--ds-chart-3)" }} />
+            {average.label ?? "Média"}
+          </li>
+        )}
+      </ul>
+      <div
+        ref={ref}
+        className="relative min-w-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-muted/40"
+        style={{ height }}
+        tabIndex={0}
+        role="group"
+        aria-label={`${label}. Setas percorrem meses e coortes.`}
+        onKeyDown={onKey}
+        onBlur={() => setPt(null)}
+      >
+        {width > 0 && (
+          <svg
+            width={width}
+            height={height}
+            className="absolute inset-0"
+            aria-hidden
+            onPointerMove={(e) => pick(e.clientX, e.clientY, e.currentTarget)}
+            onPointerLeave={() => setPt(null)}
+          >
+            {ticks.map((t) => (
+              <g key={t}>
+                <line x1={left} x2={width - right} y1={y(t)} y2={y(t)} stroke={t === lo ? "var(--ds-line)" : "var(--ds-chart-grid)"} />
+                <text x={left - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-muted text-[11px] tabular-nums">
+                  {axis(t)}
+                </text>
+              </g>
+            ))}
+            {columns.map((c, i) => (
+              <text key={i} x={x(i)} y={height - 6} textAnchor="middle" className="fill-muted text-[11px]">
+                {c}
+              </text>
+            ))}
+            {rows.map((s, r) => {
+              const d = pathOf(s.values);
+              const on = pt?.r === r;
+              return (
+                <path
+                  key={s.label}
+                  d={d}
+                  fill="none"
+                  stroke="var(--ds-chart-1)"
+                  strokeWidth={on ? 2.25 : 1.5}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  opacity={pt ? (on ? 1 : opacityOf(r) * 0.45) : opacityOf(r)}
+                  style={{ d: `path("${d}")`, transition: morph } as CSSProperties}
+                />
+              );
+            })}
+            {average &&
+              (() => {
+                const d = pathOf(average.values);
+                const lc = lastOf(average.values);
+                return (
+                  <g>
+                    <path d={d} fill="none" stroke="var(--ds-chart-3)" strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" style={{ d: `path("${d}")`, transition: morph } as CSSProperties} />
+                    {lc >= 0 && (
+                      <text x={x(lc) + 8} y={y(average.values[lc] as number)} dy="0.32em" className="fill-ink text-[11px] font-medium">
+                        {average.label ?? "Média"}
+                      </text>
+                    )}
+                  </g>
+                );
+              })()}
+            {pt && activeV != null && (
+              <g>
+                <line x1={x(pt.c)} x2={x(pt.c)} y1={m.top} y2={m.top + innerH} stroke="var(--ds-line-strong)" strokeDasharray="2 3" />
+                <circle cx={x(pt.c)} cy={y(activeV)} r={4} fill="var(--ds-surface)" stroke={pt.r === avgIndex ? "var(--ds-chart-3)" : "var(--ds-chart-1)"} strokeWidth={2} />
+              </g>
+            )}
+          </svg>
+        )}
+        {pt && active && activeV != null && (
+          <ChartTooltip
+            title={active.label}
+            rows={[
+              { label: `Mês ${columns[pt.c]}`, value: format(activeV) },
+              ...(average && pt.r !== avgIndex && average.values[pt.c] != null ? [{ label: average.label ?? "Média", value: format(average.values[pt.c] as number) }] : []),
+            ]}
+            style={{ top: 0, left: Math.max(0, Math.min(x(pt.c) + 12, width - 170)) }}
+          />
+        )}
+        <div className="sr-only" aria-live="polite">
+          {pt && active && activeV != null ? `${active.label}, mês ${columns[pt.c]}: ${format(activeV)}` : ""}
+        </div>
+      </div>
+      <SrTable label={label} data={sr} index="coorte" series={columns.map((c, i) => ({ key: `m${i}`, label: `Mês ${c}` }))} format={format} />
     </div>
   );
 }
