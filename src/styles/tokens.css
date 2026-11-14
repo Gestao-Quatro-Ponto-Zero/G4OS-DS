@@ -113,6 +113,9 @@
   /* Ação principal: por padrão é a tinta. Marcas trocam aqui. */
   --ds-primary: var(--g4-gray-900);
   --ds-on-primary: var(--g4-white);
+  /* Enviar do compositor: navy da G4 no claro, prata no escuro. Marca de cliente usa o primary. */
+  --ds-send: var(--g4-navy-blue);
+  --ds-on-send: var(--g4-royal-silver);
 
   /* Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela. */
   --ds-brand: var(--g4-navy-blue);
@@ -243,6 +246,8 @@
   --ds-on-ink: #121214;
   --ds-primary: #ececef;
   --ds-on-primary: #121214;
+  --ds-send: var(--g4-royal-silver);
+  --ds-on-send: var(--g4-navy-blue);
   --ds-navy: #0a2130;
   --ds-brand: #0a2236; /* navy continua navy, um passo acima do fundo escuro */
   --ds-on-brand: var(--g4-royal-silver);
@@ -330,6 +335,8 @@
     --ds-on-ink: #121214;
     --ds-primary: #ececef;
     --ds-on-primary: #121214;
+    --ds-send: var(--g4-royal-silver);
+    --ds-on-send: var(--g4-navy-blue);
     --ds-navy: #0a2130;
     --ds-brand: #0a2236;
     --ds-brand-accent: #c9a46f;
@@ -411,6 +418,8 @@
   --color-on-ink: var(--ds-on-ink);
   --color-primary: var(--ds-primary);
   --color-on-primary: var(--ds-on-primary);
+  --color-send: var(--ds-send);
+  --color-on-send: var(--ds-on-send);
 
   --color-navy: var(--ds-navy);
   --color-brand: var(--ds-brand);

@@ -39374,6 +39374,20 @@
         "utility": "on-primary",
         "light": "#ffffff",
         "dark": "#121214",
+        "note": "Enviar do compositor: navy da G4 no claro, prata no escuro. Marca de cliente usa o primary."
+      },
+      {
+        "token": "--ds-send",
+        "utility": "send",
+        "light": "#001f35",
+        "dark": "#f5f4f3",
+        "note": null
+      },
+      {
+        "token": "--ds-on-send",
+        "utility": "on-send",
+        "light": "#f5f4f3",
+        "dark": "#001f35",
         "note": "Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela."
       },
       {

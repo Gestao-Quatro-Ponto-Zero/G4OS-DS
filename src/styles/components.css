@@ -1000,7 +1000,7 @@
 }
 
 /* Ação da IA em momento de marca: o azul-céu da esfera, redondo.
-   Os compositores não usam: enviar é a ação principal (`bg-primary`). */
+   Os compositores não usam: enviar é chapado em `bg-send`. */
 .ds-ai-action {
   color: var(--ds-on-ink);
   background-image: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--ds-ai-accent) 55%, white) 0%, var(--ds-ai-accent) 45%, var(--ds-blue) 100%);

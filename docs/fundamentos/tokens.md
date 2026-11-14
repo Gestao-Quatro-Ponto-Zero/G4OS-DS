@@ -33,6 +33,7 @@ Por que `@theme inline`: os utilitários saem como `background-color: var(--ds-s
 | `muted` | metadado, rótulo, placeholder (**cor de texto**) | `#63666e` | `#8f929a` |
 | `line` / `line-strong` | bordas / hover de borda | `#e9eaed` / `#d2d4da` | `#2a2a2f` / `#3b3c43` |
 | `primary` / `on-primary` | ação principal e seleção / texto sobre ela | `#202124` / `#ffffff` | `#ececef` / `#121214` |
+| `send` / `on-send` | enviar e parar do compositor / ícone sobre ele (marca de cliente: igual a `primary`) | `#001f35` / `#f5f4f3` | `#f5f4f3` / `#001f35` |
 | `on-ink` | texto sobre `bg-ink`, `bg-rose`, `bg-ok`… | `#ffffff` | `#121214` |
 | `navy` | superfície de marca (escura nos dois temas) | `#031a26` | `#0a2130` |
 | `blue` | link, ação textual, "em andamento" | `#184560` | `#8cb8da` |

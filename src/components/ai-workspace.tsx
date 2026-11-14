@@ -1880,11 +1880,11 @@ export function AgentComposer({
               </button>
             </Tooltip>
             {busy ? (
-              <button type="button" onClick={onStop} aria-label="Parar" className="grid h-8 w-8 place-items-center rounded-full bg-primary text-on-primary hover:bg-primary/90">
+              <button type="button" onClick={onStop} aria-label="Parar" className="grid h-8 w-8 place-items-center rounded-full bg-send text-on-send hover:bg-send/90">
                 <Square className="h-3 w-3 fill-current" />
               </button>
             ) : (
-              <button type="button" onClick={send} disabled={!value.trim() || disabled} aria-label="Enviar" className="grid h-8 w-8 place-items-center rounded-full bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-30">
+              <button type="button" onClick={send} disabled={!value.trim() || disabled} aria-label="Enviar" className="grid h-8 w-8 place-items-center rounded-full bg-send text-on-send hover:bg-send/90 disabled:opacity-30">
                 <ArrowUp className="h-4 w-4" />
               </button>
             )}
