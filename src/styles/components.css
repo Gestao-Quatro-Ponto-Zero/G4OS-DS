@@ -987,7 +987,7 @@
   .ds-gradient-text { background: none; color: CanvasText; }
 }
 
-/* Vidro sobre o gelo: compositor da IA, painéis flutuantes de marca. */
+/* Vidro sobre o gelo: painéis flutuantes de marca. O compositor é sólido. */
 .ds-glass {
   background-color: color-mix(in oklab, var(--ds-surface) 76%, transparent);
   border: 1px solid color-mix(in oklab, var(--ds-surface) 92%, var(--ds-line));
@@ -999,7 +999,8 @@
   border-color: color-mix(in oklab, var(--ds-blue) 35%, var(--ds-line));
 }
 
-/* Ação da IA (enviar): o azul-céu da esfera, redondo. */
+/* Ação da IA em momento de marca: o azul-céu da esfera, redondo.
+   Os compositores não usam: enviar é a ação principal (`bg-primary`). */
 .ds-ai-action {
   color: var(--ds-on-ink);
   background-image: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--ds-ai-accent) 55%, white) 0%, var(--ds-ai-accent) 45%, var(--ds-blue) 100%);
