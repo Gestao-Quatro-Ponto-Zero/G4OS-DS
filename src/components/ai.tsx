@@ -1150,7 +1150,7 @@ export function ChatComposer({
   };
   return (
     <div className={cn("min-w-0", className)}>
-      <div className="focus-field ds-glass rounded-2xl transition-colors">
+      <div className="focus-field rounded-2xl border border-line bg-surface shadow-surface transition-colors">
         {attachments && attachments.length > 0 && (
           <div className="flex flex-wrap gap-1.5 px-3 pt-3">
             {attachments.map((a) => (
@@ -1187,7 +1187,7 @@ export function ChatComposer({
           )}
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">{chips}</div>
           {busy && onStop ? (
-            <button type="button" onClick={onStop} aria-label="Parar resposta" title="Parar" className="ds-ai-action inline-flex h-8 w-8 items-center justify-center rounded-full">
+            <button type="button" onClick={onStop} aria-label="Parar resposta" title="Parar" className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-send text-on-send hover:bg-send/90">
               <Square className="h-3 w-3 fill-current" />
             </button>
           ) : (
@@ -1197,7 +1197,7 @@ export function ChatComposer({
               disabled={!value.trim() || disabled}
               aria-label="Enviar"
               title="Enviar"
-              className="ds-ai-action inline-flex h-8 w-8 items-center justify-center rounded-full"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-send text-on-send hover:bg-send/90 disabled:opacity-30"
             >
               <ArrowUp className="h-4 w-4" />
             </button>

@@ -19,7 +19,9 @@ Em classe use o utilitário; em SVG/`style` use `var(--color-<utilitário>)`.
 | `line-strong` | `--ds-line-strong` | `#d2d4da` | `#3b3c43` | hover de card, borda de checkbox |
 | `on-ink` | `--ds-on-ink` | `#ffffff` | `#121214` | texto sobre preenchimento forte (ink, rose, ok…) |
 | `primary` | `--ds-primary` | `#202124` | `#ececef` |  |
-| `on-primary` | `--ds-on-primary` | `#ffffff` | `#121214` | Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela. |
+| `on-primary` | `--ds-on-primary` | `#ffffff` | `#121214` | Enviar do compositor: navy da G4 no claro, prata no escuro. Marca de cliente usa o primary. |
+| `send` | `--ds-send` | `#001f35` | `#f5f4f3` |  |
+| `on-send` | `--ds-on-send` | `#f5f4f3` | `#001f35` | Momentos de marca: capa, login, onboarding, conquista. Não é cor de tela. |
 | `brand` | `--ds-brand` | `#001f35` | `#0a2236` |  |
 | `on-brand` | `--ds-on-brand` | `#f5f4f3` | `#f5f4f3` |  |
 | `brand-accent` | `--ds-brand-accent` | `#b9915b` | `#c9a46f` | Marcador do item ativo na navegação (gesto de marca discreto). |

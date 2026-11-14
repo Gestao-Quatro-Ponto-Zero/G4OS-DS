@@ -15,6 +15,12 @@
  * Regra: primary e on-primary precisam de contraste ≥ 4,5:1 nos dois modos.
  */
 
+/* Enviar do compositor: o navy é da G4. Marca de cliente (qualquer outra) envia no primary. */
+[data-brand]:not([data-brand="g4-classico"], [data-brand="g4os"], [data-brand="g4-institucional"]) {
+  --ds-send: var(--ds-primary);
+  --ds-on-send: var(--ds-on-primary);
+}
+
 /* ---------------- Oceano: SaaS azul, cantos um pouco mais suaves ---------------- */
 [data-brand="oceano"] {
   --ds-primary: #1554d1;

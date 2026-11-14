@@ -14,7 +14,8 @@ O preset opcional G4 OS segue o key visual da marca, com fundo gelo `#F9F9F9`, t
 
 - **Gradiente de marca** (`--ds-gradient-brand`): dourado `#A38E5A` → aço `#3B5766` → azul `#005B98` → azul acinzentado `#5F87A6`. Aplicado como `background-clip: text` em títulos de momento. No KV ele se dissolve no fundo; na interface termina em um azul legível (3:1 ou mais sobre o gelo).
 - **Esfera G4 OS**: o símbolo da IA. Em movimento ela gira, recalcula e conduz; parada, aparece como orb azul desfocado (`--ds-ai-accent`) atrás do conteúdo da IA. Um por tela.
-- **Azul-céu** (`#0084DD`) é exclusivo da IA: botão enviar, orb, os três pontos de "pensando". Ações comuns continuam em Navy.
+- **Azul-céu** (`#0084DD`) é exclusivo da IA: orb, os três pontos de "pensando". Ações comuns continuam em Navy.
+- **Compositor sólido.** `AgentComposer` e `ChatComposer` são campos de trabalho: superfície, borda `line` de 1 px, sombra leve, borda `line-strong` no foco e enviar chapado em `send` (navy no claro, prata no escuro; numa marca de cliente, o `primary`). Sem vidro e sem degradê: o compositor fica atrás de conversa e lista, onde a camada expressiva não entra.
 - **Dourado terroso** (`#A38E5A`) substitui o Royal Gold no preset G4 OS: marcador da navegação, progresso, destaque de série.
 
 ## Paleta → tokens
