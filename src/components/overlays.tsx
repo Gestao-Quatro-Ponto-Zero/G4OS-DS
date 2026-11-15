@@ -239,9 +239,16 @@ export function Popover({
   side = "bottom",
   open,
   onOpenChange,
+  initialFocus = "first",
 }: {
   trigger: ReactNode;
   triggerLabel: string;
+  /**
+   * Onde o foco entra ao abrir. "first" (padrão) foca o primeiro controle, bom para formulário e busca.
+   * "popup" foca o próprio painel: use quando o conteúdo é leitura e o primeiro controle fica no fim
+   * (o foco não puxa a rolagem nem acende um anel num botão que a pessoa não escolheu). Tab segue para os controles.
+   */
+  initialFocus?: "first" | "popup";
   /** Controlado: estado aberto (use com onOpenChange, ex.: fechar ao escolher uma opção). */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -253,6 +260,7 @@ export function Popover({
   align?: "start" | "center" | "end";
   side?: "top" | "bottom" | "left" | "right";
 }) {
+  const popupRef = useRef<HTMLDivElement>(null);
   return (
     <BasePopover.Root open={open} onOpenChange={onOpenChange ? (o) => onOpenChange(o) : undefined}>
       <BasePopover.Trigger
@@ -266,7 +274,12 @@ export function Popover({
       </BasePopover.Trigger>
       <BasePopover.Portal>
         <BasePopover.Positioner side={side} align={align} sideOffset={6} collisionPadding={12} className="z-[100]">
-          <BasePopover.Popup className={cn(popupClass, "max-w-[calc(100vw-16px)] p-4")} style={{ width }}>
+          <BasePopover.Popup
+            ref={popupRef}
+            initialFocus={initialFocus === "popup" ? popupRef : undefined}
+            className={cn(popupClass, "max-w-[calc(100vw-16px)] p-4")}
+            style={{ width }}
+          >
             {title && <BasePopover.Title className="m-0 text-[13px] font-semibold">{title}</BasePopover.Title>}
             <div className={title ? "mt-2" : undefined}>{children}</div>
           </BasePopover.Popup>

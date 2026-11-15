@@ -1240,6 +1240,13 @@
               "description": "Alinhamento em relação ao gatilho."
             },
             {
+              "name": "initialFocus",
+              "type": "\"first\" | \"popup\" | undefined",
+              "required": false,
+              "default": "\"first\"",
+              "description": "Onde o foco entra ao abrir."
+            },
+            {
               "name": "onOpenChange",
               "type": "((open: boolean) => void) | undefined",
               "required": false,

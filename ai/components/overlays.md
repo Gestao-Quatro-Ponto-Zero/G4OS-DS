@@ -72,6 +72,7 @@ Popover genérico: gatilho + painel com título e conteúdo.
 | `trigger` * | `ReactNode` |  |  |
 | `triggerLabel` * | `string` |  |  |
 | `align` | `"start" \| "center" \| "end" \| undefined` | `"center"` | Alinhamento em relação ao gatilho. |
+| `initialFocus` | `"first" \| "popup" \| undefined` | `"first"` | Onde o foco entra ao abrir. |
 | `onOpenChange` | `((open: boolean) => void) \| undefined` |  |  |
 | `open` | `boolean \| undefined` |  | Controlado: estado aberto (use com onOpenChange, ex.: fechar ao escolher uma opção). |
 | `side` | `"top" \| "bottom" \| "left" \| "right" \| undefined` | `"bottom"` |  |
