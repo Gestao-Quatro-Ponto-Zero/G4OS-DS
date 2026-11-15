@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.1
+
+### Patch Changes
+
+- b5041f1: `Popover` aceita `initialFocus="popup"`: o foco entra no painel em vez do primeiro controle. Serve para painéis de leitura cujo primeiro botão fica no fim do conteúdo; o foco não rola a lista nem acende o anel num botão que a pessoa não escolheu.
+
 ## 0.14.0
 
 ### Minor Changes
