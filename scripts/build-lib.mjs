@@ -16,7 +16,7 @@ const list = (dir, ext) => readdirSync(join(root, dir)).filter((f) => ext.some((
 // Libs puras (sem React): saem SEM "use client", para rodar em Server Component,
 // rota de API ou script (ex.: buildPivot e formatCurrency no servidor). Uma lib
 // só entra aqui se nem ela nem o que importa usam React — o check abaixo garante.
-const serverSafe = ["cn", "color", "dates", "diff", "format", "geo-br", "office", "office-files", "pivot", "scale", "text"];
+const serverSafe = ["cn", "color", "dates", "diff", "format", "geo-br", "geo-maps", "office", "office-files", "pivot", "scale", "text"];
 const serverEntries = [join(root, "src/tokens/index.ts"), ...serverSafe.map((n) => join(root, "src/lib", `${n}.ts`))];
 const clientEntries = [join(root, "src/index.ts"), ...list("src/components", [".tsx", ".ts"]), ...list("src/lib", [".ts", ".tsx"]).filter((f) => !serverEntries.includes(f))];
 const entryPoints = [...clientEntries, ...serverEntries];
