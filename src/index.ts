@@ -97,6 +97,7 @@ export * from "./components/charts-kit";
 export * from "./components/charts-analytics";
 export * from "./lib/geo-br";
 export * from "./lib/geo-maps";
+export * from "./lib/geo-merge";
 export * from "./components/geo";
 export * from "./lib/pivot";
 export * from "./components/pivot";

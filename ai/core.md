@@ -176,6 +176,7 @@ Fundos `page · surface · popover · soft · rail` · texto `ink · ink-soft ·
 - **charts-analytics**: Gráficos analíticos de série temporal: · ConnectedScatter: duas medidas ao longo do tempo (CAC × LTV, preço × volume).
 - **lib-geo-br**: Contornos das 27 unidades da federação, prontos para SVG.
 - **lib-geo-maps**: Mapas além das 27 UFs, carregados sob demanda (cada um vira um pedaço do bundle e só desce quando a tela pede): · loadWorldCountries(): os países do mundo (Equal Earth) e o recorte de cada continente · loadBrMunicipios(u
+- **lib-geo-merge**: Junta regiões de um mapa em grupos, sem as divisas internas: municípios em regiões de venda, UFs em "Sudeste", países em "Mercosul".
 - **geo**: Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me
 - **lib-pivot**: Motor da tabela dinâmica (pivô).
 - **pivot**: Tabela dinâmica (pivô) para análise self-service: · PivotTable: desenha o resultado de `buildPivot()` (src/lib/pivot.ts) com cabeçalho e primeira coluna fixos, grupos recolhíveis, subtotais, total geral e sombreamento op

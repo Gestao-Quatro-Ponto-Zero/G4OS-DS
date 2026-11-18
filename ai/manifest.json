@@ -29837,6 +29837,38 @@
       "doc": "components/lib-geo-maps.md"
     },
     {
+      "name": "lib-geo-merge",
+      "file": "src/lib/geo-merge.ts",
+      "summary": "Junta regiões de um mapa em grupos, sem as divisas internas: municípios em regiões de venda, UFs em \"Sudeste\", países em \"Mercosul\".",
+      "exports": [
+        {
+          "name": "GeoGroup",
+          "kind": "type",
+          "summary": "Um grupo: o id que os valores usam, o nome que a tela mostra e os ids dos membros.",
+          "definition": "{ id: string; name?: string; members: readonly string[] }"
+        },
+        {
+          "name": "GeoMergeResult",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ regions: GeoRegion[]; unknown: string[]; }"
+        },
+        {
+          "name": "geoPathRings",
+          "kind": "function",
+          "summary": "Os anéis de um caminho SVG feito de retas.",
+          "signature": "geoPathRings(path): Point[][] | null"
+        },
+        {
+          "name": "mergeGeoRegions",
+          "kind": "function",
+          "summary": "Junta as regiões de cada grupo numa região só.",
+          "signature": "mergeGeoRegions(regions, groups): GeoMergeResult"
+        }
+      ],
+      "doc": "components/lib-geo-merge.md"
+    },
+    {
       "name": "geo",
       "file": "src/components/geo.tsx",
       "summary": "Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me",
