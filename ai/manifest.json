@@ -29782,6 +29782,61 @@
       "doc": "components/lib-geo-br.md"
     },
     {
+      "name": "lib-geo-maps",
+      "file": "src/lib/geo-maps.ts",
+      "summary": "Mapas além das 27 UFs, carregados sob demanda (cada um vira um pedaço do bundle e só desce quando a tela pede): · loadWorldCountries(): os países do mundo (Equal Earth) e o recorte de cada continente · loadBrMunicipios(u",
+      "exports": [
+        {
+          "name": "BrMunicipiosMap",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ uf: BrUfId; viewBox: string; municipios: readonly GeoShape[] }"
+        },
+        {
+          "name": "GeoShape",
+          "kind": "type",
+          "summary": "Uma região desenhável: contorno SVG, centróide e caixa da maior parte.",
+          "definition": "{ id: string; name: string; path: string; centroid: readonly [number, number]; bbox: readonly [number, number, number, number]; }"
+        },
+        {
+          "name": "loadBrMunicipios",
+          "kind": "function",
+          "summary": "Municípios de uma UF (malha do IBGE; id = código de 7 dígitos).",
+          "signature": "loadBrMunicipios(uf): Promise<BrMunicipiosMap>"
+        },
+        {
+          "name": "loadWorldCountries",
+          "kind": "function",
+          "summary": "Países do mundo (Natural Earth 1:50m, sem a Antártida).",
+          "signature": "loadWorldCountries(): Promise<WorldMap>"
+        },
+        {
+          "name": "WorldContinent",
+          "kind": "type",
+          "summary": "Continentes do mapa-múndi (a Rússia fica na Europa; Turquia e Cáucaso, na Ásia).",
+          "definition": "\"África\" | \"América do Norte\" | \"América do Sul\" | \"Ásia\" | \"Europa\" | \"Oceania\""
+        },
+        {
+          "name": "worldContinents",
+          "kind": "const",
+          "summary": null
+        },
+        {
+          "name": "WorldCountry",
+          "kind": "type",
+          "summary": "Um país: id ISO 3166-1 alfa-2 (\"BR\"), nome em português e continente.",
+          "definition": "GeoShape & { continent: WorldContinent }"
+        },
+        {
+          "name": "WorldMap",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ viewBox: string; countries: readonly WorldCountry[]; continentViewBoxes: Readonly<Record<WorldContinent, string>>; }"
+        }
+      ],
+      "doc": "components/lib-geo-maps.md"
+    },
+    {
       "name": "geo",
       "file": "src/components/geo.tsx",
       "summary": "Mapas coropléticos (região pintada pela intensidade de um número): · ChoroplethMap: mapa em SVG com escala em degraus, legenda que destaca a faixa, tooltip, seleção com zoom e navegação por setas · RankedRegionList: a me",
@@ -29853,6 +29908,20 @@
               "required": false,
               "default": null,
               "description": null
+            },
+            {
+              "name": "markerBelow",
+              "type": "number | undefined",
+              "required": false,
+              "default": "14",
+              "description": "Abaixo deste lado em px, a região ganha o círculo de toque (padrão 14)."
+            },
+            {
+              "name": "markers",
+              "type": "\"none\" | \"all\" | \"with-value\" | undefined",
+              "required": false,
+              "default": "\"all\"",
+              "description": "Círculo de toque sobre as regiões pequenas demais para o dedo (DF, ilhas)."
             },
             {
               "name": "maxHeight",
