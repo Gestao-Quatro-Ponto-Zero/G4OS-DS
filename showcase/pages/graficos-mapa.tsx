@@ -15,6 +15,7 @@ import {
   formatPercent,
   loadBrMunicipios,
   loadWorldCountries,
+  mergeGeoRegions,
   useLinkedHighlight,
   type BrMunicipiosMap,
   type WorldContinent,
@@ -129,6 +130,31 @@ function MunicipiosDemo() {
   );
 }
 
+const revenueByRegion: Record<string, number> = { Sudeste: 18_400_000, Sul: 6_100_000, Nordeste: 4_300_000, "Centro-Oeste": 3_200_000, Norte: 900_000 };
+
+function GroupsDemo() {
+  const hl = useLinkedHighlight<string>();
+  const regions = useMemo(
+    () => mergeGeoRegions(brUfs, Object.entries(brRegions).map(([id, members]) => ({ id, members }))).regions,
+    [],
+  );
+  return (
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <ChoroplethMap
+        label="Receita por região do Brasil"
+        regions={regions}
+        values={revenueByRegion}
+        scale={{ breaks: "quantile", steps: 3 }}
+        format={brl}
+        valueLabel="Receita"
+        regionLabel="Região"
+        highlight={hl}
+      />
+      <RankedRegionList label="Receita por região, da maior à menor" values={revenueByRegion} regions={regions} scale={{ breaks: "quantile", steps: 3 }} format={brl} highlight={hl} />
+    </div>
+  );
+}
+
 export default function Page() {
   const hl = useLinkedHighlight<string>();
   const [uf, setUf] = useState<string | null>("MG");
@@ -221,6 +247,7 @@ const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
             ["legend / showLabels / height", "boolean / boolean / number", "true / true / proporção", "Legenda em degraus (hover destaca a faixa); siglas nas UFs que cabem."],
             ["markers / markerBelow", "\"all\" | \"with-value\" | \"none\" / number", "all / 14", "Círculo de toque nas regiões menores que markerBelow px. with-value: só nas que têm dado (mundo, com 8); none: municípios."],
             ["loadWorldCountries / loadBrMunicipios", "() => Promise<WorldMap> / (uf) => Promise<BrMunicipiosMap>", "—", "Formas do mundo (com continentViewBoxes) e dos municípios de uma UF, carregadas sob demanda."],
+            ["mergeGeoRegions", "(regions, groups: { id, name?, members }[]) => { regions, unknown }", "—", "Junta as regiões de cada grupo sem as divisas internas (regiões de venda, grandes regiões, blocos de países)."],
             ["RankedRegionList", "label, values, scale?, format?, highlight?, limit?, hint?", "—", "Mesma escala do mapa (quadradinho de cor), barra proporcional e posição."],
             ["choroplethScale", "(values, options) => ChoroplethScale", "—", "A escala usada pelos dois: thresholds, color(v), bin(v)."],
           ]}
@@ -260,6 +287,27 @@ useEffect(() => { void loadBrMunicipios("SP").then(setMapa); }, []); // SP ~40 K
         >
           <ChartCard title="Onde estão os leads em São Paulo?" description={`Leads por município · ${formatNumber(Object.keys(leadsBySpCity).length)} cidades com lead`}>
             <MunicipiosDemo />
+          </ChartCard>
+        </Demo>
+      </DocSection>
+
+      <DocSection
+        title="Regiões sob medida"
+        rule="mergeGeoRegions(regiões, grupos) junta as regiões de cada grupo numa só, sem as divisas internas: municípios em regiões de venda, UFs em grandes regiões, países em blocos. Roda no navegador sobre as formas já carregadas. Membro que não existe volta em unknown."
+      >
+        <Demo
+          bare
+          code={`const { regions, unknown } = mergeGeoRegions(brUfs, [
+  { id: "Sudeste", members: ["ES", "MG", "RJ", "SP"] },
+  { id: "Sul", members: ["PR", "RS", "SC"] },
+]);
+// Municípios: mergeGeoRegions(mapa.municipios, [{ id: "Grande SP", members: ["3550308", "3518800"] }])
+// Países: mergeGeoRegions(mapa.countries, [{ id: "Mercosul", members: ["BR", "AR", "UY", "PY"] }])
+
+<ChoroplethMap label="Receita por região" regions={regions} values={{ Sudeste: 18.4e6, Sul: 6.1e6 }} regionLabel="Região" />`}
+        >
+          <ChartCard title="Onde está a receita?" description="Receita por região · 2026">
+            <GroupsDemo />
           </ChartCard>
         </Demo>
       </DocSection>

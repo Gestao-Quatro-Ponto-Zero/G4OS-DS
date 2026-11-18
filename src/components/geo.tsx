@@ -401,10 +401,13 @@ export function ChoroplethMap({
     return true;
   };
 
-  // Tooltip: centróide da região ativa em pixels do contêiner.
+  // Tooltip: centróide da região sob o mouse ou o foco, em pixels do contêiner. Uma região
+  // fixada (clique na lista ou no mapa) segue destacada, mas sem balão parado sobre o mapa.
+  const tipId = hl.hovered !== undefined ? hl.hovered : hl.active;
+  const tipRegion = tipId ? regions.find((r) => r.id === tipId) : undefined;
   let tip: { x: number; y: number; below: boolean } | null = null;
-  if (active && s && active.id !== zoomTo) {
-    const [cx, cy] = centerOf(active, base);
+  if (tipRegion && s && tipRegion.id !== zoomTo) {
+    const [cx, cy] = centerOf(tipRegion, base);
     const x = ox + (cx - vb[0]) * s;
     const y = oy + (cy - vb[1]) * s;
     tip = { x: Math.max(84, Math.min(W - 84, x)), y, below: y < 80 };
@@ -579,15 +582,15 @@ export function ChoroplethMap({
             <ArrowLeft aria-hidden /> {zoomOutLabel}
           </Button>
         ) : null}
-        {tip && active ? (
+        {tip && tipRegion ? (
           <div
             aria-hidden
             className="pointer-events-none absolute z-10 w-max max-w-[240px]"
             style={{ left: tip.x, top: tip.y, transform: tip.below ? "translate(-50%, 14px)" : "translate(-50%, calc(-100% - 14px))" }}
           >
             <ChartTooltipContent
-              label={active.name}
-              items={[{ label: valueLabel, value: isNum(activeValue) ? format(activeValue) : "Sem dado", color: scale.color(activeValue) ?? "var(--color-soft)" }]}
+              label={tipRegion.name}
+              items={[{ label: valueLabel, value: isNum(values[tipRegion.id]) ? format(values[tipRegion.id] as number) : "Sem dado", color: scale.color(values[tipRegion.id]) ?? "var(--color-soft)" }]}
             />
           </div>
         ) : null}
