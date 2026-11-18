@@ -299,6 +299,15 @@ export type ChoroplethMapProps = {
   formatLegend?: (n: number) => string;
   /** Sigla sobre as regiões que cabem (padrão: sim). */
   showLabels?: boolean;
+  /**
+   * Círculo de toque sobre as regiões pequenas demais para o dedo (DF, ilhas).
+   * `all` (padrão) em todas; `with-value` só nas que têm dado (mapa-múndi:
+   * o Caribe sem dado não vira uma nuvem de pontos); `none` em nenhuma
+   * (municípios: a lista ao lado é o caminho para as pequenas).
+   */
+  markers?: "all" | "with-value" | "none";
+  /** Abaixo deste lado em px, a região ganha o círculo de toque (padrão 14). No mundo, 8: só as minúsculas. */
+  markerBelow?: number;
   /** Altura em px. Padrão: proporção do viewBox, até `maxHeight`. */
   height?: number;
   /** Teto da altura automática (recortes altos, como o Nordeste). */
@@ -332,6 +341,8 @@ export function ChoroplethMap({
   legendTitle,
   formatLegend,
   showLabels = true,
+  markers = "all",
+  markerBelow = 14,
   height,
   maxHeight = 640,
   className,
@@ -361,6 +372,7 @@ export function ChoroplethMap({
   const ox = W ? (W - vb[2] * s) / 2 : 0;
   const oy = H ? (H - vb[3] * s) / 2 : 0;
   const zoomFactor = base[2] / vb[2];
+  const hatch = s ? 3.5 / s : 6 / zoomFactor;
 
   const valueText = (id: string) => (isNum(values[id]) ? format(values[id] as number) : "Sem dado");
   const dimmed = (id: string) => {
@@ -399,7 +411,7 @@ export function ChoroplethMap({
   }
 
   const srRows = useMemo(() => [...regions].sort((a, b) => a.name.localeCompare(b.name, "pt-BR")).map((r) => ({ [regionLabel]: r.name, v: values[r.id] ?? null })), [regions, values, regionLabel]);
-  const minTarget = 14; // px: abaixo disso a região ganha um círculo de toque
+  const minTarget = markerBelow; // px: abaixo disso a região ganha um círculo de toque
 
   const legendFormat = formatLegend ?? format;
   return (
@@ -424,9 +436,10 @@ export function ChoroplethMap({
       <div ref={boxRef} className="relative w-full" style={height ? { height } : { aspectRatio: `${base[2]} / ${base[3]}`, maxHeight: maxHeight }}>
         <svg viewBox={vb.join(" ")} preserveAspectRatio="xMidYMid meet" role="group" aria-label={label} className="block h-full w-full overflow-hidden">
           <defs>
-            <pattern id={hatchId} width={6 / zoomFactor} height={6 / zoomFactor} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <rect width={6 / zoomFactor} height={6 / zoomFactor} fill="var(--color-soft)" />
-              <line x1={0} y1={0} x2={0} y2={6 / zoomFactor} stroke="var(--color-line-strong)" strokeWidth={1.5 / zoomFactor} />
+            {/* Hachura com passo fixo em px: igual no Brasil, num continente ou numa UF por município. */}
+            <pattern id={hatchId} width={hatch} height={hatch} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width={hatch} height={hatch} fill="var(--color-soft)" />
+              <line x1={0} y1={0} x2={0} y2={hatch} stroke="var(--color-line-strong)" strokeWidth={hatch / 4} />
             </pattern>
           </defs>
           {/* Contorno do país em line (UFs claras não somem no fundo): o traço largo
@@ -476,8 +489,9 @@ export function ChoroplethMap({
           })}
           {/* Alvo mínimo de toque (DF, ilhas pequenas): círculo sobre o centróide. */}
           {s > 0 &&
+            markers !== "none" &&
             regions.map((r) => {
-              if (!r.bbox) return null;
+              if (!r.bbox || (markers === "with-value" && !isNum(values[r.id]))) return null;
               const w = (r.bbox[2] - r.bbox[0]) * s;
               const h = (r.bbox[3] - r.bbox[1]) * s;
               if (Math.min(w, h) >= minTarget) return null;

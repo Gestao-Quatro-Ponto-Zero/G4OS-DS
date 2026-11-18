@@ -1,12 +1,32 @@
-import { useState } from "react";
-import { ChartCard, ChoroplethMap, RankedRegionList, brRegions, brUfs, fitGeoViewBox, formatCompact, formatCurrency, formatDelta, formatPercent, useLinkedHighlight } from "@g4ai/ds";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ChartCard,
+  ChoroplethMap,
+  RankedRegionList,
+  Select,
+  Skeleton,
+  brRegions,
+  brUfs,
+  fitGeoViewBox,
+  formatCompact,
+  formatCurrency,
+  formatDelta,
+  formatNumber,
+  formatPercent,
+  loadBrMunicipios,
+  loadWorldCountries,
+  useLinkedHighlight,
+  type BrMunicipiosMap,
+  type WorldContinent,
+  type WorldMap,
+} from "@g4ai/ds";
 import { Demo, DocPage, DocSection, PropsTable, Rules, type PageMeta } from "../kit";
 
 export const meta: PageMeta = {
   title: "Mapa por estado",
   group: "Gráficos",
   order: 25,
-  description: "ChoroplethMap pinta as 27 UFs pela intensidade de um número, em degraus, e RankedRegionList mostra o mesmo dado como lista ordenada, ligada ao mapa. Para receita, clientes ou crescimento por estado.",
+  description: "ChoroplethMap pinta as 27 UFs pela intensidade de um número, em degraus, e RankedRegionList mostra o mesmo dado como lista ordenada, ligada ao mapa. Para receita, clientes ou crescimento por estado, por país ou por município.",
 };
 
 // Receita mensal por UF (R$), dados de exemplo.
@@ -24,6 +44,90 @@ const brl = (n: number) => formatCurrency(n, { compact: true });
 const quantile = { breaks: "quantile" } as const;
 const south = brUfs.filter((u) => brRegions.Sul.includes(u.id));
 const southBox = fitGeoViewBox(south);
+
+// Clientes por país (ISO 3166-1 alfa-2), dados de exemplo.
+const clientsByCountry: Record<string, number> = {
+  BR: 1240, AR: 182, CL: 140, CO: 121, MX: 166, PE: 64, UY: 38, PY: 22, US: 96, CA: 18, PT: 74, ES: 41, GB: 22, DE: 15, FR: 12, IT: 9, AO: 16, MZ: 11, ZA: 6, JP: 5, IN: 4, AU: 7,
+};
+// Leads por município de SP (código IBGE), dados de exemplo.
+const leadsBySpCity: Record<string, number> = {
+  "3550308": 2140, "3509502": 412, "3548500": 188, "3543402": 205, "3549904": 231, "3552205": 167, "3518800": 154, "3547809": 121,
+  "3534401": 133, "3506003": 74, "3548708": 142, "3525904": 118, "3538709": 96, "3516200": 41, "3541406": 38,
+};
+type ContinentFilter = WorldContinent | "Mundo";
+
+function WorldDemo() {
+  const hl = useLinkedHighlight<string>();
+  const [map, setMap] = useState<WorldMap | null>(null);
+  const [continent, setContinent] = useState<ContinentFilter>("Mundo");
+  useEffect(() => {
+    let live = true;
+    void loadWorldCountries().then((m) => live && setMap(m));
+    return () => {
+      live = false;
+    };
+  }, []);
+  const shown = useMemo(() => (map ? map.countries.filter((c) => continent === "Mundo" || c.continent === continent) : []), [map, continent]);
+  const values = useMemo(() => Object.fromEntries(Object.entries(clientsByCountry).filter(([id]) => shown.some((c) => c.id === id))), [shown]);
+  // Só os continentes com dado viram opção.
+  const options = useMemo(() => {
+    const withData = new Set(map?.countries.filter((c) => clientsByCountry[c.id] !== undefined).map((c) => c.continent));
+    return [{ value: "Mundo", label: "Mundo" }, ...[...withData].sort().map((c) => ({ value: c, label: c }))];
+  }, [map]);
+  if (!map) return <Skeleton className="h-80 w-full" />;
+  return (
+    <div className="flex flex-col gap-4">
+      <Select label="Continente" hideLabel size="compact" className="w-48" options={options} value={continent} onValueChange={(v) => setContinent(v as ContinentFilter)} />
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <ChoroplethMap
+          label="Clientes por país"
+          regions={map.countries}
+          viewBox={continent === "Mundo" ? map.viewBox : map.continentViewBoxes[continent]}
+          values={values}
+          scale={{ tone: "info", breaks: "quantile" }}
+          valueLabel="Clientes"
+          regionLabel="País"
+          markers="with-value"
+          markerBelow={8}
+          highlight={hl}
+        />
+        <RankedRegionList label="Clientes por país, do maior ao menor" values={values} regions={shown.filter((c) => values[c.id] !== undefined)} scale={{ tone: "info", breaks: "quantile" }} highlight={hl} limit={8} />
+      </div>
+    </div>
+  );
+}
+
+function MunicipiosDemo() {
+  const hl = useLinkedHighlight<string>();
+  const [map, setMap] = useState<BrMunicipiosMap | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadBrMunicipios("SP").then((m) => live && setMap(m));
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (!map) return <Skeleton className="h-80 w-full" />;
+  const listed = map.municipios.filter((m) => leadsBySpCity[m.id] !== undefined);
+  return (
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <ChoroplethMap
+        label="Leads por município de São Paulo"
+        regions={map.municipios}
+        viewBox={map.viewBox}
+        values={leadsBySpCity}
+        scale={{ tone: "info", breaks: "quantile" }}
+        valueLabel="Leads"
+        regionLabel="Município"
+        showLabels={false}
+        markers="none"
+        zoomOutLabel="Voltar ao estado"
+        highlight={hl}
+      />
+      <RankedRegionList label="Leads por município, do maior ao menor" values={leadsBySpCity} regions={listed} scale={{ tone: "info", breaks: "quantile" }} highlight={hl} limit={8} />
+    </div>
+  );
+}
 
 export default function Page() {
   const hl = useLinkedHighlight<string>();
@@ -115,10 +219,49 @@ const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
             ["highlight", "LinkedHighlight<string>", "—", "useLinkedHighlight compartilhado com RankedRegionList ou uma tabela."],
             ["zoomTo / onZoomOut", "string | null / () => void", "—", "Aproxima a UF (transição curta; movimento reduzido vai direto) e mostra “Voltar ao Brasil”."],
             ["legend / showLabels / height", "boolean / boolean / number", "true / true / proporção", "Legenda em degraus (hover destaca a faixa); siglas nas UFs que cabem."],
+            ["markers / markerBelow", "\"all\" | \"with-value\" | \"none\" / number", "all / 14", "Círculo de toque nas regiões menores que markerBelow px. with-value: só nas que têm dado (mundo, com 8); none: municípios."],
+            ["loadWorldCountries / loadBrMunicipios", "() => Promise<WorldMap> / (uf) => Promise<BrMunicipiosMap>", "—", "Formas do mundo (com continentViewBoxes) e dos municípios de uma UF, carregadas sob demanda."],
             ["RankedRegionList", "label, values, scale?, format?, highlight?, limit?, hint?", "—", "Mesma escala do mapa (quadradinho de cor), barra proporcional e posição."],
             ["choroplethScale", "(values, options) => ChoroplethScale", "—", "A escala usada pelos dois: thresholds, color(v), bin(v)."],
           ]}
         />
+      </DocSection>
+
+      <DocSection
+        title="Mundo por país, com continente"
+        rule="loadWorldCountries() traz os países (id ISO alfa-2, nome em português) e o recorte de cada continente. O filtro só oferece continentes com dado. Países pequenos com dado ganham o círculo de toque (markers=&quot;with-value&quot;)."
+      >
+        <Demo
+          bare
+          code={`const [mapa, setMapa] = useState<WorldMap | null>(null);
+useEffect(() => { void loadWorldCountries().then(setMapa); }, []); // ~20 KB com gzip, só quando a tela pede
+
+<ChoroplethMap label="Clientes por país" regions={mapa.countries}
+  viewBox={continente === "Mundo" ? mapa.viewBox : mapa.continentViewBoxes[continente]}
+  values={{ BR: 1240, AR: 182, PT: 74 }} regionLabel="País" markers="with-value" markerBelow={8} highlight={hl} />`}
+        >
+          <ChartCard title="Onde estão os clientes?" description="Clientes ativos por país · outubro de 2026">
+            <WorldDemo />
+          </ChartCard>
+        </Demo>
+      </DocSection>
+
+      <DocSection
+        title="Municípios de uma UF"
+        rule="loadBrMunicipios(uf) traz os municípios da UF com o código IBGE de 7 dígitos como id. Centenas de regiões pequenas: sem siglas e sem círculos de toque; a lista ao lado leva às pequenas."
+      >
+        <Demo
+          bare
+          code={`const [mapa, setMapa] = useState<BrMunicipiosMap | null>(null);
+useEffect(() => { void loadBrMunicipios("SP").then(setMapa); }, []); // SP ~40 KB com gzip
+
+<ChoroplethMap label="Leads por município de São Paulo" regions={mapa.municipios} viewBox={mapa.viewBox}
+  values={{ "3550308": 2140, "3509502": 412 }} regionLabel="Município" showLabels={false} markers="none" />`}
+        >
+          <ChartCard title="Onde estão os leads em São Paulo?" description={`Leads por município · ${formatNumber(Object.keys(leadsBySpCity).length)} cidades com lead`}>
+            <MunicipiosDemo />
+          </ChartCard>
+        </Demo>
       </DocSection>
 
       <DocSection title="Teclado e acessibilidade">

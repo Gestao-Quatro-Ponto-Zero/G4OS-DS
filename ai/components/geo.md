@@ -19,6 +19,8 @@ Mapa coroplético (padrão: Brasil por UF).
 | `highlight` | `LinkedHighlight<string> \| undefined` |  | Realce compartilhado com outra vista (`useLinkedHighlight`): substitui `selected`/`onSelect`. |
 | `legend` | `boolean \| undefined` | `true` | Legenda em degraus acima do mapa, com o fim da escala (passar o mouse destaca a faixa). |
 | `legendTitle` | `ReactNode` |  |  |
+| `markerBelow` | `number \| undefined` | `14` | Abaixo deste lado em px, a região ganha o círculo de toque (padrão 14). |
+| `markers` | `"none" \| "all" \| "with-value" \| undefined` | `"all"` | Círculo de toque sobre as regiões pequenas demais para o dedo (DF, ilhas). |
 | `maxHeight` | `number \| undefined` | `640` | Teto da altura automática (recortes altos, como o Nordeste). |
 | `onSelect` | `((id: string \| null) => void) \| undefined` |  | Clique ou Enter numa região (de novo na mesma solta: `null`). |
 | `onZoomOut` | `(() => void) \| undefined` |  | Ação do botão de voltar que aparece com zoom. |
