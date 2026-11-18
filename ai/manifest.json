@@ -29312,7 +29312,7 @@
           "name": "LinkedHighlight",
           "kind": "type",
           "summary": null,
-          "definition": "{ active: K | null; pinned: K | null; setPinned: (k: K | null) => void; setHover: (k: K | null) => void; isDimmed: (k: K) => boolean; bind: (k: K) => { onMouseEnter: () => void; onMouseLeave: () => void; onFocus: () => void; onBlur: () => void; onClick: () => void; onKeyDown: (e: KeyboardEvent) => void; \"data-active\": boolean | undefined; \"data-dimmed\": boolean | undefined; }; }"
+          "definition": "{ active: K | null; pinned: K | null; hovered?: K | null; setPinned: (k: K | null) => void; setHover: (k: K | null) => void; isDimmed: (k: K) => boolean; bind: (k: K) => { onMouseEnter: () => void; onMouseLeave: () => void; onFocus: () => void; onBlur: () => void; onClick: () => void; onKeyDown: (e: KeyboardEvent) => void; \"data-active\": boolean | undefined; \"data-dimmed\": boolean | undefined; …"
         },
         {
           "name": "ScaleLegend",

@@ -253,6 +253,12 @@ export type LinkedHighlight<K extends string | number> = {
   active: K | null;
   /** Item fixado por clique/Enter (ou null). */
   pinned: K | null;
+  /**
+   * Item sob o mouse ou com o foco agora (ou null). Tooltip segue este, não o
+   * fixado: um item fixado continua destacado, mas o balão some quando o mouse sai.
+   * Opcional para quem monta o próprio destaque; sem ele, vale `active`.
+   */
+  hovered?: K | null;
   setPinned: (k: K | null) => void;
   setHover: (k: K | null) => void;
   /** Esmaecido: há destaque e não é este. */
@@ -298,6 +304,7 @@ export function useLinkedHighlight<K extends string | number>({
     () => ({
       active,
       pinned,
+      hovered: hover,
       setPinned,
       setHover,
       isDimmed: (k: K) => active != null && active !== k,
@@ -320,6 +327,6 @@ export function useLinkedHighlight<K extends string | number>({
         "data-dimmed": (active != null && active !== k) || undefined,
       }),
     }),
-    [active, pinned, setPinned],
+    [active, pinned, hover, setPinned],
   );
 }

@@ -42,7 +42,7 @@ type ChartScrubberProps = { count: number; index: number; onIndexChange: (index:
 ## LinkedHighlight (type)
 
 ```ts
-type LinkedHighlight = { active: K | null; pinned: K | null; setPinned: (k: K | null) => void; setHover: (k: K | null) => void; isDimmed: (k: K) => boolean; bind: (k: K) => { onMouseEnter: () => void; onMouseLeave: () => void; onFocus: () => void; onBlur: () => void; onClick: () => void; onKeyDown: (e: KeyboardEvent) => void; "data-active": boolean | undefined; "data-dimmed": boolean | undefined; }; }
+type LinkedHighlight = { active: K | null; pinned: K | null; hovered?: K | null; setPinned: (k: K | null) => void; setHover: (k: K | null) => void; isDimmed: (k: K) => boolean; bind: (k: K) => { onMouseEnter: () => void; onMouseLeave: () => void; onFocus: () => void; onBlur: () => void; onClick: () => void; onKeyDown: (e: KeyboardEvent) => void; "data-active": boolean | undefined; "data-dimmed": boolean | undefined; …
 ```
 
 ## ScaleLegend
