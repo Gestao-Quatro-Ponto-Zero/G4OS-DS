@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.16.0
+
+### Minor Changes
+
+- 5ec7ca1: `mergeGeoRegions(regiões, grupos)` junta regiões de um mapa em grupos, sem as divisas internas: municípios em regiões de venda, UFs em grandes regiões, países em blocos. Roda no navegador sobre as formas que o `ChoroplethMap` já usa (UFs, mundo e municípios), sem dado novo. Membros que não existem voltam em `unknown`. `geoPathRings(path)` lê os anéis de um caminho SVG de retas.
+
+### Patch Changes
+
+- 5ec7ca1: `ChoroplethMap`: o balão segue só o mouse e o foco. Uma região fixada por clique (no mapa ou na `RankedRegionList`) continua destacada, mas o balão some quando o mouse sai. `LinkedHighlight` ganha `hovered`, opcional.
+
 ## 0.15.0
 
 ### Minor Changes
