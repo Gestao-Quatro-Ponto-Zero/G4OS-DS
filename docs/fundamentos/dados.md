@@ -54,6 +54,7 @@ Em código: `chartColor(i)` devolve `var(--color-chart-N)`; em TS fora do CSS, `
 | Onde no Brasil? (por UF) | mapa coroplético + lista ordenada | `ChoroplethMap` + `RankedRegionList` |
 | Onde no mundo? (por país, com filtro de continente) | mapa coroplético + lista ordenada | `ChoroplethMap` com `loadWorldCountries()` + `RankedRegionList` |
 | Onde dentro de um estado? (por município) | mapa coroplético + lista ordenada | `ChoroplethMap` com `loadBrMunicipios(uf)` + `RankedRegionList` |
+| Onde dentro de um estado? (por DDD) | mapa coroplético + lista ordenada | `ChoroplethMap` com `loadBrDdd(uf)` + `RankedRegionList` |
 | Análise livre (linhas × colunas × medidas) | tabela dinâmica | `PivotBuilder` / `PivotTable` |
 
 Peças compartilhadas em `charts-kit.tsx`: `ScaleLegend` (escala em degraus ou contínua, com hover que destaca a faixa), `ChartScrubber` (controle de tempo acessível, com tocar), `AxisBreak` e `useLinkedHighlight` (realce ligado entre gráfico e lista: hover/foco destaca, clique fixa, Esc solta).

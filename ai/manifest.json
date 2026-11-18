@@ -29787,6 +29787,18 @@
       "summary": "Mapas além das 27 UFs, carregados sob demanda (cada um vira um pedaço do bundle e só desce quando a tela pede): · loadWorldCountries(): os países do mundo (Equal Earth) e o recorte de cada continente · loadBrMunicipios(u",
       "exports": [
         {
+          "name": "BrDddMap",
+          "kind": "type",
+          "summary": null,
+          "definition": "{ uf: BrUfId; viewBox: string; ddds: readonly BrDddShape[] }"
+        },
+        {
+          "name": "BrDddShape",
+          "kind": "type",
+          "summary": "Uma região de DDD: id = o DDD (\"11\"), nome \"DDD 11\" e quantos municípios ela junta.",
+          "definition": "GeoShape & { municipios: number }"
+        },
+        {
           "name": "BrMunicipiosMap",
           "kind": "type",
           "summary": null,
@@ -29797,6 +29809,12 @@
           "kind": "type",
           "summary": "Uma região desenhável: contorno SVG, centróide e caixa da maior parte.",
           "definition": "{ id: string; name: string; path: string; centroid: readonly [number, number]; bbox: readonly [number, number, number, number]; }"
+        },
+        {
+          "name": "loadBrDdd",
+          "kind": "function",
+          "summary": "Regiões de DDD de uma UF: cada uma é a união dos seus municípios, no mesmo viewBox de `loadBrMunicipios(uf)`.",
+          "signature": "loadBrDdd(uf): Promise<BrDddMap>"
         },
         {
           "name": "loadBrMunicipios",
