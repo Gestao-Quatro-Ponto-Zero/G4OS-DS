@@ -4,7 +4,6 @@
  *   · loadWorldCountries(): os países do mundo (Equal Earth) e o recorte de
  *     cada continente
  *   · loadBrMunicipios(uf): os municípios de uma UF, com o código IBGE como id
- *   · loadBrDdd(uf): as regiões de DDD de uma UF, com o DDD como id
  * As formas servem direto ao ChoroplethMap (`regions` e `viewBox`).
  * Dados em src/lib/geo-data, gerados pelos scripts de scripts/data.
  */
@@ -82,50 +81,4 @@ const MUNICIPIOS: Record<BrUfId, () => Promise<MunModule>> = {
 export async function loadBrMunicipios(uf: BrUfId): Promise<BrMunicipiosMap> {
   const m = await MUNICIPIOS[uf]();
   return { uf, viewBox: m.viewBox, municipios: m.municipios };
-}
-
-/** Uma região de DDD: id = o DDD ("11"), nome "DDD 11" e quantos municípios ela junta. */
-export type BrDddShape = GeoShape & { municipios: number };
-
-export type BrDddMap = { uf: BrUfId; viewBox: string; ddds: readonly BrDddShape[] };
-
-type DddModule = { viewBox: string; ddds: readonly BrDddShape[] };
-const DDDS: Record<BrUfId, () => Promise<DddModule>> = {
-  AC: () => import("./geo-data/br-ddd/AC"),
-  AL: () => import("./geo-data/br-ddd/AL"),
-  AM: () => import("./geo-data/br-ddd/AM"),
-  AP: () => import("./geo-data/br-ddd/AP"),
-  BA: () => import("./geo-data/br-ddd/BA"),
-  CE: () => import("./geo-data/br-ddd/CE"),
-  DF: () => import("./geo-data/br-ddd/DF"),
-  ES: () => import("./geo-data/br-ddd/ES"),
-  GO: () => import("./geo-data/br-ddd/GO"),
-  MA: () => import("./geo-data/br-ddd/MA"),
-  MG: () => import("./geo-data/br-ddd/MG"),
-  MS: () => import("./geo-data/br-ddd/MS"),
-  MT: () => import("./geo-data/br-ddd/MT"),
-  PA: () => import("./geo-data/br-ddd/PA"),
-  PB: () => import("./geo-data/br-ddd/PB"),
-  PE: () => import("./geo-data/br-ddd/PE"),
-  PI: () => import("./geo-data/br-ddd/PI"),
-  PR: () => import("./geo-data/br-ddd/PR"),
-  RJ: () => import("./geo-data/br-ddd/RJ"),
-  RN: () => import("./geo-data/br-ddd/RN"),
-  RO: () => import("./geo-data/br-ddd/RO"),
-  RR: () => import("./geo-data/br-ddd/RR"),
-  RS: () => import("./geo-data/br-ddd/RS"),
-  SC: () => import("./geo-data/br-ddd/SC"),
-  SE: () => import("./geo-data/br-ddd/SE"),
-  SP: () => import("./geo-data/br-ddd/SP"),
-  TO: () => import("./geo-data/br-ddd/TO"),
-};
-
-/**
- * Regiões de DDD de uma UF: cada uma é a união dos seus municípios, no mesmo
- * viewBox de `loadBrMunicipios(uf)`. Um DDD que cruza a divisa aparece nas
- * duas UFs (61: DF e entorno de GO). De 1 a 5 KB com gzip.
- */
-export async function loadBrDdd(uf: BrUfId): Promise<BrDddMap> {
-  const m = await DDDS[uf]();
-  return { uf, viewBox: m.viewBox, ddds: m.ddds };
 }

@@ -4,20 +4,6 @@ Arquivo: `src/lib/geo-maps.ts` · importe de `@g4ai/ds`.
 
 Mapas além das 27 UFs, carregados sob demanda (cada um vira um pedaço do bundle e só desce quando a tela pede): · loadWorldCountries(): os países do mundo (Equal Earth) e o recorte de cada continente · loadBrMunicipios(u
 
-## BrDddMap (type)
-
-```ts
-type BrDddMap = { uf: BrUfId; viewBox: string; ddds: readonly BrDddShape[] }
-```
-
-## BrDddShape (type)
-
-Uma região de DDD: id = o DDD ("11"), nome "DDD 11" e quantos municípios ela junta.
-
-```ts
-type BrDddShape = GeoShape & { municipios: number }
-```
-
 ## BrMunicipiosMap (type)
 
 ```ts
@@ -30,24 +16,6 @@ Uma região desenhável: contorno SVG, centróide e caixa da maior parte.
 
 ```ts
 type GeoShape = { id: string; name: string; path: string; centroid: readonly [number, number]; bbox: readonly [number, number, number, number]; }
-```
-
-## loadBrDdd (function)
-
-Regiões de DDD de uma UF: cada uma é a união dos seus municípios, no mesmo viewBox de `loadBrMunicipios(uf)`.
-
-```ts
-loadBrDdd(uf): Promise<BrDddMap>
-```
-
-Exemplo (showcase `#/p/graficos-mapa`):
-
-```tsx
-const [mapa, setMapa] = useState<BrDddMap | null>(null);
-useEffect(() => { void loadBrDdd("SP").then(setMapa); }, []); // SP ~4 KB com gzip
-
-<ChoroplethMap label="Leads por DDD de São Paulo" regions={mapa.ddds} viewBox={mapa.viewBox}
-  values={{ "11": 2140, "19": 655, "16": 342 }} regionLabel="DDD" highlight={hl} />
 ```
 
 ## loadBrMunicipios (function)

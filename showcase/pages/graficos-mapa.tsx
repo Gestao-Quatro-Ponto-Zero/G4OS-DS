@@ -13,11 +13,9 @@ import {
   formatDelta,
   formatNumber,
   formatPercent,
-  loadBrDdd,
   loadBrMunicipios,
   loadWorldCountries,
   useLinkedHighlight,
-  type BrDddMap,
   type BrMunicipiosMap,
   type WorldContinent,
   type WorldMap,
@@ -131,37 +129,6 @@ function MunicipiosDemo() {
   );
 }
 
-const leadsBySpDdd: Record<string, number> = { "11": 2140, "12": 318, "13": 264, "14": 151, "15": 287, "16": 342, "17": 198, "18": 96, "19": 655 };
-
-function DddDemo() {
-  const hl = useLinkedHighlight<string>();
-  const [map, setMap] = useState<BrDddMap | null>(null);
-  useEffect(() => {
-    let live = true;
-    void loadBrDdd("SP").then((m) => live && setMap(m));
-    return () => {
-      live = false;
-    };
-  }, []);
-  if (!map) return <Skeleton className="h-80 w-full" />;
-  return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-      <ChoroplethMap
-        label="Leads por DDD de São Paulo"
-        regions={map.ddds}
-        viewBox={map.viewBox}
-        values={leadsBySpDdd}
-        scale={{ tone: "info", breaks: "quantile" }}
-        valueLabel="Leads"
-        regionLabel="DDD"
-        zoomOutLabel="Voltar ao estado"
-        highlight={hl}
-      />
-      <RankedRegionList label="Leads por DDD, do maior ao menor" values={leadsBySpDdd} regions={map.ddds} scale={{ tone: "info", breaks: "quantile" }} highlight={hl} />
-    </div>
-  );
-}
-
 export default function Page() {
   const hl = useLinkedHighlight<string>();
   const [uf, setUf] = useState<string | null>("MG");
@@ -253,7 +220,7 @@ const sul = brUfs.filter((u) => brRegions.Sul.includes(u.id));
             ["zoomTo / onZoomOut", "string | null / () => void", "—", "Aproxima a UF (transição curta; movimento reduzido vai direto) e mostra “Voltar ao Brasil”."],
             ["legend / showLabels / height", "boolean / boolean / number", "true / true / proporção", "Legenda em degraus (hover destaca a faixa); siglas nas UFs que cabem."],
             ["markers / markerBelow", "\"all\" | \"with-value\" | \"none\" / number", "all / 14", "Círculo de toque nas regiões menores que markerBelow px. with-value: só nas que têm dado (mundo, com 8); none: municípios."],
-            ["loadWorldCountries / loadBrMunicipios / loadBrDdd", "() => Promise<WorldMap> / (uf) => Promise<BrMunicipiosMap> / (uf) => Promise<BrDddMap>", "—", "Formas do mundo (com continentViewBoxes), dos municípios de uma UF e das regiões de DDD de uma UF, carregadas sob demanda."],
+            ["loadWorldCountries / loadBrMunicipios", "() => Promise<WorldMap> / (uf) => Promise<BrMunicipiosMap>", "—", "Formas do mundo (com continentViewBoxes) e dos municípios de uma UF, carregadas sob demanda."],
             ["RankedRegionList", "label, values, scale?, format?, highlight?, limit?, hint?", "—", "Mesma escala do mapa (quadradinho de cor), barra proporcional e posição."],
             ["choroplethScale", "(values, options) => ChoroplethScale", "—", "A escala usada pelos dois: thresholds, color(v), bin(v)."],
           ]}
@@ -293,24 +260,6 @@ useEffect(() => { void loadBrMunicipios("SP").then(setMapa); }, []); // SP ~40 K
         >
           <ChartCard title="Onde estão os leads em São Paulo?" description={`Leads por município · ${formatNumber(Object.keys(leadsBySpCity).length)} cidades com lead`}>
             <MunicipiosDemo />
-          </ChartCard>
-        </Demo>
-      </DocSection>
-
-      <DocSection
-        title="Regiões de DDD de uma UF"
-        rule="loadBrDdd(uf) junta os municípios de cada DDD numa região só, sem as divisas internas, no mesmo viewBox dos municípios. Id = o DDD (&quot;11&quot;). Poucas regiões grandes: siglas e círculos de toque como no mapa das UFs."
-      >
-        <Demo
-          bare
-          code={`const [mapa, setMapa] = useState<BrDddMap | null>(null);
-useEffect(() => { void loadBrDdd("SP").then(setMapa); }, []); // SP ~4 KB com gzip
-
-<ChoroplethMap label="Leads por DDD de São Paulo" regions={mapa.ddds} viewBox={mapa.viewBox}
-  values={{ "11": 2140, "19": 655, "16": 342 }} regionLabel="DDD" highlight={hl} />`}
-        >
-          <ChartCard title="Onde estão os leads em São Paulo?" description="Leads por DDD · outubro de 2026">
-            <DddDemo />
           </ChartCard>
         </Demo>
       </DocSection>
